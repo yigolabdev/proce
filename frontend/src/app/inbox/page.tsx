@@ -1,10 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent } from '../../components/ui/Card'
+import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
-import { Inbox, Mail, MailOpen, Trash2, Archive, Star, Clock, CheckCircle2, X, Sparkles, FileText, ArrowRight } from 'lucide-react'
+import {
+	Inbox,
+	Mail,
+	MailOpen,
+	Trash2,
+	Archive,
+	Star,
+	Clock,
+	CheckCircle2,
+	X,
+	Sparkles,
+	FileText,
+	ArrowRight,
+	TrendingUp,
+	Target,
+	XCircle,
+	RefreshCw,
+	Brain,
+	Zap,
+	Calendar,
+	Users,
+	AlertCircle,
+} from 'lucide-react'
 import { toast } from 'sonner'
+import Toaster from '../../components/ui/Toaster'
 
+// Inbox Message Interface
 interface Message {
 	id: string
 	from: string
@@ -21,123 +45,244 @@ interface Message {
 	type: 'task' | 'notification' | 'approval' | 'message'
 }
 
+// AI Task Recommendation Interface
+interface TaskRecommendation {
+	id: string
+	title: string
+	description: string
+	priority: 'high' | 'medium' | 'low'
+	category: string
+	estimatedTime: string
+	deadline?: string
+	reason: string
+	relatedSkills: string[]
+	confidence: number
+	status: 'pending' | 'accepted' | 'rejected'
+}
+
+interface RecommendationInsight {
+	type: 'productivity' | 'skill' | 'deadline' | 'workload'
+	title: string
+	description: string
+	icon: React.ReactNode
+}
+
 export default function InboxPage() {
 	const navigate = useNavigate()
-	const [messages, setMessages] = useState<Message[]>([
-		{
-			id: '1',
-			from: '김팀장',
-			subject: '프로젝트 진행 상황 보고 요청',
-			preview: '이번 주 프로젝트 진행 상황을 금요일까지 보고해주세요.',
-			content: '안녕하세요, 홍길동님.\n\n이번 주 금요일까지 현재 진행 중인 프로젝트의 진행 상황을 보고해주시기 바랍니다.\n\n포함되어야 할 내용:\n- 완료된 작업 목록\n- 진행 중인 작업 현황\n- 발생한 이슈 및 해결 방안\n- 다음 주 계획\n\n감사합니다.',
-			aiSummary: '김팀장님이 금요일까지 프로젝트 진행 상황 보고를 요청했습니다. 완료/진행 작업, 이슈, 다음 주 계획을 포함해야 합니다.',
-			aiInsights: [
-				'긴급도: 높음 - 금요일까지 제출 필요',
-				'예상 소요 시간: 2-3시간',
-				'유사한 이전 보고서 3건 발견',
-			],
-			suggestedActions: [
-				'작업 목록 정리하기',
-				'이슈 사항 문서화',
-				'다음 주 일정 계획',
-			],
-			relatedLinks: [
-				{ title: '이전 주간 보고서', url: '#' },
-				{ title: '프로젝트 타임라인', url: '#' },
-			],
-			timestamp: new Date(Date.now() - 1000 * 60 * 30),
-			isRead: false,
-			isStarred: true,
-			type: 'task',
-		},
-		{
-			id: '2',
-			from: '시스템',
-			subject: '새로운 작업이 할당되었습니다',
-			preview: '신규 고객 데이터 입력 작업이 할당되었습니다.',
-			content: '새로운 작업이 할당되었습니다.\n\n작업명: 신규 고객 데이터 입력\n담당자: 홍길동\n마감일: 2025-11-05\n우선순위: 중간\n\n작업 설명:\n10월에 신규 가입한 고객 50명의 데이터를 시스템에 입력해주세요.',
-			aiSummary: '신규 고객 50명의 데이터 입력 작업이 할당되었습니다. 마감일은 11월 5일이며, 우선순위는 중간입니다.',
-			aiInsights: [
-				'예상 소요 시간: 4-5시간',
-				'유사 작업 평균 완료 시간: 4.2시간',
-				'데이터 입력 템플릿 사용 권장',
-			],
-			suggestedActions: [
-				'고객 데이터 파일 다운로드',
-				'데이터 검증 체크리스트 확인',
-				'입력 진행 상황 기록',
-			],
-			relatedLinks: [
-				{ title: '데이터 입력 가이드', url: '#' },
-				{ title: '고객 정보 템플릿', url: '#' },
-			],
-			timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-			isRead: false,
-			isStarred: false,
-			type: 'notification',
-		},
-		{
-			id: '3',
-			from: '이대리',
-			subject: '휴가 신청 승인 요청',
-			preview: '다음 주 월요일부터 3일간 휴가 신청합니다.',
-			content: '안녕하세요.\n\n다음 주 월요일(11월 4일)부터 수요일(11월 6일)까지 3일간 연차 휴가를 신청합니다.\n\n사유: 개인 사정\n\n업무 인수인계는 금요일까지 완료하겠습니다.\n승인 부탁드립니다.',
-			aiSummary: '이대리님이 11월 4일부터 6일까지 3일간 연차 휴가를 신청했습니다. 업무 인수인계는 금요일까지 완료 예정입니다.',
-			aiInsights: [
-				'이대리님의 올해 잔여 연차: 5일',
-				'해당 기간 팀 업무량: 보통',
-				'대체 인력 배치 필요 없음',
-			],
-			suggestedActions: [
-				'휴가 승인 처리',
-				'팀 캘린더 업데이트',
-				'인수인계 확인',
-			],
-			relatedLinks: [
-				{ title: '휴가 관리 시스템', url: '#' },
-				{ title: '팀 일정표', url: '#' },
-			],
-			timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
-			isRead: true,
-			isStarred: false,
-			type: 'approval',
-		},
-		{
-			id: '4',
-			from: '박과장',
-			subject: '회의록 공유',
-			preview: '오늘 진행된 주간 회의록을 공유드립니다.',
-			content: '주간 팀 회의록\n\n일시: 2025-10-28 14:00\n참석자: 김팀장, 박과장, 이대리, 홍길동\n\n논의 사항:\n1. Q4 프로젝트 진행 상황\n2. 신규 고객 온보딩 프로세스 개선\n3. 다음 주 일정 공유\n\n액션 아이템:\n- 홍길동: 프로젝트 보고서 작성 (금요일)\n- 이대리: 온보딩 프로세스 문서 업데이트 (다음 주 화요일)',
-			aiSummary: '주간 팀 회의록이 공유되었습니다. Q4 프로젝트, 온보딩 프로세스, 일정이 논의되었으며, 2개의 액션 아이템이 할당되었습니다.',
-			aiInsights: [
-				'내게 할당된 액션 아이템: 1건',
-				'마감일: 금요일',
-				'관련 작업: 프로젝트 진행 상황 보고',
-			],
-			suggestedActions: [
-				'액션 아이템 작업 시작',
-				'회의록 저장',
-				'관련 문서 검토',
-			],
-			relatedLinks: [
-				{ title: '이전 회의록', url: '#' },
-				{ title: 'Q4 프로젝트 현황', url: '#' },
-			],
-			timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-			isRead: true,
-			isStarred: false,
-			type: 'message',
-		},
-	])
+	const [activeTab, setActiveTab] = useState<'messages' | 'recommendations'>('messages')
 
+	// Messages state
+	const [messages, setMessages] = useState<Message[]>([])
 	const [filter, setFilter] = useState<'all' | 'unread' | 'starred'>('all')
 	const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
 
+	// AI Recommendations state
+	const [recommendations, setRecommendations] = useState<TaskRecommendation[]>([])
+	const [insights, setInsights] = useState<RecommendationInsight[]>([])
+	const [isLoading, setIsLoading] = useState(false)
+	const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+
+	useEffect(() => {
+		loadMessages()
+		loadRecommendations()
+	}, [])
+
+	// Load Messages
+	const loadMessages = () => {
+		const mockMessages: Message[] = [
+			{
+				id: '1',
+				from: 'Team Lead',
+				subject: 'Q4 Project Status Report Request',
+				preview: 'Please submit your project status report by Friday.',
+				content: 'Hello,\n\nPlease submit your Q4 project status report by this Friday.\n\nRequired sections:\n- Completed tasks\n- Current progress\n- Issues and solutions\n- Next week plans\n\nThank you.',
+				aiSummary: 'Team Lead requests Q4 project status report by Friday. Include completed/ongoing tasks, issues, and next week plans.',
+				aiInsights: [
+					'Urgency: High - Due Friday',
+					'Estimated time: 2-3 hours',
+					'3 similar previous reports found',
+				],
+				suggestedActions: [
+					'Organize task list',
+					'Document issues',
+					'Plan next week schedule',
+				],
+				relatedLinks: [
+					{ title: 'Previous Weekly Report', url: '#' },
+					{ title: 'Project Timeline', url: '#' },
+				],
+				timestamp: new Date(Date.now() - 1000 * 60 * 30),
+				isRead: false,
+				isStarred: true,
+				type: 'task',
+			},
+			{
+				id: '2',
+				from: 'System',
+				subject: 'New Task Assigned',
+				preview: 'Customer data entry task has been assigned.',
+				content: 'New task assigned.\n\nTask: Customer Data Entry\nAssignee: You\nDeadline: 2025-11-05\nPriority: Medium\n\nDescription:\nEnter data for 50 new customers who joined in October.',
+				aiSummary: 'Customer data entry task for 50 new customers assigned. Deadline: November 5, Priority: Medium.',
+				aiInsights: [
+					'Estimated time: 4-5 hours',
+					'Similar task average completion: 4.2 hours',
+					'Data entry template recommended',
+				],
+				suggestedActions: [
+					'Download customer data file',
+					'Check data validation checklist',
+					'Track progress',
+				],
+				relatedLinks: [
+					{ title: 'Data Entry Guide', url: '#' },
+					{ title: 'Customer Info Template', url: '#' },
+				],
+				timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+				isRead: false,
+				isStarred: false,
+				type: 'notification',
+			},
+			{
+				id: '3',
+				from: 'Employee',
+				subject: 'Leave Request Approval',
+				preview: 'Requesting 3 days leave starting next Monday.',
+				content: 'Hello,\n\nI am requesting annual leave for 3 days from Monday (Nov 4) to Wednesday (Nov 6).\n\nReason: Personal matters\n\nWork handover will be completed by Friday.\nThank you.',
+				aiSummary: 'Employee requesting 3 days annual leave from Nov 4-6. Work handover by Friday.',
+				aiInsights: [
+					'Employee remaining annual leave: 5 days',
+					'Team workload during period: Normal',
+					'No replacement needed',
+				],
+				suggestedActions: [
+					'Approve leave',
+					'Update team calendar',
+					'Confirm handover',
+				],
+				relatedLinks: [
+					{ title: 'Leave Management System', url: '#' },
+					{ title: 'Team Schedule', url: '#' },
+				],
+				timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
+				isRead: true,
+				isStarred: false,
+				type: 'approval',
+			},
+		]
+		setMessages(mockMessages)
+	}
+
+	// Load AI Recommendations
+	const loadRecommendations = () => {
+		setIsLoading(true)
+
+		setTimeout(() => {
+			const mockRecommendations: TaskRecommendation[] = [
+				{
+					id: '1',
+					title: 'Review Q4 Financial Reports',
+					description: 'Analyze financial performance and prepare summary for stakeholders',
+					priority: 'high',
+					category: 'Finance',
+					estimatedTime: '2 hours',
+					deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+					reason: 'Based on your expertise in financial analysis and upcoming board meeting',
+					relatedSkills: ['Financial Analysis', 'Data Interpretation', 'Reporting'],
+					confidence: 92,
+					status: 'pending',
+				},
+				{
+					id: '2',
+					title: 'Update Customer Database',
+					description: 'Clean and update customer contact information in CRM system',
+					priority: 'medium',
+					category: 'Data Management',
+					estimatedTime: '1.5 hours',
+					reason: 'Your recent work on data quality improvement makes you ideal for this task',
+					relatedSkills: ['Data Entry', 'CRM Systems', 'Attention to Detail'],
+					confidence: 85,
+					status: 'pending',
+				},
+				{
+					id: '3',
+					title: 'Prepare Team Meeting Agenda',
+					description: 'Create agenda for next week\'s team sync meeting',
+					priority: 'medium',
+					category: 'Meeting',
+					estimatedTime: '30 minutes',
+					deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+					reason: 'You have consistently organized effective team meetings',
+					relatedSkills: ['Communication', 'Organization', 'Leadership'],
+					confidence: 88,
+					status: 'pending',
+				},
+				{
+					id: '4',
+					title: 'Code Review: Authentication Module',
+					description: 'Review pull request for new authentication implementation',
+					priority: 'high',
+					category: 'Development',
+					estimatedTime: '1 hour',
+					deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+					reason: 'Your security expertise is needed for this critical review',
+					relatedSkills: ['Security', 'Code Review', 'Authentication'],
+					confidence: 95,
+					status: 'pending',
+				},
+				{
+					id: '5',
+					title: 'Document API Endpoints',
+					description: 'Create comprehensive documentation for new API endpoints',
+					priority: 'low',
+					category: 'Documentation',
+					estimatedTime: '3 hours',
+					reason: 'You have experience writing clear technical documentation',
+					relatedSkills: ['Technical Writing', 'API Design', 'Documentation'],
+					confidence: 78,
+					status: 'pending',
+				},
+			]
+
+			const mockInsights: RecommendationInsight[] = [
+				{
+					type: 'productivity',
+					title: 'Peak Productivity Time',
+					description: 'Your productivity is highest between 9 AM - 11 AM. Schedule important tasks during this time.',
+					icon: <TrendingUp className="h-5 w-5 text-green-600" />,
+				},
+				{
+					type: 'skill',
+					title: 'Skill Match',
+					description: 'These recommendations match your top skills: Financial Analysis, Data Management, Code Review.',
+					icon: <Target className="h-5 w-5 text-blue-600" />,
+				},
+				{
+					type: 'deadline',
+					title: 'Upcoming Deadlines',
+					description: '2 high-priority tasks have deadlines within 48 hours.',
+					icon: <Clock className="h-5 w-5 text-orange-600" />,
+				},
+				{
+					type: 'workload',
+					title: 'Balanced Workload',
+					description: 'Your current workload is well-balanced. You can take on 1-2 more tasks this week.',
+					icon: <Zap className="h-5 w-5 text-purple-600" />,
+				},
+			]
+
+			setRecommendations(mockRecommendations)
+			setInsights(mockInsights)
+			setLastUpdated(new Date())
+			setIsLoading(false)
+		}, 1000)
+	}
+
+	// Message handlers
 	const handleMarkAsRead = (id: string) => {
 		setMessages((prev) =>
 			prev.map((msg) => (msg.id === id ? { ...msg, isRead: true } : msg))
 		)
-		toast.success('읽음으로 표시되었습니다')
+		toast.success('Marked as read')
 	}
 
 	const handleToggleStar = (id: string) => {
@@ -146,14 +291,14 @@ export default function InboxPage() {
 		)
 	}
 
-	const handleDelete = (id: string) => {
+	const handleDeleteMessage = (id: string) => {
 		setMessages((prev) => prev.filter((msg) => msg.id !== id))
-		toast.success('메시지가 삭제되었습니다')
+		toast.success('Message deleted')
 	}
 
 	const handleArchive = (id: string) => {
 		setMessages((prev) => prev.filter((msg) => msg.id !== id))
-		toast.success('메시지가 보관되었습니다')
+		toast.success('Message archived')
 	}
 
 	const handleOpenMessage = (message: Message) => {
@@ -169,17 +314,37 @@ export default function InboxPage() {
 
 	const handleGoToWorkInput = () => {
 		if (selectedMessage) {
-			// Store message data for pre-filling work input form
 			sessionStorage.setItem('workInputData', JSON.stringify({
 				title: selectedMessage.subject,
 				description: selectedMessage.content,
 				category: selectedMessage.type === 'task' ? 'development' : 'other',
 			}))
 			navigate('/input')
-			toast.success('작업 입력 페이지로 이동합니다')
+			toast.success('Navigating to Work Input')
 		}
 	}
 
+	// Recommendation handlers
+	const handleAcceptTask = (id: string) => {
+		setRecommendations((prev) =>
+			prev.map((rec) => (rec.id === id ? { ...rec, status: 'accepted' } : rec))
+		)
+		toast.success('Task accepted! Added to your task list.')
+	}
+
+	const handleRejectTask = (id: string) => {
+		setRecommendations((prev) =>
+			prev.map((rec) => (rec.id === id ? { ...rec, status: 'rejected' } : rec))
+		)
+		toast.info('Task declined. We\'ll adjust future recommendations.')
+	}
+
+	const handleRefreshRecommendations = () => {
+		loadRecommendations()
+		toast.success('Recommendations refreshed')
+	}
+
+	// Utility functions
 	const getTypeIcon = (type: Message['type']) => {
 		switch (type) {
 			case 'task':
@@ -196,13 +361,24 @@ export default function InboxPage() {
 	const getTypeLabel = (type: Message['type']) => {
 		switch (type) {
 			case 'task':
-				return '작업'
+				return 'Task'
 			case 'notification':
-				return '알림'
+				return 'Notification'
 			case 'approval':
-				return '승인'
+				return 'Approval'
 			case 'message':
-				return '메시지'
+				return 'Message'
+		}
+	}
+
+	const getPriorityColor = (priority: TaskRecommendation['priority']) => {
+		switch (priority) {
+			case 'high':
+				return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+			case 'medium':
+				return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+			case 'low':
+				return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
 		}
 	}
 
@@ -213,10 +389,10 @@ export default function InboxPage() {
 		const hours = Math.floor(minutes / 60)
 		const days = Math.floor(hours / 24)
 
-		if (minutes < 60) return `${minutes}분 전`
-		if (hours < 24) return `${hours}시간 전`
-		if (days < 7) return `${days}일 전`
-		return date.toLocaleDateString('ko-KR')
+		if (minutes < 60) return `${minutes}m ago`
+		if (hours < 24) return `${hours}h ago`
+		if (days < 7) return `${days}d ago`
+		return date.toLocaleDateString()
 	}
 
 	const filteredMessages = messages.filter((msg) => {
@@ -226,6 +402,8 @@ export default function InboxPage() {
 	})
 
 	const unreadCount = messages.filter((msg) => !msg.isRead).length
+	const pendingRecommendations = recommendations.filter((r) => r.status === 'pending')
+	const acceptedCount = recommendations.filter((r) => r.status === 'accepted').length
 
 	return (
 		<div className="space-y-6">
@@ -234,163 +412,398 @@ export default function InboxPage() {
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
 						<Inbox className="h-8 w-8 text-primary" />
-						인박스
+						Inbox
 					</h1>
 					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						작업 알림, 메시지, 승인 요청을 확인하세요
+						Manage your messages, tasks, and AI-powered recommendations
 					</p>
 				</div>
-				<div className="flex items-center gap-2">
-					<span className="text-sm text-neutral-600 dark:text-neutral-400">
-						읽지 않음: <span className="font-bold text-primary">{unreadCount}</span>
-					</span>
+				<div className="flex items-center gap-4">
+					{activeTab === 'messages' && (
+						<span className="text-sm text-neutral-600 dark:text-neutral-400">
+							Unread: <span className="font-bold text-primary">{unreadCount}</span>
+						</span>
+					)}
+					{activeTab === 'recommendations' && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleRefreshRecommendations}
+							disabled={isLoading}
+							className="flex items-center gap-2"
+						>
+							<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+							Refresh
+						</Button>
+					)}
 				</div>
 			</div>
 
-			{/* Filter Tabs */}
+			{/* Tabs */}
 			<div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800">
 				<button
-					onClick={() => setFilter('all')}
+					onClick={() => setActiveTab('messages')}
 					className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-						filter === 'all'
+						activeTab === 'messages'
 							? 'border-primary text-primary'
 							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
 					}`}
 				>
-					전체 ({messages.length})
+					<div className="flex items-center gap-2">
+						<Mail className="h-4 w-4" />
+						Messages ({messages.length})
+					</div>
 				</button>
 				<button
-					onClick={() => setFilter('unread')}
+					onClick={() => setActiveTab('recommendations')}
 					className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-						filter === 'unread'
+						activeTab === 'recommendations'
 							? 'border-primary text-primary'
 							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
 					}`}
 				>
-					읽지 않음 ({unreadCount})
-				</button>
-				<button
-					onClick={() => setFilter('starred')}
-					className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-						filter === 'starred'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					중요 ({messages.filter((m) => m.isStarred).length})
+					<div className="flex items-center gap-2">
+						<Sparkles className="h-4 w-4" />
+						AI Recommendations ({pendingRecommendations.length})
+					</div>
 				</button>
 			</div>
 
-			{/* Messages List */}
-			<div className="space-y-2">
-				{filteredMessages.length === 0 ? (
-					<Card>
-						<CardContent className="p-12 text-center">
-							<Inbox className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
-							<p className="text-neutral-600 dark:text-neutral-400">
-								{filter === 'unread' && '읽지 않은 메시지가 없습니다'}
-								{filter === 'starred' && '중요 표시된 메시지가 없습니다'}
-								{filter === 'all' && '메시지가 없습니다'}
-							</p>
-						</CardContent>
-					</Card>
-				) : (
-					filteredMessages.map((message) => (
-						<Card
-							key={message.id}
-							className={`transition-all hover:shadow-md cursor-pointer ${
-								!message.isRead ? 'border-l-4 border-l-primary bg-blue-50/30 dark:bg-blue-900/10' : ''
+			{/* Messages Tab */}
+			{activeTab === 'messages' && (
+				<>
+					{/* Filter Tabs */}
+					<div className="flex items-center gap-2">
+						<button
+							onClick={() => setFilter('all')}
+							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+								filter === 'all'
+									? 'bg-primary text-white'
+									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
 							}`}
-							onClick={() => handleOpenMessage(message)}
 						>
-							<CardContent className="p-4">
-								<div className="flex items-start gap-4">
-									{/* Type Icon */}
-									<div className="flex-shrink-0 mt-1">{getTypeIcon(message.type)}</div>
+							All ({messages.length})
+						</button>
+						<button
+							onClick={() => setFilter('unread')}
+							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+								filter === 'unread'
+									? 'bg-primary text-white'
+									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+							}`}
+						>
+							Unread ({unreadCount})
+						</button>
+						<button
+							onClick={() => setFilter('starred')}
+							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+								filter === 'starred'
+									? 'bg-primary text-white'
+									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+							}`}
+						>
+							Starred ({messages.filter((m) => m.isStarred).length})
+						</button>
+					</div>
 
-									{/* Content */}
-									<div className="flex-1 min-w-0">
-										<div className="flex items-start justify-between gap-4 mb-2">
+					{/* Messages List */}
+					<div className="space-y-2">
+						{filteredMessages.length === 0 ? (
+							<Card>
+								<CardContent className="p-12 text-center">
+									<Inbox className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
+									<p className="text-neutral-600 dark:text-neutral-400">
+										{filter === 'unread' && 'No unread messages'}
+										{filter === 'starred' && 'No starred messages'}
+										{filter === 'all' && 'No messages'}
+									</p>
+								</CardContent>
+							</Card>
+						) : (
+							filteredMessages.map((message) => (
+								<Card
+									key={message.id}
+									className={`transition-all hover:shadow-md cursor-pointer ${
+										!message.isRead ? 'border-l-4 border-l-primary bg-blue-50/30 dark:bg-blue-900/10' : ''
+									}`}
+									onClick={() => handleOpenMessage(message)}
+								>
+									<CardContent className="p-4">
+										<div className="flex items-start gap-4">
+											<div className="flex-shrink-0 mt-1">{getTypeIcon(message.type)}</div>
 											<div className="flex-1 min-w-0">
-												<div className="flex items-center gap-2 mb-1">
-													<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">
-														{getTypeLabel(message.type)}
-													</span>
-													<span className={`text-sm ${!message.isRead ? 'font-bold' : 'font-medium'}`}>
-														{message.from}
+												<div className="flex items-start justify-between gap-4 mb-2">
+													<div className="flex-1 min-w-0">
+														<div className="flex items-center gap-2 mb-1">
+															<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">
+																{getTypeLabel(message.type)}
+															</span>
+															<span className={`text-sm ${!message.isRead ? 'font-bold' : 'font-medium'}`}>
+																{message.from}
+															</span>
+														</div>
+														<h3
+															className={`text-base mb-1 truncate ${
+																!message.isRead ? 'font-bold text-neutral-900 dark:text-neutral-100' : 'font-medium'
+															}`}
+														>
+															{message.subject}
+														</h3>
+														<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+															{message.preview}
+														</p>
+													</div>
+													<span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
+														{formatTimestamp(message.timestamp)}
 													</span>
 												</div>
-												<h3
-													className={`text-base mb-1 truncate ${
-														!message.isRead ? 'font-bold text-neutral-900 dark:text-neutral-100' : 'font-medium'
-													}`}
-												>
-													{message.subject}
-												</h3>
-												<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-													{message.preview}
-												</p>
+												<div className="flex items-center gap-2 mt-3">
+													{!message.isRead && (
+														<Button
+															size="sm"
+															variant="outline"
+															onClick={(e) => {
+																e.stopPropagation()
+																handleMarkAsRead(message.id)
+															}}
+															className="text-xs"
+														>
+															<MailOpen className="h-3 w-3 mr-1" />
+															Read
+														</Button>
+													)}
+													<button
+														onClick={(e) => {
+															e.stopPropagation()
+															handleToggleStar(message.id)
+														}}
+														className={`p-1.5 rounded-lg transition-colors ${
+															message.isStarred
+																? 'text-yellow-500 hover:text-yellow-600'
+																: 'text-neutral-400 hover:text-yellow-500'
+														}`}
+													>
+														<Star className={`h-4 w-4 ${message.isStarred ? 'fill-current' : ''}`} />
+													</button>
+													<button
+														onClick={(e) => {
+															e.stopPropagation()
+															handleArchive(message.id)
+														}}
+														className="p-1.5 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
+													>
+														<Archive className="h-4 w-4" />
+													</button>
+													<button
+														onClick={(e) => {
+															e.stopPropagation()
+															handleDeleteMessage(message.id)
+														}}
+														className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
+													>
+														<Trash2 className="h-4 w-4" />
+													</button>
+												</div>
 											</div>
-											<span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
-												{formatTimestamp(message.timestamp)}
-											</span>
 										</div>
+									</CardContent>
+								</Card>
+							))
+						)}
+					</div>
+				</>
+			)}
 
-										{/* Actions */}
-										<div className="flex items-center gap-2 mt-3">
-											{!message.isRead && (
-												<Button
-													size="sm"
-													variant="outline"
-													onClick={(e) => {
-														e.stopPropagation()
-														handleMarkAsRead(message.id)
-													}}
-													className="text-xs"
-												>
-													<MailOpen className="h-3 w-3 mr-1" />
-													읽음
-												</Button>
-											)}
-											<button
-												onClick={(e) => {
-													e.stopPropagation()
-													handleToggleStar(message.id)
-												}}
-												className={`p-1.5 rounded-lg transition-colors ${
-													message.isStarred
-														? 'text-yellow-500 hover:text-yellow-600'
-														: 'text-neutral-400 hover:text-yellow-500'
-												}`}
-											>
-												<Star className={`h-4 w-4 ${message.isStarred ? 'fill-current' : ''}`} />
-											</button>
-											<button
-												onClick={(e) => {
-													e.stopPropagation()
-													handleArchive(message.id)
-												}}
-												className="p-1.5 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
-											>
-												<Archive className="h-4 w-4" />
-											</button>
-											<button
-												onClick={(e) => {
-													e.stopPropagation()
-													handleDelete(message.id)
-												}}
-												className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
-											>
-												<Trash2 className="h-4 w-4" />
-											</button>
-										</div>
-									</div>
+			{/* AI Recommendations Tab */}
+			{activeTab === 'recommendations' && (
+				<>
+					{/* Stats */}
+					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+						<Card>
+							<CardContent className="p-4">
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Pending</div>
+								<div className="text-2xl font-bold">{pendingRecommendations.length}</div>
+							</CardContent>
+						</Card>
+						<Card>
+							<CardContent className="p-4">
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Accepted</div>
+								<div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
+							</CardContent>
+						</Card>
+						<Card>
+							<CardContent className="p-4">
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Avg Confidence</div>
+								<div className="text-2xl font-bold text-blue-600">
+									{Math.round(recommendations.reduce((acc, r) => acc + r.confidence, 0) / recommendations.length || 0)}%
 								</div>
 							</CardContent>
 						</Card>
-					))
-				)}
-			</div>
+						<Card>
+							<CardContent className="p-4">
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Last Updated</div>
+								<div className="text-sm font-medium">
+									{lastUpdated ? formatTimestamp(lastUpdated) : 'Never'}
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+
+					{/* AI Insights */}
+					{insights.length > 0 && (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							{insights.map((insight, index) => (
+								<Card key={index} className="border-l-4 border-l-primary">
+									<CardContent className="p-4">
+										<div className="flex items-start gap-3">
+											<div className="flex-shrink-0 mt-0.5">{insight.icon}</div>
+											<div className="flex-1 min-w-0">
+												<h3 className="font-bold text-sm mb-1">{insight.title}</h3>
+												<p className="text-xs text-neutral-600 dark:text-neutral-400">
+													{insight.description}
+												</p>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							))}
+						</div>
+					)}
+
+					{/* Recommendations List */}
+					<div className="space-y-4">
+						{isLoading ? (
+							<Card>
+								<CardContent className="p-12 text-center">
+									<RefreshCw className="h-12 w-12 mx-auto mb-4 text-primary animate-spin" />
+									<p className="text-neutral-600 dark:text-neutral-400">
+										Loading recommendations...
+									</p>
+								</CardContent>
+							</Card>
+						) : pendingRecommendations.length === 0 ? (
+							<Card>
+								<CardContent className="p-12 text-center">
+									<Sparkles className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
+									<h3 className="text-lg font-bold mb-2">All Caught Up!</h3>
+									<p className="text-neutral-600 dark:text-neutral-400 mb-4">
+										No new recommendations at the moment. Check back later!
+									</p>
+									<Button onClick={handleRefreshRecommendations}>
+										<RefreshCw className="h-4 w-4 mr-2" />
+										Refresh Recommendations
+									</Button>
+								</CardContent>
+							</Card>
+						) : (
+							pendingRecommendations.map((task) => (
+								<Card key={task.id} className="hover:shadow-lg transition-shadow">
+									<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+										<div className="flex items-start justify-between gap-4">
+											<div className="flex-1 min-w-0">
+												<div className="flex items-center gap-2 mb-2">
+													<span
+														className={`text-xs font-medium px-2 py-1 rounded-full ${getPriorityColor(
+															task.priority
+														)}`}
+													>
+														{task.priority.toUpperCase()}
+													</span>
+													<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+														{task.category}
+													</span>
+													<div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
+														<Brain className="h-3 w-3" />
+														{task.confidence}% match
+													</div>
+												</div>
+												<h3 className="text-lg font-bold mb-1">{task.title}</h3>
+												<p className="text-sm text-neutral-600 dark:text-neutral-400">
+													{task.description}
+												</p>
+											</div>
+										</div>
+									</CardHeader>
+									<CardContent className="p-4">
+										<div className="space-y-4">
+											{/* Task Details */}
+											<div className="grid grid-cols-2 gap-4">
+												<div className="flex items-center gap-2 text-sm">
+													<Clock className="h-4 w-4 text-neutral-500" />
+													<span className="text-neutral-600 dark:text-neutral-400">
+														Est. {task.estimatedTime}
+													</span>
+												</div>
+												{task.deadline && (
+													<div className="flex items-center gap-2 text-sm">
+														<Calendar className="h-4 w-4 text-neutral-500" />
+														<span className="text-neutral-600 dark:text-neutral-400">
+															Due: {new Date(task.deadline).toLocaleDateString()}
+														</span>
+													</div>
+												)}
+											</div>
+
+											{/* AI Reason */}
+											<div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+												<div className="flex items-start gap-2">
+													<Brain className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+													<div className="flex-1 min-w-0">
+														<p className="text-xs font-medium text-purple-900 dark:text-purple-100 mb-1">
+															Why this task?
+														</p>
+														<p className="text-xs text-purple-700 dark:text-purple-300">
+															{task.reason}
+														</p>
+													</div>
+												</div>
+											</div>
+
+											{/* Related Skills */}
+											{task.relatedSkills.length > 0 && (
+												<div>
+													<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+														Related Skills:
+													</p>
+													<div className="flex flex-wrap gap-2">
+														{task.relatedSkills.map((skill, index) => (
+															<span
+																key={index}
+																className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full"
+															>
+																{skill}
+															</span>
+														))}
+													</div>
+												</div>
+											)}
+
+											{/* Actions */}
+											<div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+												<Button
+													onClick={() => handleAcceptTask(task.id)}
+													className="flex-1 flex items-center justify-center gap-2"
+												>
+													<CheckCircle2 className="h-4 w-4" />
+													Accept Task
+												</Button>
+												<Button
+													variant="outline"
+													onClick={() => handleRejectTask(task.id)}
+													className="flex-1 flex items-center justify-center gap-2"
+												>
+													<XCircle className="h-4 w-4" />
+													Not Now
+												</Button>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							))
+						)}
+					</div>
+				</>
+			)}
 
 			{/* Message Detail Modal */}
 			{selectedMessage && (
@@ -431,7 +844,7 @@ export default function InboxPage() {
 									<Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
 									<div className="flex-1">
 										<h3 className="font-bold text-blue-900 dark:text-blue-100 mb-2">
-											AI 요약
+											AI Summary
 										</h3>
 										<p className="text-sm text-blue-700 dark:text-blue-300">
 											{selectedMessage.aiSummary}
@@ -444,7 +857,7 @@ export default function InboxPage() {
 							<div>
 								<h3 className="font-bold mb-3 flex items-center gap-2">
 									<Mail className="h-5 w-5 text-primary" />
-									원본 내용
+									Original Content
 								</h3>
 								<div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 whitespace-pre-wrap text-sm">
 									{selectedMessage.content}
@@ -456,7 +869,7 @@ export default function InboxPage() {
 								<div>
 									<h3 className="font-bold mb-3 flex items-center gap-2">
 										<Sparkles className="h-5 w-5 text-primary" />
-										AI 인사이트
+										AI Insights
 									</h3>
 									<div className="space-y-2">
 										{selectedMessage.aiInsights.map((insight, index) => (
@@ -479,7 +892,7 @@ export default function InboxPage() {
 								<div>
 									<h3 className="font-bold mb-3 flex items-center gap-2">
 										<CheckCircle2 className="h-5 w-5 text-primary" />
-										제안 작업
+										Suggested Actions
 									</h3>
 									<div className="space-y-2">
 										{selectedMessage.suggestedActions.map((action, index) => (
@@ -502,7 +915,7 @@ export default function InboxPage() {
 								<div>
 									<h3 className="font-bold mb-3 flex items-center gap-2">
 										<FileText className="h-5 w-5 text-primary" />
-										관련 문서
+										Related Documents
 									</h3>
 									<div className="space-y-2">
 										{selectedMessage.relatedLinks.map((link, index) => (
@@ -551,7 +964,7 @@ export default function InboxPage() {
 									<button
 										onClick={(e) => {
 											e.stopPropagation()
-											handleDelete(selectedMessage.id)
+											handleDeleteMessage(selectedMessage.id)
 											handleCloseMessage()
 										}}
 										className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -561,11 +974,11 @@ export default function InboxPage() {
 								</div>
 								<div className="flex items-center gap-2">
 									<Button variant="outline" onClick={handleCloseMessage}>
-										닫기
+										Close
 									</Button>
 									<Button onClick={handleGoToWorkInput} className="flex items-center gap-2">
 										<FileText className="h-4 w-4" />
-										작업 입력으로 이동
+										Go to Work Input
 									</Button>
 								</div>
 							</div>
@@ -573,7 +986,8 @@ export default function InboxPage() {
 					</div>
 				</div>
 			)}
+
+			<Toaster />
 		</div>
 	)
 }
-

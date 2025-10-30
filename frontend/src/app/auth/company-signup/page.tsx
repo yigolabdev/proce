@@ -13,6 +13,7 @@ interface CompanyData {
 	businessNumber: string
 	industry: string
 	employeeCount: string
+	employeeCountExact: string
 	// 관리자 정보
 	adminName: string
 	adminEmail: string
@@ -29,6 +30,7 @@ export default function CompanySignUpPage() {
 		businessNumber: '',
 		industry: '',
 		employeeCount: '',
+		employeeCountExact: '',
 		adminName: '',
 		adminEmail: '',
 		adminPassword: '',
@@ -38,6 +40,14 @@ export default function CompanySignUpPage() {
 
 	const handleChange = (field: keyof CompanyData, value: string) => {
 		setData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleEmployeeCountSelect = (value: string) => {
+		setData((prev) => ({ ...prev, employeeCount: value, employeeCountExact: '' }))
+	}
+
+	const handleEmployeeCountExact = (value: string) => {
+		setData((prev) => ({ ...prev, employeeCountExact: value, employeeCount: '' }))
 	}
 
 	const handleNext = () => {
@@ -194,34 +204,95 @@ export default function CompanySignUpPage() {
 										className="h-12"
 									/>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Industry</label>
-									<Input
-										type="text"
-										placeholder="e.g., IT/Software"
-										value={data.industry}
-										onChange={(e) => handleChange('industry', e.target.value)}
-										className="h-12"
-									/>
+							<div>
+								<label className="block text-sm font-medium mb-2">Industry</label>
+								<select
+									value={data.industry}
+									onChange={(e) => handleChange('industry', e.target.value)}
+									className="w-full h-12 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+								>
+									<option value="">Select industry</option>
+									<option value="IT/SaaS/Software">IT / SaaS / Software</option>
+									<option value="Manufacturing/Production">Manufacturing / Production</option>
+									<option value="Finance/Insurance/Securities">Finance / Insurance / Securities</option>
+									<option value="Distribution/Retail/Trading">Distribution / Retail / Trading</option>
+									<option value="Service/Consulting">Service / Consulting</option>
+									<option value="Construction/Engineering">Construction / Engineering</option>
+									<option value="Medical/Pharmaceutical/Bio">Medical / Pharmaceutical / Bio</option>
+									<option value="Education/Research">Education / Research</option>
+									<option value="Media/Content/Entertainment">Media / Content / Entertainment</option>
+									<option value="Food/Beverage/Restaurant">Food / Beverage / Restaurant</option>
+									<option value="Fashion/Beauty/Lifestyle">Fashion / Beauty / Lifestyle</option>
+									<option value="Logistics/Transportation">Logistics / Transportation</option>
+									<option value="Energy/Environment">Energy / Environment</option>
+									<option value="Real Estate/Property">Real Estate / Property</option>
+									<option value="Telecommunications">Telecommunications</option>
+									<option value="Automotive/Mobility">Automotive / Mobility</option>
+									<option value="Aerospace/Defense">Aerospace / Defense</option>
+									<option value="Agriculture/Fisheries">Agriculture / Fisheries</option>
+									<option value="Legal/Accounting/Tax">Legal / Accounting / Tax</option>
+									<option value="Marketing/Advertising/PR">Marketing / Advertising / PR</option>
+									<option value="Design/Creative">Design / Creative</option>
+									<option value="Gaming/Esports">Gaming / Esports</option>
+									<option value="Travel/Hospitality">Travel / Hospitality</option>
+									<option value="Sports/Fitness">Sports / Fitness</option>
+									<option value="Non-profit/NGO">Non-profit / NGO</option>
+									<option value="Government/Public">Government / Public</option>
+									<option value="Other">Other</option>
+								</select>
+							</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">Number of Employees</label>
+								<div className="flex items-center gap-3">
+									<div className="flex-1">
+										<select
+											value={data.employeeCount}
+											onChange={(e) => handleEmployeeCountSelect(e.target.value)}
+											className="w-full h-12 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">Select range</option>
+											<option value="1-10">1-10</option>
+											<option value="11-50">11-50</option>
+											<option value="51-200">51-200</option>
+											<option value="201-500">201-500</option>
+											<option value="500+">500+</option>
+										</select>
+									</div>
+									<div className="flex items-center gap-2">
+										<span className="text-neutral-400">or</span>
+										<Input
+											type="number"
+											placeholder="Enter exact"
+											value={data.employeeCountExact}
+											onChange={(e) => handleEmployeeCountExact(e.target.value)}
+											className="h-12 w-32"
+											min="1"
+										/>
+										{(data.employeeCount || data.employeeCountExact) && (
+											<div className="flex items-center justify-center min-w-[100px] h-12 px-4 bg-primary/10 text-primary rounded-2xl font-medium">
+												{data.employeeCountExact 
+													? `${data.employeeCountExact}명` 
+													: data.employeeCount}
+											</div>
+										)}
+									</div>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Number of Employees</label>
-									<select
-										value={data.employeeCount}
-										onChange={(e) => handleChange('employeeCount', e.target.value)}
-										className="w-full h-12 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-									>
-										<option value="">Select range</option>
-										<option value="1-10">1-10</option>
-										<option value="11-50">11-50</option>
-										<option value="51-200">51-200</option>
-										<option value="201-500">201-500</option>
-										<option value="500+">500+</option>
-									</select>
-								</div>
-								<Button onClick={handleNext} className="w-full h-12 text-base mt-8">
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+									Select a range or enter the exact number
+								</p>
+							</div>
+							<div className="space-y-3 mt-8">
+								<Button onClick={handleNext} className="w-full h-12 text-base">
 									Next <ArrowRight className="ml-2 h-5 w-5" />
 								</Button>
+								<Button 
+									onClick={() => setStep(2)} 
+									variant="outline" 
+									className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+								>
+									Skip for Testing
+								</Button>
+							</div>
 							</div>
 						)}
 
@@ -286,9 +357,18 @@ export default function CompanySignUpPage() {
 										className="h-12"
 									/>
 								</div>
-								<Button onClick={handleNext} className="w-full h-12 text-base mt-8">
-									Next <ArrowRight className="ml-2 h-5 w-5" />
-								</Button>
+								<div className="space-y-3 mt-8">
+									<Button onClick={handleNext} className="w-full h-12 text-base">
+										Next <ArrowRight className="ml-2 h-5 w-5" />
+									</Button>
+									<Button 
+										onClick={() => setStep(3)} 
+										variant="outline" 
+										className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+									>
+										Skip for Testing
+									</Button>
+								</div>
 							</div>
 						)}
 
@@ -323,12 +403,16 @@ export default function CompanySignUpPage() {
 													<span className="font-medium">{data.industry}</span>
 												</div>
 											)}
-											{data.employeeCount && (
-												<div className="flex justify-between">
-													<span className="text-sm text-neutral-600 dark:text-neutral-400">Employees:</span>
-													<span className="font-medium">{data.employeeCount}</span>
-												</div>
-											)}
+										{(data.employeeCount || data.employeeCountExact) && (
+											<div className="flex justify-between">
+												<span className="text-sm text-neutral-600 dark:text-neutral-400">Employees:</span>
+												<span className="font-medium">
+													{data.employeeCountExact 
+														? `${data.employeeCountExact} employees` 
+														: data.employeeCount}
+												</span>
+											</div>
+										)}
 										</div>
 									</div>
 
@@ -355,10 +439,19 @@ export default function CompanySignUpPage() {
 									</div>
 								</div>
 
-								<Button onClick={handleSubmit} className="w-full max-w-md h-12 text-base">
-									<Check className="mr-2 h-5 w-5" />
-									Complete Registration
-								</Button>
+								<div className="space-y-3 max-w-md mx-auto">
+									<Button onClick={handleSubmit} className="w-full h-12 text-base">
+										<Check className="mr-2 h-5 w-5" />
+										Complete Registration
+									</Button>
+									<Button 
+										onClick={handleSubmit} 
+										variant="outline" 
+										className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+									>
+										Complete (Skip Validation)
+									</Button>
+								</div>
 							</div>
 						)}
 					</CardContent>

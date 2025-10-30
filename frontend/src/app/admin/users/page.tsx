@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import Input from '../../../components/ui/Input'
-import { Users, UserPlus, Mail, Trash2, Edit, Search } from 'lucide-react'
+import { Users, UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
+import Toaster from '../../../components/ui/Toaster'
 import type { UserRole } from '../../../types/auth.types'
 
 interface TeamMember {
@@ -17,68 +18,333 @@ interface TeamMember {
 	joinedAt: Date
 }
 
+const ITEMS_PER_PAGE = 15
+
 export default function UsersManagementPage() {
 	const [members, setMembers] = useState<TeamMember[]>([
 		{
 			id: '1',
-			name: '홍길동',
-			email: 'hong@example.com',
+			name: 'John Doe',
+			email: 'john@example.com',
 			role: 'worker',
-			department: '개발팀',
-			position: '시니어 개발자',
+			department: 'Engineering',
+			position: 'Senior Developer',
 			status: 'active',
 			joinedAt: new Date('2024-01-15'),
 		},
 		{
 			id: '2',
-			name: '김영희',
-			email: 'kim@example.com',
+			name: 'Jane Smith',
+			email: 'jane@example.com',
 			role: 'executive',
-			department: '경영지원팀',
+			department: 'Management',
 			position: 'CFO',
 			status: 'active',
 			joinedAt: new Date('2023-06-01'),
 		},
 		{
 			id: '3',
-			name: '이철수',
-			email: 'lee@example.com',
+			name: 'Mike Johnson',
+			email: 'mike@example.com',
 			role: 'admin',
-			department: 'IT팀',
-			position: '시스템 관리자',
+			department: 'IT',
+			position: 'System Admin',
 			status: 'active',
 			joinedAt: new Date('2023-09-20'),
 		},
 		{
 			id: '4',
-			name: '박민수',
-			email: 'park@example.com',
+			name: 'Sarah Williams',
+			email: 'sarah@example.com',
 			role: 'worker',
-			department: '마케팅팀',
-			position: '마케터',
+			department: 'Marketing',
+			position: 'Marketing Manager',
 			status: 'pending',
 			joinedAt: new Date('2024-10-25'),
+		},
+		{
+			id: '5',
+			name: 'David Brown',
+			email: 'david@example.com',
+			role: 'worker',
+			department: 'Sales',
+			position: 'Sales Representative',
+			status: 'active',
+			joinedAt: new Date('2024-02-10'),
+		},
+		{
+			id: '6',
+			name: 'Emily Davis',
+			email: 'emily@example.com',
+			role: 'worker',
+			department: 'Design',
+			position: 'UI/UX Designer',
+			status: 'active',
+			joinedAt: new Date('2024-03-15'),
+		},
+		{
+			id: '7',
+			name: 'Robert Wilson',
+			email: 'robert@example.com',
+			role: 'admin',
+			department: 'HR',
+			position: 'HR Manager',
+			status: 'active',
+			joinedAt: new Date('2023-11-05'),
+		},
+		{
+			id: '8',
+			name: 'Lisa Anderson',
+			email: 'lisa@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'Backend Developer',
+			status: 'active',
+			joinedAt: new Date('2024-04-20'),
+		},
+		{
+			id: '9',
+			name: 'James Taylor',
+			email: 'james@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'Frontend Developer',
+			status: 'active',
+			joinedAt: new Date('2024-05-12'),
+		},
+		{
+			id: '10',
+			name: 'Patricia Martinez',
+			email: 'patricia@example.com',
+			role: 'worker',
+			department: 'Sales',
+			position: 'Account Manager',
+			status: 'active',
+			joinedAt: new Date('2024-06-08'),
+		},
+		{
+			id: '11',
+			name: 'Christopher Lee',
+			email: 'chris@example.com',
+			role: 'worker',
+			department: 'Marketing',
+			position: 'Content Strategist',
+			status: 'active',
+			joinedAt: new Date('2024-07-01'),
+		},
+		{
+			id: '12',
+			name: 'Linda Garcia',
+			email: 'linda@example.com',
+			role: 'admin',
+			department: 'Operations',
+			position: 'Operations Manager',
+			status: 'active',
+			joinedAt: new Date('2024-01-20'),
+		},
+		{
+			id: '13',
+			name: 'Daniel Rodriguez',
+			email: 'daniel@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'DevOps Engineer',
+			status: 'active',
+			joinedAt: new Date('2024-08-15'),
+		},
+		{
+			id: '14',
+			name: 'Barbara Hernandez',
+			email: 'barbara@example.com',
+			role: 'worker',
+			department: 'Design',
+			position: 'Graphic Designer',
+			status: 'pending',
+			joinedAt: new Date('2024-10-28'),
+		},
+		{
+			id: '15',
+			name: 'Matthew Lopez',
+			email: 'matthew@example.com',
+			role: 'worker',
+			department: 'Sales',
+			position: 'Sales Manager',
+			status: 'active',
+			joinedAt: new Date('2023-12-10'),
+		},
+		{
+			id: '16',
+			name: 'Susan Gonzalez',
+			email: 'susan@example.com',
+			role: 'worker',
+			department: 'Marketing',
+			position: 'Social Media Manager',
+			status: 'active',
+			joinedAt: new Date('2024-09-05'),
+		},
+		{
+			id: '17',
+			name: 'Joseph Wilson',
+			email: 'joseph@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'QA Engineer',
+			status: 'active',
+			joinedAt: new Date('2024-03-22'),
+		},
+		{
+			id: '18',
+			name: 'Jessica Moore',
+			email: 'jessica@example.com',
+			role: 'executive',
+			department: 'Management',
+			position: 'CTO',
+			status: 'active',
+			joinedAt: new Date('2023-05-15'),
+		},
+		{
+			id: '19',
+			name: 'Thomas Taylor',
+			email: 'thomas@example.com',
+			role: 'worker',
+			department: 'Finance',
+			position: 'Financial Analyst',
+			status: 'active',
+			joinedAt: new Date('2024-04-10'),
+		},
+		{
+			id: '20',
+			name: 'Nancy Anderson',
+			email: 'nancy@example.com',
+			role: 'worker',
+			department: 'HR',
+			position: 'Recruiter',
+			status: 'active',
+			joinedAt: new Date('2024-02-28'),
+		},
+		{
+			id: '21',
+			name: 'Charles Thomas',
+			email: 'charles@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'Mobile Developer',
+			status: 'active',
+			joinedAt: new Date('2024-06-20'),
+		},
+		{
+			id: '22',
+			name: 'Karen Jackson',
+			email: 'karen@example.com',
+			role: 'worker',
+			department: 'Design',
+			position: 'Product Designer',
+			status: 'inactive',
+			joinedAt: new Date('2023-08-12'),
+		},
+		{
+			id: '23',
+			name: 'Steven White',
+			email: 'steven@example.com',
+			role: 'worker',
+			department: 'Sales',
+			position: 'Business Development',
+			status: 'active',
+			joinedAt: new Date('2024-07-18'),
+		},
+		{
+			id: '24',
+			name: 'Betty Harris',
+			email: 'betty@example.com',
+			role: 'worker',
+			department: 'Marketing',
+			position: 'SEO Specialist',
+			status: 'active',
+			joinedAt: new Date('2024-08-25'),
+		},
+		{
+			id: '25',
+			name: 'Paul Martin',
+			email: 'paul@example.com',
+			role: 'admin',
+			department: 'IT',
+			position: 'Network Admin',
+			status: 'active',
+			joinedAt: new Date('2023-10-05'),
+		},
+		{
+			id: '26',
+			name: 'Helen Thompson',
+			email: 'helen@example.com',
+			role: 'worker',
+			department: 'Customer Support',
+			position: 'Support Specialist',
+			status: 'active',
+			joinedAt: new Date('2024-09-12'),
+		},
+		{
+			id: '27',
+			name: 'Mark Garcia',
+			email: 'mark@example.com',
+			role: 'worker',
+			department: 'Engineering',
+			position: 'Data Engineer',
+			status: 'active',
+			joinedAt: new Date('2024-05-30'),
+		},
+		{
+			id: '28',
+			name: 'Sandra Martinez',
+			email: 'sandra@example.com',
+			role: 'worker',
+			department: 'Finance',
+			position: 'Accountant',
+			status: 'pending',
+			joinedAt: new Date('2024-10-29'),
+		},
+		{
+			id: '29',
+			name: 'Donald Robinson',
+			email: 'donald@example.com',
+			role: 'worker',
+			department: 'Operations',
+			position: 'Operations Coordinator',
+			status: 'active',
+			joinedAt: new Date('2024-04-05'),
+		},
+		{
+			id: '30',
+			name: 'Ashley Clark',
+			email: 'ashley@example.com',
+			role: 'worker',
+			department: 'Marketing',
+			position: 'Brand Manager',
+			status: 'active',
+			joinedAt: new Date('2024-03-18'),
 		},
 	])
 
 	const [searchQuery, setSearchQuery] = useState('')
 	const [isInviting, setIsInviting] = useState(false)
 	const [inviteEmail, setInviteEmail] = useState('')
+	const [currentPage, setCurrentPage] = useState(1)
+	const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
+	const [editForm, setEditForm] = useState<Partial<TeamMember>>({})
 
 	const handleInvite = () => {
 		if (!inviteEmail) {
-			toast.error('이메일을 입력해주세요')
+			toast.error('Please enter an email address')
 			return
 		}
-		toast.success(`${inviteEmail}로 초대 메일을 발송했습니다`)
+		toast.success(`Invitation sent to ${inviteEmail}`)
 		setInviteEmail('')
 		setIsInviting(false)
 	}
 
 	const handleDelete = (id: string, name: string) => {
-		if (confirm(`${name}님을 삭제하시겠습니까?`)) {
+		if (confirm(`Are you sure you want to remove ${name}?`)) {
 			setMembers((prev) => prev.filter((m) => m.id !== id))
-			toast.success('사용자가 삭제되었습니다')
+			toast.success('User removed successfully')
 		}
 	}
 
@@ -86,7 +352,39 @@ export default function UsersManagementPage() {
 		setMembers((prev) =>
 			prev.map((m) => (m.id === id ? { ...m, role: newRole } : m))
 		)
-		toast.success('권한이 변경되었습니다')
+		toast.success('Role updated successfully')
+	}
+
+	const handleEditClick = (member: TeamMember) => {
+		setEditingMember(member)
+		setEditForm({
+			name: member.name,
+			email: member.email,
+			department: member.department,
+			position: member.position,
+			role: member.role,
+			status: member.status,
+		})
+	}
+
+	const handleEditSave = () => {
+		if (!editingMember) return
+
+		setMembers((prev) =>
+			prev.map((m) =>
+				m.id === editingMember.id
+					? { ...m, ...editForm }
+					: m
+			)
+		)
+		toast.success('User updated successfully')
+		setEditingMember(null)
+		setEditForm({})
+	}
+
+	const handleEditCancel = () => {
+		setEditingMember(null)
+		setEditForm({})
 	}
 
 	const getRoleBadge = (role: UserRole) => {
@@ -96,9 +394,9 @@ export default function UsersManagementPage() {
 			executive: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
 		}
 		const labels = {
-			worker: '작업자',
-			admin: '관리자',
-			executive: '임원',
+			worker: 'Worker',
+			admin: 'Admin',
+			executive: 'Executive',
 		}
 		return (
 			<span className={`px-2 py-1 rounded-lg text-xs font-medium ${styles[role]}`}>
@@ -114,9 +412,9 @@ export default function UsersManagementPage() {
 			pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
 		}
 		const labels = {
-			active: '활성',
-			inactive: '비활성',
-			pending: '대기중',
+			active: 'Active',
+			inactive: 'Inactive',
+			pending: 'Pending',
 		}
 		return (
 			<span className={`px-2 py-1 rounded-lg text-xs font-medium ${styles[status]}`}>
@@ -131,6 +429,12 @@ export default function UsersManagementPage() {
 			member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			member.department.toLowerCase().includes(searchQuery.toLowerCase())
 	)
+
+	// Pagination
+	const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE)
+	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+	const endIndex = startIndex + ITEMS_PER_PAGE
+	const currentMembers = filteredMembers.slice(startIndex, endIndex)
 
 	const stats = {
 		total: members.length,
@@ -147,10 +451,10 @@ export default function UsersManagementPage() {
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
 						<Users className="h-8 w-8 text-primary" />
-						사용자 관리
+						User Management
 					</h1>
 					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						팀원을 초대하고 권한을 관리하세요
+						Invite team members and manage permissions
 					</p>
 				</div>
 				<Button
@@ -158,7 +462,7 @@ export default function UsersManagementPage() {
 					className="flex items-center gap-2"
 				>
 					<UserPlus className="h-5 w-5" />
-					<span>사용자 초대</span>
+					<span>Invite User</span>
 				</Button>
 			</div>
 
@@ -166,31 +470,31 @@ export default function UsersManagementPage() {
 			<div className="grid gap-4 md:grid-cols-5">
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">전체</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Total</div>
 						<div className="text-2xl font-bold">{stats.total}</div>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">활성</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Active</div>
 						<div className="text-2xl font-bold text-green-600">{stats.active}</div>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">작업자</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Workers</div>
 						<div className="text-2xl font-bold text-blue-600">{stats.workers}</div>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">관리자</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Admins</div>
 						<div className="text-2xl font-bold text-purple-600">{stats.admins}</div>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">임원</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Executives</div>
 						<div className="text-2xl font-bold text-orange-600">{stats.executives}</div>
 					</CardContent>
 				</Card>
@@ -202,23 +506,123 @@ export default function UsersManagementPage() {
 					<CardContent className="p-6">
 						<h3 className="font-bold text-lg mb-4 flex items-center gap-2">
 							<Mail className="h-5 w-5 text-primary" />
-							사용자 초대
+							Invite User
 						</h3>
 						<div className="flex gap-3">
 							<Input
 								type="email"
-								placeholder="이메일 주소 입력"
+								placeholder="Enter email address"
 								value={inviteEmail}
 								onChange={(e) => setInviteEmail(e.target.value)}
 								className="flex-1"
 							/>
-							<Button onClick={handleInvite}>초대 발송</Button>
+							<Button onClick={handleInvite}>Send Invite</Button>
 							<Button variant="outline" onClick={() => setIsInviting(false)}>
-								취소
+								Cancel
 							</Button>
 						</div>
 					</CardContent>
 				</Card>
+			)}
+
+			{/* Edit Modal */}
+			{editingMember && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+					<Card className="w-full max-w-2xl mx-4">
+						<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+							<div className="flex items-center justify-between">
+								<h3 className="font-bold text-xl flex items-center gap-2">
+									<Edit className="h-5 w-5 text-primary" />
+									Edit User
+								</h3>
+								<button
+									onClick={handleEditCancel}
+									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
+						</CardHeader>
+						<CardContent className="p-6">
+							<div className="space-y-4">
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">Name</label>
+										<Input
+											value={editForm.name || ''}
+											onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+											placeholder="Enter name"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">Email</label>
+										<Input
+											type="email"
+											value={editForm.email || ''}
+											onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+											placeholder="Enter email"
+										/>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">Department</label>
+										<Input
+											value={editForm.department || ''}
+											onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
+											placeholder="Enter department"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">Position</label>
+										<Input
+											value={editForm.position || ''}
+											onChange={(e) => setEditForm({ ...editForm, position: e.target.value })}
+											placeholder="Enter position"
+										/>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">Role</label>
+										<select
+											value={editForm.role || 'worker'}
+											onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="worker">Worker</option>
+											<option value="admin">Admin</option>
+											<option value="executive">Executive</option>
+										</select>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">Status</label>
+										<select
+											value={editForm.status || 'active'}
+											onChange={(e) => setEditForm({ ...editForm, status: e.target.value as TeamMember['status'] })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="active">Active</option>
+											<option value="inactive">Inactive</option>
+											<option value="pending">Pending</option>
+										</select>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-3 pt-4">
+									<Button onClick={handleEditSave} className="flex-1">
+										Save Changes
+									</Button>
+									<Button variant="outline" onClick={handleEditCancel} className="flex-1">
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			)}
 
 			{/* Search */}
@@ -228,9 +632,12 @@ export default function UsersManagementPage() {
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
 						<Input
 							type="text"
-							placeholder="이름, 이메일, 부서로 검색..."
+							placeholder="Search by name, email, or department..."
 							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
+							onChange={(e) => {
+								setSearchQuery(e.target.value)
+								setCurrentPage(1) // Reset to first page on search
+							}}
 							className="pl-10"
 						/>
 					</div>
@@ -240,27 +647,32 @@ export default function UsersManagementPage() {
 			{/* Members List */}
 			<Card>
 				<CardHeader>
-					<h2 className="text-xl font-bold">팀원 목록</h2>
+					<div className="flex items-center justify-between">
+						<h2 className="text-xl font-bold">Team Members</h2>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400">
+							Showing {startIndex + 1}-{Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length}
+						</div>
+					</div>
 				</CardHeader>
 				<CardContent>
-					<div className="space-y-3">
-						{filteredMembers.map((member) => (
+					<div className="space-y-2">
+						{currentMembers.map((member) => (
 							<div
 								key={member.id}
-								className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:shadow-md transition-shadow"
+								className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:shadow-md transition-shadow"
 							>
-								<div className="flex items-center gap-4 flex-1">
-									<div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold text-lg">
+								<div className="flex items-center gap-3 flex-1">
+									<div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
 										{member.name[0]}
 									</div>
-									<div className="flex-1">
-										<div className="flex items-center gap-2 mb-1">
-											<h3 className="font-bold">{member.name}</h3>
+									<div className="flex-1 min-w-0">
+										<div className="flex items-center gap-2 mb-0.5">
+											<h3 className="font-bold text-sm">{member.name}</h3>
 											{getRoleBadge(member.role)}
 											{getStatusBadge(member.status)}
 										</div>
-										<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-											<span>{member.email}</span>
+										<div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
+											<span className="truncate">{member.email}</span>
 											<span>•</span>
 											<span>{member.department}</span>
 											<span>•</span>
@@ -273,15 +685,15 @@ export default function UsersManagementPage() {
 									<select
 										value={member.role}
 										onChange={(e) => handleRoleChange(member.id, e.target.value as UserRole)}
-										className="px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900"
+										className="px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900"
 									>
-										<option value="worker">작업자</option>
-										<option value="admin">관리자</option>
-										<option value="executive">임원</option>
+										<option value="worker">Worker</option>
+										<option value="admin">Admin</option>
+										<option value="executive">Executive</option>
 									</select>
 									<button
 										className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
-										onClick={() => toast.info('편집 기능 준비중')}
+										onClick={() => handleEditClick(member)}
 									>
 										<Edit className="h-4 w-4" />
 									</button>
@@ -294,10 +706,77 @@ export default function UsersManagementPage() {
 								</div>
 							</div>
 						))}
+
+						{currentMembers.length === 0 && (
+							<div className="text-center py-12 text-neutral-600 dark:text-neutral-400">
+								No users found
+							</div>
+						)}
 					</div>
+
+					{/* Pagination */}
+					{totalPages > 1 && (
+						<div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+							<div className="text-sm text-neutral-600 dark:text-neutral-400">
+								Showing <span className="font-medium text-neutral-900 dark:text-neutral-100">{startIndex + 1}-{Math.min(endIndex, filteredMembers.length)}</span> of <span className="font-medium text-neutral-900 dark:text-neutral-100">{filteredMembers.length}</span> users
+							</div>
+							<div className="flex items-center gap-2">
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+									disabled={currentPage === 1}
+									className="flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									<ChevronLeft className="h-4 w-4" />
+									Previous
+								</Button>
+								<div className="flex items-center gap-1">
+									{Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+										// Show first page, last page, current page, and pages around current
+										let pageNumber: number
+										if (totalPages <= 5) {
+											pageNumber = i + 1
+										} else if (currentPage <= 3) {
+											pageNumber = i + 1
+										} else if (currentPage >= totalPages - 2) {
+											pageNumber = totalPages - 4 + i
+										} else {
+											pageNumber = currentPage - 2 + i
+										}
+										
+										return (
+											<button
+												key={pageNumber}
+												onClick={() => setCurrentPage(pageNumber)}
+												className={`min-w-[32px] h-8 px-2 rounded-lg text-sm font-medium transition-all ${
+													pageNumber === currentPage
+														? 'bg-primary text-white shadow-md'
+														: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
+												}`}
+											>
+												{pageNumber}
+											</button>
+										)
+									})}
+								</div>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+									disabled={currentPage === totalPages}
+									className="flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									Next
+									<ChevronRight className="h-4 w-4" />
+								</Button>
+							</div>
+						</div>
+					)}
 				</CardContent>
 			</Card>
+
+			<Toaster />
 		</div>
 	)
 }
-

@@ -13,6 +13,8 @@ import {
 	Tag,
 	Folder,
 	FileText,
+	Building,
+	Users,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
@@ -37,8 +39,20 @@ interface WorkTemplate {
 	category: string
 }
 
+interface Department {
+	id: string
+	name: string
+	code: string
+	parentId: string
+	managerId: string
+	managerName: string
+	description: string
+	employeeCount: string
+	location: string
+}
+
 export default function SystemSettingsPage() {
-	const [activeTab, setActiveTab] = useState<'categories' | 'tags' | 'templates'>('categories')
+	const [activeTab, setActiveTab] = useState<'categories' | 'tags' | 'templates' | 'departments'>('categories')
 
 	// Categories
 	const [categories, setCategories] = useState<WorkCategory[]>([])
@@ -68,6 +82,21 @@ export default function SystemSettingsPage() {
 		category: '',
 	})
 
+	// Departments
+	const [departments, setDepartments] = useState<Department[]>([])
+	const [showAddDepartment, setShowAddDepartment] = useState(false)
+	const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
+	const [newDepartment, setNewDepartment] = useState<Omit<Department, 'id'>>({
+		name: '',
+		code: '',
+		parentId: '',
+		managerId: '',
+		managerName: '',
+		description: '',
+		employeeCount: '',
+		location: '',
+	})
+
 	// Color options
 	const colorOptions = [
 		{ value: '#3B82F6', label: 'Blue' },
@@ -85,6 +114,7 @@ export default function SystemSettingsPage() {
 			const savedCategories = localStorage.getItem('workCategories')
 			const savedTags = localStorage.getItem('workTags')
 			const savedTemplates = localStorage.getItem('workTemplates')
+			const savedDepartments = localStorage.getItem('departments')
 
 			if (savedCategories) {
 				setCategories(JSON.parse(savedCategories))
@@ -144,6 +174,49 @@ export default function SystemSettingsPage() {
 				]
 				setTemplates(defaultTemplates)
 				localStorage.setItem('workTemplates', JSON.stringify(defaultTemplates))
+			}
+
+			if (savedDepartments) {
+				setDepartments(JSON.parse(savedDepartments))
+			} else {
+				// Default departments
+				const defaultDepartments: Department[] = [
+					{
+						id: '1',
+						name: 'Engineering',
+						code: 'ENG',
+						parentId: '',
+						managerId: '',
+						managerName: '',
+						description: 'Software engineering and development',
+						employeeCount: '50',
+						location: 'Seoul HQ',
+					},
+					{
+						id: '2',
+						name: 'Product',
+						code: 'PRD',
+						parentId: '',
+						managerId: '',
+						managerName: '',
+						description: 'Product management and strategy',
+						employeeCount: '15',
+						location: 'Seoul HQ',
+					},
+					{
+						id: '3',
+						name: 'Marketing',
+						code: 'MKT',
+						parentId: '',
+						managerId: '',
+						managerName: '',
+						description: 'Marketing and communications',
+						employeeCount: '20',
+						location: 'Seoul HQ',
+					},
+				]
+				setDepartments(defaultDepartments)
+				localStorage.setItem('departments', JSON.stringify(defaultDepartments))
 			}
 		} catch (error) {
 			console.error('Failed to load settings:', error)
@@ -261,6 +334,56 @@ export default function SystemSettingsPage() {
 		}
 	}
 
+	// Department handlers
+	const handleAddDepartment = () => {
+		if (!newDepartment.name || !newDepartment.code) {
+			toast.error('Please enter department name and code')
+			return
+		}
+
+		const department: Department = {
+			id: Date.now().toString(),
+			...newDepartment,
+		}
+
+		const updated = [...departments, department]
+		setDepartments(updated)
+		localStorage.setItem('departments', JSON.stringify(updated))
+		setNewDepartment({
+			name: '',
+			code: '',
+			parentId: '',
+			managerId: '',
+			managerName: '',
+			description: '',
+			employeeCount: '',
+			location: '',
+		})
+		setShowAddDepartment(false)
+		toast.success('Department added successfully')
+	}
+
+	const handleUpdateDepartment = () => {
+		if (!editingDepartment) return
+
+		const updated = departments.map((dept) =>
+			dept.id === editingDepartment.id ? editingDepartment : dept
+		)
+		setDepartments(updated)
+		localStorage.setItem('departments', JSON.stringify(updated))
+		setEditingDepartment(null)
+		toast.success('Department updated successfully')
+	}
+
+	const handleDeleteDepartment = (id: string) => {
+		if (confirm('Are you sure you want to delete this department?')) {
+			const updated = departments.filter((dept) => dept.id !== id)
+			setDepartments(updated)
+			localStorage.setItem('departments', JSON.stringify(updated))
+			toast.success('Department deleted')
+		}
+	}
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -271,7 +394,7 @@ export default function SystemSettingsPage() {
 						System Settings
 					</h1>
 					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Configure work categories, tags, and templates
+						Configure work categories, tags, templates, and departments
 					</p>
 				</div>
 			</div>
@@ -310,6 +433,17 @@ export default function SystemSettingsPage() {
 				>
 					<FileText className="inline h-4 w-4 mr-2" />
 					Templates
+				</button>
+				<button
+					onClick={() => setActiveTab('departments')}
+					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+						activeTab === 'departments'
+							? 'border-primary text-primary'
+							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+					}`}
+				>
+					<Building className="inline h-4 w-4 mr-2" />
+					Departments
 				</button>
 			</div>
 
@@ -558,6 +692,149 @@ export default function SystemSettingsPage() {
 				</div>
 			)}
 
+			{/* Departments Tab */}
+			{activeTab === 'departments' && (
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+							Manage company departments and organizational structure
+						</p>
+						<Button onClick={() => setShowAddDepartment(true)}>
+							<Plus className="h-4 w-4 mr-2" />
+							Add Department
+						</Button>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+						{departments.map((department) => (
+							<Card key={department.id}>
+								<CardContent className="p-4">
+									{editingDepartment?.id === department.id ? (
+										<div className="space-y-3">
+											<Input
+												value={editingDepartment.name}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, name: e.target.value })
+												}
+												placeholder="Department name"
+											/>
+											<Input
+												value={editingDepartment.code}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, code: e.target.value })
+												}
+												placeholder="Department code"
+											/>
+											<Input
+												value={editingDepartment.managerName}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, managerName: e.target.value })
+												}
+												placeholder="Manager name"
+											/>
+											<Input
+												value={editingDepartment.location}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, location: e.target.value })
+												}
+												placeholder="Location"
+											/>
+											<Input
+												type="number"
+												value={editingDepartment.employeeCount}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, employeeCount: e.target.value })
+												}
+												placeholder="Employee count"
+											/>
+											<Textarea
+												value={editingDepartment.description}
+												onChange={(e) =>
+													setEditingDepartment({ ...editingDepartment, description: e.target.value })
+												}
+												placeholder="Description"
+												rows={2}
+											/>
+											<div className="flex items-center gap-2">
+												<Button onClick={handleUpdateDepartment} size="sm" className="flex-1">
+													<Save className="h-4 w-4 mr-1" />
+													Save
+												</Button>
+												<Button
+													onClick={() => setEditingDepartment(null)}
+													variant="outline"
+													size="sm"
+													className="flex-1"
+												>
+													Cancel
+												</Button>
+											</div>
+										</div>
+									) : (
+										<>
+											<div className="flex items-start justify-between mb-3">
+												<div className="flex items-center gap-2">
+													<Building className="h-5 w-5 text-primary" />
+													<div>
+														<h3 className="font-bold">{department.name}</h3>
+														<span className="text-xs text-neutral-500 dark:text-neutral-400">
+															{department.code}
+														</span>
+													</div>
+												</div>
+												<div className="flex items-center gap-1">
+													<button
+														onClick={() => setEditingDepartment(department)}
+														className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													>
+														<Edit2 className="h-4 w-4 text-neutral-600" />
+													</button>
+													<button
+														onClick={() => handleDeleteDepartment(department.id)}
+														className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													>
+														<Trash2 className="h-4 w-4 text-red-500" />
+													</button>
+												</div>
+											</div>
+											<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+												{department.description}
+											</p>
+											<div className="space-y-2 text-xs">
+												{department.managerName && (
+													<div className="flex items-center gap-2">
+														<Users className="h-3 w-3 text-neutral-500" />
+														<span className="text-neutral-600 dark:text-neutral-400">
+															Manager: {department.managerName}
+														</span>
+													</div>
+												)}
+												{department.employeeCount && (
+													<div className="flex items-center gap-2">
+														<Users className="h-3 w-3 text-neutral-500" />
+														<span className="text-neutral-600 dark:text-neutral-400">
+															{department.employeeCount} employees
+														</span>
+													</div>
+												)}
+												{department.location && (
+													<div className="flex items-center gap-2">
+														<Building className="h-3 w-3 text-neutral-500" />
+														<span className="text-neutral-600 dark:text-neutral-400">
+															{department.location}
+														</span>
+													</div>
+												)}
+											</div>
+										</>
+									)}
+								</CardContent>
+							</Card>
+						))}
+					</div>
+				</div>
+			)}
+
 			{/* Add Category Dialog */}
 			{showAddCategory && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -753,6 +1030,135 @@ export default function SystemSettingsPage() {
 									<Button
 										variant="outline"
 										onClick={() => setShowAddTemplate(false)}
+										className="flex-1"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Add Department Dialog */}
+			{showAddDepartment && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl">
+						<div className="p-6">
+							<div className="flex items-center justify-between mb-4">
+								<h3 className="text-xl font-bold flex items-center gap-2">
+									<Plus className="h-5 w-5 text-primary" />
+									Add Department
+								</h3>
+								<button
+									onClick={() => setShowAddDepartment(false)}
+									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
+
+							<div className="space-y-4">
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">
+											Department Name <span className="text-red-500">*</span>
+										</label>
+										<Input
+											value={newDepartment.name}
+											onChange={(e) => setNewDepartment({ ...newDepartment, name: e.target.value })}
+											placeholder="e.g., Engineering"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-sm font-medium mb-2">
+											Department Code <span className="text-red-500">*</span>
+										</label>
+										<Input
+											value={newDepartment.code}
+											onChange={(e) => setNewDepartment({ ...newDepartment, code: e.target.value })}
+											placeholder="e.g., ENG"
+										/>
+									</div>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">Description</label>
+									<Textarea
+										value={newDepartment.description}
+										onChange={(e) =>
+											setNewDepartment({ ...newDepartment, description: e.target.value })
+										}
+										placeholder="Brief description of this department"
+										rows={3}
+									/>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">Manager Name</label>
+										<Input
+											value={newDepartment.managerName}
+											onChange={(e) =>
+												setNewDepartment({ ...newDepartment, managerName: e.target.value })
+											}
+											placeholder="e.g., John Doe"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-sm font-medium mb-2">Location</label>
+										<Input
+											value={newDepartment.location}
+											onChange={(e) =>
+												setNewDepartment({ ...newDepartment, location: e.target.value })
+											}
+											placeholder="e.g., Seoul HQ"
+										/>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">Employee Count</label>
+										<Input
+											type="number"
+											value={newDepartment.employeeCount}
+											onChange={(e) =>
+												setNewDepartment({ ...newDepartment, employeeCount: e.target.value })
+											}
+											placeholder="e.g., 50"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-sm font-medium mb-2">Parent Department</label>
+										<select
+											value={newDepartment.parentId}
+											onChange={(e) =>
+												setNewDepartment({ ...newDepartment, parentId: e.target.value })
+											}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										>
+											<option value="">None (Top Level)</option>
+											{departments.map((dept) => (
+												<option key={dept.id} value={dept.id}>
+													{dept.name} ({dept.code})
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-2 pt-4">
+									<Button onClick={handleAddDepartment} className="flex-1">
+										Add Department
+									</Button>
+									<Button
+										variant="outline"
+										onClick={() => setShowAddDepartment(false)}
 										className="flex-1"
 									>
 										Cancel

@@ -12,7 +12,9 @@ import {
 	Plus,
 	Trash2,
 	TrendingUp,
-	CheckCircle2
+	CheckCircle2,
+	Upload,
+	FileText
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -22,22 +24,29 @@ interface CompanyInfo {
 	legalName: string
 	businessNumber: string
 	taxId: string
+	corporateNumber: string
+	establishmentType: string
 	
 	// 산업 및 분류
 	industry: string
 	subIndustry: string
 	businessType: string
 	companySize: string
+	mainProducts: string
+	mainServices: string
 	
 	// 설립 정보
 	foundedYear: string
 	foundedDate: string
+	registrationDate: string
 	
 	// 인력 정보
 	employeeCount: string
 	fullTimeCount: string
 	partTimeCount: string
 	contractorCount: string
+	averageAge: string
+	averageTenure: string
 	
 	// 연락처 정보
 	address: string
@@ -49,28 +58,45 @@ interface CompanyInfo {
 	phone: string
 	fax: string
 	email: string
+	supportEmail: string
+	salesEmail: string
 	
 	// 온라인 정보
 	website: string
 	linkedIn: string
 	facebook: string
 	twitter: string
+	instagram: string
+	youtube: string
+	github: string
 	
 	// 대표자 정보
 	ceoName: string
 	ceoEmail: string
 	ceoPhone: string
+	ceoLinkedIn: string
 	
 	// 재무 담당자 정보
 	cfoName: string
 	cfoEmail: string
 	cfoPhone: string
 	
+	// 인사 담당자 정보
+	hrName: string
+	hrEmail: string
+	hrPhone: string
+	
+	// 기술 담당자 정보
+	ctoName: string
+	ctoEmail: string
+	ctoPhone: string
+	
 	// 회사 설명
 	description: string
 	vision: string
 	mission: string
 	coreValues: string
+	companyHistory: string
 	
 	// 추가 정보
 	stockSymbol: string
@@ -79,6 +105,16 @@ interface CompanyInfo {
 	timezone: string
 	currency: string
 	language: string
+	
+	// 인증 및 자격
+	certifications: string
+	awards: string
+	partnerships: string
+	
+	// 사무실 정보
+	officeCount: string
+	headquartersLocation: string
+	branchLocations: string
 }
 
 interface FinancialData {
@@ -100,6 +136,15 @@ interface KPI {
 	description: string
 }
 
+interface UploadedFinancialDocument {
+	id: string
+	name: string
+	size: number
+	year: string
+	uploadedAt: Date
+	type: string
+}
+
 export default function CompanySettingsPage() {
 	// Company Info State
 	const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
@@ -108,22 +153,29 @@ export default function CompanySettingsPage() {
 		legalName: 'Proce Incorporated',
 		businessNumber: '123-45-67890',
 		taxId: 'TAX-2024-001',
+		corporateNumber: '',
+		establishmentType: '',
 		
 		// 산업 및 분류
 		industry: 'Software & Technology',
 		subIndustry: 'Enterprise Software',
 		businessType: 'Corporation',
 		companySize: 'Medium (100-500)',
+		mainProducts: '',
+		mainServices: '',
 		
 		// 설립 정보
 		foundedYear: '2020',
 		foundedDate: '2020-03-15',
+		registrationDate: '',
 		
 		// 인력 정보
 		employeeCount: '247',
 		fullTimeCount: '220',
 		partTimeCount: '15',
 		contractorCount: '12',
+		averageAge: '',
+		averageTenure: '',
 		
 		// 연락처 정보
 		address: '서울특별시 강남구 테헤란로 123',
@@ -135,28 +187,45 @@ export default function CompanySettingsPage() {
 		phone: '+82-2-1234-5678',
 		fax: '+82-2-1234-5679',
 		email: 'contact@proce.com',
+		supportEmail: '',
+		salesEmail: '',
 		
 		// 온라인 정보
 		website: 'https://proce.com',
 		linkedIn: 'https://linkedin.com/company/proce',
 		facebook: 'https://facebook.com/proce',
 		twitter: 'https://twitter.com/proce',
+		instagram: '',
+		youtube: '',
+		github: '',
 		
 		// 대표자 정보
 		ceoName: '김대표',
 		ceoEmail: 'ceo@proce.com',
 		ceoPhone: '+82-10-1234-5678',
+		ceoLinkedIn: '',
 		
 		// 재무 담당자 정보
 		cfoName: '이재무',
 		cfoEmail: 'cfo@proce.com',
 		cfoPhone: '+82-10-2345-6789',
 		
+		// 인사 담당자 정보
+		hrName: '',
+		hrEmail: '',
+		hrPhone: '',
+		
+		// 기술 담당자 정보
+		ctoName: '',
+		ctoEmail: '',
+		ctoPhone: '',
+		
 		// 회사 설명
 		description: '데이터 기반 의사결정 플랫폼을 제공하는 기업입니다.',
 		vision: '데이터 기반 의사결정으로 모든 기업이 성공할 수 있는 세상을 만듭니다.',
 		mission: '직원들의 업무 데이터를 수집하고 분석하여 실시간 인사이트를 제공합니다.',
 		coreValues: '데이터 중심 사고, 지속적인 혁신, 투명한 소통, 고객 성공 우선',
+		companyHistory: '',
 		
 		// 추가 정보
 		stockSymbol: 'PROC',
@@ -165,6 +234,16 @@ export default function CompanySettingsPage() {
 		timezone: 'Asia/Seoul',
 		currency: 'KRW',
 		language: 'ko-KR',
+		
+		// 인증 및 자격
+		certifications: '',
+		awards: '',
+		partnerships: '',
+		
+		// 사무실 정보
+		officeCount: '',
+		headquartersLocation: '',
+		branchLocations: '',
 	})
 
 	// Financial Data State
@@ -234,6 +313,7 @@ export default function CompanySettingsPage() {
 		category: '',
 		description: '',
 	})
+	const [uploadedDocuments, setUploadedDocuments] = useState<UploadedFinancialDocument[]>([])
 
 	// Company Info Handlers
 	const handleCompanyInfoChange = (field: keyof CompanyInfo, value: string) => {
@@ -242,7 +322,7 @@ export default function CompanySettingsPage() {
 
 	const handleSaveCompanyInfo = () => {
 		// Mock save
-		toast.success('기업 정보가 저장되었습니다')
+		toast.success('Company information saved successfully')
 	}
 
 	// Financial Data Handlers
@@ -267,17 +347,17 @@ export default function CompanySettingsPage() {
 
 	const handleDeleteFinancialRecord = (index: number) => {
 		setFinancialRecords((prev) => prev.filter((_, i) => i !== index))
-		toast.success('재무 기록이 삭제되었습니다')
+		toast.success('Financial record deleted successfully')
 	}
 
 	const handleSaveFinancialData = () => {
-		toast.success('재무 정보가 저장되었습니다')
+		toast.success('Financial data saved successfully')
 	}
 
 	// KPI Handlers
 	const handleAddKPI = () => {
 		if (!newKPI.name || !newKPI.target || !newKPI.category) {
-			toast.error('필수 항목을 입력해주세요')
+			toast.error('Please fill in all required fields')
 			return
 		}
 
@@ -295,16 +375,64 @@ export default function CompanySettingsPage() {
 			description: '',
 		})
 		setShowAddKPI(false)
-		toast.success('KPI가 추가되었습니다')
+		toast.success('KPI added successfully')
 	}
 
 	const handleDeleteKPI = (id: string) => {
 		setKpis((prev) => prev.filter((kpi) => kpi.id !== id))
-		toast.success('KPI가 삭제되었습니다')
+		toast.success('KPI deleted successfully')
 	}
 
 	const handleSaveKPIs = () => {
-		toast.success('KPI 설정이 저장되었습니다')
+		toast.success('KPI settings saved successfully')
+	}
+
+	// Document Upload Handlers
+	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files
+		if (!files || files.length === 0) return
+
+		const file = files[0]
+		const allowedTypes = [
+			'application/pdf',
+			'application/vnd.ms-excel',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'text/csv',
+		]
+
+		if (!allowedTypes.includes(file.type)) {
+			toast.error('PDF, Excel, CSV 파일만 업로드 가능합니다')
+			return
+		}
+
+		if (file.size > 10 * 1024 * 1024) {
+			toast.error('파일 크기는 10MB를 초과할 수 없습니다')
+			return
+		}
+
+		const newDocument: UploadedFinancialDocument = {
+			id: Date.now().toString(),
+			name: file.name,
+			size: file.size,
+			year: new Date().getFullYear().toString(),
+			uploadedAt: new Date(),
+			type: file.type,
+		}
+
+		setUploadedDocuments((prev) => [...prev, newDocument])
+		toast.success('재무제표가 업로드되었습니다')
+		event.target.value = ''
+	}
+
+	const handleDeleteDocument = (id: string) => {
+		setUploadedDocuments((prev) => prev.filter((doc) => doc.id !== id))
+		toast.success('문서가 삭제되었습니다')
+	}
+
+	const formatFileSize = (bytes: number) => {
+		if (bytes < 1024) return bytes + ' B'
+		if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+		return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 	}
 
 	const formatCurrency = (value: string) => {
@@ -329,44 +457,48 @@ export default function CompanySettingsPage() {
 		// Calculate section-wise completion
 		const sections = [
 			{
-				name: 'Basic Information',
-				fields: [companyInfo.name, companyInfo.legalName, companyInfo.businessNumber, companyInfo.taxId],
+				name: 'Basic Info',
+				fields: [companyInfo.name, companyInfo.legalName, companyInfo.businessNumber, companyInfo.taxId, companyInfo.corporateNumber, companyInfo.establishmentType],
 			},
 			{
-				name: 'Industry & Classification',
-				fields: [companyInfo.industry, companyInfo.subIndustry, companyInfo.businessType, companyInfo.companySize],
+				name: 'Industry',
+				fields: [companyInfo.industry, companyInfo.subIndustry, companyInfo.businessType, companyInfo.companySize, companyInfo.mainProducts, companyInfo.mainServices],
 			},
 			{
-				name: 'Foundation Information',
-				fields: [companyInfo.foundedYear, companyInfo.foundedDate],
+				name: 'Foundation',
+				fields: [companyInfo.foundedYear, companyInfo.foundedDate, companyInfo.registrationDate],
 			},
 			{
-				name: 'Workforce Information',
-				fields: [companyInfo.employeeCount, companyInfo.fullTimeCount, companyInfo.partTimeCount, companyInfo.contractorCount],
+				name: 'Workforce',
+				fields: [companyInfo.employeeCount, companyInfo.fullTimeCount, companyInfo.partTimeCount, companyInfo.contractorCount, companyInfo.averageAge, companyInfo.averageTenure],
 			},
 			{
-				name: 'Contact Information',
-				fields: [companyInfo.address, companyInfo.detailedAddress, companyInfo.city, companyInfo.state, companyInfo.postalCode, companyInfo.country, companyInfo.phone, companyInfo.fax, companyInfo.email],
+				name: 'Contact',
+				fields: [companyInfo.address, companyInfo.detailedAddress, companyInfo.city, companyInfo.state, companyInfo.postalCode, companyInfo.country, companyInfo.phone, companyInfo.fax, companyInfo.email, companyInfo.supportEmail, companyInfo.salesEmail],
 			},
 			{
-				name: 'Online Information',
-				fields: [companyInfo.website, companyInfo.linkedIn, companyInfo.facebook, companyInfo.twitter],
+				name: 'Online',
+				fields: [companyInfo.website, companyInfo.linkedIn, companyInfo.facebook, companyInfo.twitter, companyInfo.instagram, companyInfo.youtube, companyInfo.github],
 			},
 			{
-				name: 'CEO Information',
-				fields: [companyInfo.ceoName, companyInfo.ceoEmail, companyInfo.ceoPhone],
+				name: 'Leadership',
+				fields: [companyInfo.ceoName, companyInfo.ceoEmail, companyInfo.ceoPhone, companyInfo.ceoLinkedIn, companyInfo.cfoName, companyInfo.cfoEmail, companyInfo.cfoPhone, companyInfo.hrName, companyInfo.hrEmail, companyInfo.hrPhone, companyInfo.ctoName, companyInfo.ctoEmail, companyInfo.ctoPhone],
 			},
 			{
-				name: 'CFO Information',
-				fields: [companyInfo.cfoName, companyInfo.cfoEmail, companyInfo.cfoPhone],
+				name: 'Description',
+				fields: [companyInfo.description, companyInfo.vision, companyInfo.mission, companyInfo.coreValues, companyInfo.companyHistory],
 			},
 			{
-				name: 'Company Description',
-				fields: [companyInfo.description, companyInfo.vision, companyInfo.mission, companyInfo.coreValues],
-			},
-			{
-				name: 'Additional Information',
+				name: 'Additional',
 				fields: [companyInfo.stockSymbol, companyInfo.stockExchange, companyInfo.fiscalYearEnd, companyInfo.timezone, companyInfo.currency, companyInfo.language],
+			},
+			{
+				name: 'Certifications',
+				fields: [companyInfo.certifications, companyInfo.awards, companyInfo.partnerships],
+			},
+			{
+				name: 'Offices',
+				fields: [companyInfo.officeCount, companyInfo.headquartersLocation, companyInfo.branchLocations],
 			},
 		]
 
@@ -565,6 +697,22 @@ export default function CompanySettingsPage() {
 										value={companyInfo.taxId}
 										onChange={(e) => handleCompanyInfoChange('taxId', e.target.value)}
 										placeholder="TAX-2024-001"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">고유번호</label>
+									<Input
+										value={companyInfo.corporateNumber}
+										onChange={(e) => handleCompanyInfoChange('corporateNumber', e.target.value)}
+										placeholder="110111-1234567"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">설립 형태</label>
+									<Input
+										value={companyInfo.establishmentType}
+										onChange={(e) => handleCompanyInfoChange('establishmentType', e.target.value)}
+										placeholder="주식회사, 유한회사 등"
 									/>
 								</div>
 							</div>
@@ -1004,29 +1152,98 @@ export default function CompanySettingsPage() {
 				</div>
 			)}
 
-			{/* Financial Data Tab */}
-			{activeTab === 'financial' && (
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<h2 className="text-xl font-bold">재무 정보</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-								연도별 재무 데이터를 입력하고 관리하세요
-							</p>
-						</div>
-						<div className="flex items-center gap-2">
-							<Button variant="outline" onClick={handleAddFinancialRecord} className="flex items-center gap-2">
-								<Plus className="h-4 w-4" />
-								연도 추가
-							</Button>
-							<Button onClick={handleSaveFinancialData} className="flex items-center gap-2">
-								<Save className="h-4 w-4" />
-								저장
-							</Button>
-						</div>
+		{/* Financial Data Tab */}
+		{activeTab === 'financial' && (
+			<div className="space-y-4">
+				<div className="flex items-center justify-between">
+					<div>
+						<h2 className="text-xl font-bold">재무 정보</h2>
+						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							연도별 재무 데이터를 입력하고 재무제표 문서를 업로드하세요
+						</p>
 					</div>
+					<div className="flex items-center gap-2">
+						<Button variant="outline" onClick={handleAddFinancialRecord} className="flex items-center gap-2">
+							<Plus className="h-4 w-4" />
+							연도 추가
+						</Button>
+						<Button onClick={handleSaveFinancialData} className="flex items-center gap-2">
+							<Save className="h-4 w-4" />
+							저장
+						</Button>
+					</div>
+				</div>
 
-					{financialRecords.map((record, index) => (
+				{/* Document Upload Section */}
+				<Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+					<CardHeader>
+						<h3 className="text-lg font-bold flex items-center gap-2">
+							<Upload className="h-5 w-5 text-primary" />
+							재무제표 문서 업로드
+						</h3>
+						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							PDF, Excel, CSV 형식의 재무제표를 업로드하세요 (최대 10MB)
+						</p>
+					</CardHeader>
+					<CardContent>
+						<div className="border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-primary transition-colors bg-white dark:bg-neutral-900">
+							<input
+								type="file"
+								id="financial-file-upload"
+								className="hidden"
+								accept=".pdf,.xls,.xlsx,.csv"
+								onChange={handleFileUpload}
+							/>
+							<label htmlFor="financial-file-upload" className="cursor-pointer">
+								<Upload className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
+								<p className="font-medium mb-2">파일을 선택하거나 드래그하세요</p>
+								<p className="text-sm text-neutral-600 dark:text-neutral-400">
+									PDF, Excel, CSV (최대 10MB)
+								</p>
+							</label>
+						</div>
+
+						{/* Uploaded Documents List */}
+						{uploadedDocuments.length > 0 && (
+							<div className="mt-6 space-y-3">
+								<h4 className="font-semibold text-sm">업로드된 문서 ({uploadedDocuments.length})</h4>
+								{uploadedDocuments.map((doc) => (
+									<div
+										key={doc.id}
+										className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-900 hover:border-primary transition-colors"
+									>
+										<div className="flex items-center gap-3 flex-1 min-w-0">
+											<FileText className="h-8 w-8 text-primary flex-shrink-0" />
+											<div className="min-w-0 flex-1">
+												<p className="font-medium truncate">{doc.name}</p>
+												<p className="text-sm text-neutral-600 dark:text-neutral-400">
+													{formatFileSize(doc.size)} • {doc.year}년 •{' '}
+													{doc.uploadedAt.toLocaleDateString('ko-KR')}
+												</p>
+											</div>
+										</div>
+										<button
+											onClick={() => handleDeleteDocument(doc.id)}
+											className="text-red-500 hover:text-red-600 transition-colors ml-2 flex-shrink-0 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+										>
+											<Trash2 className="h-4 w-4" />
+										</button>
+									</div>
+								))}
+							</div>
+						)}
+
+						{uploadedDocuments.length === 0 && (
+							<div className="mt-6 text-center py-8 text-neutral-500 dark:text-neutral-400">
+								<FileText className="h-12 w-12 mx-auto mb-2 opacity-30" />
+								<p className="text-sm">아직 업로드된 문서가 없습니다</p>
+							</div>
+						)}
+					</CardContent>
+				</Card>
+
+				{/* Financial Records */}
+				{financialRecords.map((record, index) => (
 						<Card key={index}>
 							<CardHeader>
 								<div className="flex items-center justify-between">

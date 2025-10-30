@@ -16,7 +16,6 @@ import { IntegrationsProvider } from '../app/_providers/IntegrationsContext'
 import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../components/layout/AppLayout'
 import DashboardPage from '../pages/DashboardPage'
-import SettingsPage from '../pages/SettingsPage'
 import NoMeetPage from '../pages/NoMeetPage'
 import PolicyPage from '../pages/PolicyPage'
 import InputPage from '../pages/InputPage'
@@ -32,6 +31,11 @@ import AnalyticsPage from '../app/analytics/page'
 import PerformancePage from '../app/performance/page'
 import ExecutiveDashboardPage from '../pages/ExecutiveDashboardPage'
 import OKRPage from '../app/okr/page'
+import AIRecommendationsPage from '../app/ai-recommendations/page'
+import ExecutiveGoalsPage from '../app/executive/goals/page'
+import ProjectsPage from '../app/projects/page'
+import SettingsPage from '../app/settings/page'
+import ExpensesPage from '../app/expenses/page'
 
 // QueryClient 설정 - 기본 옵션 추가
 const queryClient = new QueryClient({
@@ -62,22 +66,26 @@ const router = createBrowserRouter([
 			// 작업자 메뉴
 			{ path: '/dashboard', element: <DashboardPage /> },
 			{ path: '/input', element: <InputPage /> },
+			{ path: '/projects', element: <ProjectsPage /> },
 			{ path: '/work-history', element: <WorkHistoryPage /> },
 			{ path: '/inbox', element: <InboxPage /> },
 			{ path: '/okr', element: <OKRPage /> },
+			{ path: '/ai-recommendations', element: <AIRecommendationsPage /> },
 			// 관리자 메뉴
 			{ path: '/admin/users', element: <UsersManagementPage /> },
 			{ path: '/admin/system-settings', element: <SystemSettingsPage /> },
 			{ path: '/admin/company-settings', element: <CompanySettingsPage /> },
 			// 임원 메뉴
 			{ path: '/executive', element: <ExecutiveDashboardPage /> },
-			{ path: '/analytics', element: <AnalyticsPage /> },
-			{ path: '/performance', element: <PerformancePage /> },
-			// 기타
-			{ path: '/org/setup', element: <WorkspaceSetupPage /> },
-			{ path: '/integrations', element: <IntegrationsPage /> },
-			{ path: '/finance', element: <FinancePage /> },
-			{ path: '/settings', element: <SettingsPage /> },
+		{ path: '/executive/goals', element: <ExecutiveGoalsPage /> },
+		{ path: '/analytics', element: <AnalyticsPage /> },
+		{ path: '/performance', element: <PerformancePage /> },
+		{ path: '/expenses', element: <ExpensesPage /> },
+		// 기타
+		{ path: '/org/setup', element: <WorkspaceSetupPage /> },
+		{ path: '/integrations', element: <IntegrationsPage /> },
+		{ path: '/finance', element: <FinancePage /> },
+		{ path: '/settings', element: <SettingsPage /> },
 			{ path: '/nomeet', element: <NoMeetPage /> },
 			{ path: '/policy', element: <PolicyPage /> },
 			{ path: '/help', element: <HelpPage /> },

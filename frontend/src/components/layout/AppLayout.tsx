@@ -1,8 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
-import { useTheme } from '../../theme/ThemeProvider'
-import { useI18n } from '../../i18n/I18nProvider'
 import { useAuth } from '../../context/AuthContext'
-import { Languages, Moon, Sun, LayoutDashboard, FileText, Inbox, Users, BarChart3, Award, HelpCircle, LogOut, Settings, Target, History } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, Award, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -14,13 +12,12 @@ interface MenuItem {
 }
 
 export default function AppLayout() {
-	const { theme, toggle } = useTheme()
-	const { locale, setLocale } = useI18n()
 	const { user } = useAuth()
 
 	const link = (to: string, label: string, Icon: any) => (
 		<NavLink
 			to={to}
+			end
 			className={({ isActive }) =>
 				`flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900 ${isActive ? 'bg-neutral-100 dark:bg-neutral-900 font-medium text-primary' : 'text-neutral-700 dark:text-neutral-300'}`
 			}
@@ -39,6 +36,7 @@ export default function AppLayout() {
 				{ to: '/input', label: 'Work Input', icon: FileText, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/inbox', label: 'Inbox', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/projects', label: 'Projects', icon: FolderKanban, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/okr', label: 'OKR', icon: Target, roles: ['worker', 'admin', 'executive'] },
 			] as MenuItem[],
 		},
@@ -48,18 +46,20 @@ export default function AppLayout() {
 			items: [
 				{ to: '/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
 				{ to: '/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
-				{ to: '/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
 			] as MenuItem[],
 		},
-		{
-			title: 'Executive',
-			roles: ['executive'] as UserRole[],
-			items: [
-				{ to: '/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-				{ to: '/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
-				{ to: '/performance', label: 'Performance', icon: Award, roles: ['executive', 'admin'] },
-			] as MenuItem[],
-		},
+	{
+		title: 'Executive',
+		roles: ['executive'] as UserRole[],
+		items: [
+			{ to: '/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
+			{ to: '/executive/goals', label: 'Annual Goals', icon: Target, roles: ['executive'] },
+			{ to: '/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
+			{ to: '/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
+			{ to: '/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
+			{ to: '/performance', label: 'Performance', icon: Award, roles: ['executive', 'admin'] },
+		] as MenuItem[],
+	},
 	]
 
 	// 현재 사용자 권한에 따라 메뉴 필터링
@@ -100,45 +100,26 @@ export default function AppLayout() {
 						</div>
 					))}
 					
-					<div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />
-					
-					<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-						Help
-					</div>
-					{link('/help', 'Help', HelpCircle)}
+				<div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />
+				
+				<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+					Other
+				</div>
+				{link('/settings', 'Settings', Settings)}
+				{link('/help', 'Help', HelpCircle)}
 				</nav>
 
-				{/* Sidebar Footer - Language/Theme/Logout */}
-				<div className="px-3 py-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2 flex-shrink-0">
-					{/* Language Toggle */}
-					<button
-						onClick={() => setLocale(locale === 'en' ? 'ko' : 'en')}
-						className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors w-full"
-						aria-label="toggle language"
-					>
-						<Languages size={20} />
-						<span>Language: {locale.toUpperCase()}</span>
-					</button>
-
-					{/* Theme Toggle */}
-					<button
-						onClick={() => toggle()}
-						className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors w-full"
-						aria-label="toggle theme"
-					>
-						{theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-						<span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-					</button>
-
-					{/* Logout */}
-					<Link
-						to="/"
-						className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-					>
-						<LogOut size={20} />
-						Logout
-					</Link>
-				</div>
+			{/* Sidebar Footer - Logout */}
+			<div className="px-3 py-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2 flex-shrink-0">
+				{/* Logout */}
+				<Link
+					to="/"
+					className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+				>
+					<LogOut size={20} />
+					Logout
+				</Link>
+			</div>
 			</aside>
 
 			{/* 메인 컨텐츠 영역 - 사이드바 너비만큼 왼쪽 여백 */}
