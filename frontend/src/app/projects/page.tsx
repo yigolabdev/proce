@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -10,47 +11,40 @@ import {
 	Calendar,
 	Users,
 	Target,
-	Clock,
-	Edit,
 	Trash2,
 	CheckCircle2,
 	AlertCircle,
-	TrendingUp,
 	Filter,
+	FileText,
+	ArrowRight,
+	Clock,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
+import type { Project, ProjectMember } from './_types/projects.types'
+import { initializeMockProjects } from './_mocks/projectsApi'
 
-interface Project {
+interface WorkEntry {
 	id: string
-	name: string
-	description: string
-	objectives: string[]
-	startDate: Date
-	endDate: Date
-	status: 'planning' | 'active' | 'on-hold' | 'completed'
-	members: ProjectMember[]
-	progress: number
-	createdAt: Date
-	createdBy: string
-}
-
-interface ProjectMember {
-	id: string
-	name: string
-	email: string
-	role: 'leader' | 'member'
-	joinedAt: Date
+	title: string
+	category: string
+	projectId?: string
+	date: Date
+	duration?: string
 }
 
 export default function ProjectsPage() {
+	const navigate = useNavigate()
 	const [projects, setProjects] = useState<Project[]>([])
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 	const [filterStatus, setFilterStatus] = useState<string>('all')
+	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
+	const [expandedProjects, setExpandedProjects] = useState<string[]>([])
 
 	// Form states
 	const [projectName, setProjectName] = useState('')
 	const [projectDescription, setProjectDescription] = useState('')
+	const [projectDepartment, setProjectDepartment] = useState('')
 	const [projectObjectives, setProjectObjectives] = useState<string[]>([])
 	const [objectiveInput, setObjectiveInput] = useState('')
 	const [startDate, setStartDate] = useState('')
@@ -61,8 +55,31 @@ export default function ProjectsPage() {
 	const [memberRole, setMemberRole] = useState<'leader' | 'member'>('member')
 
 	useEffect(() => {
+		// 목업 데이터 초기화 (localStorage가 비어있으면)
+		initializeMockProjects()
 		loadProjects()
+		loadWorkEntries()
 	}, [])
+
+	const loadWorkEntries = () => {
+		try {
+			const saved = localStorage.getItem('workEntries')
+			if (saved) {
+				const parsed = JSON.parse(saved)
+				const entriesWithDates = parsed.map((entry: any) => ({
+					id: entry.id,
+					title: entry.title,
+					category: entry.category,
+					projectId: entry.projectId,
+					date: new Date(entry.date),
+					duration: entry.duration,
+				}))
+				setWorkEntries(entriesWithDates)
+			}
+		} catch (error) {
+			console.error('Failed to load work entries:', error)
+		}
+	}
 
 	const loadProjects = () => {
 		try {
@@ -154,6 +171,7 @@ export default function ProjectsPage() {
 			id: Date.now().toString(),
 			name: projectName.trim(),
 			description: projectDescription.trim(),
+			department: projectDepartment.trim() || 'General',
 			objectives: projectObjectives,
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
@@ -171,6 +189,7 @@ export default function ProjectsPage() {
 		// Reset form
 		setProjectName('')
 		setProjectDescription('')
+		setProjectDepartment('')
 		setProjectObjectives([])
 		setStartDate('')
 		setEndDate('')
@@ -325,7 +344,12 @@ export default function ProjectsPage() {
 								<div className="flex items-start justify-between">
 									<div className="flex-1 min-w-0">
 										<h3 className="font-bold text-lg mb-2 truncate">{project.name}</h3>
-										{getStatusBadge(project.status)}
+										<div className="flex items-center gap-2 flex-wrap">
+											{getStatusBadge(project.status)}
+											<span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full font-medium">
+												{project.department}
+											</span>
+										</div>
 									</div>
 									<div className="flex items-center gap-1 ml-2">
 										<button
@@ -353,10 +377,10 @@ export default function ProjectsPage() {
 										</div>
 										<ul className="space-y-1">
 											{project.objectives.slice(0, 2).map((objective, index) => (
-												<li key={index} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2">
-													<CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0 mt-0.5" />
-													<span className="line-clamp-1">{objective}</span>
-												</li>
+											<li key={index} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2">
+												<CheckCircle2 className="h-3 w-3 text-green-600 shrink-0 mt-0.5" />
+												<span className="line-clamp-1">{objective}</span>
+											</li>
 											))}
 											{project.objectives.length > 2 && (
 												<li className="text-xs text-neutral-500">
@@ -388,11 +412,11 @@ export default function ProjectsPage() {
 										{project.members.slice(0, 3).map((member) => (
 											<div
 												key={member.id}
-												className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white text-xs font-bold"
-												title={member.name}
-											>
-												{member.name[0]}
-											</div>
+											className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-xs font-bold"
+											title={member.name}
+										>
+											{member.name[0]}
+										</div>
 										))}
 										{project.members.length > 3 && (
 											<div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-medium">
@@ -403,6 +427,67 @@ export default function ProjectsPage() {
 											<span className="text-xs text-neutral-500">No members yet</span>
 										)}
 									</div>
+								</div>
+
+								{/* Related Work Entries */}
+								{workEntries.filter((w) => w.projectId === project.id).length > 0 && (
+									<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
+										<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+											<FileText className="h-4 w-4 text-neutral-500" />
+											Related Work ({workEntries.filter((w) => w.projectId === project.id).length})
+										</h4>
+										<div className="space-y-2">
+											{workEntries
+												.filter((w) => w.projectId === project.id)
+												.slice(0, 3)
+												.map((entry) => (
+													<div
+														key={entry.id}
+														className="p-2 bg-neutral-50 dark:bg-neutral-900 rounded-lg"
+													>
+														<p className="text-xs font-medium truncate">{entry.title}</p>
+														<div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
+															<span className="flex items-center gap-1">
+																<Calendar className="h-3 w-3" />
+																{entry.date.toLocaleDateString()}
+															</span>
+															{entry.duration && (
+																<span className="flex items-center gap-1">
+																	<Clock className="h-3 w-3" />
+																	{entry.duration}
+																</span>
+															)}
+														</div>
+													</div>
+												))}
+											{workEntries.filter((w) => w.projectId === project.id).length > 3 && (
+												<p className="text-xs text-center text-neutral-500">
+													+{workEntries.filter((w) => w.projectId === project.id).length - 3} more
+												</p>
+											)}
+										</div>
+									</div>
+								)}
+
+								{/* Quick Action: Add Work */}
+								<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => {
+											// Store project ID in sessionStorage for Work Input page
+											sessionStorage.setItem('workInputPreselect', JSON.stringify({
+												projectId: project.id,
+												projectName: project.name,
+											}))
+											navigate('/input')
+										}}
+										className="w-full flex items-center justify-center gap-2 text-sm"
+									>
+										<FileText className="h-4 w-4" />
+										이 프로젝트에 업무 입력하기
+										<ArrowRight className="h-4 w-4" />
+									</Button>
 								</div>
 
 								{/* Status Actions */}
@@ -473,6 +558,17 @@ export default function ProjectsPage() {
 										placeholder="Describe the project goals and scope..."
 										rows={3}
 										className="resize-none"
+									/>
+								</div>
+
+								{/* Department */}
+								<div>
+									<label className="block text-sm font-medium mb-2">Department</label>
+									<Input
+										value={projectDepartment}
+										onChange={(e) => setProjectDepartment(e.target.value)}
+										placeholder="e.g., Engineering, Marketing, Product..."
+										className="text-base"
 									/>
 								</div>
 
@@ -583,13 +679,13 @@ export default function ProjectsPage() {
 													className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl"
 												>
 													<div className="flex items-center gap-3">
-														<div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white text-xs font-bold">
-															{member.name[0]}
-														</div>
-														<div>
-															<p className="font-medium text-sm">{member.name}</p>
-															<p className="text-xs text-neutral-600 dark:text-neutral-400">{member.email}</p>
-														</div>
+													<div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-xs font-bold">
+														{member.name[0]}
+													</div>
+													<div>
+														<p className="font-medium text-sm">{member.name}</p>
+														<p className="text-xs text-neutral-600 dark:text-neutral-400">{member.email}</p>
+													</div>
 													</div>
 													<div className="flex items-center gap-2">
 														<span
@@ -617,16 +713,16 @@ export default function ProjectsPage() {
 								{/* Info Box */}
 								<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
 									<div className="flex items-start gap-3">
-										<AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-										<div>
-											<p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-												About Projects
-											</p>
-											<p className="text-xs text-blue-700 dark:text-blue-300">
-												Once created, team members can select this project when submitting work entries via Work Input.
-												This helps organize and track work by project.
-											</p>
-										</div>
+									<AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+									<div>
+										<p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+											About Projects
+										</p>
+										<p className="text-xs text-blue-700 dark:text-blue-300">
+											Once created, team members can select this project when submitting work entries via Work Input.
+											This helps organize and track work by project.
+										</p>
+									</div>
 									</div>
 								</div>
 

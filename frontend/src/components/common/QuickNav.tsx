@@ -1,10 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, LayoutDashboard, MessageSquareDashed, Gavel, FileText, Settings, HelpCircle, LogIn, UserPlus, Building2, Users, Plug } from 'lucide-react'
+import { Home, LayoutDashboard, MessageSquareDashed, Gavel, FileText, Settings, HelpCircle, UserPlus, Building2, Users, Plug } from 'lucide-react'
 import clsx from 'clsx'
 
 const links = [
 	{ to: '/', label: 'Home', Icon: Home },
-	{ to: '/auth/sign-in', label: 'Sign In', Icon: LogIn },
 	{ to: '/auth/sign-up', label: 'Sign Up', Icon: UserPlus },
 	{ to: '/auth/join', label: 'Join', Icon: Users },
 	{ to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },

@@ -41,15 +41,15 @@ export default function SignUpPage() {
 
 					<ul className="space-y-3 mb-8">
 						<li className="flex items-start gap-3 text-sm">
-							<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">1</span>
+							<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">1</span>
 							<span className="text-neutral-700 dark:text-neutral-300">Register company information</span>
 						</li>
 						<li className="flex items-start gap-3 text-sm">
-							<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">2</span>
+							<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">2</span>
 							<span className="text-neutral-700 dark:text-neutral-300">Create administrator account</span>
 						</li>
 						<li className="flex items-start gap-3 text-sm">
-							<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">3</span>
+							<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-medium">3</span>
 							<span className="text-neutral-700 dark:text-neutral-300">Issue employee invitation codes</span>
 						</li>
 					</ul>
@@ -77,15 +77,15 @@ export default function SignUpPage() {
 
 				<ul className="space-y-3 mb-8">
 					<li className="flex items-start gap-3 text-sm">
-						<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">1</span>
+						<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">1</span>
 						<span className="text-neutral-700 dark:text-neutral-300">Receive invitation code from administrator</span>
 					</li>
 					<li className="flex items-start gap-3 text-sm">
-						<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">2</span>
+						<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">2</span>
 						<span className="text-neutral-700 dark:text-neutral-300">Sign up with invitation code</span>
 					</li>
 					<li className="flex items-start gap-3 text-sm">
-						<span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">3</span>
+						<span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">3</span>
 						<span className="text-neutral-700 dark:text-neutral-300">Start working in company workspace</span>
 					</li>
 				</ul>
@@ -104,7 +104,7 @@ export default function SignUpPage() {
 			<p className="text-sm text-neutral-600 dark:text-neutral-400">
 				Already have an account?{' '}
 				<button
-					onClick={() => navigate('/auth/sign-in')}
+					onClick={() => navigate('/')}
 					className="text-primary hover:underline font-medium"
 				>
 					Sign In

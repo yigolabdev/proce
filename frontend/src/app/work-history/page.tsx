@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import {
@@ -15,6 +16,11 @@ import {
 	Trash2,
 	Download,
 	Eye,
+	FolderKanban,
+	Target,
+	Filter,
+	TrendingUp,
+	BarChart3,
 } from 'lucide-react'
 import Input from '../../components/ui/Input'
 import { toast } from 'sonner'
@@ -39,6 +45,8 @@ interface WorkEntry {
 	title: string
 	description: string
 	category: string
+	projectId?: string
+	objectiveId?: string
 	tags: string[]
 	date: Date
 	duration: string
@@ -48,12 +56,18 @@ interface WorkEntry {
 }
 
 export default function WorkHistoryPage() {
+	const navigate = useNavigate()
 	const [entries, setEntries] = useState<WorkEntry[]>([])
 	const [filteredEntries, setFilteredEntries] = useState<WorkEntry[]>([])
 	const [expandedEntries, setExpandedEntries] = useState<string[]>([])
 	const [searchQuery, setSearchQuery] = useState('')
 	const [selectedCategory, setSelectedCategory] = useState<string>('all')
+	const [selectedProject, setSelectedProject] = useState<string>('all')
+	const [selectedObjective, setSelectedObjective] = useState<string>('all')
 	const [sortBy, setSortBy] = useState<'date' | 'title'>('date')
+	const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
+	const [objectives, setObjectives] = useState<Array<{ id: string; title: string }>>([])
+	const [showFilters, setShowFilters] = useState(false)
 
 	// Categories
 	const categories = [
@@ -69,6 +83,24 @@ export default function WorkHistoryPage() {
 	// Load entries from localStorage
 	useEffect(() => {
 		try {
+			// Load projects
+			const savedProjects = localStorage.getItem('projects')
+			if (savedProjects) {
+				const parsedProjects = JSON.parse(savedProjects).map((p: any) => ({
+					id: p.id,
+					name: p.name,
+				}))
+				setProjects(parsedProjects)
+			}
+
+			// Load OKR objectives (mock for now)
+			const mockObjectives = [
+				{ id: '1', title: 'Increase Product Market Fit' },
+				{ id: '2', title: 'Scale Revenue Growth' },
+				{ id: '3', title: 'Enhance Team Productivity' },
+			]
+			setObjectives(mockObjectives)
+
 			const saved = localStorage.getItem('workEntries')
 			if (saved) {
 				const parsed = JSON.parse(saved)
@@ -89,6 +121,8 @@ export default function WorkHistoryPage() {
 						title: 'Implemented User Authentication',
 						description: 'Completed the user authentication module with JWT tokens and refresh token mechanism. Implemented login, logout, and password reset functionality.',
 						category: 'development',
+						projectId: '1',
+						objectiveId: '1',
 						tags: ['authentication', 'security', 'backend'],
 						date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
 						duration: '4h 30m',
@@ -100,12 +134,15 @@ export default function WorkHistoryPage() {
 							{ id: 'l1', url: 'https://github.com/project/pull/123', title: 'Pull Request #123', addedAt: new Date() },
 						],
 						status: 'submitted',
+						isConfidential: false,
 					},
 					{
 						id: '2',
 						title: 'Weekly Team Meeting',
 						description: 'Discussed Q4 roadmap and sprint planning. Key decisions:\n- Move to bi-weekly sprints\n- Focus on performance optimization\n- Allocate resources for documentation',
 						category: 'meeting',
+						projectId: '2',
+						objectiveId: '3',
 						tags: ['planning', 'team', 'roadmap'],
 						date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
 						duration: '1h 30m',
@@ -114,12 +151,14 @@ export default function WorkHistoryPage() {
 							{ id: 'l2', url: 'https://docs.google.com/meeting-notes', title: 'Meeting Notes', addedAt: new Date() },
 						],
 						status: 'submitted',
+						isConfidential: false,
 					},
 					{
 						id: '3',
 						title: 'Research: State Management Solutions',
 						description: 'Evaluated different state management solutions for the frontend:\n- Redux Toolkit\n- Zustand\n- Jotai\n\nRecommendation: Zustand for its simplicity and performance.',
 						category: 'research',
+						objectiveId: '1',
 						tags: ['frontend', 'state-management', 'evaluation'],
 						date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
 						duration: '3h',
@@ -128,6 +167,7 @@ export default function WorkHistoryPage() {
 						],
 						links: [],
 						status: 'submitted',
+						isConfidential: false,
 					},
 				]
 				setEntries(mockEntries)
@@ -157,6 +197,16 @@ export default function WorkHistoryPage() {
 			filtered = filtered.filter((entry) => entry.category === selectedCategory)
 		}
 
+		// Filter by project
+		if (selectedProject !== 'all') {
+			filtered = filtered.filter((entry) => entry.projectId === selectedProject)
+		}
+
+		// Filter by objective
+		if (selectedObjective !== 'all') {
+			filtered = filtered.filter((entry) => entry.objectiveId === selectedObjective)
+		}
+
 		// Sort
 		filtered.sort((a, b) => {
 			if (sortBy === 'date') {
@@ -167,7 +217,68 @@ export default function WorkHistoryPage() {
 		})
 
 		setFilteredEntries(filtered)
-	}, [entries, searchQuery, selectedCategory, sortBy])
+	}, [entries, searchQuery, selectedCategory, selectedProject, selectedObjective, sortBy])
+
+	// Calculate statistics
+	const statistics = useMemo(() => {
+		const totalEntries = filteredEntries.length
+		
+		// This week's entries
+		const oneWeekAgo = new Date()
+		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+		const thisWeekEntries = filteredEntries.filter(e => e.date >= oneWeekAgo)
+		
+		// Calculate total hours this week
+		const parseTime = (duration: string) => {
+			if (!duration) return 0
+			const match = duration.match(/(\d+)h?\s*(\d+)?m?/)
+			if (!match) return 0
+			const hours = parseInt(match[1] || '0')
+			const minutes = parseInt(match[2] || '0')
+			return hours + minutes / 60
+		}
+		
+		const totalHoursThisWeek = thisWeekEntries.reduce((sum, entry) => {
+			return sum + parseTime(entry.duration || '')
+		}, 0)
+		
+		// Most active project
+		const projectCounts: Record<string, number> = {}
+		filteredEntries.forEach(entry => {
+			if (entry.projectId) {
+				projectCounts[entry.projectId] = (projectCounts[entry.projectId] || 0) + 1
+			}
+		})
+		const mostActiveProjectId = Object.entries(projectCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+		const mostActiveProject = mostActiveProjectId 
+			? { name: projects.find(p => p.id === mostActiveProjectId)?.name || 'Unknown', count: projectCounts[mostActiveProjectId] }
+			: null
+		
+		// Most active goal
+		const goalCounts: Record<string, number> = {}
+		filteredEntries.forEach(entry => {
+			if (entry.objectiveId) {
+				goalCounts[entry.objectiveId] = (goalCounts[entry.objectiveId] || 0) + 1
+			}
+		})
+		const mostActiveGoalId = Object.entries(goalCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+		const mostActiveGoal = mostActiveGoalId
+			? { name: objectives.find(o => o.id === mostActiveGoalId)?.title || 'Unknown', count: goalCounts[mostActiveGoalId] }
+			: null
+		
+		// Average time per entry
+		const totalHours = filteredEntries.reduce((sum, entry) => sum + parseTime(entry.duration || ''), 0)
+		const avgTimePerEntry = totalEntries > 0 ? totalHours / totalEntries : 0
+		
+		return {
+			totalEntries,
+			thisWeekCount: thisWeekEntries.length,
+			totalHoursThisWeek: totalHoursThisWeek.toFixed(1),
+			mostActiveProject,
+			mostActiveGoal,
+			avgTimePerEntry: avgTimePerEntry.toFixed(1),
+		}
+	}, [filteredEntries, projects, objectives])
 
 	const toggleExpand = (id: string) => {
 		setExpandedEntries((prev) =>
@@ -175,12 +286,59 @@ export default function WorkHistoryPage() {
 		)
 	}
 
+	const handleEdit = (entry: WorkEntry) => {
+		// Store entry data in sessionStorage for editing
+		sessionStorage.setItem('workInputEditData', JSON.stringify({
+			entryId: entry.id,
+			title: entry.title,
+			description: entry.description,
+			category: entry.category,
+			projectId: entry.projectId,
+			objectiveId: entry.objectiveId,
+			tags: entry.tags,
+			files: entry.files,
+			links: entry.links,
+			isConfidential: entry.isConfidential,
+		}))
+		
+		toast.success('Opening editor...', {
+			description: 'Navigating to Work Input page to edit this entry',
+		})
+		
+		// Navigate to input page
+		navigate('/input')
+	}
+
 	const handleDelete = (id: string) => {
-		if (confirm('Are you sure you want to delete this entry?')) {
+		const entry = entries.find(e => e.id === id)
+		if (!entry) {
+			toast.error('Entry not found')
+			return
+		}
+		
+		// Build detailed confirmation message
+		let confirmMessage = `Are you sure you want to delete this work entry?\n\nTitle: ${entry.title}\n`
+		
+		if (entry.projectId) {
+			const projectName = projects.find(p => p.id === entry.projectId)?.name
+			confirmMessage += `\nProject: ${projectName || 'Unknown'}`
+		}
+		
+		if (entry.objectiveId) {
+			const objectiveName = objectives.find(o => o.id === entry.objectiveId)?.title
+			confirmMessage += `\nGoal: ${objectiveName || 'Unknown'}`
+		}
+		
+		confirmMessage += '\n\nThis action cannot be undone.'
+		
+		if (confirm(confirmMessage)) {
 			const updated = entries.filter((entry) => entry.id !== id)
 			setEntries(updated)
 			localStorage.setItem('workEntries', JSON.stringify(updated))
-			toast.success('Work entry deleted')
+			
+			toast.success('Work entry deleted', {
+				description: 'The entry has been permanently removed',
+			})
 		}
 	}
 
@@ -222,53 +380,192 @@ export default function WorkHistoryPage() {
 				</div>
 			</div>
 
+			{/* Statistics Dashboard */}
+			<Card className="bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/20">
+				<CardContent className="p-6">
+					<div className="flex items-center gap-2 mb-4">
+						<BarChart3 className="h-5 w-5 text-primary" />
+						<h3 className="font-bold text-lg">Work Statistics</h3>
+					</div>
+					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+						<div className="bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl">
+							<div className="flex items-center gap-2 mb-2">
+								<FileText className="h-4 w-4 text-neutral-500" />
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">Total Entries</p>
+							</div>
+							<p className="text-2xl font-bold text-primary">{statistics.totalEntries}</p>
+						</div>
+						<div className="bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl">
+							<div className="flex items-center gap-2 mb-2">
+								<Calendar className="h-4 w-4 text-neutral-500" />
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">This Week</p>
+							</div>
+							<p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{statistics.thisWeekCount}</p>
+							<p className="text-xs text-neutral-500 mt-1">{statistics.totalHoursThisWeek}h total</p>
+						</div>
+						<div className="bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl">
+							<div className="flex items-center gap-2 mb-2">
+								<Clock className="h-4 w-4 text-neutral-500" />
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">Avg Time</p>
+							</div>
+							<p className="text-2xl font-bold text-green-600 dark:text-green-400">{statistics.avgTimePerEntry}h</p>
+							<p className="text-xs text-neutral-500 mt-1">per entry</p>
+						</div>
+						<div className="bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl col-span-2 md:col-span-1 lg:col-span-1">
+							<div className="flex items-center gap-2 mb-2">
+								<FolderKanban className="h-4 w-4 text-neutral-500" />
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">Top Project</p>
+							</div>
+							{statistics.mostActiveProject ? (
+								<>
+									<p className="text-sm font-bold text-purple-600 dark:text-purple-400 truncate">
+										{statistics.mostActiveProject.name}
+									</p>
+									<p className="text-xs text-neutral-500 mt-1">{statistics.mostActiveProject.count} entries</p>
+								</>
+							) : (
+								<p className="text-sm text-neutral-500">No data</p>
+							)}
+						</div>
+						<div className="bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl col-span-2 md:col-span-1 lg:col-span-2">
+							<div className="flex items-center gap-2 mb-2">
+								<Target className="h-4 w-4 text-neutral-500" />
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">Top Goal</p>
+							</div>
+							{statistics.mostActiveGoal ? (
+								<>
+									<p className="text-sm font-bold text-green-600 dark:text-green-400 truncate">
+										{statistics.mostActiveGoal.name}
+									</p>
+									<p className="text-xs text-neutral-500 mt-1">{statistics.mostActiveGoal.count} entries</p>
+								</>
+							) : (
+								<p className="text-sm text-neutral-500">No data</p>
+							)}
+						</div>
+					</div>
+					{filteredEntries.length !== entries.length && (
+						<div className="mt-4 pt-4 border-t border-primary/20">
+							<p className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
+								<TrendingUp className="h-3 w-3" />
+								Statistics are based on filtered results ({filteredEntries.length} of {entries.length} entries)
+							</p>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+
 			{/* Filters */}
 			<Card>
 				<CardContent className="p-6">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-						{/* Search */}
-						<div className="lg:col-span-2">
-							<div className="relative">
-								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-								<Input
-									placeholder="Search by title, description, or tags..."
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									className="pl-10"
-								/>
+					<div className="flex items-center justify-between mb-4">
+						<h3 className="font-semibold flex items-center gap-2">
+							<Filter className="h-4 w-4" />
+							Filters
+						</h3>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setShowFilters(!showFilters)}
+							className="flex items-center gap-2"
+						>
+							{showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+							{showFilters ? 'Hide' : 'Show'} Advanced Filters
+						</Button>
+					</div>
+
+					<div className="space-y-4">
+						{/* Basic Filters */}
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							{/* Search */}
+							<div className="lg:col-span-2">
+								<div className="relative">
+									<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+									<Input
+										placeholder="Search by title, description, or tags..."
+										value={searchQuery}
+										onChange={(e) => setSearchQuery(e.target.value)}
+										className="pl-10"
+									/>
+								</div>
+							</div>
+
+							{/* Category Filter */}
+							<div>
+								<select
+									value={selectedCategory}
+									onChange={(e) => setSelectedCategory(e.target.value)}
+									className="w-full h-11 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+								>
+									{categories.map((cat) => (
+										<option key={cat.id} value={cat.id}>
+											{cat.label}
+										</option>
+									))}
+								</select>
+							</div>
+
+							{/* Sort */}
+							<div>
+								<select
+									value={sortBy}
+									onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
+									className="w-full h-11 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+								>
+									<option value="date">Sort by Date</option>
+									<option value="title">Sort by Title</option>
+								</select>
 							</div>
 						</div>
 
-						{/* Category Filter */}
-						<div>
-							<select
-								value={selectedCategory}
-								onChange={(e) => setSelectedCategory(e.target.value)}
-								className="w-full h-11 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-							>
-								{categories.map((cat) => (
-									<option key={cat.id} value={cat.id}>
-										{cat.label}
-									</option>
-								))}
-							</select>
-						</div>
+						{/* Advanced Filters */}
+						{showFilters && (
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								{/* Project Filter */}
+								<div>
+									<label className="block text-sm font-medium mb-2 flex items-center gap-2">
+										<FolderKanban className="h-4 w-4" />
+										Filter by Project
+									</label>
+									<select
+										value={selectedProject}
+										onChange={(e) => setSelectedProject(e.target.value)}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="all">All Projects</option>
+										{projects.map((project) => (
+											<option key={project.id} value={project.id}>
+												📁 {project.name}
+											</option>
+										))}
+									</select>
+								</div>
 
-						{/* Sort */}
-						<div>
-							<select
-								value={sortBy}
-								onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
-								className="w-full h-11 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-							>
-								<option value="date">Sort by Date</option>
-								<option value="title">Sort by Title</option>
-							</select>
-						</div>
+								{/* OKR Filter */}
+								<div>
+									<label className="block text-sm font-medium mb-2 flex items-center gap-2">
+										<Target className="h-4 w-4" />
+										Filter by Goal (OKR)
+									</label>
+									<select
+										value={selectedObjective}
+										onChange={(e) => setSelectedObjective(e.target.value)}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="all">All Goals</option>
+										{objectives.map((objective) => (
+											<option key={objective.id} value={objective.id}>
+												🎯 {objective.title}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						)}
 					</div>
 
 					{/* Active Filters Summary */}
-					{(searchQuery || selectedCategory !== 'all') && (
+					{(searchQuery || selectedCategory !== 'all' || selectedProject !== 'all' || selectedObjective !== 'all') && (
 						<div className="mt-4 flex items-center gap-2 flex-wrap">
 							<span className="text-sm text-neutral-600 dark:text-neutral-400">Active filters:</span>
 							{searchQuery && (
@@ -283,6 +580,22 @@ export default function WorkHistoryPage() {
 								<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
 									Category: {categories.find((c) => c.id === selectedCategory)?.label}
 									<button onClick={() => setSelectedCategory('all')} className="hover:text-primary/70">
+										×
+									</button>
+								</span>
+							)}
+							{selectedProject !== 'all' && (
+								<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-sm">
+									📁 Project: {projects.find((p) => p.id === selectedProject)?.name}
+									<button onClick={() => setSelectedProject('all')} className="hover:opacity-70">
+										×
+									</button>
+								</span>
+							)}
+							{selectedObjective !== 'all' && (
+								<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-sm">
+									🎯 Goal: {objectives.find((o) => o.id === selectedObjective)?.title}
+									<button onClick={() => setSelectedObjective('all')} className="hover:opacity-70">
 										×
 									</button>
 								</span>
@@ -343,7 +656,7 @@ export default function WorkHistoryPage() {
 													{categories.find((c) => c.id === entry.category)?.label}
 												</span>
 											</div>
-											<div className="flex items-center gap-4 ml-8 text-sm text-neutral-600 dark:text-neutral-400">
+											<div className="flex items-center gap-4 ml-8 text-sm text-neutral-600 dark:text-neutral-400 flex-wrap">
 												<span className="flex items-center gap-1">
 													<Calendar className="h-4 w-4" />
 													{formatDate(entry.date)}
@@ -366,10 +679,22 @@ export default function WorkHistoryPage() {
 														{entry.links.length} link{entry.links.length > 1 ? 's' : ''}
 													</span>
 												)}
+												{entry.projectId && (
+													<span className="flex items-center gap-1 text-xs px-2 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">
+														<FolderKanban className="h-3 w-3" />
+														{projects.find((p) => p.id === entry.projectId)?.name || 'Project'}
+													</span>
+												)}
+												{entry.objectiveId && (
+													<span className="flex items-center gap-1 text-xs px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">
+														<Target className="h-3 w-3" />
+														{objectives.find((o) => o.id === entry.objectiveId)?.title || 'Goal'}
+													</span>
+												)}
 											</div>
 										</div>
 										<div className="flex items-center gap-2 ml-4">
-											<Button variant="outline" size="sm">
+											<Button variant="outline" size="sm" onClick={() => handleEdit(entry)}>
 												<Edit2 className="h-4 w-4" />
 											</Button>
 											<Button variant="outline" size="sm" onClick={() => handleDelete(entry.id)}>

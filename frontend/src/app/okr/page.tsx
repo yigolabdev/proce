@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -16,6 +16,8 @@ import {
 	Flag,
 	ChevronDown,
 	ChevronUp,
+	FileText,
+	Clock,
 } from 'lucide-react'
 
 interface KeyResult {
@@ -40,7 +42,40 @@ interface Objective {
 	endDate: string
 }
 
+interface WorkEntry {
+	id: string
+	title: string
+	category: string
+	objectiveId?: string
+	date: Date
+	duration?: string
+}
+
 export default function OKRPage() {
+	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
+	const [expandedObjectives, setExpandedObjectives] = useState<string[]>([])
+
+	useEffect(() => {
+		// Load work entries from localStorage
+		try {
+			const saved = localStorage.getItem('workEntries')
+			if (saved) {
+				const parsed = JSON.parse(saved)
+				const entriesWithDates = parsed.map((entry: any) => ({
+					id: entry.id,
+					title: entry.title,
+					category: entry.category,
+					objectiveId: entry.objectiveId,
+					date: new Date(entry.date),
+					duration: entry.duration,
+				}))
+				setWorkEntries(entriesWithDates)
+			}
+		} catch (error) {
+			console.error('Failed to load work entries:', error)
+		}
+	}, [])
+
 	const [objectives] = useState<Objective[]>([
 		{
 			id: '1',
@@ -155,7 +190,6 @@ export default function OKRPage() {
 		},
 	])
 
-	const [expandedObjectives, setExpandedObjectives] = useState<string[]>(['1', '2', '3'])
 	const [selectedQuarter, setSelectedQuarter] = useState<string>('Q4 2024')
 	const [showAddObjective, setShowAddObjective] = useState(false)
 
@@ -234,7 +268,7 @@ export default function OKRPage() {
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
 						<Target className="h-8 w-8 text-primary" />
-						OKR Management
+						My Goals (OKR)
 					</h1>
 					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
 						Set objectives and track key results to achieve your goals
@@ -478,6 +512,54 @@ export default function OKRPage() {
 													</div>
 												)
 											})}
+
+											{/* Related Work Entries */}
+											<div className="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+												<h4 className="font-bold text-sm mb-3 flex items-center gap-2">
+													<FileText className="h-4 w-4" />
+													Related Work ({workEntries.filter((w) => w.objectiveId === objective.id).length})
+												</h4>
+												{workEntries.filter((w) => w.objectiveId === objective.id).length === 0 ? (
+													<p className="text-xs text-neutral-500 italic">
+														No work entries linked to this objective yet
+													</p>
+												) : (
+													<div className="space-y-2">
+														{workEntries
+															.filter((w) => w.objectiveId === objective.id)
+															.slice(0, 5)
+															.map((entry) => (
+																<div
+																	key={entry.id}
+																	className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg"
+																>
+																	<div className="flex-1 min-w-0">
+																		<p className="text-sm font-medium truncate">
+																			{entry.title}
+																		</p>
+																		<div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+																			<span className="flex items-center gap-1">
+																				<Calendar className="h-3 w-3" />
+																				{entry.date.toLocaleDateString()}
+																			</span>
+																			{entry.duration && (
+																				<span className="flex items-center gap-1">
+																					<Clock className="h-3 w-3" />
+																					{entry.duration}
+																				</span>
+																			)}
+																		</div>
+																	</div>
+																</div>
+															))}
+														{workEntries.filter((w) => w.objectiveId === objective.id).length > 5 && (
+															<p className="text-xs text-center text-neutral-500">
+																+{workEntries.filter((w) => w.objectiveId === objective.id).length - 5} more
+															</p>
+														)}
+													</div>
+												)}
+											</div>
 										</div>
 									</CardContent>
 								)}

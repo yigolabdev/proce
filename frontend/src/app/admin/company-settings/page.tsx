@@ -14,9 +14,17 @@ import {
 	TrendingUp,
 	CheckCircle2,
 	Upload,
-	FileText
+	FileText,
+	Sparkles,
+	Calendar,
+	Users,
+	Lightbulb,
+	Edit,
+	Copy,
+	Brain
 } from 'lucide-react'
 import { toast } from 'sonner'
+import Toaster from '../../../components/ui/Toaster'
 
 interface CompanyInfo {
 	// 기본 정보
@@ -125,6 +133,42 @@ interface FinancialData {
 	totalLiabilities: string
 	longTermDebt: string
 	totalEquity: string
+}
+
+interface CompanyGoal {
+	id: string
+	name: string
+	description: string
+	category: string
+	period: 'quarterly' | 'annual'
+	quarter?: string
+	year: string
+	targetValue: string
+	unit: string
+	measurementMethod: string
+	department: string[] // 연관 부서
+	priority: 'high' | 'medium' | 'low'
+	aiRecommendationEnabled: boolean
+	createdAt: Date
+	updatedAt: Date
+}
+
+interface OKRTemplate {
+	id: string
+	goalId: string // 연결된 전사 목표 ID
+	name: string
+	description: string
+	targetRole: string[] // 추천 대상 역할/직책
+	targetDepartment: string[] // 추천 대상 부서
+	keyResults: {
+		id: string
+		description: string
+		targetValue: string
+		unit: string
+	}[]
+	recommendationScore: number // AI 추천 우선순위 점수
+	autoAssign: boolean // 자동 할당 여부
+	createdAt: Date
 }
 
 interface KPI {
@@ -268,44 +312,104 @@ export default function CompanySettingsPage() {
 		},
 	])
 
-	// KPI State
-	const [kpis, setKpis] = useState<KPI[]>([
+	// Company Goals State
+	const [companyGoals, setCompanyGoals] = useState<CompanyGoal[]>([
 		{
 			id: '1',
-			name: 'Monthly Recurring Revenue',
-			target: '1000000',
-			unit: 'USD',
+			name: '연매출 100억 달성',
+			description: '2024년 연매출 목표 100억원을 달성하여 시장 선도 기업으로 성장',
 			category: 'Revenue',
-			description: '월간 반복 매출',
+			period: 'annual',
+			year: '2024',
+			targetValue: '10000000000',
+			unit: 'KRW',
+			measurementMethod: '월별 매출 집계',
+			department: ['Sales', 'Marketing', 'Product'],
+			priority: 'high',
+			aiRecommendationEnabled: true,
+			createdAt: new Date('2024-01-01'),
+			updatedAt: new Date('2024-01-01'),
 		},
 		{
 			id: '2',
-			name: 'Customer Acquisition Cost',
-			target: '500',
-			unit: 'USD',
-			category: 'Marketing',
-			description: '고객 획득 비용',
-		},
-		{
-			id: '3',
-			name: 'Customer Lifetime Value',
-			target: '5000',
-			unit: 'USD',
-			category: 'Revenue',
-			description: '고객 생애 가치',
-		},
-		{
-			id: '4',
-			name: 'Employee Productivity Score',
-			target: '85',
-			unit: '%',
-			category: 'Operations',
-			description: '직원 생산성 점수',
+			name: '고객 만족도 90점 이상 유지',
+			description: 'NPS 기준 고객 만족도를 90점 이상 유지하여 고객 충성도 향상',
+			category: 'Customer',
+			period: 'quarterly',
+			quarter: 'Q4',
+			year: '2024',
+			targetValue: '90',
+			unit: 'NPS',
+			measurementMethod: '분기별 고객 설문조사',
+			department: ['Customer Support', 'Product', 'Engineering'],
+			priority: 'high',
+			aiRecommendationEnabled: true,
+			createdAt: new Date('2024-10-01'),
+			updatedAt: new Date('2024-10-01'),
 		},
 	])
 
-	const [activeTab, setActiveTab] = useState<'company' | 'financial' | 'kpi'>('company')
+	// OKR Templates State
+	const [okrTemplates, setOKRTemplates] = useState<OKRTemplate[]>([
+		{
+			id: '1',
+			goalId: '1',
+			name: '신규 고객 획득 증대',
+			description: '연매출 목표 달성을 위한 신규 고객 100명 확보',
+			targetRole: ['Sales Manager', 'Account Executive', 'Business Development'],
+			targetDepartment: ['Sales'],
+			keyResults: [
+				{ id: 'kr1', description: '신규 리드 300개 생성', targetValue: '300', unit: '건' },
+				{ id: 'kr2', description: '리드-고객 전환율 33% 이상', targetValue: '33', unit: '%' },
+				{ id: 'kr3', description: '평균 계약 금액 1억원 이상', targetValue: '100000000', unit: 'KRW' },
+			],
+			recommendationScore: 95,
+			autoAssign: true,
+			createdAt: new Date('2024-01-02'),
+		},
+		{
+			id: '2',
+			goalId: '1',
+			name: '마케팅 캠페인 ROI 향상',
+			description: '효율적인 마케팅 캠페인으로 매출 기여',
+			targetRole: ['Marketing Manager', 'Growth Marketing', 'Content Marketing'],
+			targetDepartment: ['Marketing'],
+			keyResults: [
+				{ id: 'kr1', description: '광고 ROAS 500% 달성', targetValue: '500', unit: '%' },
+				{ id: 'kr2', description: '월간 MQL 200개 생성', targetValue: '200', unit: '건' },
+				{ id: 'kr3', description: '콘텐츠 조회수 100만 달성', targetValue: '1000000', unit: '회' },
+			],
+			recommendationScore: 90,
+			autoAssign: true,
+			createdAt: new Date('2024-01-02'),
+		},
+		{
+			id: '3',
+			goalId: '2',
+			name: '고객 응답 시간 단축',
+			description: '고객 만족도 향상을 위한 빠른 응답 체계 구축',
+			targetRole: ['Customer Support', 'Support Engineer'],
+			targetDepartment: ['Customer Support'],
+			keyResults: [
+				{ id: 'kr1', description: '평균 응답 시간 1시간 이내', targetValue: '1', unit: 'hour' },
+				{ id: 'kr2', description: '첫 응답률 95% 이상', targetValue: '95', unit: '%' },
+				{ id: 'kr3', description: '고객 만족도 4.5점 이상', targetValue: '4.5', unit: '점' },
+			],
+			recommendationScore: 92,
+			autoAssign: false,
+			createdAt: new Date('2024-10-02'),
+		},
+	])
+
+	// KPI State (기존 호환성 유지)
+	const [kpis, setKpis] = useState<KPI[]>([])
+
+	const [activeTab, setActiveTab] = useState<'company' | 'annual-goals' | 'financial'>('company')
+	const [showAddGoal, setShowAddGoal] = useState(false)
+	const [showAddTemplate, setShowAddTemplate] = useState(false)
 	const [showAddKPI, setShowAddKPI] = useState(false)
+	const [editingGoal, setEditingGoal] = useState<CompanyGoal | null>(null)
+	const [editingTemplate, setEditingTemplate] = useState<OKRTemplate | null>(null)
 	const [newKPI, setNewKPI] = useState<Omit<KPI, 'id'>>({
 		name: '',
 		target: '',
@@ -313,7 +417,37 @@ export default function CompanySettingsPage() {
 		category: '',
 		description: '',
 	})
+	
+	const [newGoal, setNewGoal] = useState<Partial<CompanyGoal>>({
+		name: '',
+		description: '',
+		category: '',
+		period: 'quarterly',
+		year: new Date().getFullYear().toString(),
+		quarter: 'Q1',
+		targetValue: '',
+		unit: '',
+		measurementMethod: '',
+		department: [],
+		priority: 'medium',
+		aiRecommendationEnabled: true,
+	})
+
+	const [newTemplate, setNewTemplate] = useState<Partial<OKRTemplate>>({
+		goalId: '',
+		name: '',
+		description: '',
+		targetRole: [],
+		targetDepartment: [],
+		keyResults: [],
+		recommendationScore: 50,
+		autoAssign: false,
+	})
+
 	const [uploadedDocuments, setUploadedDocuments] = useState<UploadedFinancialDocument[]>([])
+
+	const departments = ['Sales', 'Marketing', 'Engineering', 'Product', 'Customer Support', 'Finance', 'HR', 'Operations']
+	const roles = ['Manager', 'Team Lead', 'Senior', 'Junior', 'Engineer', 'Designer', 'Analyst', 'Executive']
 
 	// Company Info Handlers
 	const handleCompanyInfoChange = (field: keyof CompanyInfo, value: string) => {
@@ -354,15 +488,146 @@ export default function CompanySettingsPage() {
 		toast.success('Financial data saved successfully')
 	}
 
-	// KPI Handlers
+	// Company Goal Handlers
+	const handleAddGoal = () => {
+		if (!newGoal.name || !newGoal.targetValue || !newGoal.category) {
+			toast.error('필수 항목을 모두 입력해주세요')
+			return
+		}
+
+		const goal: CompanyGoal = {
+			id: Date.now().toString(),
+			name: newGoal.name,
+			description: newGoal.description || '',
+			category: newGoal.category,
+			period: newGoal.period || 'quarterly',
+			quarter: newGoal.quarter,
+			year: newGoal.year || new Date().getFullYear().toString(),
+			targetValue: newGoal.targetValue,
+			unit: newGoal.unit || '',
+			measurementMethod: newGoal.measurementMethod || '',
+			department: newGoal.department || [],
+			priority: newGoal.priority || 'medium',
+			aiRecommendationEnabled: newGoal.aiRecommendationEnabled ?? true,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}
+
+		setCompanyGoals([...companyGoals, goal])
+		setNewGoal({
+			name: '',
+			description: '',
+			category: '',
+			period: 'quarterly',
+			year: new Date().getFullYear().toString(),
+			quarter: 'Q1',
+			targetValue: '',
+			unit: '',
+			measurementMethod: '',
+			department: [],
+			priority: 'medium',
+			aiRecommendationEnabled: true,
+		})
+		setShowAddGoal(false)
+		toast.success('전사 목표가 추가되었습니다')
+	}
+
+	const handleDeleteGoal = (id: string) => {
+		// 연관된 템플릿도 삭제할지 확인
+		const relatedTemplates = okrTemplates.filter((t) => t.goalId === id)
+		if (relatedTemplates.length > 0 && !confirm(`이 목표와 연관된 ${relatedTemplates.length}개의 OKR 템플릿도 삭제됩니다. 계속하시겠습니까?`)) {
+			return
+		}
+
+		setCompanyGoals((prev) => prev.filter((g) => g.id !== id))
+		setOKRTemplates((prev) => prev.filter((t) => t.goalId !== id))
+		toast.success('전사 목표가 삭제되었습니다')
+	}
+
+	const handleAddTemplate = () => {
+		if (!newTemplate.name || !newTemplate.goalId || !newTemplate.targetDepartment || newTemplate.targetDepartment.length === 0) {
+			toast.error('필수 항목을 모두 입력해주세요')
+			return
+		}
+
+		const template: OKRTemplate = {
+			id: Date.now().toString(),
+			goalId: newTemplate.goalId,
+			name: newTemplate.name,
+			description: newTemplate.description || '',
+			targetRole: newTemplate.targetRole || [],
+			targetDepartment: newTemplate.targetDepartment,
+			keyResults: newTemplate.keyResults || [],
+			recommendationScore: newTemplate.recommendationScore || 50,
+			autoAssign: newTemplate.autoAssign || false,
+			createdAt: new Date(),
+		}
+
+		setOKRTemplates([...okrTemplates, template])
+		setNewTemplate({
+			goalId: '',
+			name: '',
+			description: '',
+			targetRole: [],
+			targetDepartment: [],
+			keyResults: [],
+			recommendationScore: 50,
+			autoAssign: false,
+		})
+		setShowAddTemplate(false)
+		toast.success('OKR 템플릿이 추가되었습니다')
+	}
+
+	const handleDeleteTemplate = (id: string) => {
+		setOKRTemplates((prev) => prev.filter((t) => t.id !== id))
+		toast.success('OKR 템플릿이 삭제되었습니다')
+	}
+
+	const handleSaveGoalsAndTemplates = () => {
+		// localStorage에 저장
+		localStorage.setItem('companyGoals', JSON.stringify(companyGoals))
+		localStorage.setItem('okrTemplates', JSON.stringify(okrTemplates))
+		toast.success('전사 목표 및 OKR 템플릿이 저장되었습니다')
+	}
+
+	const addKeyResult = () => {
+		const newKR = {
+			id: Date.now().toString(),
+			description: '',
+			targetValue: '',
+			unit: '',
+		}
+		setNewTemplate({
+			...newTemplate,
+			keyResults: [...(newTemplate.keyResults || []), newKR],
+		})
+	}
+
+	const removeKeyResult = (krId: string) => {
+		setNewTemplate({
+			...newTemplate,
+			keyResults: (newTemplate.keyResults || []).filter((kr) => kr.id !== krId),
+		})
+	}
+
+	const updateKeyResult = (krId: string, field: string, value: string) => {
+		setNewTemplate({
+			...newTemplate,
+			keyResults: (newTemplate.keyResults || []).map((kr) =>
+				kr.id === krId ? { ...kr, [field]: value } : kr
+			),
+		})
+	}
+
+	// KPI Handlers (기존 호환성 유지)
 	const handleAddKPI = () => {
 		if (!newKPI.name || !newKPI.target || !newKPI.category) {
-			toast.error('Please fill in all required fields')
+			toast.error('필수 항목을 모두 입력해주세요')
 			return
 		}
 
 		const kpi: KPI = {
-			id: Math.random().toString(36).substr(2, 9),
+			id: Date.now().toString(),
 			...newKPI,
 		}
 
@@ -375,16 +640,17 @@ export default function CompanySettingsPage() {
 			description: '',
 		})
 		setShowAddKPI(false)
-		toast.success('KPI added successfully')
+		toast.success('KPI가 추가되었습니다')
 	}
 
 	const handleDeleteKPI = (id: string) => {
 		setKpis((prev) => prev.filter((kpi) => kpi.id !== id))
-		toast.success('KPI deleted successfully')
+		toast.success('KPI가 삭제되었습니다')
 	}
 
 	const handleSaveKPIs = () => {
-		toast.success('KPI settings saved successfully')
+		localStorage.setItem('kpis', JSON.stringify(kpis))
+		toast.success('KPI 설정이 저장되었습니다')
 	}
 
 	// Document Upload Handlers
@@ -621,6 +887,17 @@ export default function CompanySettingsPage() {
 					Company Info
 				</button>
 				<button
+					onClick={() => setActiveTab('annual-goals')}
+					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+						activeTab === 'annual-goals'
+							? 'border-primary text-primary'
+							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+					}`}
+				>
+					<Target className="inline h-4 w-4 mr-2" />
+					Annual Goals
+				</button>
+				<button
 					onClick={() => setActiveTab('financial')}
 					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
 						activeTab === 'financial'
@@ -630,17 +907,6 @@ export default function CompanySettingsPage() {
 				>
 					<DollarSign className="inline h-4 w-4 mr-2" />
 					Financial Data
-				</button>
-				<button
-					onClick={() => setActiveTab('kpi')}
-					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'kpi'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<Target className="inline h-4 w-4 mr-2" />
-					KPI Settings
 				</button>
 			</div>
 
@@ -1152,271 +1418,871 @@ export default function CompanySettingsPage() {
 				</div>
 			)}
 
-		{/* Financial Data Tab */}
-		{activeTab === 'financial' && (
-			<div className="space-y-4">
-				<div className="flex items-center justify-between">
-					<div>
-						<h2 className="text-xl font-bold">재무 정보</h2>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-							연도별 재무 데이터를 입력하고 재무제표 문서를 업로드하세요
-						</p>
+			{/* Annual Goals Tab */}
+			{activeTab === 'annual-goals' && (
+				<div className="space-y-6">
+					{/* Summary Dashboard */}
+					<div className="grid gap-4 md:grid-cols-2">
+						<Card className="border-primary/20">
+							<CardContent className="p-6">
+								<div className="flex items-center justify-between mb-4">
+									<Target className="h-8 w-8 text-primary" />
+									<TrendingUp className="h-5 w-5 text-green-600" />
+								</div>
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+									전사 목표
+								</div>
+								<div className="text-3xl font-bold">{companyGoals.length}</div>
+							</CardContent>
+						</Card>
+						<Card className="border-green-200 dark:border-green-800">
+							<CardContent className="p-6">
+								<div className="flex items-center justify-between mb-4">
+									<Sparkles className="h-8 w-8 text-green-600" />
+								</div>
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+									OKR 템플릿
+								</div>
+								<div className="text-3xl font-bold">{okrTemplates.length}</div>
+							</CardContent>
+						</Card>
 					</div>
-					<div className="flex items-center gap-2">
-						<Button variant="outline" onClick={handleAddFinancialRecord} className="flex items-center gap-2">
-							<Plus className="h-4 w-4" />
-							연도 추가
-						</Button>
-						<Button onClick={handleSaveFinancialData} className="flex items-center gap-2">
-							<Save className="h-4 w-4" />
-							저장
-						</Button>
-					</div>
+
+					{/* Company Goals Section */}
+					<Card>
+						<CardHeader>
+							<div className="flex items-center justify-between">
+								<div>
+									<h2 className="text-xl font-bold flex items-center gap-2">
+										<Target className="h-6 w-6 text-primary" />
+										전사 목표 (Company Goals)
+									</h2>
+									<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+										회사의 핵심 목표를 설정하고 AI 기반 OKR 추천을 활성화하세요
+									</p>
+								</div>
+								<div className="flex items-center gap-2">
+									<Button variant="outline" onClick={() => setShowAddGoal(true)} className="flex items-center gap-2">
+										<Plus className="h-4 w-4" />
+										목표 추가
+									</Button>
+									<Button onClick={handleSaveGoalsAndTemplates} className="flex items-center gap-2">
+										<Save className="h-4 w-4" />
+										저장
+									</Button>
+								</div>
+							</div>
+						</CardHeader>
+						<CardContent>
+							{companyGoals.length === 0 ? (
+								<div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
+									<Target className="h-16 w-16 mx-auto mb-4 opacity-30" />
+									<p className="text-lg font-medium mb-2">아직 설정된 목표가 없습니다</p>
+									<p className="text-sm mb-4">전사 목표를 추가하여 시작하세요</p>
+									<Button onClick={() => setShowAddGoal(true)} className="flex items-center gap-2">
+										<Plus className="h-4 w-4" />
+										첫 목표 추가하기
+									</Button>
+								</div>
+							) : (
+								<div className="space-y-4">
+									{companyGoals.map((goal) => (
+										<div
+											key={goal.id}
+											className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-primary transition-colors"
+										>
+											<div className="flex items-start justify-between mb-4">
+												<div className="flex-1">
+													<div className="flex items-center gap-2 mb-2">
+														<span className={`px-3 py-1 rounded-full text-xs font-medium ${
+															goal.priority === 'high'
+																? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+																: goal.priority === 'medium'
+																? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+																: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+														}`}>
+															{goal.priority === 'high' ? '높음' : goal.priority === 'medium' ? '중간' : '낮음'}
+														</span>
+														<span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+															{goal.category}
+														</span>
+														<span className="text-xs text-neutral-500 dark:text-neutral-400">
+															{goal.period === 'annual' ? `${goal.year}년` : `${goal.year} ${goal.quarter}`}
+														</span>
+														{goal.aiRecommendationEnabled && (
+															<span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 flex items-center gap-1">
+																<Brain className="h-3 w-3" />
+																AI 추천 활성화
+															</span>
+														)}
+													</div>
+													<h3 className="font-bold text-lg mb-2">{goal.name}</h3>
+													<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+														{goal.description}
+													</p>
+													<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+														<div>
+															<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">목표 값</p>
+															<p className="font-bold">{Number(goal.targetValue).toLocaleString()} {goal.unit}</p>
+														</div>
+														<div>
+															<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">측정 방법</p>
+															<p className="text-sm">{goal.measurementMethod}</p>
+														</div>
+														<div className="md:col-span-2">
+															<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">연관 부서</p>
+															<div className="flex items-center gap-1 flex-wrap">
+																{goal.department.map((dept, idx) => (
+																	<span key={idx} className="text-xs px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded">
+																		{dept}
+																	</span>
+																))}
+															</div>
+														</div>
+													</div>
+												</div>
+												<button
+													onClick={() => handleDeleteGoal(goal.id)}
+													className="text-red-500 hover:text-red-600 transition-colors ml-4 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+												>
+													<Trash2 className="h-5 w-5" />
+												</button>
+											</div>
+											{okrTemplates.filter(t => t.goalId === goal.id).length > 0 && (
+												<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
+													<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+														연결된 OKR 템플릿: {okrTemplates.filter(t => t.goalId === goal.id).length}개
+													</p>
+												</div>
+											)}
+										</div>
+									))}
+								</div>
+							)}
+						</CardContent>
+					</Card>
+
+					{/* OKR Templates Section */}
+					<Card className="border-green-200 dark:border-green-800">
+						<CardHeader>
+							<div className="flex items-center justify-between">
+								<div>
+									<h2 className="text-xl font-bold flex items-center gap-2">
+										<Sparkles className="h-6 w-6 text-green-600" />
+										OKR 템플릿 (OKR Templates)
+									</h2>
+									<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+										직원들에게 추천될 OKR 템플릿을 생성하고 관리하세요
+									</p>
+								</div>
+								<Button variant="outline" onClick={() => setShowAddTemplate(true)} className="flex items-center gap-2">
+									<Plus className="h-4 w-4" />
+									템플릿 추가
+								</Button>
+							</div>
+						</CardHeader>
+						<CardContent>
+							{okrTemplates.length === 0 ? (
+								<div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
+									<Lightbulb className="h-16 w-16 mx-auto mb-4 opacity-30" />
+									<p className="text-lg font-medium mb-2">아직 생성된 OKR 템플릿이 없습니다</p>
+									<p className="text-sm mb-4">전사 목표와 연결된 OKR 템플릿을 추가하세요</p>
+									<Button onClick={() => setShowAddTemplate(true)} className="flex items-center gap-2">
+										<Plus className="h-4 w-4" />
+										첫 템플릿 추가하기
+									</Button>
+								</div>
+							) : (
+								<div className="space-y-4">
+									{okrTemplates.map((template) => {
+										const relatedGoal = companyGoals.find(g => g.id === template.goalId)
+										return (
+											<div
+												key={template.id}
+												className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-green-500 transition-colors"
+											>
+												<div className="flex items-start justify-between mb-4">
+													<div className="flex-1">
+														<div className="flex items-center gap-2 mb-2">
+															{relatedGoal && (
+																<span className="px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+																	{relatedGoal.name}
+																</span>
+															)}
+															{template.autoAssign && (
+																<span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+																	자동 할당
+																</span>
+															)}
+															<span className="text-xs text-neutral-500 dark:text-neutral-400">
+																추천 점수: {template.recommendationScore}
+															</span>
+														</div>
+														<h3 className="font-bold text-lg mb-2">{template.name}</h3>
+														<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+															{template.description}
+														</p>
+														<div className="grid grid-cols-2 gap-4 mb-3">
+															<div>
+																<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">대상 부서</p>
+																<div className="flex items-center gap-1 flex-wrap">
+																	{template.targetDepartment.map((dept, idx) => (
+																		<span key={idx} className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded">
+																			{dept}
+																		</span>
+																	))}
+																</div>
+															</div>
+															<div>
+																<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">대상 역할</p>
+																<div className="flex items-center gap-1 flex-wrap">
+																	{template.targetRole.map((role, idx) => (
+																		<span key={idx} className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded">
+																			{role}
+																		</span>
+																	))}
+																</div>
+															</div>
+														</div>
+														{template.keyResults.length > 0 && (
+															<div className="pt-3 border-t border-neutral-200 dark:border-neutral-800">
+																<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+																	핵심 결과 (Key Results):
+																</p>
+																<ul className="space-y-1">
+																	{template.keyResults.map((kr) => (
+																		<li key={kr.id} className="text-sm flex items-start gap-2">
+																			<CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+																			<span>{kr.description} - <span className="font-bold">{kr.targetValue} {kr.unit}</span></span>
+																		</li>
+																	))}
+																</ul>
+															</div>
+														)}
+													</div>
+													<button
+														onClick={() => handleDeleteTemplate(template.id)}
+														className="text-red-500 hover:text-red-600 transition-colors ml-4 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+													>
+														<Trash2 className="h-5 w-5" />
+													</button>
+												</div>
+											</div>
+										)
+									})}
+								</div>
+							)}
+						</CardContent>
+					</Card>
 				</div>
+			)}
 
-				{/* Document Upload Section */}
-				<Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
-					<CardHeader>
-						<h3 className="text-lg font-bold flex items-center gap-2">
-							<Upload className="h-5 w-5 text-primary" />
-							재무제표 문서 업로드
-						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-							PDF, Excel, CSV 형식의 재무제표를 업로드하세요 (최대 10MB)
-						</p>
-					</CardHeader>
-					<CardContent>
-						<div className="border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-primary transition-colors bg-white dark:bg-neutral-900">
-							<input
-								type="file"
-								id="financial-file-upload"
-								className="hidden"
-								accept=".pdf,.xls,.xlsx,.csv"
-								onChange={handleFileUpload}
-							/>
-							<label htmlFor="financial-file-upload" className="cursor-pointer">
-								<Upload className="h-12 w-12 mx-auto mb-4 text-neutral-400" />
-								<p className="font-medium mb-2">파일을 선택하거나 드래그하세요</p>
-								<p className="text-sm text-neutral-600 dark:text-neutral-400">
-									PDF, Excel, CSV (최대 10MB)
-								</p>
-							</label>
-						</div>
+			{/* Financial Data Tab */}
+			{activeTab === 'financial' && (
+				<div className="space-y-6">
+					{/* Summary Dashboard */}
+					<div className="grid gap-4 md:grid-cols-2">
+						<Card className="border-blue-200 dark:border-blue-800">
+							<CardContent className="p-6">
+								<div className="flex items-center justify-between mb-4">
+									<DollarSign className="h-8 w-8 text-blue-600" />
+								</div>
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+									재무 연도
+								</div>
+								<div className="text-3xl font-bold">{financialRecords.length}</div>
+							</CardContent>
+						</Card>
+						<Card className="border-purple-200 dark:border-purple-800">
+							<CardContent className="p-6">
+								<div className="flex items-center justify-between mb-4">
+									<FileText className="h-8 w-8 text-purple-600" />
+								</div>
+								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+									재무 문서
+								</div>
+								<div className="text-3xl font-bold">{uploadedDocuments.length}</div>
+							</CardContent>
+						</Card>
+					</div>
 
-						{/* Uploaded Documents List */}
-						{uploadedDocuments.length > 0 && (
-							<div className="mt-6 space-y-3">
-								<h4 className="font-semibold text-sm">업로드된 문서 ({uploadedDocuments.length})</h4>
-								{uploadedDocuments.map((doc) => (
-									<div
-										key={doc.id}
-										className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-900 hover:border-primary transition-colors"
-									>
-										<div className="flex items-center gap-3 flex-1 min-w-0">
-											<FileText className="h-8 w-8 text-primary flex-shrink-0" />
-											<div className="min-w-0 flex-1">
-												<p className="font-medium truncate">{doc.name}</p>
-												<p className="text-sm text-neutral-600 dark:text-neutral-400">
-													{formatFileSize(doc.size)} • {doc.year}년 •{' '}
-													{doc.uploadedAt.toLocaleDateString('ko-KR')}
-												</p>
+					{/* Financial Data Section */}
+					<Card className="border-blue-200 dark:border-blue-800">
+						<CardHeader>
+							<div className="flex items-center justify-between">
+								<div>
+									<h2 className="text-xl font-bold flex items-center gap-2">
+										<DollarSign className="h-6 w-6 text-blue-600" />
+										재무 데이터 (Financial Data)
+									</h2>
+									<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+										연도별 재무 데이터를 입력하고 재무제표 문서를 업로드하세요
+									</p>
+								</div>
+								<div className="flex items-center gap-2">
+									<Button variant="outline" onClick={handleAddFinancialRecord} className="flex items-center gap-2">
+										<Plus className="h-4 w-4" />
+										연도 추가
+									</Button>
+									<Button onClick={handleSaveFinancialData} className="flex items-center gap-2">
+										<Save className="h-4 w-4" />
+										저장
+									</Button>
+								</div>
+							</div>
+						</CardHeader>
+						<CardContent className="space-y-6">
+							{/* Document Upload */}
+							<div className="border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-2xl p-8 text-center hover:border-blue-500 transition-colors bg-blue-50/30 dark:bg-blue-900/10">
+								<input
+									type="file"
+									id="financial-file-upload"
+									className="hidden"
+									accept=".pdf,.xls,.xlsx,.csv"
+									onChange={handleFileUpload}
+								/>
+								<label htmlFor="financial-file-upload" className="cursor-pointer">
+									<Upload className="h-12 w-12 mx-auto mb-4 text-blue-400" />
+									<p className="font-medium mb-2">재무제표 파일 업로드</p>
+									<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										PDF, Excel, CSV (최대 10MB)
+									</p>
+								</label>
+							</div>
+
+							{/* Uploaded Documents */}
+							{uploadedDocuments.length > 0 && (
+								<div className="space-y-3">
+									<h4 className="font-semibold text-sm flex items-center gap-2">
+										<FileText className="h-4 w-4" />
+										업로드된 문서 ({uploadedDocuments.length})
+									</h4>
+									{uploadedDocuments.map((doc) => (
+										<div
+											key={doc.id}
+											className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-900 hover:border-primary transition-colors"
+										>
+											<div className="flex items-center gap-3 flex-1 min-w-0">
+												<FileText className="h-8 w-8 text-blue-600 shrink-0" />
+												<div className="min-w-0 flex-1">
+													<p className="font-medium truncate">{doc.name}</p>
+													<p className="text-sm text-neutral-600 dark:text-neutral-400">
+														{formatFileSize(doc.size)} • {doc.year}년 • {doc.uploadedAt.toLocaleDateString('ko-KR')}
+													</p>
+												</div>
+											</div>
+											<button
+												onClick={() => handleDeleteDocument(doc.id)}
+												className="text-red-500 hover:text-red-600 transition-colors ml-2 shrink-0 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+											>
+												<Trash2 className="h-4 w-4" />
+											</button>
+										</div>
+									))}
+								</div>
+							)}
+
+							{/* Financial Records */}
+							<div className="space-y-4">
+								{financialRecords.map((record, index) => (
+									<div key={index} className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
+										<div className="flex items-center justify-between mb-4">
+											<h3 className="text-lg font-bold">{record.year}년 재무 데이터</h3>
+											<button
+												onClick={() => handleDeleteFinancialRecord(index)}
+												className="text-red-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+											>
+												<Trash2 className="h-5 w-5" />
+											</button>
+										</div>
+										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+											<div>
+												<label className="block text-sm font-medium mb-2">연도</label>
+												<Input
+													type="number"
+													value={record.year}
+													onChange={(e) => handleFinancialChange(index, 'year', e.target.value)}
+													placeholder="2024"
+												/>
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">총 매출 (USD)</label>
+												<Input
+													type="number"
+													value={record.totalRevenue}
+													onChange={(e) => handleFinancialChange(index, 'totalRevenue', e.target.value)}
+													placeholder="12400000"
+												/>
+												{record.totalRevenue && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.totalRevenue)}
+													</p>
+												)}
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">순이익 (USD)</label>
+												<Input
+													type="number"
+													value={record.netIncome}
+													onChange={(e) => handleFinancialChange(index, 'netIncome', e.target.value)}
+													placeholder="4200000"
+												/>
+												{record.netIncome && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.netIncome)}
+													</p>
+												)}
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">총 자산 (USD)</label>
+												<Input
+													type="number"
+													value={record.totalAssets}
+													onChange={(e) => handleFinancialChange(index, 'totalAssets', e.target.value)}
+													placeholder="18500000"
+												/>
+												{record.totalAssets && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.totalAssets)}
+													</p>
+												)}
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">총 부채 (USD)</label>
+												<Input
+													type="number"
+													value={record.totalLiabilities}
+													onChange={(e) => handleFinancialChange(index, 'totalLiabilities', e.target.value)}
+													placeholder="6200000"
+												/>
+												{record.totalLiabilities && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.totalLiabilities)}
+													</p>
+												)}
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">장기 부채 (USD)</label>
+												<Input
+													type="number"
+													value={record.longTermDebt}
+													onChange={(e) => handleFinancialChange(index, 'longTermDebt', e.target.value)}
+													placeholder="3100000"
+												/>
+												{record.longTermDebt && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.longTermDebt)}
+													</p>
+												)}
+											</div>
+											<div>
+												<label className="block text-sm font-medium mb-2">총 자본 (USD)</label>
+												<Input
+													type="number"
+													value={record.totalEquity}
+													onChange={(e) => handleFinancialChange(index, 'totalEquity', e.target.value)}
+													placeholder="12300000"
+												/>
+												{record.totalEquity && (
+													<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+														{formatCurrency(record.totalEquity)}
+													</p>
+												)}
 											</div>
 										</div>
-										<button
-											onClick={() => handleDeleteDocument(doc.id)}
-											className="text-red-500 hover:text-red-600 transition-colors ml-2 flex-shrink-0 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
-										>
-											<Trash2 className="h-4 w-4" />
-										</button>
 									</div>
 								))}
 							</div>
-						)}
+						</CardContent>
+					</Card>
+				</div>
+			)}
 
-						{uploadedDocuments.length === 0 && (
-							<div className="mt-6 text-center py-8 text-neutral-500 dark:text-neutral-400">
-								<FileText className="h-12 w-12 mx-auto mb-2 opacity-30" />
-								<p className="text-sm">아직 업로드된 문서가 없습니다</p>
+			{/* Add Goal Dialog */}
+			{showAddGoal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+						<div className="p-6">
+							<div className="flex items-center justify-between mb-4">
+								<h3 className="text-xl font-bold flex items-center gap-2">
+									<Target className="h-5 w-5 text-primary" />
+									새 전사 목표 추가
+								</h3>
+								<button
+									onClick={() => setShowAddGoal(false)}
+									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								>
+									<X className="h-5 w-5" />
+								</button>
 							</div>
-						)}
-					</CardContent>
-				</Card>
 
-				{/* Financial Records */}
-				{financialRecords.map((record, index) => (
-						<Card key={index}>
-							<CardHeader>
-								<div className="flex items-center justify-between">
-									<h3 className="text-lg font-bold">{record.year}년 재무 데이터</h3>
-									<button
-										onClick={() => handleDeleteFinancialRecord(index)}
-										className="text-red-500 hover:text-red-600"
-									>
-										<Trash2 className="h-5 w-5" />
-									</button>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										목표 이름 <span className="text-red-500">*</span>
+									</label>
+									<Input
+										value={newGoal.name || ''}
+										onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
+										placeholder="예: 연매출 100억 달성"
+									/>
 								</div>
-							</CardHeader>
-							<CardContent>
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+								<div>
+									<label className="block text-sm font-medium mb-2">설명</label>
+									<Textarea
+										value={newGoal.description || ''}
+										onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
+										placeholder="목표에 대한 상세 설명을 입력하세요"
+										rows={3}
+									/>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">
+											카테고리 <span className="text-red-500">*</span>
+										</label>
+										<select
+											value={newGoal.category || ''}
+											onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										>
+											<option value="">선택하세요</option>
+											{categories.map((cat) => (
+												<option key={cat} value={cat}>
+													{cat}
+												</option>
+											))}
+										</select>
+									</div>
+
+									<div>
+										<label className="block text-sm font-medium mb-2">우선순위</label>
+										<select
+											value={newGoal.priority || 'medium'}
+											onChange={(e) => setNewGoal({ ...newGoal, priority: e.target.value as 'high' | 'medium' | 'low' })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										>
+											<option value="high">높음</option>
+											<option value="medium">중간</option>
+											<option value="low">낮음</option>
+										</select>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">기간</label>
+										<select
+											value={newGoal.period || 'quarterly'}
+											onChange={(e) => setNewGoal({ ...newGoal, period: e.target.value as 'quarterly' | 'annual' })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										>
+											<option value="quarterly">분기</option>
+											<option value="annual">연간</option>
+										</select>
+									</div>
+
 									<div>
 										<label className="block text-sm font-medium mb-2">연도</label>
 										<Input
 											type="number"
-											value={record.year}
-											onChange={(e) => handleFinancialChange(index, 'year', e.target.value)}
+											value={newGoal.year || new Date().getFullYear()}
+											onChange={(e) => setNewGoal({ ...newGoal, year: e.target.value })}
 											placeholder="2024"
 										/>
 									</div>
+								</div>
+
+								{newGoal.period === 'quarterly' && (
 									<div>
-										<label className="block text-sm font-medium mb-2">총 매출 (USD)</label>
-										<Input
-											type="number"
-											value={record.totalRevenue}
-											onChange={(e) => handleFinancialChange(index, 'totalRevenue', e.target.value)}
-											placeholder="12400000"
-										/>
-										{record.totalRevenue && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.totalRevenue)}
-											</p>
-										)}
+										<label className="block text-sm font-medium mb-2">분기</label>
+										<select
+											value={newGoal.quarter || 'Q1'}
+											onChange={(e) => setNewGoal({ ...newGoal, quarter: e.target.value })}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										>
+											<option value="Q1">Q1</option>
+											<option value="Q2">Q2</option>
+											<option value="Q3">Q3</option>
+											<option value="Q4">Q4</option>
+										</select>
 									</div>
+								)}
+
+								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium mb-2">순이익 (USD)</label>
+										<label className="block text-sm font-medium mb-2">
+											목표 값 <span className="text-red-500">*</span>
+										</label>
 										<Input
 											type="number"
-											value={record.netIncome}
-											onChange={(e) => handleFinancialChange(index, 'netIncome', e.target.value)}
-											placeholder="4200000"
+											value={newGoal.targetValue || ''}
+											onChange={(e) => setNewGoal({ ...newGoal, targetValue: e.target.value })}
+											placeholder="10000000000"
 										/>
-										{record.netIncome && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.netIncome)}
-											</p>
-										)}
 									</div>
+
 									<div>
-										<label className="block text-sm font-medium mb-2">총 자산 (USD)</label>
+										<label className="block text-sm font-medium mb-2">단위</label>
 										<Input
-											type="number"
-											value={record.totalAssets}
-											onChange={(e) => handleFinancialChange(index, 'totalAssets', e.target.value)}
-											placeholder="18500000"
+											value={newGoal.unit || ''}
+											onChange={(e) => setNewGoal({ ...newGoal, unit: e.target.value })}
+											placeholder="KRW, USD, %, 건"
 										/>
-										{record.totalAssets && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.totalAssets)}
-											</p>
-										)}
-									</div>
-									<div>
-										<label className="block text-sm font-medium mb-2">총 부채 (USD)</label>
-										<Input
-											type="number"
-											value={record.totalLiabilities}
-											onChange={(e) => handleFinancialChange(index, 'totalLiabilities', e.target.value)}
-											placeholder="6200000"
-										/>
-										{record.totalLiabilities && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.totalLiabilities)}
-											</p>
-										)}
-									</div>
-									<div>
-										<label className="block text-sm font-medium mb-2">장기 부채 (USD)</label>
-										<Input
-											type="number"
-											value={record.longTermDebt}
-											onChange={(e) => handleFinancialChange(index, 'longTermDebt', e.target.value)}
-											placeholder="3100000"
-										/>
-										{record.longTermDebt && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.longTermDebt)}
-											</p>
-										)}
-									</div>
-									<div>
-										<label className="block text-sm font-medium mb-2">총 자본 (USD)</label>
-										<Input
-											type="number"
-											value={record.totalEquity}
-											onChange={(e) => handleFinancialChange(index, 'totalEquity', e.target.value)}
-											placeholder="12300000"
-										/>
-										{record.totalEquity && (
-											<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-												{formatCurrency(record.totalEquity)}
-											</p>
-										)}
 									</div>
 								</div>
-							</CardContent>
-						</Card>
-					))}
+
+								<div>
+									<label className="block text-sm font-medium mb-2">측정 방법</label>
+									<Input
+										value={newGoal.measurementMethod || ''}
+										onChange={(e) => setNewGoal({ ...newGoal, measurementMethod: e.target.value })}
+										placeholder="예: 월별 매출 집계"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">연관 부서</label>
+									<select
+										multiple
+										value={newGoal.department || []}
+										onChange={(e) => {
+											const selected = Array.from(e.target.selectedOptions, option => option.value)
+											setNewGoal({ ...newGoal, department: selected })
+										}}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[120px]"
+									>
+										{departments.map((dept) => (
+											<option key={dept} value={dept}>
+												{dept}
+											</option>
+										))}
+									</select>
+									<p className="text-xs text-neutral-500 mt-1">Ctrl/Cmd를 눌러 여러 부서를 선택하세요</p>
+								</div>
+
+								<div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl border border-green-200 dark:border-green-800">
+									<input
+										type="checkbox"
+										id="ai-recommendation"
+										checked={newGoal.aiRecommendationEnabled ?? true}
+										onChange={(e) => setNewGoal({ ...newGoal, aiRecommendationEnabled: e.target.checked })}
+										className="w-4 h-4"
+									/>
+									<label htmlFor="ai-recommendation" className="text-sm font-medium flex items-center gap-2">
+										<Brain className="h-4 w-4 text-green-600" />
+										AI 기반 OKR 추천 활성화
+									</label>
+								</div>
+
+								<div className="flex items-center gap-2 pt-2">
+									<Button onClick={handleAddGoal} className="flex-1 justify-center">
+										추가
+									</Button>
+									<Button
+										variant="outline"
+										onClick={() => setShowAddGoal(false)}
+										className="flex-1 justify-center"
+									>
+										취소
+									</Button>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			)}
 
-			{/* KPI Tab */}
-			{activeTab === 'kpi' && (
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<h2 className="text-xl font-bold">KPI 목표 설정</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-								회사의 핵심 성과 지표(KPI)를 설정하고 관리하세요
-							</p>
-						</div>
-						<div className="flex items-center gap-2">
-							<Button variant="outline" onClick={() => setShowAddKPI(true)} className="flex items-center gap-2">
-								<Plus className="h-4 w-4" />
-								KPI 추가
-							</Button>
-							<Button onClick={handleSaveKPIs} className="flex items-center gap-2">
-								<Save className="h-4 w-4" />
-								저장
-							</Button>
-						</div>
-					</div>
+			{/* Add Template Dialog */}
+			{showAddTemplate && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+						<div className="p-6">
+							<div className="flex items-center justify-between mb-4">
+								<h3 className="text-xl font-bold flex items-center gap-2">
+									<Sparkles className="h-5 w-5 text-green-600" />
+									새 OKR 템플릿 추가
+								</h3>
+								<button
+									onClick={() => setShowAddTemplate(false)}
+									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
 
-					{/* KPI List */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						{kpis.map((kpi) => (
-							<Card key={kpi.id}>
-								<CardContent className="p-4">
-									<div className="flex items-start justify-between mb-3">
-										<div className="flex-1">
-											<div className="flex items-center gap-2 mb-1">
-												<TrendingUp className="h-4 w-4 text-primary" />
-												<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">
-													{kpi.category}
-												</span>
-											</div>
-											<h3 className="font-bold text-lg mb-1">{kpi.name}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-												{kpi.description}
-											</p>
-										</div>
-										<button
-											onClick={() => handleDeleteKPI(kpi.id)}
-											className="text-red-500 hover:text-red-600 ml-2"
-										>
-											<Trash2 className="h-4 w-4" />
-										</button>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										연결할 전사 목표 <span className="text-red-500">*</span>
+									</label>
+									<select
+										value={newTemplate.goalId || ''}
+										onChange={(e) => setNewTemplate({ ...newTemplate, goalId: e.target.value })}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">선택하세요</option>
+										{companyGoals.map((goal) => (
+											<option key={goal.id} value={goal.id}>
+												{goal.name} ({goal.period === 'annual' ? goal.year : `${goal.year} ${goal.quarter}`})
+											</option>
+										))}
+									</select>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										템플릿 이름 <span className="text-red-500">*</span>
+									</label>
+									<Input
+										value={newTemplate.name || ''}
+										onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
+										placeholder="예: 신규 고객 획득 증대"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">설명</label>
+									<Textarea
+										value={newTemplate.description || ''}
+										onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
+										placeholder="템플릿에 대한 상세 설명을 입력하세요"
+										rows={3}
+									/>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										대상 부서 <span className="text-red-500">*</span>
+									</label>
+									<select
+										multiple
+										value={newTemplate.targetDepartment || []}
+										onChange={(e) => {
+											const selected = Array.from(e.target.selectedOptions, option => option.value)
+											setNewTemplate({ ...newTemplate, targetDepartment: selected })
+										}}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[100px]"
+									>
+										{departments.map((dept) => (
+											<option key={dept} value={dept}>
+												{dept}
+											</option>
+										))}
+									</select>
+									<p className="text-xs text-neutral-500 mt-1">Ctrl/Cmd를 눌러 여러 부서를 선택하세요</p>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">대상 역할</label>
+									<select
+										multiple
+										value={newTemplate.targetRole || []}
+										onChange={(e) => {
+											const selected = Array.from(e.target.selectedOptions, option => option.value)
+											setNewTemplate({ ...newTemplate, targetRole: selected })
+										}}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[100px]"
+									>
+										{roles.map((role) => (
+											<option key={role} value={role}>
+												{role}
+											</option>
+										))}
+									</select>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium mb-2">추천 점수 (0-100)</label>
+									<Input
+										type="number"
+										min="0"
+										max="100"
+										value={newTemplate.recommendationScore || 50}
+										onChange={(e) => setNewTemplate({ ...newTemplate, recommendationScore: Number(e.target.value) })}
+									/>
+								</div>
+
+								<div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl border border-green-200 dark:border-green-800">
+									<input
+										type="checkbox"
+										id="auto-assign"
+										checked={newTemplate.autoAssign || false}
+										onChange={(e) => setNewTemplate({ ...newTemplate, autoAssign: e.target.checked })}
+										className="w-4 h-4"
+									/>
+									<label htmlFor="auto-assign" className="text-sm font-medium">
+										해당 부서/역할에 자동 할당
+									</label>
+								</div>
+
+								{/* Key Results */}
+								<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+									<div className="flex items-center justify-between mb-3">
+										<label className="block text-sm font-medium">핵심 결과 (Key Results)</label>
+										<Button variant="outline" size="sm" onClick={addKeyResult} className="flex items-center gap-1">
+											<Plus className="h-3 w-3" />
+											추가
+										</Button>
 									</div>
-									<div className="flex items-center gap-2 p-3 bg-primary/5 rounded-xl">
-										<Target className="h-5 w-5 text-primary" />
-										<div>
-											<p className="text-xs text-neutral-600 dark:text-neutral-400">목표</p>
-											<p className="font-bold text-lg">
-												{kpi.target} {kpi.unit}
-											</p>
+									
+									{(newTemplate.keyResults || []).length === 0 ? (
+										<p className="text-sm text-neutral-500 text-center py-4">
+											핵심 결과를 추가하세요
+										</p>
+									) : (
+										<div className="space-y-3">
+											{(newTemplate.keyResults || []).map((kr) => (
+												<div key={kr.id} className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
+													<div className="flex items-start gap-2 mb-3">
+														<Input
+															value={kr.description}
+															onChange={(e) => updateKeyResult(kr.id, 'description', e.target.value)}
+															placeholder="핵심 결과 설명"
+															className="flex-1"
+														/>
+														<button
+															onClick={() => removeKeyResult(kr.id)}
+															className="text-red-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+														>
+															<X className="h-4 w-4" />
+														</button>
+													</div>
+													<div className="grid grid-cols-2 gap-2">
+														<Input
+															type="number"
+															value={kr.targetValue}
+															onChange={(e) => updateKeyResult(kr.id, 'targetValue', e.target.value)}
+															placeholder="목표 값"
+														/>
+														<Input
+															value={kr.unit}
+															onChange={(e) => updateKeyResult(kr.id, 'unit', e.target.value)}
+															placeholder="단위"
+														/>
+													</div>
+												</div>
+											))}
 										</div>
-									</div>
-								</CardContent>
-							</Card>
-						))}
+									)}
+								</div>
+
+								<div className="flex items-center gap-2 pt-2">
+									<Button onClick={handleAddTemplate} className="flex-1 justify-center">
+										추가
+									</Button>
+									<Button
+										variant="outline"
+										onClick={() => setShowAddTemplate(false)}
+										className="flex-1 justify-center"
+									>
+										취소
+									</Button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			)}
@@ -1518,7 +2384,8 @@ export default function CompanySettingsPage() {
 					</div>
 				</div>
 			)}
+			
+			<Toaster />
 		</div>
 	)
 }
-

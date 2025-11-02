@@ -462,7 +462,7 @@ export default function CompanySignUpPage() {
 					<p className="text-sm text-neutral-600 dark:text-neutral-400">
 						Already have an account?{' '}
 						<button
-							onClick={() => navigate('/auth/sign-in')}
+							onClick={() => navigate('/')}
 							className="text-primary hover:underline font-medium"
 						>
 							Sign In

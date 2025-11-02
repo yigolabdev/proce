@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import SignInPage from '../app/auth/sign-in/page'
 import SignUpPage from '../app/auth/sign-up/page'
 import ForgotPasswordPage from '../app/auth/forgot-password/page'
 import CompanySignUpPage from '../app/auth/company-signup/page'
@@ -52,7 +51,6 @@ const queryClient = new QueryClient({
 // 라우터 설정
 const router = createBrowserRouter([
 	{ path: '/', element: <LandingPage /> },
-	{ path: '/auth/sign-in', element: <SignInPage /> },
 	{ path: '/auth/sign-up', element: <SignUpPage /> },
 	{ path: '/auth/forgot-password', element: <ForgotPasswordPage /> },
 	{ path: '/auth/company-signup', element: <CompanySignUpPage /> },

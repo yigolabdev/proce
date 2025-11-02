@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import Input from '../../../components/ui/Input'
-import { Users, UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Users, UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import type { UserRole } from '../../../types/auth.types'
@@ -327,18 +327,172 @@ export default function UsersManagementPage() {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [isInviting, setIsInviting] = useState(false)
 	const [inviteEmail, setInviteEmail] = useState('')
+	const [inviteEmails, setInviteEmails] = useState<string[]>([])
 	const [currentPage, setCurrentPage] = useState(1)
 	const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
 	const [editForm, setEditForm] = useState<Partial<TeamMember>>({})
+	const [showBulkUpload, setShowBulkUpload] = useState(false)
+	const [uploadedEmails, setUploadedEmails] = useState<Array<{ email: string; name?: string; valid: boolean; error?: string }>>([])
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
-	const handleInvite = () => {
-		if (!inviteEmail) {
-			toast.error('Please enter an email address')
+	// Email validation
+	const validateEmail = (email: string): boolean => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+		return emailRegex.test(email.trim())
+	}
+
+	// Handle email input for Gmail-style tags
+	const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+			e.preventDefault()
+			addEmail()
+		} else if (e.key === 'Backspace' && !inviteEmail && inviteEmails.length > 0) {
+			// Remove last email tag when backspace is pressed with empty input
+			setInviteEmails((prev) => prev.slice(0, -1))
+		}
+	}
+
+	const addEmail = () => {
+		const email = inviteEmail.trim()
+		if (!email) return
+
+		if (!validateEmail(email)) {
+			toast.error('Please enter a valid email address')
 			return
 		}
-		toast.success(`Invitation sent to ${inviteEmail}`)
+
+		if (inviteEmails.includes(email)) {
+			toast.error('This email is already added')
+			return
+		}
+
+		if (members.some((m) => m.email === email)) {
+			toast.error('This user is already a member')
+			return
+		}
+
+		setInviteEmails((prev) => [...prev, email])
+		setInviteEmail('')
+	}
+
+	const removeEmail = (emailToRemove: string) => {
+		setInviteEmails((prev) => prev.filter((e) => e !== emailToRemove))
+	}
+
+	const handleSendInvites = () => {
+		if (inviteEmails.length === 0) {
+			toast.error('Please add at least one email address')
+			return
+		}
+
+		// Send invitations
+		toast.success(`Invitation${inviteEmails.length > 1 ? 's' : ''} sent to ${inviteEmails.length} user${inviteEmails.length > 1 ? 's' : ''}`)
+		
+		// Reset state
+		setInviteEmails([])
 		setInviteEmail('')
 		setIsInviting(false)
+	}
+
+	// Handle file upload for bulk invites
+	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+
+		const fileExtension = file.name.split('.').pop()?.toLowerCase()
+		
+		if (fileExtension === 'csv') {
+			// Handle CSV file
+			const reader = new FileReader()
+			reader.onload = (event) => {
+				const text = event.target?.result as string
+				parseCsvData(text)
+			}
+			reader.readAsText(file)
+		} else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+			// For Excel files, show instructions for CSV conversion
+			toast.error('Please convert your Excel file to CSV format first')
+		} else {
+			toast.error('Please upload a CSV file')
+		}
+
+		// Reset file input
+		if (fileInputRef.current) {
+			fileInputRef.current.value = ''
+		}
+	}
+
+	const parseCsvData = (csvText: string) => {
+		const lines = csvText.split('\n').filter((line) => line.trim())
+		const emails: Array<{ email: string; name?: string; valid: boolean; error?: string }> = []
+
+		lines.forEach((line, index) => {
+			// Skip header row if it contains "email" or "name"
+			if (index === 0 && (line.toLowerCase().includes('email') || line.toLowerCase().includes('name'))) {
+				return
+			}
+
+			const columns = line.split(',').map((col) => col.trim().replace(/['"]/g, ''))
+			const email = columns[0]
+			const name = columns[1] || undefined
+
+			if (!email) return
+
+			const valid = validateEmail(email)
+			const alreadyMember = members.some((m) => m.email === email)
+			const duplicate = emails.some((e) => e.email === email)
+
+			if (!valid) {
+				emails.push({ email, name, valid: false, error: 'Invalid email format' })
+			} else if (alreadyMember) {
+				emails.push({ email, name, valid: false, error: 'Already a member' })
+			} else if (duplicate) {
+				emails.push({ email, name, valid: false, error: 'Duplicate in file' })
+			} else {
+				emails.push({ email, name, valid: true })
+			}
+		})
+
+		setUploadedEmails(emails)
+		setShowBulkUpload(true)
+		
+		const validCount = emails.filter((e) => e.valid).length
+		const invalidCount = emails.length - validCount
+		
+		if (invalidCount > 0) {
+			toast.warning(`Found ${validCount} valid email(s) and ${invalidCount} invalid/duplicate email(s)`)
+		} else {
+			toast.success(`Found ${validCount} valid email(s)`)
+		}
+	}
+
+	const handleBulkInvite = () => {
+		const validEmails = uploadedEmails.filter((e) => e.valid)
+		
+		if (validEmails.length === 0) {
+			toast.error('No valid emails to invite')
+			return
+		}
+
+		toast.success(`Invitation${validEmails.length > 1 ? 's' : ''} sent to ${validEmails.length} user${validEmails.length > 1 ? 's' : ''}`)
+		
+		// Reset state
+		setUploadedEmails([])
+		setShowBulkUpload(false)
+	}
+
+	const downloadTemplate = () => {
+		const csvContent = 'email,name\nexample1@company.com,John Doe\nexample2@company.com,Jane Smith\nexample3@company.com,Mike Johnson'
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+		const link = document.createElement('a')
+		const url = URL.createObjectURL(blob)
+		link.setAttribute('href', url)
+		link.setAttribute('download', 'email_template.csv')
+		link.style.visibility = 'hidden'
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+		toast.success('Template downloaded!')
 	}
 
 	const handleDelete = (id: string, name: string) => {
@@ -500,29 +654,228 @@ export default function UsersManagementPage() {
 				</Card>
 			</div>
 
-			{/* Invite Modal */}
+			{/* Invite Modal - Gmail Style */}
 			{isInviting && (
 				<Card className="border-primary/50 bg-primary/5">
 					<CardContent className="p-6">
-						<h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-							<Mail className="h-5 w-5 text-primary" />
-							Invite User
-						</h3>
-						<div className="flex gap-3">
-							<Input
-								type="email"
-								placeholder="Enter email address"
-								value={inviteEmail}
-								onChange={(e) => setInviteEmail(e.target.value)}
-								className="flex-1"
-							/>
-							<Button onClick={handleInvite}>Send Invite</Button>
-							<Button variant="outline" onClick={() => setIsInviting(false)}>
-								Cancel
-							</Button>
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="font-bold text-lg flex items-center gap-2">
+								<Mail className="h-5 w-5 text-primary" />
+								Invite Users
+							</h3>
+							<button
+								onClick={() => {
+									setIsInviting(false)
+									setInviteEmails([])
+									setInviteEmail('')
+								}}
+								className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+							>
+								<X className="h-5 w-5" />
+							</button>
+						</div>
+
+						{/* Gmail-style Email Input */}
+						<div className="space-y-4">
+							<div className="border border-neutral-300 dark:border-neutral-700 rounded-2xl p-3 bg-white dark:bg-neutral-900 min-h-[100px]">
+								<div className="flex flex-wrap gap-2 mb-2">
+									{inviteEmails.map((email) => (
+										<div
+											key={email}
+											className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+										>
+											<span>{email}</span>
+											<button
+												onClick={() => removeEmail(email)}
+												className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+											>
+												<X className="h-3 w-3" />
+											</button>
+										</div>
+									))}
+									<input
+										type="text"
+										value={inviteEmail}
+										onChange={(e) => setInviteEmail(e.target.value)}
+										onKeyDown={handleEmailKeyDown}
+										onBlur={addEmail}
+										placeholder={inviteEmails.length === 0 ? 'Enter email addresses (separate with comma, space, or Enter)' : ''}
+										className="flex-1 min-w-[200px] outline-none bg-transparent text-sm"
+									/>
+								</div>
+								{inviteEmails.length > 0 && (
+									<div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										{inviteEmails.length} email{inviteEmails.length > 1 ? 's' : ''} added
+									</div>
+								)}
+							</div>
+
+							{/* Bulk Upload Option */}
+							<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+								<div className="flex items-center justify-between mb-3">
+									<h4 className="font-medium text-sm flex items-center gap-2">
+										<FileSpreadsheet className="h-4 w-4 text-primary" />
+										Bulk Upload from CSV
+									</h4>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={downloadTemplate}
+										className="flex items-center gap-1 text-xs"
+									>
+										<Download className="h-3 w-3" />
+										Download Template
+									</Button>
+								</div>
+								<div className="flex gap-2">
+									<input
+										ref={fileInputRef}
+										type="file"
+										accept=".csv,.xlsx,.xls"
+										onChange={handleFileUpload}
+										className="hidden"
+									/>
+									<Button
+										variant="outline"
+										onClick={() => fileInputRef.current?.click()}
+										className="flex-1 flex items-center justify-center gap-2"
+									>
+										<Upload className="h-4 w-4" />
+										Upload CSV File
+									</Button>
+								</div>
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+									CSV format: email,name (optional)
+								</p>
+							</div>
+
+							{/* Action Buttons */}
+							<div className="flex items-center gap-3">
+								<Button onClick={handleSendInvites} className="flex-1">
+									<Mail className="h-4 w-4 mr-2" />
+									Send {inviteEmails.length > 0 ? `${inviteEmails.length} ` : ''}Invite{inviteEmails.length !== 1 ? 's' : ''}
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => {
+										setIsInviting(false)
+										setInviteEmails([])
+										setInviteEmail('')
+									}}
+									className="flex-1"
+								>
+									Cancel
+								</Button>
+							</div>
 						</div>
 					</CardContent>
 				</Card>
+			)}
+
+			{/* Bulk Upload Preview Modal */}
+			{showBulkUpload && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+					<Card className="w-full max-w-4xl max-h-[80vh] flex flex-col">
+						<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+							<div className="flex items-center justify-between">
+								<h3 className="font-bold text-xl flex items-center gap-2">
+									<FileSpreadsheet className="h-6 w-6 text-primary" />
+									Bulk Invite Preview
+								</h3>
+								<button
+									onClick={() => {
+										setShowBulkUpload(false)
+										setUploadedEmails([])
+									}}
+									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
+						</CardHeader>
+						<CardContent className="p-6 overflow-y-auto flex-1">
+							<div className="space-y-4">
+								{/* Summary */}
+								<div className="grid grid-cols-2 gap-4">
+									<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+										<div className="flex items-center gap-2 mb-2">
+											<CheckCircle2 className="h-5 w-5 text-green-600" />
+											<span className="font-medium text-green-900 dark:text-green-100">Valid Emails</span>
+										</div>
+										<div className="text-3xl font-bold text-green-600">
+											{uploadedEmails.filter((e) => e.valid).length}
+										</div>
+									</div>
+									<div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+										<div className="flex items-center gap-2 mb-2">
+											<AlertCircle className="h-5 w-5 text-red-600" />
+											<span className="font-medium text-red-900 dark:text-red-100">Invalid/Duplicate</span>
+										</div>
+										<div className="text-3xl font-bold text-red-600">
+											{uploadedEmails.filter((e) => !e.valid).length}
+										</div>
+									</div>
+								</div>
+
+								{/* Email List */}
+								<div className="space-y-2">
+									<h4 className="font-medium text-sm text-neutral-600 dark:text-neutral-400">Email List</h4>
+									<div className="max-h-[400px] overflow-y-auto space-y-2">
+										{uploadedEmails.map((item, index) => (
+											<div
+												key={index}
+												className={`p-3 border rounded-xl flex items-center justify-between ${
+													item.valid
+														? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
+														: 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
+												}`}
+											>
+												<div className="flex items-center gap-3 flex-1 min-w-0">
+													{item.valid ? (
+														<CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+													) : (
+														<AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+													)}
+													<div className="flex-1 min-w-0">
+														<div className="font-medium text-sm truncate">{item.email}</div>
+														{item.name && <div className="text-xs text-neutral-600 dark:text-neutral-400">{item.name}</div>}
+													</div>
+												</div>
+												{!item.valid && item.error && (
+													<span className="text-xs text-red-600 dark:text-red-400 ml-2">
+														{item.error}
+													</span>
+												)}
+											</div>
+										))}
+									</div>
+								</div>
+
+								{/* Action Buttons */}
+								<div className="flex items-center gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+									<Button
+										onClick={handleBulkInvite}
+										disabled={uploadedEmails.filter((e) => e.valid).length === 0}
+										className="flex-1"
+									>
+										<Mail className="h-4 w-4 mr-2" />
+										Send {uploadedEmails.filter((e) => e.valid).length} Invite{uploadedEmails.filter((e) => e.valid).length !== 1 ? 's' : ''}
+									</Button>
+									<Button
+										variant="outline"
+										onClick={() => {
+											setShowBulkUpload(false)
+											setUploadedEmails([])
+										}}
+										className="flex-1"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			)}
 
 			{/* Edit Modal */}

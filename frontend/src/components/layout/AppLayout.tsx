@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, Award, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -32,12 +32,12 @@ export default function AppLayout() {
 			title: 'Work',
 			roles: ['worker', 'admin', 'executive'] as UserRole[],
 			items: [
+				{ to: '/okr', label: 'My Goals (OKR)', icon: Target, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/input', label: 'Work Input', icon: FileText, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/inbox', label: 'Inbox', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
 				{ to: '/projects', label: 'Projects', icon: FolderKanban, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/okr', label: 'OKR', icon: Target, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/inbox', label: 'Notifications', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
 			] as MenuItem[],
 		},
 		{
@@ -53,11 +53,9 @@ export default function AppLayout() {
 		roles: ['executive'] as UserRole[],
 		items: [
 			{ to: '/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-			{ to: '/executive/goals', label: 'Annual Goals', icon: Target, roles: ['executive'] },
 			{ to: '/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
 			{ to: '/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
 			{ to: '/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
-			{ to: '/performance', label: 'Performance', icon: Award, roles: ['executive', 'admin'] },
 		] as MenuItem[],
 	},
 	]

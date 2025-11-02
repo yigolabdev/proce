@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
 
 			// 3초 후 로그인 페이지로 이동
 			setTimeout(() => {
-				navigate('/auth/sign-in')
+				navigate('/')
 			}, 3000)
 		}, 1500)
 	}
@@ -342,7 +342,7 @@ export default function ForgotPasswordPage() {
 									<br />
 									Redirecting to sign in page...
 								</p>
-								<Button onClick={() => navigate('/auth/sign-in')} className="w-full h-12 text-base">
+								<Button onClick={() => navigate('/')} className="w-full h-12 text-base">
 									Go to Sign In
 								</Button>
 							</div>
@@ -356,7 +356,7 @@ export default function ForgotPasswordPage() {
 						<p className="text-sm text-neutral-600 dark:text-neutral-400">
 							Remember your password?{' '}
 							<button
-								onClick={() => navigate('/auth/sign-in')}
+								onClick={() => navigate('/')}
 								className="text-primary hover:underline font-medium"
 							>
 								Sign In

@@ -177,7 +177,76 @@ export default function InboxPage() {
 		setIsLoading(true)
 
 		setTimeout(() => {
-			const mockRecommendations: TaskRecommendation[] = [
+			// Load actual data from localStorage
+			const projectsData = localStorage.getItem('projects')
+			const workEntriesData = localStorage.getItem('workEntries')
+			
+			const projects = projectsData ? JSON.parse(projectsData) : []
+			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: any) => ({
+				...e,
+				date: new Date(e.date)
+			})) : []
+			
+			// Mock OKR data (would come from localStorage in production)
+			const objectives = [
+				{ id: '1', title: 'Increase Product Market Fit', progress: 45, target: 80 },
+				{ id: '2', title: 'Scale Revenue Growth', progress: 30, target: 100 },
+				{ id: '3', title: 'Enhance Team Productivity', progress: 70, target: 90 },
+			]
+			
+			// Analyze and generate recommendations
+			const generatedRecommendations: TaskRecommendation[] = []
+			
+			// 1. Check for low-progress objectives
+			objectives.forEach(objective => {
+				if (objective.progress < 50) {
+					const gap = objective.target - objective.progress
+					generatedRecommendations.push({
+						id: `okr-${objective.id}`,
+						title: `Boost Progress on "${objective.title}"`,
+						description: `Your goal "${objective.title}" is at ${objective.progress}% (target: ${objective.target}%). Focus on key results to close the ${gap}% gap.`,
+						priority: objective.progress < 30 ? 'high' : 'medium',
+						category: 'goal-progress',
+						estimatedTime: '2-4 hours',
+						deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+						reason: `AI detected low progress (${objective.progress}%) on this critical goal. Recommended action to avoid falling behind.`,
+						relatedSkills: ['Strategic Planning', 'Goal Management', 'Execution'],
+						confidence: 90,
+						status: 'pending',
+					})
+				}
+			})
+			
+			// 2. Check for projects with no recent activity
+			const sevenDaysAgo = new Date()
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+			
+			projects
+				.filter((p: any) => p.status === 'active')
+				.forEach((project: any) => {
+					const recentWork = workEntries.filter((e: any) => 
+						e.projectId === project.id && new Date(e.date) >= sevenDaysAgo
+					)
+					
+					if (recentWork.length === 0) {
+						generatedRecommendations.push({
+							id: `project-${project.id}`,
+							title: `Update Project: ${project.name}`,
+							description: `No activity recorded for "${project.name}" in the last 7 days. Consider updating progress or scheduling next steps.`,
+							priority: 'medium',
+							category: 'project-update',
+							estimatedTime: '1-2 hours',
+							deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+							reason: 'AI detected no recent activity on this active project. Regular updates ensure project momentum.',
+							relatedSkills: ['Project Management', 'Communication', 'Planning'],
+							confidence: 85,
+							status: 'pending',
+						})
+					}
+				})
+			
+			// 3. Add some standard recommendations
+			const standardRecommendations: TaskRecommendation[] = [
 				{
 					id: '1',
 					title: 'Review Q4 Financial Reports',
@@ -269,9 +338,27 @@ export default function InboxPage() {
 					icon: <Zap className="h-5 w-5 text-purple-600" />,
 				},
 			]
+			
+			// Combine AI-generated and standard recommendations
+			const allRecommendations = [
+				...generatedRecommendations,
+				...standardRecommendations.slice(0, Math.max(0, 5 - generatedRecommendations.length))
+			]
 
-			setRecommendations(mockRecommendations)
-			setInsights(mockInsights)
+			setRecommendations(allRecommendations)
+			
+			// Update insights based on actual data
+			const updatedInsights: RecommendationInsight[] = [
+				{
+					type: 'productivity',
+					title: 'AI Analysis Active',
+					description: `Analyzed ${projects.length} projects and ${objectives.length} goals to generate personalized recommendations.`,
+					icon: <Brain className="h-5 w-5 text-blue-600" />,
+				},
+				...mockInsights.slice(0, 3)
+			]
+			
+			setInsights(updatedInsights)
 			setLastUpdated(new Date())
 			setIsLoading(false)
 		}, 1000)
@@ -326,10 +413,30 @@ export default function InboxPage() {
 
 	// Recommendation handlers
 	const handleAcceptTask = (id: string) => {
+		const task = recommendations.find((rec) => rec.id === id)
+		if (!task) return
+
+		// Work Input으로 이동하면서 추천 정보 전달
+		sessionStorage.setItem('workInputData', JSON.stringify({
+			title: task.title,
+			description: task.description,
+			category: task.category.toLowerCase().replace(/\s+/g, '-'),
+			estimatedTime: task.estimatedTime,
+			priority: task.priority,
+			deadline: task.deadline,
+			skills: task.relatedSkills,
+			aiReason: task.reason,
+			source: 'ai-recommendation'
+		}))
+
+		// 상태 업데이트
 		setRecommendations((prev) =>
 			prev.map((rec) => (rec.id === id ? { ...rec, status: 'accepted' } : rec))
 		)
-		toast.success('Task accepted! Added to your task list.')
+
+		// Work Input 페이지로 이동
+		navigate('/input')
+		toast.success('Redirecting to Work Input to complete task details...')
 	}
 
 	const handleRejectTask = (id: string) => {
@@ -412,10 +519,10 @@ export default function InboxPage() {
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
 						<Inbox className="h-8 w-8 text-primary" />
-						Inbox
+						Notifications & AI Assistant
 					</h1>
 					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Manage your messages, tasks, and AI-powered recommendations
+						Stay updated with messages, tasks, and AI-powered recommendations
 					</p>
 				</div>
 				<div className="flex items-center gap-4">

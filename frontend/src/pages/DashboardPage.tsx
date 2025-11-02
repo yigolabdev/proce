@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
 import { 
 	TrendingUp, 
 	TrendingDown,
@@ -10,8 +12,37 @@ import {
 	ArrowRight,
 	CheckCircle2,
 	AlertCircle,
-	Sparkles
+	Sparkles,
+	Target,
+	Eye,
+	Clock,
+	FileText,
+	FolderKanban
 } from 'lucide-react'
+
+interface WorkEntry {
+	id: string
+	title: string
+	description: string
+	category: string
+	projectId?: string
+	objectiveId?: string
+	tags: string[]
+	date: Date
+	duration?: string
+	status: 'draft' | 'submitted'
+	isConfidential?: boolean
+}
+
+interface Project {
+	id: string
+	name: string
+}
+
+interface Objective {
+	id: string
+	title: string
+}
 
 interface KPIMetric {
 	id: string
@@ -34,6 +65,118 @@ interface Achievement {
 }
 
 export default function DashboardPage() {
+	const navigate = useNavigate()
+	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
+	
+	// Load work entries from localStorage
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem('workEntries')
+			if (saved) {
+				const parsed = JSON.parse(saved)
+				const entriesWithDates = parsed.map((entry: any) => ({
+					...entry,
+					date: new Date(entry.date),
+				}))
+				setWorkEntries(entriesWithDates)
+			}
+		} catch (error) {
+			console.error('Failed to load work entries:', error)
+		}
+	}, [])
+	
+	// Calculate real OKR progress based on actual work entries
+	const calculateOKRProgress = (objectiveId: string) => {
+		const relatedEntries = workEntries.filter(entry => entry.objectiveId === objectiveId)
+		if (relatedEntries.length === 0) return 0
+		
+		// Simple calculation: each work entry contributes to progress
+		// This is a basic approach - in production, you'd have more sophisticated logic
+		const baseProgress = Math.min(relatedEntries.length * 15, 100)
+		return baseProgress
+	}
+	
+	// OKR Data with real progress calculation
+	const myOKRs = [
+		{
+			id: '1',
+			title: 'Increase Product Market Fit',
+			progress: calculateOKRProgress('1') || 75,
+			keyResultsCount: 3,
+			status: (calculateOKRProgress('1') >= 75 ? 'on-track' : calculateOKRProgress('1') >= 50 ? 'at-risk' : 'behind') as const,
+		},
+		{
+			id: '2',
+			title: 'Scale Revenue Growth',
+			progress: calculateOKRProgress('2') || 64,
+			keyResultsCount: 3,
+			status: (calculateOKRProgress('2') >= 75 ? 'on-track' : calculateOKRProgress('2') >= 50 ? 'at-risk' : 'behind') as const,
+		},
+		{
+			id: '3',
+			title: 'Enhance Team Productivity',
+			progress: calculateOKRProgress('3') || 85,
+			keyResultsCount: 4,
+			status: (calculateOKRProgress('3') >= 75 ? 'on-track' : calculateOKRProgress('3') >= 50 ? 'at-risk' : 'behind') as const,
+		},
+	]
+
+	const avgOKRProgress = Math.round(
+		myOKRs.reduce((sum, okr) => sum + okr.progress, 0) / myOKRs.length
+	)
+	
+	// Recent Work (Last 7 Days)
+	const recentWork = useMemo(() => {
+		const sevenDaysAgo = new Date()
+		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+		
+		return workEntries
+			.filter(entry => {
+				const entryDate = new Date(entry.date)
+				return entryDate >= sevenDaysAgo
+			})
+			.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+			.slice(0, 5)
+	}, [workEntries])
+	
+	// Load projects and objectives for display
+	const [projects, setProjects] = useState<Project[]>([])
+	const [objectives, setObjectives] = useState<Objective[]>([])
+	
+	useEffect(() => {
+		// Load projects
+		const savedProjects = localStorage.getItem('projects')
+		if (savedProjects) {
+			setProjects(JSON.parse(savedProjects))
+		}
+		
+		// Load objectives (using same as OKR page)
+		setObjectives(myOKRs)
+	}, [])
+	
+	const getProjectName = (projectId?: string) => {
+		if (!projectId) return null
+		const project = projects.find((p: any) => p.id === projectId)
+		return project?.name
+	}
+	
+	const getObjectiveName = (objectiveId?: string) => {
+		if (!objectiveId) return null
+		const objective = objectives.find((o: any) => o.id === objectiveId)
+		return objective?.title
+	}
+	
+	const formatRelativeDate = (date: Date) => {
+		const now = new Date()
+		const diff = now.getTime() - date.getTime()
+		const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+		
+		if (days === 0) return 'Today'
+		if (days === 1) return 'Yesterday'
+		if (days < 7) return `${days} days ago`
+		return date.toLocaleDateString()
+	}
+	
 	// KPI Metrics
 	const [kpiMetrics] = useState<KPIMetric[]>([
 		{
@@ -245,6 +388,190 @@ export default function DashboardPage() {
 							총 {kpiMetrics.length}개 KPI
 						</span>
 					</div>
+				</CardContent>
+			</Card>
+
+			{/* My OKR Summary */}
+			<Card className="border-primary/20">
+				<CardHeader>
+					<div className="flex items-center justify-between">
+						<div>
+							<h2 className="text-xl font-bold flex items-center gap-2">
+								<Target className="h-6 w-6 text-primary" />
+								내 목표 (My OKR)
+							</h2>
+							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+								개인 목표 진행 상황
+							</p>
+						</div>
+						<div className="flex items-center gap-3">
+							<div className="text-right">
+								<p className="text-3xl font-bold text-primary">{avgOKRProgress}%</p>
+								<p className="text-xs text-neutral-600 dark:text-neutral-400">평균 달성률</p>
+							</div>
+							<Button 
+								variant="outline" 
+								size="sm" 
+								onClick={() => navigate('/okr')}
+								className="flex items-center gap-2"
+							>
+								<Eye className="h-4 w-4" />
+								자세히 보기
+							</Button>
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						{myOKRs.map((okr) => (
+							<div
+								key={okr.id}
+								className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-primary transition-colors cursor-pointer"
+								onClick={() => navigate('/okr')}
+							>
+								<div className="flex items-start justify-between mb-3">
+									<h3 className="font-bold text-sm flex-1">{okr.title}</h3>
+									<span
+										className={`text-xs font-medium px-2 py-1 rounded-full ${
+											okr.status === 'on-track'
+												? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+												: okr.status === 'at-risk'
+												? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+												: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+										}`}
+									>
+										{okr.status === 'on-track' ? '순조' : okr.status === 'at-risk' ? '주의' : '위험'}
+									</span>
+								</div>
+								<div className="space-y-2">
+									<div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
+										<span>{okr.keyResultsCount}개 핵심 결과</span>
+										<span className="font-bold text-primary">{okr.progress}%</span>
+									</div>
+									<div className="relative w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+										<div
+											className={`absolute top-0 left-0 h-full rounded-full transition-all duration-300 ${
+												okr.status === 'on-track'
+													? 'bg-green-500'
+													: okr.status === 'at-risk'
+													? 'bg-orange-500'
+													: 'bg-red-500'
+											}`}
+											style={{ width: `${okr.progress}%` }}
+										/>
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+					{myOKRs.length === 0 && (
+						<div className="text-center py-12">
+							<Target className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
+							<p className="text-neutral-600 dark:text-neutral-400 mb-4">
+								아직 설정된 목표가 없습니다
+							</p>
+							<Button onClick={() => navigate('/okr')} className="flex items-center gap-2">
+								<Target className="h-4 w-4" />
+								목표 설정하기
+							</Button>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+
+			{/* Recent Work Section */}
+			<Card>
+				<CardHeader>
+					<div className="flex items-center justify-between">
+						<div>
+							<h2 className="text-xl font-bold flex items-center gap-2">
+								<FileText className="h-6 w-6 text-primary" />
+								최근 업무 (Recent Work)
+							</h2>
+							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+								지난 7일간의 업무 활동
+							</p>
+						</div>
+						<Button 
+							variant="outline" 
+							size="sm" 
+							onClick={() => navigate('/work-history')}
+							className="flex items-center gap-2"
+						>
+							전체 보기
+							<ArrowRight className="h-4 w-4" />
+						</Button>
+					</div>
+				</CardHeader>
+				<CardContent>
+					{recentWork.length === 0 ? (
+						<div className="text-center py-12">
+							<FileText className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
+							<p className="text-neutral-600 dark:text-neutral-400 mb-2">
+								최근 7일간 업무 기록이 없습니다
+							</p>
+							<p className="text-sm text-neutral-500 mb-4">
+								업무를 입력하면 여기에 표시됩니다
+							</p>
+							<Button onClick={() => navigate('/input')} className="flex items-center gap-2">
+								<FileText className="h-4 w-4" />
+								업무 입력하기
+							</Button>
+						</div>
+					) : (
+						<div className="space-y-3">
+							{recentWork.map(entry => (
+								<div
+									key={entry.id}
+									className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-primary hover:shadow-md transition-all cursor-pointer"
+									onClick={() => navigate('/work-history')}
+								>
+									<div className="flex items-start justify-between mb-2">
+										<h3 className="font-bold text-sm flex-1">{entry.title}</h3>
+										<span className="text-xs text-neutral-500 ml-2 shrink-0">
+											{formatRelativeDate(new Date(entry.date))}
+										</span>
+									</div>
+									<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-3 line-clamp-2">
+										{entry.description}
+									</p>
+									<div className="flex items-center gap-2 flex-wrap">
+										{entry.projectId && getProjectName(entry.projectId) && (
+											<span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">
+												<FolderKanban className="h-3 w-3" />
+												{getProjectName(entry.projectId)}
+											</span>
+										)}
+										{entry.objectiveId && getObjectiveName(entry.objectiveId) && (
+											<span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">
+												<Target className="h-3 w-3" />
+												{getObjectiveName(entry.objectiveId)}
+											</span>
+										)}
+										{entry.duration && (
+											<span className="inline-flex items-center gap-1 text-xs text-neutral-500">
+												<Clock className="h-3 w-3" />
+												{entry.duration}
+											</span>
+										)}
+									</div>
+								</div>
+							))}
+							{recentWork.length >= 5 && (
+								<div className="text-center pt-2">
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => navigate('/work-history')}
+										className="flex items-center gap-2"
+									>
+										더 많은 업무 보기
+										<ArrowRight className="h-4 w-4" />
+									</Button>
+								</div>
+							)}
+						</div>
+					)}
 				</CardContent>
 			</Card>
 
