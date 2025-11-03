@@ -7,35 +7,29 @@ on:
 
 jobs:
   deploy:
-    name: Build & Deploy React App
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout your source code
-      - name: Checkout source code
+      - name: Checkout
         uses: actions/checkout@v3
 
-      # Step 2: Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Step 4: Build your React app
       - name: Build project
         run: npm run build
 
-      # Step 5: Debug (optional, but useful)
-      - name: List build folder
+      - name: Debug workspace
         run: |
-          echo "Contents of build folder:"
-          ls -R build || echo "No build folder found!"
+          echo "Current directory:"
+          pwd
+          echo "Listing all files:"
+          ls -R
 
-      # Step 6: Upload build folder to S3
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:
