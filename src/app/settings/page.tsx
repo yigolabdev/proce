@@ -23,10 +23,6 @@ import {
 	Clock,
 	Briefcase,
 	MapPin,
-	Link as LinkIcon,
-	Github,
-	Linkedin,
-	Twitter,
 	Upload,
 	Camera,
 	Languages,
@@ -36,8 +32,6 @@ import {
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../theme/ThemeProvider'
-import { useI18n } from '../../i18n/I18nProvider'
 
 interface UserProfile {
 	// Basic Info
@@ -109,8 +103,6 @@ interface AppearanceSettings {
 
 export default function SettingsPage() {
 	const { user } = useAuth()
-	const { theme, toggle: toggleTheme } = useTheme()
-	const { locale, setLocale } = useI18n()
 	const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'notifications' | 'privacy' | 'appearance'>('profile')
 	
 	// Profile states

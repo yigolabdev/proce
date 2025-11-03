@@ -97,27 +97,33 @@ export default function DashboardPage() {
 	}
 	
 	// OKR Data with real progress calculation
+	const getStatus = (progress: number): 'on-track' | 'at-risk' | 'behind' => {
+		if (progress >= 75) return 'on-track'
+		if (progress >= 50) return 'at-risk'
+		return 'behind'
+	}
+	
 	const myOKRs = [
 		{
 			id: '1',
 			title: 'Increase Product Market Fit',
 			progress: calculateOKRProgress('1') || 75,
 			keyResultsCount: 3,
-			status: (calculateOKRProgress('1') >= 75 ? 'on-track' : calculateOKRProgress('1') >= 50 ? 'at-risk' : 'behind') as const,
+			status: getStatus(calculateOKRProgress('1') || 75),
 		},
 		{
 			id: '2',
 			title: 'Scale Revenue Growth',
 			progress: calculateOKRProgress('2') || 64,
 			keyResultsCount: 3,
-			status: (calculateOKRProgress('2') >= 75 ? 'on-track' : calculateOKRProgress('2') >= 50 ? 'at-risk' : 'behind') as const,
+			status: getStatus(calculateOKRProgress('2') || 64),
 		},
 		{
 			id: '3',
 			title: 'Enhance Team Productivity',
 			progress: calculateOKRProgress('3') || 85,
 			keyResultsCount: 4,
-			status: (calculateOKRProgress('3') >= 75 ? 'on-track' : calculateOKRProgress('3') >= 50 ? 'at-risk' : 'behind') as const,
+			status: getStatus(calculateOKRProgress('3') || 85),
 		},
 	]
 

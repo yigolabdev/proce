@@ -1,4 +1,4 @@
-import type { Project, ProjectMember } from '../_types/projects.types'
+import type { Project } from '../_types/projects.types'
 
 /**
  * 프로젝트 목업 데이터
@@ -322,7 +322,7 @@ export const projectsApi = {
 	/**
 	 * 프로젝트 삭제
 	 */
-	deleteProject: async (id: string): Promise<void> => {
+	deleteProject: async (_id: string): Promise<void> => {
 		await new Promise((resolve) => setTimeout(resolve, 300))
 	},
 }

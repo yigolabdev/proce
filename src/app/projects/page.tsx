@@ -39,7 +39,6 @@ export default function ProjectsPage() {
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 	const [filterStatus, setFilterStatus] = useState<string>('all')
 	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
-	const [expandedProjects, setExpandedProjects] = useState<string[]>([])
 
 	// Form states
 	const [projectName, setProjectName] = useState('')

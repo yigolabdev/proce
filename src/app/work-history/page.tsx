@@ -134,7 +134,6 @@ export default function WorkHistoryPage() {
 							{ id: 'l1', url: 'https://github.com/project/pull/123', title: 'Pull Request #123', addedAt: new Date() },
 						],
 						status: 'submitted',
-						isConfidential: false,
 					},
 					{
 						id: '2',
@@ -151,7 +150,6 @@ export default function WorkHistoryPage() {
 							{ id: 'l2', url: 'https://docs.google.com/meeting-notes', title: 'Meeting Notes', addedAt: new Date() },
 						],
 						status: 'submitted',
-						isConfidential: false,
 					},
 					{
 						id: '3',
@@ -167,7 +165,6 @@ export default function WorkHistoryPage() {
 						],
 						links: [],
 						status: 'submitted',
-						isConfidential: false,
 					},
 				]
 				setEntries(mockEntries)
@@ -298,7 +295,6 @@ export default function WorkHistoryPage() {
 			tags: entry.tags,
 			files: entry.files,
 			links: entry.links,
-			isConfidential: entry.isConfidential,
 		}))
 		
 		toast.success('Opening editor...', {

@@ -10,6 +10,10 @@ jobs:
     name: Build & Deploy React App
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: proce_frontend
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -34,4 +38,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: build
+          SOURCE_DIR: proce_frontend/dist

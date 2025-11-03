@@ -11,14 +11,21 @@ import { ERROR_MESSAGES } from '../constants'
  * 에러 타입 정의
  */
 export class AppError extends Error {
+	code?: string
+	statusCode?: number
+	details?: any
+	
 	constructor(
 		message: string,
-		public code?: string,
-		public statusCode?: number,
-		public details?: any
+		code?: string,
+		statusCode?: number,
+		details?: any
 	) {
 		super(message)
 		this.name = 'AppError'
+		this.code = code
+		this.statusCode = statusCode
+		this.details = details
 	}
 }
 

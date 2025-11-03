@@ -142,7 +142,6 @@ export default function InputPage() {
 	const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null)
 	const [recentProjects, setRecentProjects] = useState<string[]>([])
 	const [recentObjectives, setRecentObjectives] = useState<string[]>([])
-	const descriptionRef = useRef<HTMLTextAreaElement>(null)
 
 	// Load system settings and drafts
 	useEffect(() => {

@@ -22,8 +22,6 @@ import {
 	Brain,
 	Zap,
 	Calendar,
-	Users,
-	AlertCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
