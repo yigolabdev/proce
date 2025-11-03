@@ -16,11 +16,7 @@ import {
 	Upload,
 	FileText,
 	Sparkles,
-	Calendar,
-	Users,
 	Lightbulb,
-	Edit,
-	Copy,
 	Brain
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -408,8 +404,6 @@ export default function CompanySettingsPage() {
 	const [showAddGoal, setShowAddGoal] = useState(false)
 	const [showAddTemplate, setShowAddTemplate] = useState(false)
 	const [showAddKPI, setShowAddKPI] = useState(false)
-	const [editingGoal, setEditingGoal] = useState<CompanyGoal | null>(null)
-	const [editingTemplate, setEditingTemplate] = useState<OKRTemplate | null>(null)
 	const [newKPI, setNewKPI] = useState<Omit<KPI, 'id'>>({
 		name: '',
 		target: '',
@@ -641,16 +635,6 @@ export default function CompanySettingsPage() {
 		})
 		setShowAddKPI(false)
 		toast.success('KPI가 추가되었습니다')
-	}
-
-	const handleDeleteKPI = (id: string) => {
-		setKpis((prev) => prev.filter((kpi) => kpi.id !== id))
-		toast.success('KPI가 삭제되었습니다')
-	}
-
-	const handleSaveKPIs = () => {
-		localStorage.setItem('kpis', JSON.stringify(kpis))
-		toast.success('KPI 설정이 저장되었습니다')
 	}
 
 	// Document Upload Handlers
