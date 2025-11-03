@@ -25,9 +25,9 @@ jobs:
 
       - name: Debug workspace
         run: |
-          echo "Current directory:"
+          echo "Current path:"
           pwd
-          echo "Listing all files:"
+          echo "Files here:"
           ls -R
 
       - name: Deploy to S3
