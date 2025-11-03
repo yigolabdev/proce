@@ -38,7 +38,7 @@ export default function LandingPage() {
 		}
 
 		login(mockUsers[role])
-		navigate('/dashboard')
+		navigate('/app/dashboard')
 	}
 
 	return (

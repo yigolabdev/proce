@@ -69,7 +69,7 @@ export default function SignInForm() {
 			} else {
 				try { window.localStorage.removeItem('proce:remember') } catch {}
 			}
-			navigate('/dashboard')
+			navigate('/app/dashboard')
 		} finally {
 			setSubmitting(false)
 		}

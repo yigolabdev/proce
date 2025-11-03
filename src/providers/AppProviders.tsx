@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import SignUpPage from '../app/auth/sign-up/page'
@@ -36,6 +36,24 @@ import ProjectsPage from '../app/projects/page'
 import SettingsPage from '../app/settings/page'
 import ExpensesPage from '../app/expenses/page'
 
+// 404 Not Found Page Component
+function NotFoundPage() {
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+			<div className="text-center">
+				<h1 className="text-6xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">404</h1>
+				<p className="text-xl text-neutral-600 dark:text-neutral-400 mb-8">Page not found</p>
+				<a
+					href="/"
+					className="inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-colors"
+				>
+					Go back home
+				</a>
+			</div>
+		</div>
+	)
+}
+
 // QueryClient 설정 - 기본 옵션 추가
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -58,37 +76,62 @@ const router = createBrowserRouter([
 	{ path: '/auth/join', element: <JoinWorkspacePage /> },
 	{ path: '/auth/onboarding', element: <OnboardingPage /> },
 	{
-		path: '/',
+		path: '/app',
 		element: <AppLayout />,
 		children: [
 			// 작업자 메뉴
-			{ path: '/dashboard', element: <DashboardPage /> },
-			{ path: '/input', element: <InputPage /> },
-			{ path: '/projects', element: <ProjectsPage /> },
-			{ path: '/work-history', element: <WorkHistoryPage /> },
-			{ path: '/inbox', element: <InboxPage /> },
-			{ path: '/okr', element: <OKRPage /> },
-			{ path: '/ai-recommendations', element: <AIRecommendationsPage /> },
+			{ path: '/app/dashboard', element: <DashboardPage /> },
+			{ path: '/app/input', element: <InputPage /> },
+			{ path: '/app/projects', element: <ProjectsPage /> },
+			{ path: '/app/work-history', element: <WorkHistoryPage /> },
+			{ path: '/app/inbox', element: <InboxPage /> },
+			{ path: '/app/okr', element: <OKRPage /> },
+			{ path: '/app/ai-recommendations', element: <AIRecommendationsPage /> },
 			// 관리자 메뉴
-			{ path: '/admin/users', element: <UsersManagementPage /> },
-			{ path: '/admin/system-settings', element: <SystemSettingsPage /> },
-			{ path: '/admin/company-settings', element: <CompanySettingsPage /> },
+			{ path: '/app/admin/users', element: <UsersManagementPage /> },
+			{ path: '/app/admin/system-settings', element: <SystemSettingsPage /> },
+			{ path: '/app/admin/company-settings', element: <CompanySettingsPage /> },
 			// 임원 메뉴
-			{ path: '/executive', element: <ExecutiveDashboardPage /> },
-		{ path: '/executive/goals', element: <ExecutiveGoalsPage /> },
-		{ path: '/analytics', element: <AnalyticsPage /> },
-		{ path: '/performance', element: <PerformancePage /> },
-		{ path: '/expenses', element: <ExpensesPage /> },
-		// 기타
-		{ path: '/org/setup', element: <WorkspaceSetupPage /> },
-		{ path: '/integrations', element: <IntegrationsPage /> },
-		{ path: '/finance', element: <FinancePage /> },
-		{ path: '/settings', element: <SettingsPage /> },
-			{ path: '/nomeet', element: <NoMeetPage /> },
-			{ path: '/policy', element: <PolicyPage /> },
-			{ path: '/help', element: <HelpPage /> },
+			{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
+			{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
+			{ path: '/app/analytics', element: <AnalyticsPage /> },
+			{ path: '/app/performance', element: <PerformancePage /> },
+			{ path: '/app/expenses', element: <ExpensesPage /> },
+			// 기타
+			{ path: '/app/org/setup', element: <WorkspaceSetupPage /> },
+			{ path: '/app/integrations', element: <IntegrationsPage /> },
+			{ path: '/app/finance', element: <FinancePage /> },
+			{ path: '/app/settings', element: <SettingsPage /> },
+			{ path: '/app/nomeet', element: <NoMeetPage /> },
+			{ path: '/app/policy', element: <PolicyPage /> },
+			{ path: '/app/help', element: <HelpPage /> },
 		],
 	},
+	// Legacy routes - redirect to new paths
+	{ path: '/dashboard', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: '/input', element: <Navigate to="/app/input" replace /> },
+	{ path: '/projects', element: <Navigate to="/app/projects" replace /> },
+	{ path: '/work-history', element: <Navigate to="/app/work-history" replace /> },
+	{ path: '/inbox', element: <Navigate to="/app/inbox" replace /> },
+	{ path: '/okr', element: <Navigate to="/app/okr" replace /> },
+	{ path: '/ai-recommendations', element: <Navigate to="/app/ai-recommendations" replace /> },
+	{ path: '/admin/users', element: <Navigate to="/app/admin/users" replace /> },
+	{ path: '/admin/system-settings', element: <Navigate to="/app/admin/system-settings" replace /> },
+	{ path: '/admin/company-settings', element: <Navigate to="/app/admin/company-settings" replace /> },
+	{ path: '/executive', element: <Navigate to="/app/executive" replace /> },
+	{ path: '/executive/goals', element: <Navigate to="/app/executive/goals" replace /> },
+	{ path: '/analytics', element: <Navigate to="/app/analytics" replace /> },
+	{ path: '/performance', element: <Navigate to="/app/performance" replace /> },
+	{ path: '/expenses', element: <Navigate to="/app/expenses" replace /> },
+	{ path: '/org/setup', element: <Navigate to="/app/org/setup" replace /> },
+	{ path: '/integrations', element: <Navigate to="/app/integrations" replace /> },
+	{ path: '/finance', element: <Navigate to="/app/finance" replace /> },
+	{ path: '/settings', element: <Navigate to="/app/settings" replace /> },
+	{ path: '/nomeet', element: <Navigate to="/app/nomeet" replace /> },
+	{ path: '/policy', element: <Navigate to="/app/policy" replace /> },
+	{ path: '/help', element: <Navigate to="/app/help" replace /> },
+	// 404 - Catch all
+	{ path: '*', element: <NotFoundPage /> },
 ])
 
 /**

@@ -32,30 +32,30 @@ export default function AppLayout() {
 			title: 'Work',
 			roles: ['worker', 'admin', 'executive'] as UserRole[],
 			items: [
-				{ to: '/okr', label: 'My Goals (OKR)', icon: Target, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/input', label: 'Work Input', icon: FileText, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/projects', label: 'Projects', icon: FolderKanban, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/inbox', label: 'Notifications', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
+				{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
 			] as MenuItem[],
 		},
 		{
 			title: 'Administration',
 			roles: ['admin', 'executive'] as UserRole[],
 			items: [
-				{ to: '/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
-				{ to: '/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
+				{ to: '/app/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
+				{ to: '/app/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
 			] as MenuItem[],
 		},
 	{
 		title: 'Executive',
 		roles: ['executive'] as UserRole[],
 		items: [
-			{ to: '/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-			{ to: '/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
-			{ to: '/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
-			{ to: '/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
+			{ to: '/app/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
+			{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
+			{ to: '/app/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
+			{ to: '/app/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
 		] as MenuItem[],
 	},
 	]
@@ -103,8 +103,8 @@ export default function AppLayout() {
 				<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
 					Other
 				</div>
-				{link('/settings', 'Settings', Settings)}
-				{link('/help', 'Help', HelpCircle)}
+				{link('/app/settings', 'Settings', Settings)}
+				{link('/app/help', 'Help', HelpCircle)}
 				</nav>
 
 			{/* Sidebar Footer - Logout */}
