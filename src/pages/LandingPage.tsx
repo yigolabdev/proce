@@ -78,8 +78,12 @@ export default function LandingPage() {
 				{/* Service Name */}
 				<div className="mb-12 text-center">
 					<h1 className="text-5xl font-bold tracking-tight mb-3">Proce</h1>
-					<p className="text-neutral-600 dark:text-neutral-400">
+					<p className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2">
 						Data-Driven Decision Platform
+					</p>
+					<p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+						업무 성과를 측정하고, 목표를 관리하며,<br />
+						데이터 기반의 의사결정을 지원하는 통합 플랫폼
 					</p>
 				</div>
 
