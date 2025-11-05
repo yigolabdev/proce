@@ -12,11 +12,13 @@ import {
 	Plus,
 	Trash2,
 	TrendingUp,
+	TrendingDown,
 	CheckCircle2,
 	Upload,
 	FileText,
 	Brain,
-	Users
+	Users,
+	Edit2
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
@@ -155,6 +157,26 @@ interface CompanyInfoSection {
 	order: number
 	createdAt: string
 	updatedAt: string
+}
+
+interface ExpenseEntry {
+	id: string
+	date: string
+	category: string
+	subcategory: string
+	amount: string
+	description: string
+	paymentMethod: string
+	vendor: string
+	department: string
+	approvedBy: string
+	tags: string[]
+	createdAt: Date
+}
+
+interface ExpenseCategory {
+	name: string
+	subcategories: string[]
 }
 
 export default function CompanySettingsPage() {
@@ -311,7 +333,7 @@ export default function CompanySettingsPage() {
 	])
 
 
-	const [activeTab, setActiveTab] = useState<'company' | 'annual-goals' | 'financial'>('company')
+	const [activeTab, setActiveTab] = useState<'company' | 'annual-goals' | 'financial' | 'expenses'>('company')
 	const [showAddGoal, setShowAddGoal] = useState(false)
 	
 	const [newGoal, setNewGoal] = useState<Partial<CompanyGoal>>({
@@ -339,6 +361,27 @@ export default function CompanySettingsPage() {
 	const [showDetailedInfoDialog, setShowDetailedInfoDialog] = useState(false)
 	const [editingSection, setEditingSection] = useState<CompanyInfoSection | null>(null)
 
+	// Expenses State
+	const [expenses, setExpenses] = useState<ExpenseEntry[]>([])
+	const [showAddExpense, setShowAddExpense] = useState(false)
+	const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null)
+	const [currentExpense, setCurrentExpense] = useState<ExpenseEntry>({
+		id: '',
+		date: new Date().toISOString().split('T')[0],
+		category: '',
+		subcategory: '',
+		amount: '',
+		description: '',
+		paymentMethod: '',
+		vendor: '',
+		department: '',
+		approvedBy: '',
+		tags: [],
+		createdAt: new Date(),
+	})
+	const [expenseSearchTerm, setExpenseSearchTerm] = useState('')
+	const [expenseFilterCategory, setExpenseFilterCategory] = useState<string>('All')
+
 	const departments = ['Sales', 'Marketing', 'Engineering', 'Product', 'Customer Support', 'Finance', 'HR', 'Operations']
 	const socialPlatforms = ['LinkedIn', 'Facebook', 'Twitter/X', 'Instagram', 'YouTube', 'GitHub', 'TikTok', 'Discord', 'Slack', 'Medium', 'Reddit', 'Other']
 	
@@ -352,6 +395,19 @@ export default function CompanySettingsPage() {
 		{ title: '경영 목표', content: '# 단기 목표 (1년)\n\n# 중기 목표 (3년)\n\n# 장기 목표 (5년+)' },
 		{ title: '재무 현황', content: '회사의 재무 현황과 성과를 작성해주세요.\n\n※ 민감한 정보는 주의해서 입력해주세요.' },
 	]
+
+	const expenseCategories: ExpenseCategory[] = [
+		{ name: 'Personnel', subcategories: ['Salaries', 'Bonuses', 'Benefits', 'Training', 'Recruitment', 'Consulting'] },
+		{ name: 'Operations', subcategories: ['Rent', 'Utilities', 'Maintenance', 'Supplies', 'Equipment', 'Insurance'] },
+		{ name: 'Marketing', subcategories: ['Advertising', 'Events', 'PR', 'Digital Marketing', 'Content Creation', 'Sponsorship'] },
+		{ name: 'Technology', subcategories: ['Software Licenses', 'Cloud Services', 'Hardware', 'IT Support', 'Development', 'Security'] },
+		{ name: 'Sales', subcategories: ['Commissions', 'Travel', 'Entertainment', 'Client Gifts', 'Trade Shows'] },
+		{ name: 'R&D', subcategories: ['Research', 'Prototyping', 'Testing', 'Patents', 'Lab Equipment'] },
+		{ name: 'Finance', subcategories: ['Bank Fees', 'Interest', 'Accounting', 'Legal', 'Taxes', 'Audit'] },
+		{ name: 'Other', subcategories: ['Miscellaneous', 'One-time', 'Emergency'] },
+	]
+
+	const paymentMethods = ['Corporate Card', 'Bank Transfer', 'Cash', 'Check', 'Online Payment', 'Other']
 
 	// Company Info Handlers
 	const handleCompanyInfoChange = (field: keyof CompanyInfo, value: string | Array<{ platform: string; url: string }>) => {
@@ -552,7 +608,86 @@ export default function CompanySettingsPage() {
 	// Load sections on mount
 	useEffect(() => {
 		loadCompanyInfoSections()
+		loadExpenses()
 	}, [])
+
+	// Expenses Handlers
+	const loadExpenses = () => {
+		const saved = localStorage.getItem('expenses')
+		if (saved) {
+			const parsed = JSON.parse(saved)
+			setExpenses(parsed.map((e: any) => ({ ...e, createdAt: new Date(e.createdAt) })))
+		}
+	}
+
+	const saveExpenses = (expenseList: ExpenseEntry[]) => {
+		localStorage.setItem('expenses', JSON.stringify(expenseList))
+		setExpenses(expenseList)
+	}
+
+	const handleExpenseInputChange = (field: keyof ExpenseEntry, value: string | string[]) => {
+		setCurrentExpense((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleAddExpense = () => {
+		if (!currentExpense.category || !currentExpense.amount || !currentExpense.date) {
+			toast.error('필수 항목을 입력해주세요')
+			return
+		}
+
+		if (editingExpenseId) {
+			const updated = expenses.map((e) =>
+				e.id === editingExpenseId ? { ...currentExpense, id: editingExpenseId } : e
+			)
+			saveExpenses(updated)
+			toast.success('경비가 수정되었습니다')
+			setEditingExpenseId(null)
+		} else {
+			const newExpense: ExpenseEntry = {
+				...currentExpense,
+				id: Date.now().toString(),
+				createdAt: new Date(),
+			}
+			saveExpenses([newExpense, ...expenses])
+			toast.success('경비가 추가되었습니다')
+		}
+
+		setCurrentExpense({
+			id: '',
+			date: new Date().toISOString().split('T')[0],
+			category: '',
+			subcategory: '',
+			amount: '',
+			description: '',
+			paymentMethod: '',
+			vendor: '',
+			department: '',
+			approvedBy: '',
+			tags: [],
+			createdAt: new Date(),
+		})
+		setShowAddExpense(false)
+	}
+
+	const handleEditExpense = (expense: ExpenseEntry) => {
+		setCurrentExpense(expense)
+		setEditingExpenseId(expense.id)
+		setShowAddExpense(true)
+	}
+
+	const handleDeleteExpense = (id: string) => {
+		if (!confirm('이 경비를 삭제하시겠습니까?')) return
+		saveExpenses(expenses.filter((e) => e.id !== id))
+		toast.success('경비가 삭제되었습니다')
+	}
+
+	const filteredExpenses = expenses.filter((expense) => {
+		const matchesSearch =
+			expense.description.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+			expense.vendor.toLowerCase().includes(expenseSearchTerm.toLowerCase())
+		const matchesCategory = expenseFilterCategory === 'All' || expense.category === expenseFilterCategory
+		return matchesSearch && matchesCategory
+	})
 
 	// KPI Handlers removed - feature will be added later
 
@@ -818,6 +953,17 @@ export default function CompanySettingsPage() {
 				>
 					<DollarSign className="inline h-4 w-4 mr-2" />
 					Financial Data
+				</button>
+				<button
+					onClick={() => setActiveTab('expenses')}
+					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+						activeTab === 'expenses'
+							? 'border-primary text-primary'
+							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+					}`}
+				>
+					<TrendingDown className="inline h-4 w-4 mr-2" />
+					Expenses
 				</button>
 			</div>
 
@@ -1345,20 +1491,7 @@ export default function CompanySettingsPage() {
 					{/* 추가 정보 */}
 					<Card>
 						<CardHeader>
-							<div className="flex items-center justify-between">
-								<h2 className="text-xl font-bold">추가 정보</h2>
-								<Button 
-									variant="outline" 
-									onClick={() => {
-										loadCompanyInfoSections()
-										setShowDetailedInfoDialog(true)
-									}} 
-									className="flex items-center gap-2"
-								>
-									<FileText className="h-4 w-4" />
-									상세 정보 관리
-								</Button>
-							</div>
+							<h2 className="text-xl font-bold">추가 정보</h2>
 						</CardHeader>
 						<CardContent>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1461,6 +1594,17 @@ export default function CompanySettingsPage() {
 									</p>
 								</div>
 								<div className="flex items-center gap-2">
+									<Button 
+										variant="outline" 
+										onClick={() => {
+											loadCompanyInfoSections()
+											setShowDetailedInfoDialog(true)
+										}} 
+										className="flex items-center gap-2"
+									>
+										<FileText className="h-4 w-4" />
+										상세 정보 관리
+									</Button>
 									<Button variant="outline" onClick={() => setShowAddGoal(true)} className="flex items-center gap-2">
 										<Plus className="h-4 w-4" />
 										목표 추가
@@ -1991,6 +2135,275 @@ export default function CompanySettingsPage() {
 						</div>
 					</div>
 				</div>
+		)}
+
+		{/* Expenses Tab */}
+		{activeTab === 'expenses' && (
+			<div className="space-y-6">
+				{/* Header */}
+				<Card>
+					<CardHeader>
+						<div className="flex items-center justify-between">
+							<div>
+								<h2 className="text-xl font-bold flex items-center gap-2">
+									<TrendingDown className="h-6 w-6 text-red-600" />
+									경비 관리 (Expenses)
+								</h2>
+								<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+									회사의 경비를 카테고리별로 관리하고 추적하세요
+								</p>
+							</div>
+							<Button variant="outline" onClick={() => setShowAddExpense(true)} className="flex items-center gap-2">
+								<Plus className="h-4 w-4" />
+								경비 추가
+							</Button>
+						</div>
+					</CardHeader>
+					<CardContent>
+						<div className="flex items-center gap-4 mb-4">
+							<div className="flex-1">
+								<Input
+									placeholder="검색 (설명, 공급업체...)"
+									value={expenseSearchTerm}
+									onChange={(e) => setExpenseSearchTerm(e.target.value)}
+								/>
+							</div>
+							<select
+								value={expenseFilterCategory}
+								onChange={(e) => setExpenseFilterCategory(e.target.value)}
+								className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+							>
+								<option value="All">모든 카테고리</option>
+								{expenseCategories.map((cat) => (
+									<option key={cat.name} value={cat.name}>
+										{cat.name}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+							총 {filteredExpenses.length}개 경비
+						</div>
+
+						{filteredExpenses.length === 0 ? (
+							<div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
+								<TrendingDown className="h-16 w-16 mx-auto mb-4 opacity-30" />
+								<p>경비가 없습니다</p>
+							</div>
+						) : (
+							<div className="space-y-2">
+								{filteredExpenses.map((expense) => (
+									<div
+										key={expense.id}
+										className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:border-primary transition-colors"
+									>
+										<div className="flex items-start justify-between">
+											<div className="flex-1">
+												<div className="flex items-center gap-2 mb-2">
+													<span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded">
+														{expense.category}
+													</span>
+													{expense.subcategory && (
+														<span className="text-xs text-neutral-500 dark:text-neutral-400">
+															{expense.subcategory}
+														</span>
+													)}
+													<span className="text-xs text-neutral-500 dark:text-neutral-400">
+														{expense.date}
+													</span>
+												</div>
+												<p className="font-medium mb-1">{expense.description || '(설명 없음)'}</p>
+												<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+													<span className="font-bold text-lg text-primary">
+														₩{Number(expense.amount).toLocaleString()}
+													</span>
+													{expense.vendor && <span>공급업체: {expense.vendor}</span>}
+													{expense.department && <span>부서: {expense.department}</span>}
+												</div>
+											</div>
+											<div className="flex items-center gap-2">
+												<button
+													onClick={() => handleEditExpense(expense)}
+													className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+												>
+													<Edit2 className="h-4 w-4" />
+												</button>
+												<button
+													onClick={() => handleDeleteExpense(expense.id)}
+													className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+												>
+													<Trash2 className="h-4 w-4" />
+												</button>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</CardContent>
+				</Card>
+			</div>
+		)}
+
+		{/* Add/Edit Expense Dialog */}
+		{showAddExpense && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+				<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+					<div className="p-6">
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="text-xl font-bold">
+								{editingExpenseId ? '경비 수정' : '새 경비 추가'}
+							</h3>
+							<button
+								onClick={() => {
+									setShowAddExpense(false)
+									setEditingExpenseId(null)
+								}}
+								className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+							>
+								<X className="h-5 w-5" />
+							</button>
+						</div>
+
+						<div className="space-y-4">
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										날짜 <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="date"
+										value={currentExpense.date}
+										onChange={(e) => handleExpenseInputChange('date', e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										금액 <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="number"
+										value={currentExpense.amount}
+										onChange={(e) => handleExpenseInputChange('amount', e.target.value)}
+										placeholder="0"
+									/>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										카테고리 <span className="text-red-500">*</span>
+									</label>
+									<select
+										value={currentExpense.category}
+										onChange={(e) => {
+											handleExpenseInputChange('category', e.target.value)
+											handleExpenseInputChange('subcategory', '')
+										}}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">선택</option>
+										{expenseCategories.map((cat) => (
+											<option key={cat.name} value={cat.name}>
+												{cat.name}
+											</option>
+										))}
+									</select>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">서브카테고리</label>
+									<select
+										value={currentExpense.subcategory}
+										onChange={(e) => handleExpenseInputChange('subcategory', e.target.value)}
+										disabled={!currentExpense.category}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">선택</option>
+										{currentExpense.category &&
+											expenseCategories
+												.find((c) => c.name === currentExpense.category)
+												?.subcategories.map((sub) => (
+													<option key={sub} value={sub}>
+														{sub}
+													</option>
+												))}
+									</select>
+								</div>
+							</div>
+
+							<div>
+								<label className="block text-sm font-medium mb-2">설명</label>
+								<Textarea
+									value={currentExpense.description}
+									onChange={(e) => handleExpenseInputChange('description', e.target.value)}
+									rows={3}
+									placeholder="경비 내용 설명"
+								/>
+							</div>
+
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">결제 방법</label>
+									<select
+										value={currentExpense.paymentMethod}
+										onChange={(e) => handleExpenseInputChange('paymentMethod', e.target.value)}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">선택</option>
+										{paymentMethods.map((method) => (
+											<option key={method} value={method}>
+												{method}
+											</option>
+										))}
+									</select>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">부서</label>
+									<select
+										value={currentExpense.department}
+										onChange={(e) => handleExpenseInputChange('department', e.target.value)}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">선택</option>
+										{departments.map((dept) => (
+											<option key={dept} value={dept}>
+												{dept}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+
+							<div>
+								<label className="block text-sm font-medium mb-2">공급업체</label>
+								<Input
+									value={currentExpense.vendor}
+									onChange={(e) => handleExpenseInputChange('vendor', e.target.value)}
+									placeholder="공급업체명"
+								/>
+							</div>
+
+							<div className="flex items-center gap-2 pt-4">
+								<Button onClick={handleAddExpense} className="flex-1">
+									{editingExpenseId ? '수정' : '추가'}
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => {
+										setShowAddExpense(false)
+										setEditingExpenseId(null)
+									}}
+									className="flex-1"
+								>
+									취소
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		)}
 
 		{/* Add KPI Dialog - Removed for now, feature will be added later */}

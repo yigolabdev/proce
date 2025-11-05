@@ -474,49 +474,7 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 		lastUpdated: '2025-01-04',
 	},
 
-	EXECUTIVE_COMPANY_INFO: {
-		title: {
-			ko: '회사 정보 관리',
-			en: 'Company Information Management',
-		},
-		purpose: {
-			ko: '회사의 상세 정보를 섹션 단위로 자유롭게 입력하고 관리하는 경영진 전용 페이지 (마크다운 지원, 자동 저장, 파일 첨부)',
-			en: 'Executive page for freely managing detailed company information in sections (Markdown support, auto-save, file attachments)',
-		},
-		features: {
-			ko: [
-				'섹션 기반 구조: 주제별 섹션 생성 및 관리',
-				'마크다운 에디터: 풍부한 텍스트 편집 (제목, 리스트, 링크, 코드 등)',
-				'미리보기: 편집/미리보기 모드 전환',
-				'자동 저장: 실시간 자동 저장',
-				'파일 첨부: 문서, 이미지 첨부',
-				'링크 추가: 외부 리소스 링크',
-				'섹션 순서 변경: 드래그 앤 드롭 정렬 (예정)',
-				'템플릿: 미션/비전, 조직도, 연혁 등 사전 정의 템플릿',
-				'데이터 백업: JSON Export/Import',
-			],
-			en: [
-				'Section-based structure: Create and manage sections by topic',
-				'Markdown editor: Rich text editing (headers, lists, links, code, etc.)',
-				'Preview mode: Toggle between edit/preview',
-				'Auto-save: Real-time automatic saving',
-				'File attachments: Attach documents, images',
-				'Add links: External resource links',
-				'Reorder sections: Drag and drop sorting (planned)',
-				'Templates: Predefined templates (Mission/Vision, Org Chart, History, etc.)',
-				'Data backup: JSON Export/Import',
-			],
-		},
-		status: {
-		ko: '미완성',
-		en: 'Not Started',
-		},
-		lastUpdated: '2025-01-04',
-		notes: {
-			ko: '섹션 순서 변경(드래그 앤 드롭)은 향후 추가 예정. 현재는 localStorage에 저장.',
-			en: 'Section reordering (drag and drop) planned for future. Currently stored in localStorage.',
-		},
-	},
+	// EXECUTIVE_COMPANY_INFO removed - Feature moved to Company Settings > Company KPI tab
 
 	ADMIN_COMPANY_SETTINGS: {
 		title: {
@@ -786,35 +744,7 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 		lastUpdated: '2025-01-04',
 	},
 
-	FINANCE: {
-		title: {
-			ko: '재무 관리',
-			en: 'Finance Management',
-		},
-		purpose: {
-			ko: '회사의 재무 현황 및 예산을 관리하는 경영진 전용 페이지',
-			en: 'Executive page for managing company financial status and budgets',
-		},
-		features: {
-			ko: [
-				'재무 대시보드: 수익, 비용, 순이익',
-				'예산 관리: 부서별 예산 할당',
-				'비용 추적: 월별, 분기별 비용',
-				'재무 보고서: PDF/Excel 내보내기',
-			],
-			en: [
-				'Financial dashboard: Revenue, expenses, net profit',
-				'Budget management: Department budget allocation',
-				'Expense tracking: Monthly, quarterly expenses',
-				'Financial reports: PDF/Excel export',
-			],
-		},
-		status: {
-		ko: '미완성',
-		en: 'Not Started',
-		},
-		lastUpdated: '2025-01-04',
-	},
+	// FINANCE removed - Feature integrated into Company Settings > Financial Data tab
 
 	EXPENSES: {
 		title: {

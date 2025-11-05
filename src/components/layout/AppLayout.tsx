@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown, Building2, Briefcase, DollarSign, Shield } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, Building2, Shield } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -32,12 +32,12 @@ export default function AppLayout() {
 		title: 'Work',
 		roles: ['user', 'admin', 'executive'] as UserRole[],
 		items: [
-			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
 	},
 		{
@@ -54,11 +54,8 @@ export default function AppLayout() {
 			roles: ['executive'] as UserRole[],
 			items: [
 				{ to: '/app/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
-				{ to: '/app/executive/company-info', label: 'Company Info', icon: Briefcase, roles: ['executive'] },
-				{ to: '/app/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
-				{ to: '/app/finance', label: 'Finance', icon: DollarSign, roles: ['executive'] },
 				{ to: '/app/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
+				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
 			] as MenuItem[],
 		},
 	]
