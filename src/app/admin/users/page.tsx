@@ -24,9 +24,9 @@ export default function UsersManagementPage() {
 	const [members, setMembers] = useState<TeamMember[]>([
 		{
 			id: '1',
-			name: 'John Doe',
-			email: 'john@example.com',
-			role: 'worker',
+		name: 'John Doe',
+		email: 'john@example.com',
+		role: 'user',
 			department: 'Engineering',
 			position: 'Senior Developer',
 			status: 'active',
@@ -56,7 +56,7 @@ export default function UsersManagementPage() {
 			id: '4',
 			name: 'Sarah Williams',
 			email: 'sarah@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Marketing',
 			position: 'Marketing Manager',
 			status: 'pending',
@@ -66,7 +66,7 @@ export default function UsersManagementPage() {
 			id: '5',
 			name: 'David Brown',
 			email: 'david@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Sales',
 			position: 'Sales Representative',
 			status: 'active',
@@ -76,7 +76,7 @@ export default function UsersManagementPage() {
 			id: '6',
 			name: 'Emily Davis',
 			email: 'emily@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Design',
 			position: 'UI/UX Designer',
 			status: 'active',
@@ -96,7 +96,7 @@ export default function UsersManagementPage() {
 			id: '8',
 			name: 'Lisa Anderson',
 			email: 'lisa@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'Backend Developer',
 			status: 'active',
@@ -106,7 +106,7 @@ export default function UsersManagementPage() {
 			id: '9',
 			name: 'James Taylor',
 			email: 'james@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'Frontend Developer',
 			status: 'active',
@@ -116,7 +116,7 @@ export default function UsersManagementPage() {
 			id: '10',
 			name: 'Patricia Martinez',
 			email: 'patricia@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Sales',
 			position: 'Account Manager',
 			status: 'active',
@@ -126,7 +126,7 @@ export default function UsersManagementPage() {
 			id: '11',
 			name: 'Christopher Lee',
 			email: 'chris@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Marketing',
 			position: 'Content Strategist',
 			status: 'active',
@@ -146,7 +146,7 @@ export default function UsersManagementPage() {
 			id: '13',
 			name: 'Daniel Rodriguez',
 			email: 'daniel@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'DevOps Engineer',
 			status: 'active',
@@ -156,7 +156,7 @@ export default function UsersManagementPage() {
 			id: '14',
 			name: 'Barbara Hernandez',
 			email: 'barbara@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Design',
 			position: 'Graphic Designer',
 			status: 'pending',
@@ -166,7 +166,7 @@ export default function UsersManagementPage() {
 			id: '15',
 			name: 'Matthew Lopez',
 			email: 'matthew@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Sales',
 			position: 'Sales Manager',
 			status: 'active',
@@ -176,7 +176,7 @@ export default function UsersManagementPage() {
 			id: '16',
 			name: 'Susan Gonzalez',
 			email: 'susan@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Marketing',
 			position: 'Social Media Manager',
 			status: 'active',
@@ -186,7 +186,7 @@ export default function UsersManagementPage() {
 			id: '17',
 			name: 'Joseph Wilson',
 			email: 'joseph@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'QA Engineer',
 			status: 'active',
@@ -206,7 +206,7 @@ export default function UsersManagementPage() {
 			id: '19',
 			name: 'Thomas Taylor',
 			email: 'thomas@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Finance',
 			position: 'Financial Analyst',
 			status: 'active',
@@ -216,7 +216,7 @@ export default function UsersManagementPage() {
 			id: '20',
 			name: 'Nancy Anderson',
 			email: 'nancy@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'HR',
 			position: 'Recruiter',
 			status: 'active',
@@ -226,7 +226,7 @@ export default function UsersManagementPage() {
 			id: '21',
 			name: 'Charles Thomas',
 			email: 'charles@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'Mobile Developer',
 			status: 'active',
@@ -236,7 +236,7 @@ export default function UsersManagementPage() {
 			id: '22',
 			name: 'Karen Jackson',
 			email: 'karen@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Design',
 			position: 'Product Designer',
 			status: 'inactive',
@@ -246,7 +246,7 @@ export default function UsersManagementPage() {
 			id: '23',
 			name: 'Steven White',
 			email: 'steven@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Sales',
 			position: 'Business Development',
 			status: 'active',
@@ -256,7 +256,7 @@ export default function UsersManagementPage() {
 			id: '24',
 			name: 'Betty Harris',
 			email: 'betty@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Marketing',
 			position: 'SEO Specialist',
 			status: 'active',
@@ -276,7 +276,7 @@ export default function UsersManagementPage() {
 			id: '26',
 			name: 'Helen Thompson',
 			email: 'helen@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Customer Support',
 			position: 'Support Specialist',
 			status: 'active',
@@ -286,7 +286,7 @@ export default function UsersManagementPage() {
 			id: '27',
 			name: 'Mark Garcia',
 			email: 'mark@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Engineering',
 			position: 'Data Engineer',
 			status: 'active',
@@ -296,7 +296,7 @@ export default function UsersManagementPage() {
 			id: '28',
 			name: 'Sandra Martinez',
 			email: 'sandra@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Finance',
 			position: 'Accountant',
 			status: 'pending',
@@ -306,7 +306,7 @@ export default function UsersManagementPage() {
 			id: '29',
 			name: 'Donald Robinson',
 			email: 'donald@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Operations',
 			position: 'Operations Coordinator',
 			status: 'active',
@@ -316,7 +316,7 @@ export default function UsersManagementPage() {
 			id: '30',
 			name: 'Ashley Clark',
 			email: 'ashley@example.com',
-			role: 'worker',
+			role: 'user',
 			department: 'Marketing',
 			position: 'Brand Manager',
 			status: 'active',
@@ -543,12 +543,12 @@ export default function UsersManagementPage() {
 
 	const getRoleBadge = (role: UserRole) => {
 		const styles = {
-			worker: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+			user: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
 			admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 			executive: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
 		}
 		const labels = {
-			worker: 'Worker',
+			user: 'User',
 			admin: 'Admin',
 			executive: 'Executive',
 		}
@@ -593,7 +593,7 @@ export default function UsersManagementPage() {
 	const stats = {
 		total: members.length,
 		active: members.filter((m) => m.status === 'active').length,
-		workers: members.filter((m) => m.role === 'worker').length,
+		users: members.filter((m) => m.role === 'user').length,
 		admins: members.filter((m) => m.role === 'admin').length,
 		executives: members.filter((m) => m.role === 'executive').length,
 	}
@@ -636,8 +636,8 @@ export default function UsersManagementPage() {
 				</Card>
 				<Card>
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Workers</div>
-						<div className="text-2xl font-bold text-blue-600">{stats.workers}</div>
+						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Users</div>
+						<div className="text-2xl font-bold text-blue-600">{stats.users}</div>
 					</CardContent>
 				</Card>
 				<Card>
@@ -939,16 +939,16 @@ export default function UsersManagementPage() {
 
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium mb-2">Role</label>
-										<select
-											value={editForm.role || 'worker'}
-											onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
-											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-										>
-											<option value="worker">Worker</option>
-											<option value="admin">Admin</option>
-											<option value="executive">Executive</option>
-										</select>
+									<label className="block text-sm font-medium mb-2">Role</label>
+									<select
+										value={editForm.role || 'user'}
+										onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="user">User</option>
+										<option value="admin">Admin</option>
+										<option value="executive">Executive</option>
+									</select>
 									</div>
 									<div>
 										<label className="block text-sm font-medium mb-2">Status</label>
@@ -1015,7 +1015,7 @@ export default function UsersManagementPage() {
 								className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:shadow-md transition-shadow"
 							>
 								<div className="flex items-center gap-3 flex-1">
-									<div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
+									<div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
 										{member.name[0]}
 									</div>
 									<div className="flex-1 min-w-0">
@@ -1040,7 +1040,7 @@ export default function UsersManagementPage() {
 										onChange={(e) => handleRoleChange(member.id, e.target.value as UserRole)}
 										className="px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900"
 									>
-										<option value="worker">Worker</option>
+										<option value="user">User</option>
 										<option value="admin">Admin</option>
 										<option value="executive">Executive</option>
 									</select>

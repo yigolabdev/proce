@@ -10,7 +10,7 @@ export function Button({ className, variant = 'primary', size = 'md', ...props }
 	return (
 		<button
 			className={clsx(
-				'rounded-2xl font-medium transition-shadow disabled:opacity-50 disabled:cursor-not-allowed',
+				'inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-shadow disabled:opacity-50 disabled:cursor-not-allowed',
 				{
 					'bg-primary text-white shadow-sm hover:shadow-md': variant === 'primary',
 					'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700': variant === 'secondary',

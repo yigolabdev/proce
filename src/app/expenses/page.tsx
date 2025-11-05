@@ -5,6 +5,8 @@ import { Button } from '../../components/ui/Button'
 import Textarea from '../../components/ui/Textarea'
 import { Plus, Trash2, Edit2, DollarSign, TrendingDown, Calendar, Tag, Search, Filter, Download } from 'lucide-react'
 import { toast } from 'sonner'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 
 interface ExpenseEntry {
 	id: string
@@ -234,6 +236,9 @@ export default function ExpensesPage() {
 
 	return (
 		<div className="space-y-6">
+			{/* Developer Memo */}
+			<DevMemo content={DEV_MEMOS.EXPENSES} />
+
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>

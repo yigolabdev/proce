@@ -64,13 +64,13 @@ export const DATE_FORMAT = {
 // ============================================
 
 export const USER_ROLES = {
-	WORKER: 'worker',
+	USER: 'user',
 	ADMIN: 'admin',
 	EXECUTIVE: 'executive',
 } as const
 
 export const ROLE_LABELS = {
-	[USER_ROLES.WORKER]: 'Worker',
+	[USER_ROLES.USER]: 'User',
 	[USER_ROLES.ADMIN]: 'Admin',
 	[USER_ROLES.EXECUTIVE]: 'Executive',
 } as const

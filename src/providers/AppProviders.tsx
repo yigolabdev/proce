@@ -15,7 +15,6 @@ import { IntegrationsProvider } from '../app/_providers/IntegrationsContext'
 import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../components/layout/AppLayout'
 import DashboardPage from '../pages/DashboardPage'
-import NoMeetPage from '../pages/NoMeetPage'
 import PolicyPage from '../pages/PolicyPage'
 import InputPage from '../pages/InputPage'
 import WorkHistoryPage from '../app/work-history/page'
@@ -32,6 +31,7 @@ import ExecutiveDashboardPage from '../pages/ExecutiveDashboardPage'
 import OKRPage from '../app/okr/page'
 import AIRecommendationsPage from '../app/ai-recommendations/page'
 import ExecutiveGoalsPage from '../app/executive/goals/page'
+import CompanyInfoPage from '../app/executive/company-info/page'
 import ProjectsPage from '../app/projects/page'
 import SettingsPage from '../app/settings/page'
 import ExpensesPage from '../app/expenses/page'
@@ -94,6 +94,7 @@ const router = createBrowserRouter([
 			// 임원 메뉴
 			{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
 			{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
+			{ path: '/app/executive/company-info', element: <CompanyInfoPage /> },
 			{ path: '/app/analytics', element: <AnalyticsPage /> },
 			{ path: '/app/performance', element: <PerformancePage /> },
 			{ path: '/app/expenses', element: <ExpensesPage /> },
@@ -102,7 +103,6 @@ const router = createBrowserRouter([
 			{ path: '/app/integrations', element: <IntegrationsPage /> },
 			{ path: '/app/finance', element: <FinancePage /> },
 			{ path: '/app/settings', element: <SettingsPage /> },
-			{ path: '/app/nomeet', element: <NoMeetPage /> },
 			{ path: '/app/policy', element: <PolicyPage /> },
 			{ path: '/app/help', element: <HelpPage /> },
 		],
@@ -127,7 +127,6 @@ const router = createBrowserRouter([
 	{ path: '/integrations', element: <Navigate to="/app/integrations" replace /> },
 	{ path: '/finance', element: <Navigate to="/app/finance" replace /> },
 	{ path: '/settings', element: <Navigate to="/app/settings" replace /> },
-	{ path: '/nomeet', element: <Navigate to="/app/nomeet" replace /> },
 	{ path: '/policy', element: <Navigate to="/app/policy" replace /> },
 	{ path: '/help', element: <Navigate to="/app/help" replace /> },
 	// 404 - Catch all

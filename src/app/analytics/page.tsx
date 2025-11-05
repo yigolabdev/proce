@@ -14,6 +14,8 @@ import {
 	Building2,
 	UserCircle2,
 } from 'lucide-react'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 
 type ViewMode = 'overview' | 'departments' | 'individuals'
 
@@ -184,6 +186,9 @@ export default function AnalyticsPage() {
 
 	return (
 		<div className="space-y-6">
+			{/* Developer Memo */}
+			<DevMemo content={DEV_MEMOS.ANALYTICS} />
+
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>

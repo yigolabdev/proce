@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import Input from '../../../components/ui/Input'
 import Textarea from '../../../components/ui/Textarea'
-import { 
-	Building2, 
-	DollarSign, 
-	Target, 
-	Save, 
+import {
+	Building2,
+	DollarSign,
+	Target,
+	Save,
 	X,
 	Plus,
 	Trash2,
@@ -15,19 +15,19 @@ import {
 	CheckCircle2,
 	Upload,
 	FileText,
-	Sparkles,
-	Lightbulb,
-	Brain
+	Brain,
+	Users
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
+import DevMemo from '../../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../../constants/devMemos'
 
 interface CompanyInfo {
 	// 기본 정보
 	name: string
 	legalName: string
 	businessNumber: string
-	taxId: string
 	corporateNumber: string
 	establishmentType: string
 	
@@ -67,23 +67,13 @@ interface CompanyInfo {
 	
 	// 온라인 정보
 	website: string
-	linkedIn: string
-	facebook: string
-	twitter: string
-	instagram: string
-	youtube: string
-	github: string
+	socialLinks: Array<{ platform: string; url: string }>
 	
 	// 대표자 정보
 	ceoName: string
 	ceoEmail: string
 	ceoPhone: string
 	ceoLinkedIn: string
-	
-	// 재무 담당자 정보
-	cfoName: string
-	cfoEmail: string
-	cfoPhone: string
 	
 	// 인사 담당자 정보
 	hrName: string
@@ -149,33 +139,6 @@ interface CompanyGoal {
 	updatedAt: Date
 }
 
-interface OKRTemplate {
-	id: string
-	goalId: string // 연결된 전사 목표 ID
-	name: string
-	description: string
-	targetRole: string[] // 추천 대상 역할/직책
-	targetDepartment: string[] // 추천 대상 부서
-	keyResults: {
-		id: string
-		description: string
-		targetValue: string
-		unit: string
-	}[]
-	recommendationScore: number // AI 추천 우선순위 점수
-	autoAssign: boolean // 자동 할당 여부
-	createdAt: Date
-}
-
-interface KPI {
-	id: string
-	name: string
-	target: string
-	unit: string
-	category: string
-	description: string
-}
-
 interface UploadedFinancialDocument {
 	id: string
 	name: string
@@ -185,6 +148,15 @@ interface UploadedFinancialDocument {
 	type: string
 }
 
+interface CompanyInfoSection {
+	id: string
+	title: string
+	content: string
+	order: number
+	createdAt: string
+	updatedAt: string
+}
+
 export default function CompanySettingsPage() {
 	// Company Info State
 	const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
@@ -192,9 +164,8 @@ export default function CompanySettingsPage() {
 		name: 'Proce Inc.',
 		legalName: 'Proce Incorporated',
 		businessNumber: '123-45-67890',
-		taxId: 'TAX-2024-001',
-		corporateNumber: '',
-		establishmentType: '',
+		corporateNumber: '110111-1234567',
+		establishmentType: '주식회사',
 		
 		// 산업 및 분류
 		industry: 'Software & Technology',
@@ -232,23 +203,17 @@ export default function CompanySettingsPage() {
 		
 		// 온라인 정보
 		website: 'https://proce.com',
-		linkedIn: 'https://linkedin.com/company/proce',
-		facebook: 'https://facebook.com/proce',
-		twitter: 'https://twitter.com/proce',
-		instagram: '',
-		youtube: '',
-		github: '',
+		socialLinks: [
+			{ platform: 'LinkedIn', url: 'https://linkedin.com/company/proce' },
+			{ platform: 'Facebook', url: 'https://facebook.com/proce' },
+			{ platform: 'Twitter/X', url: 'https://twitter.com/proce' },
+		],
 		
 		// 대표자 정보
 		ceoName: '김대표',
 		ceoEmail: 'ceo@proce.com',
 		ceoPhone: '+82-10-1234-5678',
 		ceoLinkedIn: '',
-		
-		// 재무 담당자 정보
-		cfoName: '이재무',
-		cfoEmail: 'cfo@proce.com',
-		cfoPhone: '+82-10-2345-6789',
 		
 		// 인사 담당자 정보
 		hrName: '',
@@ -345,72 +310,9 @@ export default function CompanySettingsPage() {
 		},
 	])
 
-	// OKR Templates State
-	const [okrTemplates, setOKRTemplates] = useState<OKRTemplate[]>([
-		{
-			id: '1',
-			goalId: '1',
-			name: '신규 고객 획득 증대',
-			description: '연매출 목표 달성을 위한 신규 고객 100명 확보',
-			targetRole: ['Sales Manager', 'Account Executive', 'Business Development'],
-			targetDepartment: ['Sales'],
-			keyResults: [
-				{ id: 'kr1', description: '신규 리드 300개 생성', targetValue: '300', unit: '건' },
-				{ id: 'kr2', description: '리드-고객 전환율 33% 이상', targetValue: '33', unit: '%' },
-				{ id: 'kr3', description: '평균 계약 금액 1억원 이상', targetValue: '100000000', unit: 'KRW' },
-			],
-			recommendationScore: 95,
-			autoAssign: true,
-			createdAt: new Date('2024-01-02'),
-		},
-		{
-			id: '2',
-			goalId: '1',
-			name: '마케팅 캠페인 ROI 향상',
-			description: '효율적인 마케팅 캠페인으로 매출 기여',
-			targetRole: ['Marketing Manager', 'Growth Marketing', 'Content Marketing'],
-			targetDepartment: ['Marketing'],
-			keyResults: [
-				{ id: 'kr1', description: '광고 ROAS 500% 달성', targetValue: '500', unit: '%' },
-				{ id: 'kr2', description: '월간 MQL 200개 생성', targetValue: '200', unit: '건' },
-				{ id: 'kr3', description: '콘텐츠 조회수 100만 달성', targetValue: '1000000', unit: '회' },
-			],
-			recommendationScore: 90,
-			autoAssign: true,
-			createdAt: new Date('2024-01-02'),
-		},
-		{
-			id: '3',
-			goalId: '2',
-			name: '고객 응답 시간 단축',
-			description: '고객 만족도 향상을 위한 빠른 응답 체계 구축',
-			targetRole: ['Customer Support', 'Support Engineer'],
-			targetDepartment: ['Customer Support'],
-			keyResults: [
-				{ id: 'kr1', description: '평균 응답 시간 1시간 이내', targetValue: '1', unit: 'hour' },
-				{ id: 'kr2', description: '첫 응답률 95% 이상', targetValue: '95', unit: '%' },
-				{ id: 'kr3', description: '고객 만족도 4.5점 이상', targetValue: '4.5', unit: '점' },
-			],
-			recommendationScore: 92,
-			autoAssign: false,
-			createdAt: new Date('2024-10-02'),
-		},
-	])
-
-	// KPI State (기존 호환성 유지)
-	const [kpis, setKpis] = useState<KPI[]>([])
 
 	const [activeTab, setActiveTab] = useState<'company' | 'annual-goals' | 'financial'>('company')
 	const [showAddGoal, setShowAddGoal] = useState(false)
-	const [showAddTemplate, setShowAddTemplate] = useState(false)
-	const [showAddKPI, setShowAddKPI] = useState(false)
-	const [newKPI, setNewKPI] = useState<Omit<KPI, 'id'>>({
-		name: '',
-		target: '',
-		unit: '',
-		category: '',
-		description: '',
-	})
 	
 	const [newGoal, setNewGoal] = useState<Partial<CompanyGoal>>({
 		name: '',
@@ -427,24 +329,32 @@ export default function CompanySettingsPage() {
 		aiRecommendationEnabled: true,
 	})
 
-	const [newTemplate, setNewTemplate] = useState<Partial<OKRTemplate>>({
-		goalId: '',
-		name: '',
-		description: '',
-		targetRole: [],
-		targetDepartment: [],
-		keyResults: [],
-		recommendationScore: 50,
-		autoAssign: false,
-	})
 
 	const [uploadedDocuments, setUploadedDocuments] = useState<UploadedFinancialDocument[]>([])
+	const [newSocialPlatform, setNewSocialPlatform] = useState('')
+	const [newSocialUrl, setNewSocialUrl] = useState('')
+	
+	// Company Info Sections (추가 상세 정보)
+	const [companyInfoSections, setCompanyInfoSections] = useState<CompanyInfoSection[]>([])
+	const [showDetailedInfoDialog, setShowDetailedInfoDialog] = useState(false)
+	const [editingSection, setEditingSection] = useState<CompanyInfoSection | null>(null)
 
 	const departments = ['Sales', 'Marketing', 'Engineering', 'Product', 'Customer Support', 'Finance', 'HR', 'Operations']
-	const roles = ['Manager', 'Team Lead', 'Senior', 'Junior', 'Engineer', 'Designer', 'Analyst', 'Executive']
+	const socialPlatforms = ['LinkedIn', 'Facebook', 'Twitter/X', 'Instagram', 'YouTube', 'GitHub', 'TikTok', 'Discord', 'Slack', 'Medium', 'Reddit', 'Other']
+	
+	const sectionTemplates = [
+		{ title: '회사 개요', content: '회사의 전반적인 소개를 작성해주세요.\n\n- 설립 연도:\n- 주요 사업:\n- 회사 규모:\n- 본사 위치:' },
+		{ title: '비전 & 미션', content: '# 비전\n우리가 나아가고자 하는 방향을 작성해주세요.\n\n# 미션\n우리가 달성하고자 하는 목표를 작성해주세요.' },
+		{ title: '핵심 가치', content: '회사의 핵심 가치를 작성해주세요.\n\n1. \n2. \n3. ' },
+		{ title: '주요 연혁', content: '# 주요 연혁\n\n## 2024\n- \n\n## 2023\n- \n\n## 2022\n- ' },
+		{ title: '조직 구조', content: '회사의 조직 구조와 주요 부서를 설명해주세요.' },
+		{ title: '사업 영역', content: '# 사업 영역\n\n## 주요 사업\n\n## 제품/서비스\n\n## 시장 및 고객' },
+		{ title: '경영 목표', content: '# 단기 목표 (1년)\n\n# 중기 목표 (3년)\n\n# 장기 목표 (5년+)' },
+		{ title: '재무 현황', content: '회사의 재무 현황과 성과를 작성해주세요.\n\n※ 민감한 정보는 주의해서 입력해주세요.' },
+	]
 
 	// Company Info Handlers
-	const handleCompanyInfoChange = (field: keyof CompanyInfo, value: string) => {
+	const handleCompanyInfoChange = (field: keyof CompanyInfo, value: string | Array<{ platform: string; url: string }>) => {
 		setCompanyInfo((prev) => ({ ...prev, [field]: value }))
 	}
 
@@ -452,6 +362,53 @@ export default function CompanySettingsPage() {
 		// Mock save
 		toast.success('Company information saved successfully')
 	}
+
+	// Social Links Handlers
+	const handleAddSocialLink = () => {
+		if (!newSocialPlatform || !newSocialUrl.trim()) {
+			toast.error('플랫폼과 URL을 모두 입력해주세요')
+			return
+		}
+
+		const newLink = { platform: newSocialPlatform, url: newSocialUrl.trim() }
+		handleCompanyInfoChange('socialLinks', [...(companyInfo.socialLinks || []), newLink])
+		setNewSocialPlatform('')
+		setNewSocialUrl('')
+		toast.success('소셜 링크가 추가되었습니다')
+	}
+
+	const handleRemoveSocialLink = (index: number) => {
+		const updated = (companyInfo.socialLinks || []).filter((_, i) => i !== index)
+		handleCompanyInfoChange('socialLinks', updated)
+		toast.success('소셜 링크가 삭제되었습니다')
+	}
+
+	// Get system user statistics from localStorage
+	const getSystemUserStats = () => {
+		try {
+			const usersData = localStorage.getItem('users')
+			if (!usersData) {
+				return { total: 0, byRole: { user: 0, admin: 0, executive: 0 } }
+			}
+
+			const users = JSON.parse(usersData)
+			const byRole = users.reduce((acc: any, user: any) => {
+				const role = user.role || 'user'
+				acc[role] = (acc[role] || 0) + 1
+				return acc
+			}, { user: 0, admin: 0, executive: 0 })
+
+			return {
+				total: users.length,
+				byRole,
+			}
+		} catch (error) {
+			console.error('Failed to get user stats:', error)
+			return { total: 0, byRole: { user: 0, admin: 0, executive: 0 } }
+		}
+	}
+
+	const systemUserStats = getSystemUserStats()
 
 	// Financial Data Handlers
 	const handleAddFinancialRecord = () => {
@@ -527,115 +484,77 @@ export default function CompanySettingsPage() {
 	}
 
 	const handleDeleteGoal = (id: string) => {
-		// 연관된 템플릿도 삭제할지 확인
-		const relatedTemplates = okrTemplates.filter((t) => t.goalId === id)
-		if (relatedTemplates.length > 0 && !confirm(`이 목표와 연관된 ${relatedTemplates.length}개의 OKR 템플릿도 삭제됩니다. 계속하시겠습니까?`)) {
-			return
-		}
-
 		setCompanyGoals((prev) => prev.filter((g) => g.id !== id))
-		setOKRTemplates((prev) => prev.filter((t) => t.goalId !== id))
 		toast.success('전사 목표가 삭제되었습니다')
 	}
 
-	const handleAddTemplate = () => {
-		if (!newTemplate.name || !newTemplate.goalId || !newTemplate.targetDepartment || newTemplate.targetDepartment.length === 0) {
-			toast.error('필수 항목을 모두 입력해주세요')
-			return
-		}
-
-		const template: OKRTemplate = {
-			id: Date.now().toString(),
-			goalId: newTemplate.goalId,
-			name: newTemplate.name,
-			description: newTemplate.description || '',
-			targetRole: newTemplate.targetRole || [],
-			targetDepartment: newTemplate.targetDepartment,
-			keyResults: newTemplate.keyResults || [],
-			recommendationScore: newTemplate.recommendationScore || 50,
-			autoAssign: newTemplate.autoAssign || false,
-			createdAt: new Date(),
-		}
-
-		setOKRTemplates([...okrTemplates, template])
-		setNewTemplate({
-			goalId: '',
-			name: '',
-			description: '',
-			targetRole: [],
-			targetDepartment: [],
-			keyResults: [],
-			recommendationScore: 50,
-			autoAssign: false,
-		})
-		setShowAddTemplate(false)
-		toast.success('OKR 템플릿이 추가되었습니다')
-	}
-
-	const handleDeleteTemplate = (id: string) => {
-		setOKRTemplates((prev) => prev.filter((t) => t.id !== id))
-		toast.success('OKR 템플릿이 삭제되었습니다')
-	}
-
-	const handleSaveGoalsAndTemplates = () => {
+	const handleSaveGoals = () => {
 		// localStorage에 저장
 		localStorage.setItem('companyGoals', JSON.stringify(companyGoals))
-		localStorage.setItem('okrTemplates', JSON.stringify(okrTemplates))
-		toast.success('전사 목표 및 OKR 템플릿이 저장되었습니다')
+		toast.success('전사 목표가 저장되었습니다')
 	}
 
-	const addKeyResult = () => {
-		const newKR = {
+	// Suppress unused variable warning - function is called from UI
+	void handleSaveGoals
+
+	// Company Info Sections Handlers
+	const loadCompanyInfoSections = () => {
+		const saved = localStorage.getItem('company_info_sections')
+		if (saved) {
+			try {
+				setCompanyInfoSections(JSON.parse(saved))
+			} catch (e) {
+				console.error('Failed to load company info sections', e)
+			}
+		}
+	}
+
+	const saveCompanyInfoSections = (sections: CompanyInfoSection[]) => {
+		localStorage.setItem('company_info_sections', JSON.stringify(sections))
+		setCompanyInfoSections(sections)
+		toast.success('상세 정보가 저장되었습니다')
+	}
+
+	const handleAddSection = (templateTitle?: string) => {
+		const template = sectionTemplates.find(t => t.title === templateTitle)
+		const newSection: CompanyInfoSection = {
 			id: Date.now().toString(),
-			description: '',
-			targetValue: '',
-			unit: '',
+			title: template?.title || '새 섹션',
+			content: template?.content || '',
+			order: companyInfoSections.length,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
 		}
-		setNewTemplate({
-			...newTemplate,
-			keyResults: [...(newTemplate.keyResults || []), newKR],
-		})
+		const updated = [...companyInfoSections, newSection]
+		saveCompanyInfoSections(updated)
+		setEditingSection(newSection)
 	}
 
-	const removeKeyResult = (krId: string) => {
-		setNewTemplate({
-			...newTemplate,
-			keyResults: (newTemplate.keyResults || []).filter((kr) => kr.id !== krId),
-		})
-	}
-
-	const updateKeyResult = (krId: string, field: string, value: string) => {
-		setNewTemplate({
-			...newTemplate,
-			keyResults: (newTemplate.keyResults || []).map((kr) =>
-				kr.id === krId ? { ...kr, [field]: value } : kr
-			),
-		})
-	}
-
-	// KPI Handlers (기존 호환성 유지)
-	const handleAddKPI = () => {
-		if (!newKPI.name || !newKPI.target || !newKPI.category) {
-			toast.error('필수 항목을 모두 입력해주세요')
-			return
+	const handleUpdateSection = (id: string, updates: Partial<CompanyInfoSection>) => {
+		const updated = companyInfoSections.map(s =>
+			s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
+		)
+		saveCompanyInfoSections(updated)
+		if (editingSection?.id === id) {
+			setEditingSection({ ...editingSection, ...updates, updatedAt: new Date().toISOString() })
 		}
-
-		const kpi: KPI = {
-			id: Date.now().toString(),
-			...newKPI,
-		}
-
-		setKpis([...kpis, kpi])
-		setNewKPI({
-			name: '',
-			target: '',
-			unit: '',
-			category: '',
-			description: '',
-		})
-		setShowAddKPI(false)
-		toast.success('KPI가 추가되었습니다')
 	}
+
+	const handleDeleteSection = (id: string) => {
+		if (!confirm('이 섹션을 삭제하시겠습니까?')) return
+		const updated = companyInfoSections.filter(s => s.id !== id)
+		saveCompanyInfoSections(updated)
+		if (editingSection?.id === id) {
+			setEditingSection(null)
+		}
+	}
+
+	// Load sections on mount
+	useEffect(() => {
+		loadCompanyInfoSections()
+	}, [])
+
+	// KPI Handlers removed - feature will be added later
 
 	// Document Upload Handlers
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -701,14 +620,19 @@ export default function CompanySettingsPage() {
 		// Count filled fields in CompanyInfo
 		const companyInfoFields = Object.values(companyInfo)
 		const totalFields = companyInfoFields.length
-		const filledFields = companyInfoFields.filter(value => value && value.trim() !== '').length
+		const filledFields = companyInfoFields.filter(value => {
+			if (Array.isArray(value)) {
+				return value.length > 0
+			}
+			return value && typeof value === 'string' && value.trim() !== ''
+		}).length
 		const percentage = Math.round((filledFields / totalFields) * 100)
 
 		// Calculate section-wise completion
 		const sections = [
 			{
 				name: 'Basic Info',
-				fields: [companyInfo.name, companyInfo.legalName, companyInfo.businessNumber, companyInfo.taxId, companyInfo.corporateNumber, companyInfo.establishmentType],
+				fields: [companyInfo.name, companyInfo.legalName, companyInfo.businessNumber, companyInfo.corporateNumber, companyInfo.establishmentType],
 			},
 			{
 				name: 'Industry',
@@ -728,11 +652,11 @@ export default function CompanySettingsPage() {
 			},
 			{
 				name: 'Online',
-				fields: [companyInfo.website, companyInfo.linkedIn, companyInfo.facebook, companyInfo.twitter, companyInfo.instagram, companyInfo.youtube, companyInfo.github],
+				fields: [companyInfo.website, ...(companyInfo.socialLinks || []).map(link => link.url)],
 			},
 			{
 				name: 'Leadership',
-				fields: [companyInfo.ceoName, companyInfo.ceoEmail, companyInfo.ceoPhone, companyInfo.ceoLinkedIn, companyInfo.cfoName, companyInfo.cfoEmail, companyInfo.cfoPhone, companyInfo.hrName, companyInfo.hrEmail, companyInfo.hrPhone, companyInfo.ctoName, companyInfo.ctoEmail, companyInfo.ctoPhone],
+				fields: [companyInfo.ceoName, companyInfo.ceoEmail, companyInfo.ceoPhone, companyInfo.ceoLinkedIn, companyInfo.hrName, companyInfo.hrEmail, companyInfo.hrPhone, companyInfo.ctoName, companyInfo.ctoEmail, companyInfo.ctoPhone],
 			},
 			{
 				name: 'Description',
@@ -773,6 +697,9 @@ export default function CompanySettingsPage() {
 
 	return (
 		<div className="space-y-6">
+			{/* Developer Memo */}
+			<DevMemo content={DEV_MEMOS.ADMIN_COMPANY_SETTINGS} />
+
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -786,9 +713,9 @@ export default function CompanySettingsPage() {
 				</div>
 			</div>
 
-			{/* Progress Bar - Only show for Company Info tab */}
-			{activeTab === 'company' && (
-				<Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+		{/* Progress Bar - Only show for Company Info tab */}
+		{activeTab === 'company' && (
+			<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
 					<CardContent className="p-6">
 						<div className="flex items-center justify-between mb-3">
 							<div className="flex items-center gap-3">
@@ -809,7 +736,7 @@ export default function CompanySettingsPage() {
 						{/* Main Progress Bar */}
 						<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
 							<div
-								className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
+								className="absolute top-0 left-0 h-full bg-linear-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
 								style={{ width: `${completionStats.percentage}%` }}
 							/>
 						</div>
@@ -879,7 +806,7 @@ export default function CompanySettingsPage() {
 					}`}
 				>
 					<Target className="inline h-4 w-4 mr-2" />
-					Annual Goals
+					전사 목표 (Company KPI)
 				</button>
 				<button
 					onClick={() => setActiveTab('financial')}
@@ -941,30 +868,35 @@ export default function CompanySettingsPage() {
 										placeholder="123-45-67890"
 									/>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">법인등록번호</label>
-									<Input
-										value={companyInfo.taxId}
-										onChange={(e) => handleCompanyInfoChange('taxId', e.target.value)}
-										placeholder="TAX-2024-001"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">고유번호</label>
-									<Input
-										value={companyInfo.corporateNumber}
-										onChange={(e) => handleCompanyInfoChange('corporateNumber', e.target.value)}
-										placeholder="110111-1234567"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">설립 형태</label>
-									<Input
-										value={companyInfo.establishmentType}
-										onChange={(e) => handleCompanyInfoChange('establishmentType', e.target.value)}
-										placeholder="주식회사, 유한회사 등"
-									/>
-								</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">법인등록번호</label>
+								<Input
+									value={companyInfo.corporateNumber}
+									onChange={(e) => handleCompanyInfoChange('corporateNumber', e.target.value)}
+									placeholder="110111-1234567"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">설립 형태</label>
+								<select
+									value={companyInfo.establishmentType}
+									onChange={(e) => handleCompanyInfoChange('establishmentType', e.target.value)}
+									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+								>
+									<option value="">선택하세요</option>
+									<option value="주식회사">주식회사</option>
+									<option value="유한회사">유한회사</option>
+									<option value="유한책임회사">유한책임회사</option>
+									<option value="합명회사">합명회사</option>
+									<option value="합자회사">합자회사</option>
+									<option value="개인사업자">개인사업자</option>
+									<option value="비영리법인">비영리법인</option>
+									<option value="사단법인">사단법인</option>
+									<option value="재단법인">재단법인</option>
+									<option value="사회적협동조합">사회적협동조합</option>
+									<option value="기타">기타</option>
+								</select>
+							</div>
 							</div>
 						</CardContent>
 					</Card>
@@ -1047,44 +979,89 @@ export default function CompanySettingsPage() {
 						<CardHeader>
 							<h2 className="text-xl font-bold">인력 정보</h2>
 						</CardHeader>
-						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">총 직원 수</label>
-									<Input
-										type="number"
-										value={companyInfo.employeeCount}
-										onChange={(e) => handleCompanyInfoChange('employeeCount', e.target.value)}
-										placeholder="247"
-									/>
+						<CardContent className="space-y-6">
+							{/* 실제 인력 정보 */}
+							<div>
+								<h3 className="text-sm font-semibold mb-3 text-neutral-700 dark:text-neutral-300">실제 인력 수</h3>
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+									<div>
+										<label className="block text-sm font-medium mb-2">총 직원 수</label>
+										<Input
+											type="number"
+											value={companyInfo.employeeCount}
+											onChange={(e) => handleCompanyInfoChange('employeeCount', e.target.value)}
+											placeholder="247"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">정규직</label>
+										<Input
+											type="number"
+											value={companyInfo.fullTimeCount}
+											onChange={(e) => handleCompanyInfoChange('fullTimeCount', e.target.value)}
+											placeholder="220"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">계약직</label>
+										<Input
+											type="number"
+											value={companyInfo.partTimeCount}
+											onChange={(e) => handleCompanyInfoChange('partTimeCount', e.target.value)}
+											placeholder="15"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2">외주</label>
+										<Input
+											type="number"
+											value={companyInfo.contractorCount}
+											onChange={(e) => handleCompanyInfoChange('contractorCount', e.target.value)}
+											placeholder="12"
+										/>
+									</div>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">정규직</label>
-									<Input
-										type="number"
-										value={companyInfo.fullTimeCount}
-										onChange={(e) => handleCompanyInfoChange('fullTimeCount', e.target.value)}
-										placeholder="220"
-									/>
+							</div>
+
+							{/* 시스템 사용자 정보 */}
+							<div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+								<h3 className="text-sm font-semibold mb-3 text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
+									<Users className="h-4 w-4 text-primary" />
+									시스템 사용자 정보
+								</h3>
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+									<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+										<div className="text-xs text-blue-700 dark:text-blue-300 mb-1 font-medium">총 사용자</div>
+										<div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{systemUserStats.total}</div>
+										<p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+											등록된 계정 수
+										</p>
+									</div>
+									<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+										<div className="text-xs text-green-700 dark:text-green-300 mb-1 font-medium">일반 사용자</div>
+										<div className="text-2xl font-bold text-green-900 dark:text-green-100">{systemUserStats.byRole.user}</div>
+										<p className="text-xs text-green-600 dark:text-green-400 mt-1">
+											User 역할
+										</p>
+									</div>
+									<div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+										<div className="text-xs text-purple-700 dark:text-purple-300 mb-1 font-medium">관리자</div>
+										<div className="text-2xl font-bold text-purple-900 dark:text-purple-100">{systemUserStats.byRole.admin}</div>
+										<p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+											Admin 역할
+										</p>
+									</div>
+									<div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+										<div className="text-xs text-orange-700 dark:text-orange-300 mb-1 font-medium">경영진</div>
+										<div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{systemUserStats.byRole.executive}</div>
+										<p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+											Executive 역할
+										</p>
+									</div>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">계약직</label>
-									<Input
-										type="number"
-										value={companyInfo.partTimeCount}
-										onChange={(e) => handleCompanyInfoChange('partTimeCount', e.target.value)}
-										placeholder="15"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">외주</label>
-									<Input
-										type="number"
-										value={companyInfo.contractorCount}
-										onChange={(e) => handleCompanyInfoChange('contractorCount', e.target.value)}
-										placeholder="12"
-									/>
-								</div>
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
+									* 시스템 사용자 정보는 실제 등록된 사용자 계정 수를 표시합니다
+								</p>
 							</div>
 						</CardContent>
 					</Card>
@@ -1180,43 +1157,104 @@ export default function CompanySettingsPage() {
 						<CardHeader>
 							<h2 className="text-xl font-bold">온라인 정보</h2>
 						</CardHeader>
-						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">웹사이트</label>
-									<Input
-										type="url"
-										value={companyInfo.website}
-										onChange={(e) => handleCompanyInfoChange('website', e.target.value)}
-										placeholder="https://proce.com"
-									/>
+						<CardContent className="space-y-5">
+							{/* 웹사이트 */}
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									웹사이트 <span className="text-red-500">*</span>
+								</label>
+								<Input
+									type="url"
+									value={companyInfo.website}
+									onChange={(e) => handleCompanyInfoChange('website', e.target.value)}
+									placeholder="https://proce.com"
+								/>
+							</div>
+
+							{/* 소셜 미디어 & 플랫폼 */}
+							<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								<div className="flex items-center justify-between mb-3">
+									<label className="block text-sm font-medium">
+										소셜 미디어 & 플랫폼
+									</label>
+									<span className="text-xs text-neutral-500 dark:text-neutral-400">
+										{(companyInfo.socialLinks || []).length}개 추가됨
+									</span>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">LinkedIn</label>
-									<Input
-										type="url"
-										value={companyInfo.linkedIn}
-										onChange={(e) => handleCompanyInfoChange('linkedIn', e.target.value)}
-										placeholder="https://linkedin.com/company/proce"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Facebook</label>
-									<Input
-										type="url"
-										value={companyInfo.facebook}
-										onChange={(e) => handleCompanyInfoChange('facebook', e.target.value)}
-										placeholder="https://facebook.com/proce"
-									/>
-								</div>
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">Twitter</label>
-									<Input
-										type="url"
-										value={companyInfo.twitter}
-										onChange={(e) => handleCompanyInfoChange('twitter', e.target.value)}
-										placeholder="https://twitter.com/proce"
-									/>
+
+								{/* 추가된 소셜 링크 목록 */}
+								{(companyInfo.socialLinks || []).length > 0 && (
+									<div className="space-y-2 mb-4">
+										{(companyInfo.socialLinks || []).map((link, index) => (
+											<div
+												key={index}
+												className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl"
+											>
+												<span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-sm font-medium min-w-[120px] text-center">
+													{link.platform}
+												</span>
+												<Input
+													type="url"
+													value={link.url}
+													onChange={(e) => {
+														const updated = [...(companyInfo.socialLinks || [])]
+														updated[index] = { ...updated[index], url: e.target.value }
+														handleCompanyInfoChange('socialLinks', updated)
+													}}
+													placeholder="https://..."
+													className="flex-1"
+												/>
+												<button
+													onClick={() => handleRemoveSocialLink(index)}
+													className="text-red-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+												>
+													<X className="h-4 w-4" />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
+
+								{/* 새 소셜 링크 추가 */}
+								<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+									<div className="flex items-center gap-2 mb-3">
+										<Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+										<span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+											새 플랫폼 추가
+										</span>
+									</div>
+									<div className="flex items-center gap-2">
+										<select
+											value={newSocialPlatform}
+											onChange={(e) => setNewSocialPlatform(e.target.value)}
+											className="px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900 min-w-[140px]"
+										>
+											<option value="">플랫폼 선택</option>
+											{socialPlatforms.map((platform) => (
+												<option key={platform} value={platform}>
+													{platform}
+												</option>
+											))}
+										</select>
+										<Input
+											type="url"
+											value={newSocialUrl}
+											onChange={(e) => setNewSocialUrl(e.target.value)}
+											placeholder="https://..."
+											className="flex-1"
+											disabled={!newSocialPlatform}
+										/>
+										<Button
+											onClick={handleAddSocialLink}
+											disabled={!newSocialPlatform || !newSocialUrl.trim()}
+											className="shrink-0"
+										>
+											<Plus className="h-4 w-4" />
+										</Button>
+									</div>
+									<p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+										플랫폼을 선택하고 URL을 입력한 후 추가 버튼을 클릭하세요
+									</p>
 								</div>
 							</div>
 						</CardContent>
@@ -1253,43 +1291,6 @@ export default function CompanySettingsPage() {
 										value={companyInfo.ceoPhone}
 										onChange={(e) => handleCompanyInfoChange('ceoPhone', e.target.value)}
 										placeholder="+82-10-1234-5678"
-									/>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* 재무 담당자 정보 */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">재무 담당자 정보</h2>
-						</CardHeader>
-						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">CFO명</label>
-									<Input
-										value={companyInfo.cfoName}
-										onChange={(e) => handleCompanyInfoChange('cfoName', e.target.value)}
-										placeholder="이재무"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">CFO 이메일</label>
-									<Input
-										type="email"
-										value={companyInfo.cfoEmail}
-										onChange={(e) => handleCompanyInfoChange('cfoEmail', e.target.value)}
-										placeholder="cfo@proce.com"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">CFO 전화번호</label>
-									<Input
-										type="tel"
-										value={companyInfo.cfoPhone}
-										onChange={(e) => handleCompanyInfoChange('cfoPhone', e.target.value)}
-										placeholder="+82-10-2345-6789"
 									/>
 								</div>
 							</div>
@@ -1344,7 +1345,20 @@ export default function CompanySettingsPage() {
 					{/* 추가 정보 */}
 					<Card>
 						<CardHeader>
-							<h2 className="text-xl font-bold">추가 정보</h2>
+							<div className="flex items-center justify-between">
+								<h2 className="text-xl font-bold">추가 정보</h2>
+								<Button 
+									variant="outline" 
+									onClick={() => {
+										loadCompanyInfoSections()
+										setShowDetailedInfoDialog(true)
+									}} 
+									className="flex items-center gap-2"
+								>
+									<FileText className="h-4 w-4" />
+									상세 정보 관리
+								</Button>
+							</div>
 						</CardHeader>
 						<CardContent>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1406,31 +1420,32 @@ export default function CompanySettingsPage() {
 			{activeTab === 'annual-goals' && (
 				<div className="space-y-6">
 					{/* Summary Dashboard */}
-					<div className="grid gap-4 md:grid-cols-2">
-						<Card className="border-primary/20">
-							<CardContent className="p-6">
-								<div className="flex items-center justify-between mb-4">
-									<Target className="h-8 w-8 text-primary" />
-									<TrendingUp className="h-5 w-5 text-green-600" />
+					<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent dark:from-primary/10">
+						<CardContent className="p-6">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-4">
+									<div className="p-3 bg-primary/10 rounded-2xl">
+										<Target className="h-8 w-8 text-primary" />
+									</div>
+									<div>
+										<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+											전사 목표 (Company KPI)
+										</div>
+										<div className="text-3xl font-bold">{companyGoals.length}개</div>
+									</div>
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
-									전사 목표
+								<div className="text-right">
+									<div className="flex items-center gap-2 text-green-600 mb-1">
+										<TrendingUp className="h-5 w-5" />
+										<span className="text-sm font-medium">개인 OKR 연계</span>
+									</div>
+									<p className="text-xs text-neutral-500 dark:text-neutral-400">
+										각 직원의 OKR이 이 목표와 연결됩니다
+									</p>
 								</div>
-								<div className="text-3xl font-bold">{companyGoals.length}</div>
-							</CardContent>
-						</Card>
-						<Card className="border-green-200 dark:border-green-800">
-							<CardContent className="p-6">
-								<div className="flex items-center justify-between mb-4">
-									<Sparkles className="h-8 w-8 text-green-600" />
-								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
-									OKR 템플릿
-								</div>
-								<div className="text-3xl font-bold">{okrTemplates.length}</div>
-							</CardContent>
-						</Card>
-					</div>
+							</div>
+						</CardContent>
+					</Card>
 
 					{/* Company Goals Section */}
 					<Card>
@@ -1439,10 +1454,10 @@ export default function CompanySettingsPage() {
 								<div>
 									<h2 className="text-xl font-bold flex items-center gap-2">
 										<Target className="h-6 w-6 text-primary" />
-										전사 목표 (Company Goals)
+										전사 목표 (Company KPI)
 									</h2>
 									<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-										회사의 핵심 목표를 설정하고 AI 기반 OKR 추천을 활성화하세요
+										회사의 핵심 성과 지표를 설정하세요. 각 직원은 자신의 OKR을 작성할 때 이 전사 목표와 연계합니다.
 									</p>
 								</div>
 								<div className="flex items-center gap-2">
@@ -1450,7 +1465,7 @@ export default function CompanySettingsPage() {
 										<Plus className="h-4 w-4" />
 										목표 추가
 									</Button>
-									<Button onClick={handleSaveGoalsAndTemplates} className="flex items-center gap-2">
+									<Button onClick={handleSaveGoals} className="flex items-center gap-2">
 										<Save className="h-4 w-4" />
 										저장
 									</Button>
@@ -1530,130 +1545,10 @@ export default function CompanySettingsPage() {
 													className="text-red-500 hover:text-red-600 transition-colors ml-4 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
 												>
 													<Trash2 className="h-5 w-5" />
-												</button>
-											</div>
-											{okrTemplates.filter(t => t.goalId === goal.id).length > 0 && (
-												<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
-													<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-														연결된 OKR 템플릿: {okrTemplates.filter(t => t.goalId === goal.id).length}개
-													</p>
-												</div>
-											)}
-										</div>
+										</button>
+									</div>
+								</div>
 									))}
-								</div>
-							)}
-						</CardContent>
-					</Card>
-
-					{/* OKR Templates Section */}
-					<Card className="border-green-200 dark:border-green-800">
-						<CardHeader>
-							<div className="flex items-center justify-between">
-								<div>
-									<h2 className="text-xl font-bold flex items-center gap-2">
-										<Sparkles className="h-6 w-6 text-green-600" />
-										OKR 템플릿 (OKR Templates)
-									</h2>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-										직원들에게 추천될 OKR 템플릿을 생성하고 관리하세요
-									</p>
-								</div>
-								<Button variant="outline" onClick={() => setShowAddTemplate(true)} className="flex items-center gap-2">
-									<Plus className="h-4 w-4" />
-									템플릿 추가
-								</Button>
-							</div>
-						</CardHeader>
-						<CardContent>
-							{okrTemplates.length === 0 ? (
-								<div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
-									<Lightbulb className="h-16 w-16 mx-auto mb-4 opacity-30" />
-									<p className="text-lg font-medium mb-2">아직 생성된 OKR 템플릿이 없습니다</p>
-									<p className="text-sm mb-4">전사 목표와 연결된 OKR 템플릿을 추가하세요</p>
-									<Button onClick={() => setShowAddTemplate(true)} className="flex items-center gap-2">
-										<Plus className="h-4 w-4" />
-										첫 템플릿 추가하기
-									</Button>
-								</div>
-							) : (
-								<div className="space-y-4">
-									{okrTemplates.map((template) => {
-										const relatedGoal = companyGoals.find(g => g.id === template.goalId)
-										return (
-											<div
-												key={template.id}
-												className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-green-500 transition-colors"
-											>
-												<div className="flex items-start justify-between mb-4">
-													<div className="flex-1">
-														<div className="flex items-center gap-2 mb-2">
-															{relatedGoal && (
-																<span className="px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-																	{relatedGoal.name}
-																</span>
-															)}
-															{template.autoAssign && (
-																<span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-																	자동 할당
-																</span>
-															)}
-															<span className="text-xs text-neutral-500 dark:text-neutral-400">
-																추천 점수: {template.recommendationScore}
-															</span>
-														</div>
-														<h3 className="font-bold text-lg mb-2">{template.name}</h3>
-														<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-															{template.description}
-														</p>
-														<div className="grid grid-cols-2 gap-4 mb-3">
-															<div>
-																<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">대상 부서</p>
-																<div className="flex items-center gap-1 flex-wrap">
-																	{template.targetDepartment.map((dept, idx) => (
-																		<span key={idx} className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded">
-																			{dept}
-																		</span>
-																	))}
-																</div>
-															</div>
-															<div>
-																<p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">대상 역할</p>
-																<div className="flex items-center gap-1 flex-wrap">
-																	{template.targetRole.map((role, idx) => (
-																		<span key={idx} className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded">
-																			{role}
-																		</span>
-																	))}
-																</div>
-															</div>
-														</div>
-														{template.keyResults.length > 0 && (
-															<div className="pt-3 border-t border-neutral-200 dark:border-neutral-800">
-																<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-																	핵심 결과 (Key Results):
-																</p>
-																<ul className="space-y-1">
-																	{template.keyResults.map((kr) => (
-																		<li key={kr.id} className="text-sm flex items-start gap-2">
-																			<CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-																			<span>{kr.description} - <span className="font-bold">{kr.targetValue} {kr.unit}</span></span>
-																		</li>
-																	))}
-																</ul>
-															</div>
-														)}
-													</div>
-													<button
-														onClick={() => handleDeleteTemplate(template.id)}
-														className="text-red-500 hover:text-red-600 transition-colors ml-4 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
-													>
-														<Trash2 className="h-5 w-5" />
-													</button>
-												</div>
-											</div>
-										)
-									})}
 								</div>
 							)}
 						</CardContent>
@@ -2028,23 +1923,42 @@ export default function CompanySettingsPage() {
 								</div>
 
 								<div>
-									<label className="block text-sm font-medium mb-2">연관 부서</label>
-									<select
-										multiple
-										value={newGoal.department || []}
-										onChange={(e) => {
-											const selected = Array.from(e.target.selectedOptions, option => option.value)
-											setNewGoal({ ...newGoal, department: selected })
-										}}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[120px]"
-									>
-										{departments.map((dept) => (
-											<option key={dept} value={dept}>
-												{dept}
-											</option>
-										))}
-									</select>
-									<p className="text-xs text-neutral-500 mt-1">Ctrl/Cmd를 눌러 여러 부서를 선택하세요</p>
+									<label className="block text-sm font-medium mb-2">
+										연관 부서
+										{(newGoal.department || []).length > 0 && (
+											<span className="ml-2 text-xs text-primary">
+												({(newGoal.department || []).length}개 선택됨)
+											</span>
+										)}
+									</label>
+									<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
+										<div className="flex flex-wrap gap-2">
+											{departments.map((dept) => {
+												const isSelected = (newGoal.department || []).includes(dept)
+												return (
+													<button
+														key={dept}
+														type="button"
+														onClick={() => {
+															const current = newGoal.department || []
+															const updated = isSelected
+																? current.filter(d => d !== dept)
+																: [...current, dept]
+															setNewGoal({ ...newGoal, department: updated })
+														}}
+														className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+															isSelected
+																? 'bg-primary text-white shadow-sm'
+																: 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700 hover:border-primary hover:text-primary'
+														}`}
+													>
+														{dept}
+													</button>
+												)
+											})}
+										</div>
+									</div>
+									<p className="text-xs text-neutral-500 mt-1">버튼을 클릭하여 부서를 선택하세요 (다중 선택 가능)</p>
 								</div>
 
 								<div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl border border-green-200 dark:border-green-800">
@@ -2077,293 +1991,176 @@ export default function CompanySettingsPage() {
 						</div>
 					</div>
 				</div>
-			)}
+		)}
 
-			{/* Add Template Dialog */}
-			{showAddTemplate && (
+		{/* Add KPI Dialog - Removed for now, feature will be added later */}
+
+		{/* Detailed Info Dialog */}
+			{showDetailedInfoDialog && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-						<div className="p-6">
+					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+						<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
-									<Sparkles className="h-5 w-5 text-green-600" />
-									새 OKR 템플릿 추가
+									<FileText className="h-5 w-5 text-primary" />
+									회사 상세 정보 관리
 								</h3>
 								<button
-									onClick={() => setShowAddTemplate(false)}
+									onClick={() => {
+										setShowDetailedInfoDialog(false)
+										setEditingSection(null)
+									}}
 									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>
 							</div>
+							<p className="text-sm text-neutral-600 dark:text-neutral-400">
+								회사의 상세 정보를 섹션별로 관리할 수 있습니다. 템플릿을 사용하거나 직접 섹션을 추가하세요.
+							</p>
+						</div>
 
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										연결할 전사 목표 <span className="text-red-500">*</span>
-									</label>
-									<select
-										value={newTemplate.goalId || ''}
-										onChange={(e) => setNewTemplate({ ...newTemplate, goalId: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="">선택하세요</option>
-										{companyGoals.map((goal) => (
-											<option key={goal.id} value={goal.id}>
-												{goal.name} ({goal.period === 'annual' ? goal.year : `${goal.year} ${goal.quarter}`})
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										템플릿 이름 <span className="text-red-500">*</span>
-									</label>
-									<Input
-										value={newTemplate.name || ''}
-										onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-										placeholder="예: 신규 고객 획득 증대"
-									/>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">설명</label>
-									<Textarea
-										value={newTemplate.description || ''}
-										onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
-										placeholder="템플릿에 대한 상세 설명을 입력하세요"
-										rows={3}
-									/>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										대상 부서 <span className="text-red-500">*</span>
-									</label>
-									<select
-										multiple
-										value={newTemplate.targetDepartment || []}
-										onChange={(e) => {
-											const selected = Array.from(e.target.selectedOptions, option => option.value)
-											setNewTemplate({ ...newTemplate, targetDepartment: selected })
-										}}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[100px]"
-									>
-										{departments.map((dept) => (
-											<option key={dept} value={dept}>
-												{dept}
-											</option>
-										))}
-									</select>
-									<p className="text-xs text-neutral-500 mt-1">Ctrl/Cmd를 눌러 여러 부서를 선택하세요</p>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">대상 역할</label>
-									<select
-										multiple
-										value={newTemplate.targetRole || []}
-										onChange={(e) => {
-											const selected = Array.from(e.target.selectedOptions, option => option.value)
-											setNewTemplate({ ...newTemplate, targetRole: selected })
-										}}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 min-h-[100px]"
-									>
-										{roles.map((role) => (
-											<option key={role} value={role}>
-												{role}
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">추천 점수 (0-100)</label>
-									<Input
-										type="number"
-										min="0"
-										max="100"
-										value={newTemplate.recommendationScore || 50}
-										onChange={(e) => setNewTemplate({ ...newTemplate, recommendationScore: Number(e.target.value) })}
-									/>
-								</div>
-
-								<div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl border border-green-200 dark:border-green-800">
-									<input
-										type="checkbox"
-										id="auto-assign"
-										checked={newTemplate.autoAssign || false}
-										onChange={(e) => setNewTemplate({ ...newTemplate, autoAssign: e.target.checked })}
-										className="w-4 h-4"
-									/>
-									<label htmlFor="auto-assign" className="text-sm font-medium">
-										해당 부서/역할에 자동 할당
-									</label>
-								</div>
-
-								{/* Key Results */}
-								<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
-									<div className="flex items-center justify-between mb-3">
-										<label className="block text-sm font-medium">핵심 결과 (Key Results)</label>
-										<Button variant="outline" size="sm" onClick={addKeyResult} className="flex items-center gap-1">
-											<Plus className="h-3 w-3" />
-											추가
-										</Button>
+						<div className="flex-1 overflow-y-auto p-6">
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+								{/* Left: Section List */}
+								<div className="space-y-4">
+									<div className="flex items-center justify-between mb-4">
+										<h4 className="font-semibold text-lg">섹션 목록</h4>
+										<div className="flex items-center gap-2">
+											<select
+												onChange={(e) => {
+													if (e.target.value) {
+														handleAddSection(e.target.value)
+														e.target.value = ''
+													}
+												}}
+												className="px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900"
+											>
+												<option value="">템플릿 선택</option>
+												{sectionTemplates.map((template) => (
+													<option key={template.title} value={template.title}>
+														{template.title}
+													</option>
+												))}
+											</select>
+											<Button
+												size="sm"
+												onClick={() => handleAddSection()}
+												className="flex items-center gap-1"
+											>
+												<Plus className="h-4 w-4" />
+												새 섹션
+											</Button>
+										</div>
 									</div>
-									
-									{(newTemplate.keyResults || []).length === 0 ? (
-										<p className="text-sm text-neutral-500 text-center py-4">
-											핵심 결과를 추가하세요
-										</p>
+
+									{companyInfoSections.length === 0 ? (
+										<div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
+											<FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
+											<p className="text-sm">아직 추가된 섹션이 없습니다</p>
+											<p className="text-xs mt-1">템플릿을 선택하거나 새 섹션을 추가하세요</p>
+										</div>
 									) : (
-										<div className="space-y-3">
-											{(newTemplate.keyResults || []).map((kr) => (
-												<div key={kr.id} className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
-													<div className="flex items-start gap-2 mb-3">
-														<Input
-															value={kr.description}
-															onChange={(e) => updateKeyResult(kr.id, 'description', e.target.value)}
-															placeholder="핵심 결과 설명"
-															className="flex-1"
-														/>
-														<button
-															onClick={() => removeKeyResult(kr.id)}
-															className="text-red-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
-														>
-															<X className="h-4 w-4" />
-														</button>
+										<div className="space-y-2">
+											{companyInfoSections
+												.sort((a, b) => a.order - b.order)
+												.map((section) => (
+													<div
+														key={section.id}
+														onClick={() => setEditingSection(section)}
+														className={`p-4 rounded-xl border cursor-pointer transition-all ${
+															editingSection?.id === section.id
+																? 'border-primary bg-primary/5 shadow-sm'
+																: 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
+														}`}
+													>
+														<div className="flex items-start justify-between">
+															<div className="flex-1">
+																<h5 className="font-medium mb-1">{section.title}</h5>
+																<p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2">
+																	{section.content.substring(0, 80)}...
+																</p>
+																<p className="text-xs text-neutral-400 dark:text-neutral-500 mt-2">
+																	{new Date(section.updatedAt).toLocaleDateString('ko-KR')}
+																</p>
+															</div>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation()
+																	handleDeleteSection(section.id)
+																}}
+																className="text-red-500 hover:text-red-600 p-1"
+															>
+																<Trash2 className="h-4 w-4" />
+															</button>
+														</div>
 													</div>
-													<div className="grid grid-cols-2 gap-2">
-														<Input
-															type="number"
-															value={kr.targetValue}
-															onChange={(e) => updateKeyResult(kr.id, 'targetValue', e.target.value)}
-															placeholder="목표 값"
-														/>
-														<Input
-															value={kr.unit}
-															onChange={(e) => updateKeyResult(kr.id, 'unit', e.target.value)}
-															placeholder="단위"
-														/>
-													</div>
-												</div>
-											))}
+												))}
 										</div>
 									)}
 								</div>
 
-								<div className="flex items-center gap-2 pt-2">
-									<Button onClick={handleAddTemplate} className="flex-1 justify-center">
-										추가
-									</Button>
-									<Button
-										variant="outline"
-										onClick={() => setShowAddTemplate(false)}
-										className="flex-1 justify-center"
-									>
-										취소
-									</Button>
+								{/* Right: Section Editor */}
+								<div className="space-y-4">
+									{editingSection ? (
+										<div className="border border-neutral-200 dark:border-neutral-800 rounded-xl p-4">
+											<h4 className="font-semibold text-lg mb-4">섹션 편집</h4>
+											<div className="space-y-4">
+												<div>
+													<label className="block text-sm font-medium mb-2">
+														섹션 제목 <span className="text-red-500">*</span>
+													</label>
+													<Input
+														value={editingSection.title}
+														onChange={(e) =>
+															handleUpdateSection(editingSection.id, { title: e.target.value })
+														}
+														placeholder="섹션 제목"
+													/>
+												</div>
+												<div>
+													<label className="block text-sm font-medium mb-2">
+														내용 <span className="text-red-500">*</span>
+													</label>
+													<Textarea
+														value={editingSection.content}
+														onChange={(e) =>
+															handleUpdateSection(editingSection.id, { content: e.target.value })
+														}
+														placeholder="섹션 내용을 작성하세요. 마크다운 형식을 사용할 수 있습니다."
+														rows={15}
+														className="font-mono text-sm"
+													/>
+												</div>
+												<div className="text-xs text-neutral-500 dark:text-neutral-400">
+													<p>마지막 수정: {new Date(editingSection.updatedAt).toLocaleString('ko-KR')}</p>
+												</div>
+											</div>
+										</div>
+									) : (
+										<div className="border border-dashed border-neutral-300 dark:border-neutral-700 rounded-xl p-12 text-center text-neutral-500 dark:text-neutral-400">
+											<FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
+											<p className="text-sm">왼쪽에서 섹션을 선택하여 편집하세요</p>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			)}
 
-			{/* Add KPI Dialog */}
-			{showAddKPI && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-md">
-						<div className="p-6">
-							<div className="flex items-center justify-between mb-4">
-								<h3 className="text-xl font-bold flex items-center gap-2">
-									<Plus className="h-5 w-5 text-primary" />
-									새 KPI 추가
-								</h3>
-								<button
-									onClick={() => setShowAddKPI(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-								>
-									<X className="h-5 w-5" />
-								</button>
+						<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+							<div className="text-sm text-neutral-600 dark:text-neutral-400">
+								총 {companyInfoSections.length}개 섹션
 							</div>
-
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										KPI 이름 <span className="text-red-500">*</span>
-									</label>
-									<Input
-										value={newKPI.name}
-										onChange={(e) => setNewKPI({ ...newKPI, name: e.target.value })}
-										placeholder="예: Monthly Recurring Revenue"
-									/>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										카테고리 <span className="text-red-500">*</span>
-									</label>
-									<select
-										value={newKPI.category}
-										onChange={(e) => setNewKPI({ ...newKPI, category: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="">선택하세요</option>
-										{categories.map((cat) => (
-											<option key={cat} value={cat}>
-												{cat}
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div className="grid grid-cols-2 gap-4">
-									<div>
-										<label className="block text-sm font-medium mb-2">
-											목표 값 <span className="text-red-500">*</span>
-										</label>
-										<Input
-											type="number"
-											value={newKPI.target}
-											onChange={(e) => setNewKPI({ ...newKPI, target: e.target.value })}
-											placeholder="1000000"
-										/>
-									</div>
-									<div>
-										<label className="block text-sm font-medium mb-2">단위</label>
-										<Input
-											value={newKPI.unit}
-											onChange={(e) => setNewKPI({ ...newKPI, unit: e.target.value })}
-											placeholder="USD, %, 건"
-										/>
-									</div>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium mb-2">설명</label>
-									<Textarea
-										value={newKPI.description}
-										onChange={(e) => setNewKPI({ ...newKPI, description: e.target.value })}
-										placeholder="KPI에 대한 설명을 입력하세요"
-										rows={3}
-									/>
-								</div>
-
-								<div className="flex items-center gap-2 pt-2">
-									<Button onClick={handleAddKPI} className="flex-1 justify-center">
-										추가
-									</Button>
-									<Button
-										variant="outline"
-										onClick={() => setShowAddKPI(false)}
-										className="flex-1 justify-center"
-									>
-										취소
-									</Button>
-								</div>
-							</div>
+							<Button
+								onClick={() => {
+									setShowDetailedInfoDialog(false)
+									setEditingSection(null)
+								}}
+								className="flex items-center gap-2"
+							>
+								<CheckCircle2 className="h-4 w-4" />
+								완료
+							</Button>
 						</div>
 					</div>
 				</div>

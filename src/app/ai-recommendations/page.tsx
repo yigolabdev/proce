@@ -399,7 +399,7 @@ export default function AIRecommendationsPage() {
 			)}
 
 			{/* How It Works */}
-			<Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+			<Card className="bg-linear-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
 				<CardContent className="p-6">
 					<h3 className="font-bold text-lg mb-4 flex items-center gap-2">
 						<Brain className="h-5 w-5 text-primary" />

@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 import {
 	FolderKanban,
 	Plus,
@@ -249,8 +251,10 @@ export default function ProjectsPage() {
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
+		<>
+			<DevMemo content={DEV_MEMOS.PROJECTS} pagePath="/app/projects/page.tsx" />
+			<div className="space-y-6">
+				{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
@@ -746,7 +750,8 @@ export default function ProjectsPage() {
 			)}
 
 			<Toaster />
-		</div>
+			</div>
+		</>
 	)
 }
 

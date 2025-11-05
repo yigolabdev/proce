@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 import {
 	FileText,
 	Calendar,
@@ -362,8 +364,10 @@ export default function WorkHistoryPage() {
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
+		<>
+			<DevMemo content={DEV_MEMOS.WORK_HISTORY} pagePath="/app/work-history/page.tsx" />
+			<div className="space-y-6">
+				{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
@@ -377,7 +381,7 @@ export default function WorkHistoryPage() {
 			</div>
 
 			{/* Statistics Dashboard */}
-			<Card className="bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/20">
+			<Card className="bg-linear-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/20">
 				<CardContent className="p-6">
 					<div className="flex items-center gap-2 mb-4">
 						<BarChart3 className="h-5 w-5 text-primary" />
@@ -827,7 +831,8 @@ export default function WorkHistoryPage() {
 					})}
 				</div>
 			)}
-		</div>
+			</div>
+		</>
 	)
 }
 

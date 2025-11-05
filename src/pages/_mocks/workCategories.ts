@@ -1,6 +1,6 @@
 /**
- * Work Input 카테고리 목업 데이터
- * 개발 중심이 아닌 모든 업무 형태를 포괄하는 카테고리
+ * Work Input Category Mock Data
+ * Comprehensive categories covering all types of work, not just development
  */
 
 export interface WorkCategory {
@@ -11,113 +11,121 @@ export interface WorkCategory {
 }
 
 export const mockWorkCategories: WorkCategory[] = [
-	// 완료/보고
+	// Completion/Report
 	{
 		id: 'completed-work',
-		name: '완료한 업무를 보고합니다',
+		name: 'Report Completed Work',
 		color: '#10B981', // green
-		description: '내가 완료한 작업, 달성한 성과, 마무리된 프로젝트 등을 공유합니다',
+		description: 'Share completed tasks, achievements, and finished projects',
 	},
 	{
 		id: 'progress-update',
-		name: '진행 상황을 공유합니다',
+		name: 'Share Progress Update',
 		color: '#3B82F6', // blue
-		description: '현재 진행 중인 업무의 상태, 진척도, 중간 결과 등을 알립니다',
+		description: 'Update current work status, progress, and intermediate results',
 	},
 
-	// 요청
+	// Requests
 	{
 		id: 'approval-request',
-		name: '승인을 요청합니다',
+		name: 'Request Approval',
 		color: '#F59E0B', // amber
-		description: '의사결정, 예산 승인, 계획 검토 등 상위자의 승인이 필요합니다',
+		description: 'Request approval for decisions, budgets, plans, etc.',
 	},
 	{
 		id: 'feedback-request',
-		name: '의견을 요청합니다',
+		name: 'Request Feedback',
 		color: '#8B5CF6', // purple
-		description: '아이디어, 작업물, 제안서 등에 대한 피드백과 조언을 구합니다',
+		description: 'Seek feedback and advice on ideas, work products, or proposals',
 	},
 	{
 		id: 'review-request',
-		name: '검토를 요청합니다',
+		name: 'Request Review',
 		color: '#6366F1', // indigo
-		description: '문서, 코드, 디자인 등의 결과물에 대한 리뷰를 요청합니다',
+		description: 'Request review of documents, code, design, or other deliverables',
 	},
 	{
 		id: 'help-request',
-		name: '도움을 요청합니다',
+		name: 'Request Help',
 		color: '#EF4444', // red
-		description: '문제 해결, 기술 지원, 업무 협조 등이 필요한 상황입니다',
+		description: 'Need assistance with problem-solving, technical support, or collaboration',
 	},
 
-	// 제안/문제
+	// Proposals/Issues
 	{
 		id: 'proposal',
-		name: '제안을 합니다',
+		name: 'Make Proposal',
 		color: '#A855F7', // purple
-		description: '새로운 프로젝트, 개선 방안, 비즈니스 아이디어 등을 제시합니다',
+		description: 'Present new projects, improvements, or business ideas',
 	},
 	{
 		id: 'issue-report',
-		name: '문제를 보고합니다',
+		name: 'Report Issue',
 		color: '#DC2626', // red
-		description: '발생한 오류, 이슈, 장애 상황 등을 알리고 해결을 요청합니다',
+		description: 'Report errors, issues, or problems and request resolution',
 	},
 
-	// 정보 공유
+	// Information Sharing
 	{
 		id: 'info-sharing',
-		name: '정보를 공유합니다',
+		name: 'Share Information',
 		color: '#06B6D4', // cyan
-		description: '팀원들이 알아야 할 소식, 자료, 참고 정보 등을 전달합니다',
+		description: 'Share news, materials, and reference information with team',
 	},
 	{
 		id: 'knowledge-sharing',
-		name: '지식을 공유합니다',
+		name: 'Share Knowledge',
 		color: '#8B5CF6', // violet
-		description: '학습한 내용, 노하우, 베스트 프랙티스 등을 나눕니다',
+		description: 'Share learnings, know-how, and best practices',
 	},
 
-	// 기록/문서화
+	// Recording/Documentation
 	{
 		id: 'meeting-notes',
-		name: '회의 내용을 기록합니다',
+		name: 'Record Meeting Notes',
 		color: '#7C3AED', // violet
-		description: '회의록, 논의사항, 결정사항, 액션 아이템 등을 정리합니다',
+		description: 'Document meeting minutes, discussions, decisions, and action items',
 	},
 	{
 		id: 'documentation',
-		name: '문서를 작성합니다',
+		name: 'Create Documentation',
 		color: '#6366F1', // indigo
-		description: '매뉴얼, 가이드, 프로세스 문서 등을 만들어 보관합니다',
+		description: 'Create manuals, guides, and process documents',
 	},
 
-	// 질문/계획
+	// Questions/Planning
 	{
 		id: 'question',
-		name: '질문합니다',
+		name: 'Ask Question',
 		color: '#14B8A6', // teal
-		description: '궁금한 점, 확인이 필요한 사항에 대해 답변을 구합니다',
+		description: 'Ask questions and seek answers on matters that need clarification',
 	},
 	{
 		id: 'planning',
-		name: '계획을 수립합니다',
+		name: 'Create Plan',
 		color: '#3B82F6', // blue
-		description: '앞으로의 일정, 업무 계획, 로드맵 등을 세우고 공유합니다',
+		description: 'Establish and share schedules, work plans, and roadmaps',
 	},
 
-	// 기타
+	// Async Discussion
+	{
+		id: 'async-discussion',
+		name: 'Async Discussion (NoMeet)',
+		color: '#EC4899', // pink
+		description: 'Structured asynchronous discussion to replace meetings and enable decision-making without synchronous gatherings',
+	},
+
+	// Other
 	{
 		id: 'other',
-		name: '기타',
+		name: 'Other',
 		color: '#9CA3AF', // gray
-		description: '위 항목에 해당하지 않는 내용을 입력합니다',
+		description: 'Content that does not fit into the above categories',
 	},
 ]
 
 /**
- * Work Tags 목업 데이터
+ * Work Tags Mock Data
  */
 export interface WorkTag {
 	id: string
@@ -188,7 +196,7 @@ export const mockWorkTags: WorkTag[] = [
 ]
 
 /**
- * Work Templates 목업 데이터
+ * Work Templates Mock Data
  */
 export interface WorkTemplate {
 	id: string
@@ -273,10 +281,10 @@ export const mockWorkTemplates: WorkTemplate[] = [
 ]
 
 /**
- * 목업 데이터를 localStorage에 초기화하는 함수
- * 버전 관리를 통해 카테고리 구조 변경 시 자동 업데이트
+ * Initialize mock data to localStorage
+ * Automatic update on category structure changes through version control
  */
-const WORK_CATEGORIES_VERSION = '2.1' // 카테고리 최적화: 15개 핵심 항목 + 이모티콘 제거
+const WORK_CATEGORIES_VERSION = '3.1' // Added Async Discussion (NoMeet)
 
 export const initializeMockWorkCategories = (): void => {
 	try {

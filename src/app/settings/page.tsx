@@ -380,7 +380,7 @@ export default function SettingsPage() {
 						<CardContent className="p-6">
 							<div className="flex items-center gap-6">
 								<div className="relative">
-									<div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold">
+									<div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold">
 										{profile.name[0] || 'U'}
 									</div>
 									<button className="absolute bottom-0 right-0 p-2 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">

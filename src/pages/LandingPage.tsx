@@ -4,6 +4,8 @@ import Toaster from '../components/ui/Toaster'
 import { useAuth } from '../context/AuthContext'
 import { Shield, Users, Briefcase } from 'lucide-react'
 import type { UserRole } from '../types/auth.types'
+import DevMemo from '../components/dev/DevMemo'
+import { DEV_MEMOS } from '../constants/devMemos'
 
 export default function LandingPage() {
 	const navigate = useNavigate()
@@ -11,11 +13,11 @@ export default function LandingPage() {
 
 	const handleQuickLogin = (role: UserRole) => {
 		const mockUsers = {
-			worker: {
+			user: {
 				id: '1',
-				email: 'worker@test.com',
+				email: 'user@test.com',
 				name: '홍길동',
-				role: 'worker' as UserRole,
+				role: 'user' as UserRole,
 				department: '개발팀',
 				position: '시니어 개발자',
 			},
@@ -42,20 +44,22 @@ export default function LandingPage() {
 	}
 
 	return (
-		<div className="flex min-h-dvh items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
-			{/* Test Login Buttons - Fixed Bottom Left */}
+		<>
+			<DevMemo content={DEV_MEMOS.LANDING} pagePath="/pages/LandingPage.tsx" />
+			<div className="flex min-h-dvh items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
+				{/* Test Login Buttons - Fixed Bottom Left */}
 			<div className="fixed bottom-4 left-4 z-50 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-4">
 				<div className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
 					🧪 Test Login
 				</div>
-				<div className="flex flex-col gap-2">
-					<button
-						onClick={() => handleQuickLogin('worker')}
-						className="flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-					>
-						<Users className="h-3 w-3" />
-						<span>Worker</span>
-					</button>
+			<div className="flex flex-col gap-2">
+				<button
+					onClick={() => handleQuickLogin('user')}
+					className="flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+				>
+					<Users className="h-3 w-3" />
+					<span>User</span>
+				</button>
 					<button
 						onClick={() => handleQuickLogin('admin')}
 						className="flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
@@ -90,6 +94,7 @@ export default function LandingPage() {
 				<SignInForm />
 			</div>
 			<Toaster />
-		</div>
+			</div>
+		</>
 	)
 }

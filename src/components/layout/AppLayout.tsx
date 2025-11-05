@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, TrendingDown, Building2, Briefcase, DollarSign, Shield } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -28,36 +28,39 @@ export default function AppLayout() {
 
 	// Menu definition by role
 	const menuGroups = [
-		{
-			title: 'Work',
-			roles: ['worker', 'admin', 'executive'] as UserRole[],
-			items: [
-				{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['worker', 'admin', 'executive'] },
-				{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['worker', 'admin', 'executive'] },
-			] as MenuItem[],
-		},
+	{
+		title: 'Work',
+		roles: ['user', 'admin', 'executive'] as UserRole[],
+		items: [
+			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
+		] as MenuItem[],
+	},
 		{
 			title: 'Administration',
 			roles: ['admin', 'executive'] as UserRole[],
 			items: [
 				{ to: '/app/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
+				{ to: '/app/org/setup', label: 'Organization Setup', icon: Building2, roles: ['admin', 'executive'] },
 				{ to: '/app/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
 			] as MenuItem[],
 		},
-	{
-		title: 'Executive',
-		roles: ['executive'] as UserRole[],
-		items: [
-			{ to: '/app/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-			{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
-			{ to: '/app/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
-			{ to: '/app/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
-		] as MenuItem[],
-	},
+		{
+			title: 'Executive',
+			roles: ['executive'] as UserRole[],
+			items: [
+				{ to: '/app/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
+				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
+				{ to: '/app/executive/company-info', label: 'Company Info', icon: Briefcase, roles: ['executive'] },
+				{ to: '/app/expenses', label: 'Expenses', icon: TrendingDown, roles: ['executive'] },
+				{ to: '/app/finance', label: 'Finance', icon: DollarSign, roles: ['executive'] },
+				{ to: '/app/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
+			] as MenuItem[],
+		},
 	]
 
 	// 현재 사용자 권한에 따라 메뉴 필터링
@@ -78,11 +81,11 @@ export default function AppLayout() {
 					<div className="size-8 rounded-2xl bg-primary" />
 					<div className="flex-1 min-w-0">
 						<div className="text-lg font-semibold">Proce</div>
-					{user && (
-						<div className="text-xs text-neutral-600 dark:text-neutral-400 truncate">
-							{user.name} • {user.role === 'worker' ? 'Worker' : user.role === 'admin' ? 'Admin' : 'Executive'}
-						</div>
-					)}
+				{user && (
+					<div className="text-xs text-neutral-600 dark:text-neutral-400 truncate">
+						{user.name} • {user.role === 'user' ? 'User' : user.role === 'admin' ? 'Admin' : 'Executive'}
+					</div>
+				)}
 					</div>
 				</div>
 
@@ -105,6 +108,7 @@ export default function AppLayout() {
 				</div>
 				{link('/app/settings', 'Settings', Settings)}
 				{link('/app/help', 'Help', HelpCircle)}
+				{link('/app/policy', 'Privacy Policy', Shield)}
 				</nav>
 
 			{/* Sidebar Footer - Logout */}

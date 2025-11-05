@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import DevMemo from '../components/dev/DevMemo'
+import { DEV_MEMOS } from '../constants/devMemos'
 import { 
 	TrendingUp, 
 	TrendingDown,
@@ -336,8 +338,10 @@ export default function DashboardPage() {
 	const criticalCount = kpiMetrics.filter((kpi) => kpi.status === 'critical').length
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
+		<>
+			<DevMemo content={DEV_MEMOS.DASHBOARD} pagePath="/pages/DashboardPage.tsx" />
+			<div className="space-y-6">
+				{/* Header */}
 			<div>
 				<h1 className="text-3xl font-bold">전체 대시보드</h1>
 				<p className="mt-2 text-neutral-600 dark:text-neutral-400">
@@ -371,10 +375,10 @@ export default function DashboardPage() {
 						<div
 							className={`h-full transition-all duration-500 ${
 								overallProgress >= 100
-									? 'bg-gradient-to-r from-green-500 to-emerald-500'
+									? 'bg-linear-to-r from-green-500 to-emerald-500'
 									: overallProgress >= 80
-									? 'bg-gradient-to-r from-blue-500 to-cyan-500'
-									: 'bg-gradient-to-r from-orange-500 to-amber-500'
+									? 'bg-linear-to-r from-blue-500 to-cyan-500'
+									: 'bg-linear-to-r from-orange-500 to-amber-500'
 							}`}
 							style={{ width: `${Math.min(overallProgress, 100)}%` }}
 						/>
@@ -778,7 +782,7 @@ export default function DashboardPage() {
 			</div>
 
 			{/* Motivational Message */}
-			<Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+			<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
 				<CardContent className="p-6">
 					<div className="flex items-center gap-4">
 						<div className="p-3 rounded-2xl bg-primary/10">
@@ -803,6 +807,7 @@ export default function DashboardPage() {
 					</div>
 				</CardContent>
 			</Card>
-		</div>
+			</div>
+		</>
 	)
 }

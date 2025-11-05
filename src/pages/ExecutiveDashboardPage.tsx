@@ -22,6 +22,8 @@ import {
 	Filter
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
+import DevMemo from '../components/dev/DevMemo'
+import { DEV_MEMOS } from '../constants/devMemos'
 
 interface KPICard {
 	title: string
@@ -322,6 +324,9 @@ export default function ExecutiveDashboardPage() {
 
 	return (
 		<div className="space-y-6">
+			{/* Developer Memo */}
+			<DevMemo content={DEV_MEMOS.EXECUTIVE_DASHBOARD} />
+
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -574,7 +579,7 @@ export default function ExecutiveDashboardPage() {
 			</div>
 
 			{/* Quick Actions */}
-			<Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+			<Card className="border-primary/20 bg-linear-to-br from-primary/5 to-transparent">
 				<CardContent className="p-6">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-4">

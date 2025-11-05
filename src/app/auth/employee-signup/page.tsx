@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Users, ArrowLeft, Key, Building2, Mail, Lock, User, Phone } from 'lucide-react'
+import { Users, ArrowLeft, Key, Building2, Mail, Lock, User, Phone, Briefcase, UserCog } from 'lucide-react'
 import { toast } from 'sonner'
+import DevMemo from '../../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../../constants/devMemos'
+
+interface Department {
+	id: string
+	name: string
+	isDefaultIntake: boolean
+}
 
 interface EmployeeData {
 	inviteCode: string
@@ -13,13 +21,14 @@ interface EmployeeData {
 	password: string
 	passwordConfirm: string
 	phone: string
+	countryCode: string
 	department: string
 	position: string
 }
 
 export default function EmployeeSignUpPage() {
 	const navigate = useNavigate()
-	const [step, setStep] = useState(1) // 1: 초대코드, 2: 직원정보
+	const [step, setStep] = useState(1) // 1: invite code, 2: employee info
 	const [data, setData] = useState<EmployeeData>({
 		inviteCode: '',
 		name: '',
@@ -27,10 +36,103 @@ export default function EmployeeSignUpPage() {
 		password: '',
 		passwordConfirm: '',
 		phone: '',
+		countryCode: '+82', // Default to South Korea
 		department: '',
 		position: '',
 	})
 	const [companyInfo, setCompanyInfo] = useState<{ name: string; industry: string } | null>(null)
+	const [departments, setDepartments] = useState<Department[]>([])
+	const [showCustomDepartment, setShowCustomDepartment] = useState(false)
+	const [showCustomPosition, setShowCustomPosition] = useState(false)
+	const [customDepartment, setCustomDepartment] = useState('')
+	const [customPosition, setCustomPosition] = useState('')
+	
+	// Development mode check
+	const isDevelopment = import.meta.env.DEV
+	
+	// Country codes for phone numbers
+	const countryCodes = [
+		{ code: '+82', country: '🇰🇷 South Korea', flag: '🇰🇷' },
+		{ code: '+1', country: '🇺🇸 United States', flag: '🇺🇸' },
+		{ code: '+86', country: '🇨🇳 China', flag: '🇨🇳' },
+		{ code: '+81', country: '🇯🇵 Japan', flag: '🇯🇵' },
+		{ code: '+44', country: '🇬🇧 United Kingdom', flag: '🇬🇧' },
+		{ code: '+49', country: '🇩🇪 Germany', flag: '🇩🇪' },
+		{ code: '+33', country: '🇫🇷 France', flag: '🇫🇷' },
+		{ code: '+61', country: '🇦🇺 Australia', flag: '🇦🇺' },
+		{ code: '+65', country: '🇸🇬 Singapore', flag: '🇸🇬' },
+		{ code: '+91', country: '🇮🇳 India', flag: '🇮🇳' },
+		{ code: '+55', country: '🇧🇷 Brazil', flag: '🇧🇷' },
+		{ code: '+7', country: '🇷🇺 Russia', flag: '🇷🇺' },
+		{ code: '+34', country: '🇪🇸 Spain', flag: '🇪🇸' },
+		{ code: '+39', country: '🇮🇹 Italy', flag: '🇮🇹' },
+		{ code: '+852', country: '🇭🇰 Hong Kong', flag: '🇭🇰' },
+		{ code: '+886', country: '🇹🇼 Taiwan', flag: '🇹🇼' },
+	]
+	
+	// Common job positions (International standards)
+	const positions = [
+		{ value: 'intern', label: 'Intern' },
+		{ value: 'junior', label: 'Junior' },
+		{ value: 'staff', label: 'Staff' },
+		{ value: 'senior-staff', label: 'Senior Staff' },
+		{ value: 'associate', label: 'Associate' },
+		{ value: 'senior-associate', label: 'Senior Associate' },
+		{ value: 'manager', label: 'Manager' },
+		{ value: 'senior-manager', label: 'Senior Manager' },
+		{ value: 'director', label: 'Director' },
+		{ value: 'senior-director', label: 'Senior Director' },
+		{ value: 'vp', label: 'Vice President' },
+		{ value: 'svp', label: 'Senior Vice President' },
+		{ value: 'cxo', label: 'C-Level Executive' },
+		{ value: 'custom', label: '✏️ Custom (Enter manually)' },
+	]
+	
+	// Load departments from Organization Setup
+	useEffect(() => {
+		const loadDepartments = () => {
+			try {
+				const savedSettings = localStorage.getItem('workspaceSettings')
+				if (savedSettings) {
+					const settings = JSON.parse(savedSettings)
+					if (settings.deptRole && settings.deptRole.departments && settings.deptRole.departments.length > 0) {
+						setDepartments(settings.deptRole.departments)
+						return
+					}
+				}
+				
+				// If no departments configured, use mock data
+				const mockDepartments: Department[] = [
+					{ id: '1', name: 'Engineering', isDefaultIntake: true },
+					{ id: '2', name: 'Product', isDefaultIntake: false },
+					{ id: '3', name: 'Design', isDefaultIntake: false },
+					{ id: '4', name: 'Marketing', isDefaultIntake: false },
+					{ id: '5', name: 'Sales', isDefaultIntake: false },
+					{ id: '6', name: 'Human Resources', isDefaultIntake: false },
+					{ id: '7', name: 'Finance', isDefaultIntake: false },
+					{ id: '8', name: 'Operations', isDefaultIntake: false },
+					{ id: '9', name: 'Customer Success', isDefaultIntake: false },
+					{ id: '10', name: 'Legal', isDefaultIntake: false },
+				]
+				setDepartments(mockDepartments)
+			} catch (error) {
+				console.error('Failed to load departments:', error)
+				// Fallback to mock data on error
+				const mockDepartments: Department[] = [
+					{ id: '1', name: 'Engineering', isDefaultIntake: true },
+					{ id: '2', name: 'Product', isDefaultIntake: false },
+					{ id: '3', name: 'Design', isDefaultIntake: false },
+					{ id: '4', name: 'Marketing', isDefaultIntake: false },
+					{ id: '5', name: 'Sales', isDefaultIntake: false },
+				]
+				setDepartments(mockDepartments)
+			}
+		}
+		
+		if (step === 2) {
+			loadDepartments()
+		}
+	}, [step])
 
 	const handleChange = (field: keyof EmployeeData, value: string) => {
 		setData((prev) => ({ ...prev, [field]: value }))
@@ -38,66 +140,105 @@ export default function EmployeeSignUpPage() {
 
 	const handleVerifyCode = async () => {
 		if (!data.inviteCode) {
-			toast.error('초대 코드를 입력해주세요')
+			toast.error('Please enter the invite code')
 			return
 		}
 
-		// Mock API call - 초대 코드 검증
+		// Mock API call - verify invite code
 		if (data.inviteCode.length < 6) {
-			toast.error('올바른 초대 코드를 입력해주세요')
+			toast.error('Please enter a valid invite code')
 			return
 		}
 
 		// Mock company info
 		setCompanyInfo({
-			name: '(주)테크컴퍼니',
-			industry: 'IT/소프트웨어',
+			name: 'Tech Company Inc.',
+			industry: 'IT/Software',
 		})
-		toast.success('초대 코드가 확인되었습니다')
+		toast.success('Invite code verified successfully')
 		setStep(2)
 	}
 
 	const handleSubmit = async () => {
 		if (!data.name || !data.email || !data.password) {
-			toast.error('필수 항목을 입력해주세요')
+			toast.error('Please fill in all required fields')
 			return
 		}
 		if (data.password !== data.passwordConfirm) {
-			toast.error('비밀번호가 일치하지 않습니다')
+			toast.error('Passwords do not match')
+			return
+		}
+
+		// Use custom department if selected
+		const finalDepartment = showCustomDepartment ? customDepartment : data.department
+		const finalPosition = showCustomPosition ? customPosition : data.position
+
+		if (!finalDepartment || !finalPosition) {
+			toast.error('Please select or enter department and position')
 			return
 		}
 
 		// Mock API call
-		toast.success('직원 회원가입이 완료되었습니다!')
+		console.log('Submitting with:', {
+			...data,
+			department: finalDepartment,
+			position: finalPosition,
+		})
+		
+		toast.success('Employee registration completed successfully! Please sign in.')
 		setTimeout(() => {
-			navigate('/dashboard')
+			navigate('/')
 		}, 1500)
 	}
 
+	const handleDepartmentChange = (value: string) => {
+		if (value === 'custom') {
+			setShowCustomDepartment(true)
+			handleChange('department', '')
+		} else {
+			setShowCustomDepartment(false)
+			setCustomDepartment('')
+			handleChange('department', value)
+		}
+	}
+
+	const handlePositionChange = (value: string) => {
+		if (value === 'custom') {
+			setShowCustomPosition(true)
+			handleChange('position', '')
+		} else {
+			setShowCustomPosition(false)
+			setCustomPosition('')
+			handleChange('position', value)
+		}
+	}
+
 	return (
-		<div className="mx-auto min-h-dvh w-full max-w-2xl px-4 py-12">
-			<div className="mb-8">
+		<>
+			<DevMemo content={DEV_MEMOS.EMPLOYEE_SIGNUP} pagePath="/app/auth/employee-signup/page.tsx" />
+			<div className="mx-auto min-h-dvh w-full max-w-2xl px-4 py-12">
+				<div className="mb-8">
 				<button
 					onClick={() => step === 1 ? navigate('/auth/sign-up') : setStep(1)}
 					className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors mb-4"
 				>
 					<ArrowLeft className="h-4 w-4" />
-					이전
+					Back
 				</button>
 				<h1 className="text-3xl font-bold flex items-center gap-3">
 					<Users className="h-8 w-8 text-green-600 dark:text-green-400" />
-					직원 회원가입
+					Employee Sign Up
 				</h1>
 				<p className="mt-2 text-neutral-600 dark:text-neutral-300">
-					관리자로부터 받은 초대 코드로 가입하세요
+					Join your company using the invite code from your administrator
 				</p>
 			</div>
 
 			<Card>
 				<CardHeader>
 					<h2 className="text-xl font-bold">
-						{step === 1 && '초대 코드 입력'}
-						{step === 2 && '직원 정보 입력'}
+						{step === 1 && 'Enter Invite Code'}
+						{step === 2 && 'Employee Information'}
 					</h2>
 				</CardHeader>
 				<CardContent>
@@ -109,29 +250,52 @@ export default function EmployeeSignUpPage() {
 									<Key className="h-10 w-10 text-green-600 dark:text-green-400" />
 								</div>
 								<p className="text-neutral-600 dark:text-neutral-400 mb-6">
-									회사 관리자로부터 받은 초대 코드를 입력해주세요
+									Enter the invite code you received from your company administrator
 								</p>
 							</div>
 
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									초대 코드 <span className="text-red-500">*</span>
+									Invite Code <span className="text-red-500">*</span>
 								</label>
 								<Input
 									type="text"
-									placeholder="예: ABC12345"
+									placeholder="e.g., ABC12345"
 									value={data.inviteCode}
 									onChange={(e) => handleChange('inviteCode', e.target.value.toUpperCase())}
 									className="text-center text-lg font-mono tracking-wider"
 								/>
 								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-									초대 코드는 대소문자를 구분하지 않습니다
+									Invite codes are case-insensitive
 								</p>
 							</div>
 
 							<Button onClick={handleVerifyCode} className="w-full">
-								초대 코드 확인
+								Verify Code
 							</Button>
+
+							{/* Development: Skip to Step 2 */}
+							{isDevelopment && (
+								<div className="pt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+									<p className="text-xs text-neutral-500 mb-2 text-center">
+										🔧 Development Mode
+									</p>
+									<Button
+										variant="outline"
+										onClick={() => {
+											setCompanyInfo({
+												name: 'Tech Company Inc.',
+												industry: 'IT/Software',
+											})
+											setStep(2)
+											toast.info('Skipped to Step 2 (Dev Mode)')
+										}}
+										className="w-full border-dashed"
+									>
+										⚡ Skip to Step 2
+									</Button>
+								</div>
+							)}
 						</div>
 					)}
 
@@ -157,11 +321,11 @@ export default function EmployeeSignUpPage() {
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<User className="inline h-4 w-4 mr-1" />
-										이름 <span className="text-red-500">*</span>
+										Full Name <span className="text-red-500">*</span>
 									</label>
 									<Input
 										type="text"
-										placeholder="이름을 입력하세요"
+										placeholder="Enter your full name"
 										value={data.name}
 										onChange={(e) => handleChange('name', e.target.value)}
 									/>
@@ -170,7 +334,7 @@ export default function EmployeeSignUpPage() {
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<Mail className="inline h-4 w-4 mr-1" />
-										이메일 <span className="text-red-500">*</span>
+										Email <span className="text-red-500">*</span>
 									</label>
 									<Input
 										type="email"
@@ -183,11 +347,11 @@ export default function EmployeeSignUpPage() {
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<Lock className="inline h-4 w-4 mr-1" />
-										비밀번호 <span className="text-red-500">*</span>
+										Password <span className="text-red-500">*</span>
 									</label>
 									<Input
 										type="password"
-										placeholder="8자 이상 입력하세요"
+										placeholder="At least 8 characters"
 										value={data.password}
 										onChange={(e) => handleChange('password', e.target.value)}
 									/>
@@ -196,11 +360,11 @@ export default function EmployeeSignUpPage() {
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<Lock className="inline h-4 w-4 mr-1" />
-										비밀번호 확인 <span className="text-red-500">*</span>
+										Confirm Password <span className="text-red-500">*</span>
 									</label>
 									<Input
 										type="password"
-										placeholder="비밀번호를 다시 입력하세요"
+										placeholder="Re-enter your password"
 										value={data.passwordConfirm}
 										onChange={(e) => handleChange('passwordConfirm', e.target.value)}
 									/>
@@ -209,46 +373,143 @@ export default function EmployeeSignUpPage() {
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<Phone className="inline h-4 w-4 mr-1" />
-										연락처
+										Phone Number
 									</label>
-									<Input
-										type="tel"
-										placeholder="010-0000-0000"
-										value={data.phone}
-										onChange={(e) => handleChange('phone', e.target.value)}
-									/>
+									<div className="flex gap-2">
+										<select
+											value={data.countryCode}
+											onChange={(e) => handleChange('countryCode', e.target.value)}
+											className="w-32 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+										>
+											{countryCodes.map((country) => (
+												<option key={country.code} value={country.code}>
+													{country.flag} {country.code}
+												</option>
+											))}
+										</select>
+										<Input
+											type="tel"
+											placeholder="10-1234-5678"
+											value={data.phone}
+											onChange={(e) => handleChange('phone', e.target.value)}
+											className="flex-1"
+										/>
+									</div>
+									<p className="text-xs text-neutral-500 mt-1">
+										Enter your phone number without country code
+									</p>
 								</div>
 
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium mb-2">부서</label>
-										<Input
-											type="text"
-											placeholder="예: 개발팀"
-											value={data.department}
-											onChange={(e) => handleChange('department', e.target.value)}
-										/>
+										<label className="block text-sm font-medium mb-2">
+											<Briefcase className="inline h-4 w-4 mr-1" />
+											Department
+										</label>
+										<select
+											value={showCustomDepartment ? 'custom' : data.department}
+											onChange={(e) => handleDepartmentChange(e.target.value)}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">-- Select Department --</option>
+											{departments.map((dept) => (
+												<option key={dept.id} value={dept.name}>
+													{dept.name}
+													{dept.isDefaultIntake && ' (Default)'}
+												</option>
+											))}
+											<option value="custom">✏️ Custom (Enter manually)</option>
+										</select>
+										{showCustomDepartment && (
+											<Input
+												type="text"
+												placeholder="Enter department name"
+												value={customDepartment}
+												onChange={(e) => setCustomDepartment(e.target.value)}
+												className="mt-2"
+											/>
+										)}
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">직급</label>
-										<Input
-											type="text"
-											placeholder="예: 대리"
-											value={data.position}
-											onChange={(e) => handleChange('position', e.target.value)}
-										/>
+										<label className="block text-sm font-medium mb-2">
+											<UserCog className="inline h-4 w-4 mr-1" />
+											Position
+										</label>
+										<select
+											value={showCustomPosition ? 'custom' : data.position}
+											onChange={(e) => handlePositionChange(e.target.value)}
+											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">-- Select Position --</option>
+											{positions.map((pos) => (
+												<option key={pos.value} value={pos.value}>
+													{pos.label}
+												</option>
+											))}
+										</select>
+										{showCustomPosition && (
+											<Input
+												type="text"
+												placeholder="Enter position title"
+												value={customPosition}
+												onChange={(e) => setCustomPosition(e.target.value)}
+												className="mt-2"
+											/>
+										)}
 									</div>
 								</div>
 							</div>
 
 							<Button onClick={handleSubmit} className="w-full mt-6">
-								가입 완료
+								Complete Registration
 							</Button>
+
+							{/* Development: Skip to Login */}
+							{isDevelopment && (
+								<div className="pt-4 mt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+									<p className="text-xs text-neutral-500 mb-2 text-center">
+										🔧 Development Mode
+									</p>
+									<div className="grid grid-cols-2 gap-2">
+										<Button
+											variant="outline"
+											onClick={() => {
+												toast.success('Skipped to Landing/Login (Dev Mode)')
+												navigate('/')
+											}}
+											className="border-dashed"
+										>
+											⚡ Skip to Login
+										</Button>
+										<Button
+											variant="outline"
+											onClick={() => {
+												// Simulate successful login for development
+							const mockUser = {
+								id: 'dev-user-001',
+								name: 'Dev User',
+								email: 'dev@example.com',
+								role: 'user' as const,
+								department: 'Engineering',
+								position: 'Developer',
+							}
+												localStorage.setItem('proce:user', JSON.stringify(mockUser))
+												toast.success('Auto-logged in (Dev Mode)')
+												navigate('/app/dashboard')
+											}}
+											className="border-dashed"
+										>
+											⚡ Skip to Dashboard
+										</Button>
+									</div>
+								</div>
+							)}
 						</div>
 					)}
 				</CardContent>
 			</Card>
-		</div>
+			</div>
+		</>
 	)
 }
 

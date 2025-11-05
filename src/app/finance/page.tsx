@@ -4,6 +4,8 @@ import Input from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 import { Upload, Plus, Trash2, FileText, TrendingUp, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 
 interface FinancialData {
 	id: string
@@ -135,6 +137,9 @@ export default function FinancePage() {
 
 	return (
 		<div className="space-y-6">
+			{/* Developer Memo */}
+			<DevMemo content={DEV_MEMOS.FINANCE} />
+
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>

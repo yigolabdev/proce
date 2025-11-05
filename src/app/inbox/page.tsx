@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
+import DevMemo from '../../components/dev/DevMemo'
+import { DEV_MEMOS } from '../../constants/devMemos'
 import {
 	Inbox,
 	Mail,
@@ -511,8 +513,10 @@ export default function InboxPage() {
 	const acceptedCount = recommendations.filter((r) => r.status === 'accepted').length
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
+		<>
+			<DevMemo content={DEV_MEMOS.INBOX} pagePath="/app/inbox/page.tsx" />
+			<div className="space-y-6">
+				{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-3">
@@ -1093,6 +1097,7 @@ export default function InboxPage() {
 			)}
 
 			<Toaster />
-		</div>
+			</div>
+		</>
 	)
 }

@@ -14,11 +14,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [authState, setAuthState] = useState<AuthState>({
 		user: {
 			id: '1',
-			email: 'user@example.com',
-			name: '홍길동',
-			role: 'worker', // 기본값: worker, admin, executive로 변경 가능
-			department: '개발팀',
-			position: '시니어 개발자',
+		email: 'user@example.com',
+		name: '홍길동',
+		role: 'user', // 기본값: user, admin, executive로 변경 가능
+		department: '개발팀',
+		position: '시니어 개발자',
 		},
 		isAuthenticated: true,
 	})
