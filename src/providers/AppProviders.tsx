@@ -29,6 +29,9 @@ import ExecutiveGoalsPage from '../app/executive/goals/page'
 import ProjectsPage from '../app/projects/page'
 import SettingsPage from '../app/settings/page'
 
+// Development Pages (only in dev mode)
+import DevelopmentRoadmapPage from '../app/dev/roadmap/page'
+
 // 404 Not Found Page Component
 function NotFoundPage() {
 	return (
@@ -59,6 +62,33 @@ const queryClient = new QueryClient({
 	},
 })
 
+// Build app routes with conditional dev routes
+const appRoutes = [
+	// 작업자 메뉴
+	{ path: '/app/dashboard', element: <DashboardPage /> },
+	{ path: '/app/input', element: <InputPage /> },
+	{ path: '/app/projects', element: <ProjectsPage /> },
+	{ path: '/app/work-history', element: <WorkHistoryPage /> },
+	{ path: '/app/inbox', element: <InboxPage /> },
+	{ path: '/app/okr', element: <OKRPage /> },
+	{ path: '/app/ai-recommendations', element: <AIRecommendationsPage /> },
+	// 관리자 메뉴
+	{ path: '/app/admin/users', element: <UsersManagementPage /> },
+	{ path: '/app/admin/system-settings', element: <SystemSettingsPage /> },
+	{ path: '/app/admin/company-settings', element: <CompanySettingsPage /> },
+	// 임원 메뉴
+	{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
+	{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
+	{ path: '/app/analytics', element: <Navigate to="/app/executive" replace /> },
+	{ path: '/app/performance', element: <PerformancePage /> },
+	// 기타
+	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
+	{ path: '/app/integrations', element: <IntegrationsPage /> },
+	{ path: '/app/settings', element: <SettingsPage /> },
+	// Development routes (only in dev mode)
+	...(import.meta.env.DEV ? [{ path: '/app/dev/roadmap', element: <DevelopmentRoadmapPage /> }] : []),
+]
+
 // 라우터 설정
 const router = createBrowserRouter([
 	{ path: '/', element: <LandingPage /> },
@@ -71,29 +101,7 @@ const router = createBrowserRouter([
 	{
 		path: '/app',
 		element: <AppLayout />,
-		children: [
-			// 작업자 메뉴
-			{ path: '/app/dashboard', element: <DashboardPage /> },
-			{ path: '/app/input', element: <InputPage /> },
-			{ path: '/app/projects', element: <ProjectsPage /> },
-			{ path: '/app/work-history', element: <WorkHistoryPage /> },
-			{ path: '/app/inbox', element: <InboxPage /> },
-			{ path: '/app/okr', element: <OKRPage /> },
-			{ path: '/app/ai-recommendations', element: <AIRecommendationsPage /> },
-			// 관리자 메뉴
-			{ path: '/app/admin/users', element: <UsersManagementPage /> },
-			{ path: '/app/admin/system-settings', element: <SystemSettingsPage /> },
-			{ path: '/app/admin/company-settings', element: <CompanySettingsPage /> },
-			// 임원 메뉴
-			{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
-			{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
-			{ path: '/app/analytics', element: <Navigate to="/app/executive" replace /> },
-			{ path: '/app/performance', element: <PerformancePage /> },
-			// 기타
-			{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
-			{ path: '/app/integrations', element: <IntegrationsPage /> },
-			{ path: '/app/settings', element: <SettingsPage /> },
-		],
+		children: appRoutes,
 	},
 	// Legacy routes - redirect to new paths
 	{ path: '/dashboard', element: <Navigate to="/app/dashboard" replace /> },

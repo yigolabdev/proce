@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2 } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -48,18 +48,26 @@ export default function AppLayout() {
 				{ to: '/app/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
 			] as MenuItem[],
 		},
-		{
-			title: 'Executive',
-			roles: ['executive', 'admin'] as UserRole[],
-			items: [
-				{ to: '/app/executive', label: 'Analytics & Insights', icon: BarChart3, roles: ['executive', 'admin'] },
-				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Building2, roles: ['executive', 'admin'] },
-			] as MenuItem[],
-		},
-	]
+	{
+		title: 'Executive',
+		roles: ['executive', 'admin'] as UserRole[],
+		items: [
+			{ to: '/app/executive', label: 'Analytics & Insights', icon: BarChart3, roles: ['executive', 'admin'] },
+			{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Building2, roles: ['executive', 'admin'] },
+		] as MenuItem[],
+	},
+	// Development menu (only visible in dev mode)
+	...(import.meta.env.DEV ? [{
+		title: 'Development',
+		roles: ['user', 'admin', 'executive'] as UserRole[],
+		items: [
+			{ to: '/app/dev/roadmap', label: '🚀 Product Roadmap', icon: Rocket, roles: ['user', 'admin', 'executive'] },
+		] as MenuItem[],
+	}] : []),
+]
 
-	// 현재 사용자 권한에 따라 메뉴 필터링
-	const visibleMenuGroups = menuGroups
+// 현재 사용자 권한에 따라 메뉴 필터링
+const visibleMenuGroups = menuGroups
 		.filter((group) => user && group.roles.includes(user.role))
 		.map((group) => ({
 			...group,
