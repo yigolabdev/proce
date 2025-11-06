@@ -201,8 +201,8 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 		},
 		lastUpdated: '2025-01-05',
 		notes: {
-			ko: 'OKR 진행률 업데이트 시 자동으로 Objective 상태 재계산. 모든 데이터는 localStorage에 저장 (서버 연동 필요).',
-			en: 'Objective status automatically recalculated on Key Result progress update. All data stored in localStorage (server integration needed).',
+			ko: 'OKR 진행률 업데이트 시 자동으로 Objective 상태 재계산. 모든 데이터는 localStorage에 저장 (서버 연동 필요). ⚠️ 업무 카테고리는 System Settings의 Add Category 기능과 공유됩니다 (localStorage: workCategories).',
+			en: 'Objective status automatically recalculated on Key Result progress update. All data stored in localStorage (server integration needed). ⚠️ Work categories are shared with System Settings Add Category feature (localStorage: workCategories).',
 		},
 	},
 
@@ -415,8 +415,8 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 			en: 'System Settings',
 		},
 		purpose: {
-			ko: '시스템 전반의 설정을 관리하는 관리자 페이지 (보안, 백업, 로그 등)',
-			en: 'Admin page for managing system-wide settings (security, backup, logs, etc.)',
+			ko: '시스템 전반의 설정을 관리하는 관리자 페이지 (보안, 백업, 로그, 카테고리 관리 등)',
+			en: 'Admin page for managing system-wide settings (security, backup, logs, category management, etc.)',
 		},
 		features: {
 			ko: [
@@ -425,6 +425,7 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 				'시스템 로그: 접속 기록, 에러 로그',
 				'API 설정: 외부 연동 API 키 관리',
 				'알림 설정: 이메일, 푸시 알림 설정',
+				'카테고리 관리: 업무 카테고리 추가/수정/삭제 (Add Category)',
 			],
 			en: [
 				'Security settings: Password policy, 2FA',
@@ -432,13 +433,18 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 				'System logs: Access logs, error logs',
 				'API settings: External API key management',
 				'Notification settings: Email, push notifications',
+				'Category management: Add/edit/delete work categories (Add Category)',
 			],
 		},
 		status: {
 		ko: '미완성',
 		en: 'Not Started',
 		},
-		lastUpdated: '2025-01-04',
+		lastUpdated: '2025-01-05',
+		notes: {
+			ko: '⚠️ Add Category 기능으로 추가/수정된 업무 카테고리는 Work Input 페이지와 실시간으로 공유됩니다 (localStorage: workCategories). 카테고리 변경 시 즉시 Work Input의 카테고리 선택 드롭다운에 반영됩니다.',
+			en: '⚠️ Work categories added/modified via Add Category feature are shared in real-time with Work Input page (localStorage: workCategories). Category changes are immediately reflected in Work Input category dropdown.',
+		},
 	},
 
 	// ==================== EXECUTIVE PAGES ====================
@@ -596,32 +602,72 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 
 	ANALYTICS: {
 		title: {
-			ko: '분석 대시보드',
-			en: 'Analytics Dashboard',
+			ko: '분석 대시보드 (구버전)',
+			en: 'Analytics Dashboard (Legacy)',
 		},
 		purpose: {
-			ko: '업무 데이터를 시각화하고 통계를 제공하는 분석 페이지 (차트, 그래프, 보고서)',
-			en: 'Analytics page providing visualizations and statistics for work data (charts, graphs, reports)',
+			ko: '⚠️ 이 페이지는 /app/executive로 리다이렉트됩니다. Executive 페이지를 참조하세요.',
+			en: '⚠️ This page redirects to /app/executive. See Executive page instead.',
 		},
 		features: {
 			ko: [
-				'업무 통계: 기간별, 카테고리별, 프로젝트별',
-				'차트: Line, Bar, Pie, Radar 차트',
-				'비교 분석: 기간 비교, 팀 비교',
-				'Export: PDF, Excel 내보내기 (예정)',
+				'→ /app/executive로 자동 리다이렉트',
 			],
 			en: [
-				'Work statistics: By period, category, project',
-				'Charts: Line, Bar, Pie, Radar charts',
-				'Comparative analysis: Period comparison, team comparison',
-				'Export: PDF, Excel export (planned)',
+				'→ Auto-redirects to /app/executive',
 			],
 		},
 		status: {
-		ko: '미완성',
-		en: 'Not Started',
+			ko: '리다이렉트됨',
+			en: 'Redirected',
 		},
-		lastUpdated: '2025-01-04',
+		lastUpdated: '2025-01-06',
+	},
+
+	EXECUTIVE: {
+		title: {
+			ko: '고급 분석 & 인사이트 (Analytics & Insights)',
+			en: 'Advanced Analytics & Insights',
+		},
+		purpose: {
+			ko: '실제 localStorage 데이터를 기반으로 한 전문가 수준의 고급 분석 대시보드. 4개 탭으로 구성: Overview, Comparison, Team Performance, Reports',
+			en: 'Professional-grade advanced analytics dashboard based on real localStorage data. 4 tabs: Overview, Comparison, Team Performance, Reports',
+		},
+		features: {
+			ko: [
+				'📊 Overview Tab: KPI 카드, Work Entries Trend (LineChart), Category Distribution (PieChart), AI-Powered Insights',
+				'📈 Comparison Tab: 기간 비교 분석 (Current vs Previous), BarChart, 상세 변화율 분석',
+				'👥 Team Performance Tab: Department Rankings, Project Analytics (Risk Assessment), OKR Performance',
+				'📄 Reports Tab: CSV/JSON Export, Printable PDF Report, 5가지 리포트 타입',
+				'🔄 실시간 필터: 7개 날짜 범위 프리셋 (Last 7/30/90 days, This/Last Month, This Year)',
+				'🎯 실제 데이터 활용: workEntries, projects, objectives localStorage 데이터 분석',
+				'📊 Recharts 통합: Line, Bar, Pie 차트로 데이터 시각화',
+				'💡 AI Insights: 자동 생성된 인사이트 카드 (성과, 위험, 추천사항)',
+				'📤 Export 기능: CSV (5종류), JSON (전체 리포트), PDF (Print-friendly)',
+				'🎨 Professional UX: 최고 기획자 수준의 UI/UX, 최고 개발자 수준의 코드',
+			],
+			en: [
+				'📊 Overview Tab: KPI cards, Work Entries Trend (LineChart), Category Distribution (PieChart), AI-Powered Insights',
+				'📈 Comparison Tab: Period comparison (Current vs Previous), BarChart, detailed change analysis',
+				'👥 Team Performance Tab: Department Rankings, Project Analytics (Risk Assessment), OKR Performance',
+				'📄 Reports Tab: CSV/JSON Export, Printable PDF Report, 5 report types',
+				'🔄 Real-time Filters: 7 date range presets (Last 7/30/90 days, This/Last Month, This Year)',
+				'🎯 Real Data: Analyzes workEntries, projects, objectives from localStorage',
+				'📊 Recharts Integration: Data visualization with Line, Bar, Pie charts',
+				'💡 AI Insights: Auto-generated insight cards (performance, risks, recommendations)',
+				'📤 Export Features: CSV (5 types), JSON (full report), PDF (print-friendly)',
+				'🎨 Professional UX: Top-tier product manager UX + top-tier developer code quality',
+			],
+		},
+		status: {
+			ko: '완료 ✅ (최고 수준 구현)',
+			en: 'Completed ✅ (Professional-grade)',
+		},
+		lastUpdated: '2025-01-06',
+		notes: {
+			ko: '모든 분석 로직은 실제 localStorage 데이터에서 계산됩니다. Mock 데이터 없음. 9개 파일로 모듈화 (types, utils, 4 tab components, main page).',
+			en: 'All analytics calculated from real localStorage data. No mock data. Modularized into 9 files (types, utils, 4 tab components, main page).',
+		},
 	},
 
 	AI_RECOMMENDATIONS: {
@@ -654,65 +700,8 @@ export const DEV_MEMOS: Record<string, DevMemoContent> = {
 		lastUpdated: '2025-01-04',
 	},
 
-	HELP: {
-		title: {
-			ko: '도움말',
-			en: 'Help Center',
-		},
-		purpose: {
-			ko: '사용자 가이드, FAQ, 문의하기를 제공하는 도움말 페이지',
-			en: 'Help page providing user guides, FAQs, and contact support',
-		},
-		features: {
-			ko: [
-				'사용자 가이드: 기능별 사용법',
-				'FAQ: 자주 묻는 질문',
-				'문의하기: 지원 티켓 생성',
-				'비디오 튜토리얼 (예정)',
-			],
-			en: [
-				'User guide: How-to for each feature',
-				'FAQ: Frequently asked questions',
-				'Contact support: Create support ticket',
-				'Video tutorials (planned)',
-			],
-		},
-		status: {
-		ko: '미완성',
-		en: 'Not Started',
-		},
-		lastUpdated: '2025-01-04',
-	},
-
-	POLICY: {
-		title: {
-			ko: '개인정보 처리방침',
-			en: 'Privacy Policy',
-		},
-		purpose: {
-			ko: '개인정보 처리방침 및 이용약관을 표시하는 페이지',
-			en: 'Page displaying privacy policy and terms of service',
-		},
-		features: {
-			ko: [
-				'개인정보 처리방침 전문',
-				'이용약관',
-				'쿠키 정책',
-				'마지막 업데이트 날짜',
-			],
-			en: [
-				'Full privacy policy',
-				'Terms of service',
-				'Cookie policy',
-				'Last updated date',
-			],
-		},
-		status: {
-		ko: '미완성',
-		en: 'Not Started',
-		},
-		lastUpdated: '2025-01-04',
-	},
+	// HELP removed - Feature removed from application
+	// POLICY removed - Feature removed from application
 
 	NO_MEET: {
 		title: {

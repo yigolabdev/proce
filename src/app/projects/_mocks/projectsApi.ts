@@ -51,6 +51,33 @@ export const mockProjects: Project[] = [
 		progress: 65,
 		createdAt: new Date('2024-01-10'),
 		createdBy: '김민수',
+		schedule: {
+			plannedStartDate: '2024-01-15',
+			actualStartDate: '2024-01-15',
+			plannedEndDate: '2024-06-30',
+			estimatedEndDate: '2024-06-30',
+			milestones: [
+				{
+					id: 'ms1-1',
+					name: 'NLP 모델 학습 완료',
+					plannedDate: '2024-03-15',
+					status: 'completed',
+					completionDate: '2024-03-12',
+				},
+				{
+					id: 'ms1-2',
+					name: 'UI/UX 디자인 완료',
+					plannedDate: '2024-04-30',
+					status: 'in-progress',
+				},
+				{
+					id: 'ms1-3',
+					name: '베타 테스트 시작',
+					plannedDate: '2024-06-01',
+					status: 'pending',
+				},
+			],
+		},
 	},
 	{
 		id: '2',
@@ -92,6 +119,32 @@ export const mockProjects: Project[] = [
 		progress: 42,
 		createdAt: new Date('2024-01-25'),
 		createdBy: '정현우',
+		schedule: {
+			plannedStartDate: '2024-02-01',
+			actualStartDate: '2024-02-01',
+			plannedEndDate: '2024-08-31',
+			milestones: [
+				{
+					id: 'ms2-1',
+					name: '사용자 리서치 완료',
+					plannedDate: '2024-03-15',
+					status: 'completed',
+					completionDate: '2024-03-10',
+				},
+				{
+					id: 'ms2-2',
+					name: '디자인 시스템 구축',
+					plannedDate: '2024-05-31',
+					status: 'in-progress',
+				},
+				{
+					id: 'ms2-3',
+					name: '앱 베타 출시',
+					plannedDate: '2024-08-01',
+					status: 'pending',
+				},
+			],
+		},
 	},
 	{
 		id: '3',
@@ -147,6 +200,31 @@ export const mockProjects: Project[] = [
 		progress: 15,
 		createdAt: new Date('2024-02-20'),
 		createdBy: '송민재',
+		schedule: {
+			plannedStartDate: '2024-03-01',
+			actualStartDate: '2024-03-01',
+			plannedEndDate: '2024-12-31',
+			milestones: [
+				{
+					id: 'ms3-1',
+					name: '데이터 파이프라인 완료',
+					plannedDate: '2024-05-31',
+					status: 'in-progress',
+				},
+				{
+					id: 'ms3-2',
+					name: '대시보드 v1 출시',
+					plannedDate: '2024-08-31',
+					status: 'pending',
+				},
+				{
+					id: 'ms3-3',
+					name: '예측 분석 모델 적용',
+					plannedDate: '2024-11-30',
+					status: 'pending',
+				},
+			],
+		},
 	},
 	{
 		id: '4',
@@ -181,6 +259,35 @@ export const mockProjects: Project[] = [
 		progress: 100,
 		createdAt: new Date('2023-10-25'),
 		createdBy: '배수아',
+		schedule: {
+			plannedStartDate: '2023-11-01',
+			actualStartDate: '2023-11-01',
+			plannedEndDate: '2024-02-28',
+			estimatedEndDate: '2024-02-28',
+			milestones: [
+				{
+					id: 'ms4-1',
+					name: 'OpenAPI 스펙 적용',
+					plannedDate: '2023-12-15',
+					status: 'completed',
+					completionDate: '2023-12-10',
+				},
+				{
+					id: 'ms4-2',
+					name: '테스트 기능 구현',
+					plannedDate: '2024-01-31',
+					status: 'completed',
+					completionDate: '2024-01-28',
+				},
+				{
+					id: 'ms4-3',
+					name: '정식 출시',
+					plannedDate: '2024-02-28',
+					status: 'completed',
+					completionDate: '2024-02-25',
+				},
+			],
+		},
 	},
 	{
 		id: '5',
@@ -222,6 +329,32 @@ export const mockProjects: Project[] = [
 		progress: 30,
 		createdAt: new Date('2024-01-05'),
 		createdBy: '차은우',
+		schedule: {
+			plannedStartDate: '2024-01-10',
+			actualStartDate: '2024-01-10',
+			plannedEndDate: '2024-05-31',
+			milestones: [
+				{
+					id: 'ms5-1',
+					name: '인프라 분석 완료',
+					plannedDate: '2024-02-15',
+					status: 'completed',
+					completionDate: '2024-02-10',
+				},
+				{
+					id: 'ms5-2',
+					name: 'AWS 아키텍처 설계',
+					plannedDate: '2024-03-31',
+					status: 'in-progress',
+				},
+				{
+					id: 'ms5-3',
+					name: '마이그레이션 완료',
+					plannedDate: '2024-05-31',
+					status: 'pending',
+				},
+			],
+		},
 	},
 	{
 		id: '6',
@@ -256,6 +389,32 @@ export const mockProjects: Project[] = [
 		progress: 55,
 		createdAt: new Date('2024-02-10'),
 		createdBy: '안재현',
+		schedule: {
+			plannedStartDate: '2024-02-15',
+			actualStartDate: '2024-02-15',
+			plannedEndDate: '2024-07-31',
+			milestones: [
+				{
+					id: 'ms6-1',
+					name: '취약점 분석 완료',
+					plannedDate: '2024-03-31',
+					status: 'completed',
+					completionDate: '2024-03-28',
+				},
+				{
+					id: 'ms6-2',
+					name: '2FA 도입',
+					plannedDate: '2024-05-31',
+					status: 'in-progress',
+				},
+				{
+					id: 'ms6-3',
+					name: '보안 교육 프로그램 론칭',
+					plannedDate: '2024-07-31',
+					status: 'pending',
+				},
+			],
+		},
 	},
 ]
 

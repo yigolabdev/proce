@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -19,11 +20,17 @@ import {
 	FileText,
 	Clock,
 	Save,
+	TrendingUp,
+	BarChart3,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
+import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 
 interface KeyResult {
 	id: string
@@ -107,9 +114,23 @@ interface WorkEntry {
 }
 
 export default function OKRPage() {
+	const navigate = useNavigate()
 	const [objectives, setObjectives] = useState<Objective[]>([])
 	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
 	const [expandedObjectives, setExpandedObjectives] = useState<string[]>([])
+	const [loading, setLoading] = useState(true)
+	
+	// Keyboard shortcuts
+	useKeyboardShortcuts({
+		newObjective: () => handleOpenAddObjective(),
+		cancel: () => {
+			setShowAddObjective(false)
+			setShowEditObjective(false)
+			setShowAddKeyResult(false)
+		},
+		goToDashboard: () => navigate('/app/dashboard'),
+		newWork: () => navigate('/app/input'),
+	})
 	
 	// Get current quarter dynamically
 	const getCurrentPeriod = () => {
@@ -1151,19 +1172,209 @@ export default function OKRPage() {
 								unit: '%',
 								owner: 'Finance Team',
 							},
-							{
-								id: 'kr60',
-								description: 'Secure $10M in ARR',
-								target: 10000000,
-								current: 9500000,
-								unit: 'USD',
-								owner: 'Revenue Team',
-							},
-						],
-					},
-				]
-				setObjectives(mockObjectives)
-				localStorage.setItem('objectives', JSON.stringify(mockObjectives))
+						{
+							id: 'kr60',
+							description: 'Secure $10M in ARR',
+							target: 10000000,
+							current: 9500000,
+							unit: 'USD',
+							owner: 'Revenue Team',
+						},
+					],
+				},
+				{
+					id: '26',
+					title: 'Enhance Data Security & Compliance',
+					description: 'Strengthen security measures and achieve compliance certifications',
+					period: 'Mar 2025',
+					periodType: 'month',
+					owner: 'Security Team',
+					team: 'Security',
+					status: 'on-track',
+					startDate: '2025-03-01',
+					endDate: '2025-03-31',
+					keyResults: [
+						{
+							id: 'kr67',
+							description: 'Achieve SOC 2 Type II certification',
+							target: 1,
+							current: 0.8,
+							unit: 'progress',
+							owner: 'Security Team',
+						},
+						{
+							id: 'kr68',
+							description: 'Complete 100% of security audits',
+							target: 100,
+							current: 85,
+							unit: '%',
+							owner: 'Compliance Officer',
+						},
+						{
+							id: 'kr69',
+							description: 'Implement zero-trust architecture',
+							target: 1,
+							current: 0.6,
+							unit: 'progress',
+							owner: 'Infrastructure Team',
+						},
+					],
+				},
+				{
+					id: '27',
+					title: 'Build Community & Developer Ecosystem',
+					description: 'Foster vibrant developer community and open-source contributions',
+					period: 'Q1 2025',
+					periodType: 'quarter',
+					owner: 'Developer Relations',
+					team: 'Community',
+					status: 'behind',
+					startDate: '2025-01-01',
+					endDate: '2025-03-31',
+					keyResults: [
+						{
+							id: 'kr70',
+							description: 'Onboard 1,000 active developers',
+							target: 1000,
+							current: 320,
+							unit: 'developers',
+							owner: 'DevRel Team',
+						},
+						{
+							id: 'kr71',
+							description: 'Publish 20 technical tutorials',
+							target: 20,
+							current: 8,
+							unit: 'tutorials',
+							owner: 'Content Team',
+						},
+						{
+							id: 'kr72',
+							description: 'Host 5 developer meetups',
+							target: 5,
+							current: 1,
+							unit: 'meetups',
+							owner: 'Community Manager',
+						},
+					],
+				},
+				{
+					id: '28',
+					title: 'Reduce Technical Debt',
+					description: 'Refactor legacy code and improve system architecture',
+					period: 'Apr 2025',
+					periodType: 'month',
+					owner: 'Engineering Lead',
+					team: 'Engineering',
+					status: 'at-risk',
+					startDate: '2025-04-01',
+					endDate: '2025-04-30',
+					keyResults: [
+						{
+							id: 'kr73',
+							description: 'Refactor 30% of legacy codebase',
+							target: 30,
+							current: 12,
+							unit: '%',
+							owner: 'Backend Team',
+						},
+						{
+							id: 'kr74',
+							description: 'Reduce code complexity score by 40%',
+							target: 40,
+							current: 18,
+							unit: '%',
+							owner: 'Engineering Team',
+						},
+						{
+							id: 'kr75',
+							description: 'Eliminate all critical technical debt issues',
+							target: 100,
+							current: 55,
+							unit: '%',
+							owner: 'Tech Lead',
+						},
+					],
+				},
+				{
+					id: '29',
+					title: 'Scale Customer Support Operations',
+					description: 'Build scalable support infrastructure for growing customer base',
+					period: 'Q2 2025',
+					periodType: 'quarter',
+					owner: 'Support Manager',
+					team: 'Customer Support',
+					status: 'on-track',
+					startDate: '2025-04-01',
+					endDate: '2025-06-30',
+					keyResults: [
+						{
+							id: 'kr76',
+							description: 'Implement AI chatbot with 70% resolution rate',
+							target: 70,
+							current: 65,
+							unit: '%',
+							owner: 'AI Team',
+						},
+						{
+							id: 'kr77',
+							description: 'Reduce average response time to 30 minutes',
+							target: 30,
+							current: 35,
+							unit: 'minutes',
+							owner: 'Support Team',
+						},
+						{
+							id: 'kr78',
+							description: 'Maintain 95% customer satisfaction',
+							target: 95,
+							current: 94,
+							unit: '%',
+							owner: 'Support Manager',
+						},
+					],
+				},
+				{
+					id: '30',
+					title: 'Launch Mobile App Version 2.0',
+					description: 'Release major mobile app update with new features',
+					period: 'May 2025',
+					periodType: 'month',
+					owner: 'Mobile Team Lead',
+					team: 'Mobile Development',
+					status: 'completed',
+					startDate: '2025-05-01',
+					endDate: '2025-05-31',
+					keyResults: [
+						{
+							id: 'kr79',
+							description: 'Ship 10 new features',
+							target: 10,
+							current: 10,
+							unit: 'features',
+							owner: 'Mobile Developers',
+						},
+						{
+							id: 'kr80',
+							description: 'Achieve 4.5+ app store rating',
+							target: 4.5,
+							current: 4.6,
+							unit: 'rating',
+							owner: 'Product Manager',
+						},
+						{
+							id: 'kr81',
+							description: 'Reach 100,000 downloads in first month',
+							target: 100000,
+							current: 125000,
+							unit: 'downloads',
+							owner: 'Marketing Team',
+						},
+					],
+				},
+			]
+			setObjectives(mockObjectives)
+			localStorage.setItem('objectives', JSON.stringify(mockObjectives))
 			}
 		} catch (error) {
 			console.error('Failed to load objectives:', error)
@@ -1537,22 +1748,135 @@ export default function OKRPage() {
 				</Card>
 			</div>
 
+			{/* Charts Section */}
+			{filteredObjectives.length > 0 && (
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+					{/* Status Distribution Donut Chart */}
+					<Card>
+						<CardHeader>
+							<h3 className="font-bold flex items-center gap-2">
+								<BarChart3 className="h-5 w-5 text-primary" />
+								Status Distribution
+							</h3>
+						</CardHeader>
+						<CardContent className="p-6">
+							<ResponsiveContainer width="100%" height={250}>
+								<PieChart>
+									<Pie
+										data={[
+											{ name: 'On Track', value: overallStats.onTrack, color: '#16a34a' },
+											{ name: 'At Risk', value: overallStats.atRisk, color: '#ea580c' },
+											{ name: 'Behind', value: overallStats.behind, color: '#dc2626' },
+											{ name: 'Completed', value: overallStats.completed, color: '#2563eb' },
+										].filter(item => item.value > 0)}
+										cx="50%"
+										cy="50%"
+										innerRadius={60}
+										outerRadius={90}
+										paddingAngle={2}
+										dataKey="value"
+									>
+										{[
+											{ name: 'On Track', value: overallStats.onTrack, color: '#16a34a' },
+											{ name: 'At Risk', value: overallStats.atRisk, color: '#ea580c' },
+											{ name: 'Behind', value: overallStats.behind, color: '#dc2626' },
+											{ name: 'Completed', value: overallStats.completed, color: '#2563eb' },
+										].filter(item => item.value > 0).map((entry, index) => (
+											<Cell key={`cell-${index}`} fill={entry.color} />
+										))}
+									</Pie>
+									<Tooltip 
+										contentStyle={{ 
+											backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+											border: '1px solid #e5e7eb',
+											borderRadius: '8px',
+											padding: '8px 12px'
+										}}
+									/>
+									<Legend 
+										verticalAlign="bottom" 
+										height={36}
+										iconType="circle"
+									/>
+								</PieChart>
+							</ResponsiveContainer>
+							<div className="text-center mt-2">
+								<div className="text-2xl font-bold text-primary">{overallStats.totalObjectives}</div>
+								<div className="text-xs text-neutral-600 dark:text-neutral-400">Total Objectives</div>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Progress by Objective Bar Chart */}
+					<Card>
+						<CardHeader>
+							<h3 className="font-bold flex items-center gap-2">
+								<TrendingUp className="h-5 w-5 text-primary" />
+								Progress Overview
+							</h3>
+						</CardHeader>
+						<CardContent className="p-6">
+							<ResponsiveContainer width="100%" height={250}>
+								<BarChart
+									data={filteredObjectives.map(obj => ({
+										name: obj.title.length > 15 ? obj.title.substring(0, 15) + '...' : obj.title,
+										progress: calculateProgress(obj.keyResults),
+									}))}
+									margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+								>
+									<CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+									<XAxis 
+										dataKey="name" 
+										tick={{ fontSize: 11 }}
+										angle={-45}
+										textAnchor="end"
+										height={80}
+									/>
+									<YAxis 
+										tick={{ fontSize: 11 }}
+										domain={[0, 100]}
+									/>
+									<Tooltip 
+										contentStyle={{ 
+											backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+											border: '1px solid #e5e7eb',
+											borderRadius: '8px',
+											padding: '8px 12px'
+										}}
+										formatter={(value: number) => [`${value}%`, 'Progress']}
+									/>
+									<Bar 
+										dataKey="progress" 
+										fill="#3b82f6"
+										radius={[4, 4, 0, 0]}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+							<div className="flex items-center justify-center gap-2 mt-2">
+								<div className="w-3 h-3 rounded-sm bg-primary"></div>
+								<span className="text-xs text-neutral-600 dark:text-neutral-400">
+									Average: {overallStats.avgProgress}%
+								</span>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+			)}
+
 			{/* Objectives List */}
 			<div className="space-y-4">
 				{filteredObjectives.length === 0 ? (
-					<Card>
-						<CardContent className="p-12 text-center">
-							<Target className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-							<h3 className="text-lg font-bold mb-2">No Objectives for {selectedQuarter}</h3>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-								Start by creating your first objective for this period
-							</p>
+					<EmptyState
+						icon={<Target className="h-12 w-12" />}
+						title={`No Objectives for ${selectedQuarter}`}
+						description="Create your first objective to start tracking your goals"
+						action={
 							<Button onClick={handleOpenAddObjective}>
 								<Plus className="h-4 w-4 mr-2" />
 								Add Objective
 							</Button>
-						</CardContent>
-					</Card>
+						}
+					/>
 				) : (
 					filteredObjectives.map((objective) => {
 						const progress = calculateProgress(objective.keyResults)

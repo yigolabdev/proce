@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, HelpCircle, LogOut, Settings, Target, History, FolderKanban, Building2, Shield } from 'lucide-react'
+import { LayoutDashboard, FileText, Inbox, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2 } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -34,10 +34,10 @@ export default function AppLayout() {
 		items: [
 			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
 	},
 		{
@@ -45,17 +45,15 @@ export default function AppLayout() {
 			roles: ['admin', 'executive'] as UserRole[],
 			items: [
 				{ to: '/app/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
-				{ to: '/app/org/setup', label: 'Organization Setup', icon: Building2, roles: ['admin', 'executive'] },
 				{ to: '/app/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
 			] as MenuItem[],
 		},
 		{
 			title: 'Executive',
-			roles: ['executive'] as UserRole[],
+			roles: ['executive', 'admin'] as UserRole[],
 			items: [
-				{ to: '/app/executive', label: 'Executive Dashboard', icon: BarChart3, roles: ['executive'] },
-				{ to: '/app/analytics', label: 'Analytics', icon: BarChart3, roles: ['executive', 'admin'] },
-				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Settings, roles: ['executive'] },
+				{ to: '/app/executive', label: 'Analytics & Insights', icon: BarChart3, roles: ['executive', 'admin'] },
+				{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Building2, roles: ['executive', 'admin'] },
 			] as MenuItem[],
 		},
 	]
@@ -104,8 +102,6 @@ export default function AppLayout() {
 					Other
 				</div>
 				{link('/app/settings', 'Settings', Settings)}
-				{link('/app/help', 'Help', HelpCircle)}
-				{link('/app/policy', 'Privacy Policy', Shield)}
 				</nav>
 
 			{/* Sidebar Footer - Logout */}

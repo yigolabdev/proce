@@ -16,6 +16,7 @@ interface Department {
 
 interface EmployeeData {
 	inviteCode: string
+	username: string
 	name: string
 	email: string
 	password: string
@@ -31,6 +32,7 @@ export default function EmployeeSignUpPage() {
 	const [step, setStep] = useState(1) // 1: invite code, 2: employee info
 	const [data, setData] = useState<EmployeeData>({
 		inviteCode: '',
+		username: '',
 		name: '',
 		email: '',
 		password: '',
@@ -47,9 +49,24 @@ export default function EmployeeSignUpPage() {
 	const [customDepartment, setCustomDepartment] = useState('')
 	const [customPosition, setCustomPosition] = useState('')
 	
+	// Email verification states
+	const [isCodeSent, setIsCodeSent] = useState(false)
+	const [sentCode, setSentCode] = useState('')
+	const [verificationCode, setVerificationCode] = useState('')
+	const [timeLeft, setTimeLeft] = useState(0)
+	const [isEmailVerified, setIsEmailVerified] = useState(false)
+	
 	// TODO: Remove development features before production deployment
 	// Development mode check
 	const isDevelopment = true // import.meta.env.DEV
+	
+	// Timer effect for email verification
+	useEffect(() => {
+		if (timeLeft > 0) {
+			const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
+			return () => clearTimeout(timer)
+		}
+	}, [timeLeft])
 	
 	// Country codes for phone numbers
 	const countryCodes = [
@@ -139,9 +156,60 @@ export default function EmployeeSignUpPage() {
 		setData((prev) => ({ ...prev, [field]: value }))
 	}
 
+	// Send email verification code
+	const handleSendCode = async () => {
+		if (!data.email) {
+			toast.error('Please enter your email address')
+			return
+		}
+		
+		// Simple email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+		if (!emailRegex.test(data.email)) {
+			toast.error('Please enter a valid email address')
+			return
+		}
+		
+		// Generate random 6-digit code
+		const code = Math.floor(100000 + Math.random() * 900000).toString()
+		setSentCode(code)
+		setIsCodeSent(true)
+		setTimeLeft(180) // 3 minutes
+		
+		// TODO: Replace with actual API call to send email
+		toast.success(`Verification code sent to ${data.email}`)
+		toast.info(`Demo code: ${code}`, { duration: 5000 })
+	}
+	
+	// Verify email code
+	const handleVerifyEmailCode = async () => {
+		if (!verificationCode) {
+			toast.error('Please enter the verification code')
+			return
+		}
+		
+		if (verificationCode !== sentCode) {
+			toast.error('Invalid verification code')
+			return
+		}
+		
+		setIsEmailVerified(true)
+		toast.success('Email verified successfully!')
+	}
+	
+	// Resend verification code
+	const handleResendCode = () => {
+		handleSendCode()
+	}
+
 	const handleVerifyCode = async () => {
 		if (!data.inviteCode) {
 			toast.error('Please enter the invite code')
+			return
+		}
+		
+		if (!isEmailVerified) {
+			toast.error('Please verify your email first')
 			return
 		}
 
@@ -161,8 +229,12 @@ export default function EmployeeSignUpPage() {
 	}
 
 	const handleSubmit = async () => {
-		if (!data.name || !data.email || !data.password) {
+		if (!data.username || !data.name || !data.email || !data.password) {
 			toast.error('Please fill in all required fields')
+			return
+		}
+		if (data.username.length < 3) {
+			toast.error('Username must be at least 3 characters')
 			return
 		}
 		if (data.password !== data.passwordConfirm) {
@@ -243,19 +315,102 @@ export default function EmployeeSignUpPage() {
 					</h2>
 				</CardHeader>
 				<CardContent>
-					{/* Step 1: Invite Code */}
-					{step === 1 && (
-						<div className="space-y-6">
-							<div className="text-center py-8">
-								<div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-									<Key className="h-10 w-10 text-green-600 dark:text-green-400" />
-								</div>
-								<p className="text-neutral-600 dark:text-neutral-400 mb-6">
-									Enter the invite code you received from your company administrator
-								</p>
+				{/* Step 1: Invite Code */}
+				{step === 1 && (
+					<div className="space-y-6">
+						<div className="text-center py-8">
+							<div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+								<Key className="h-10 w-10 text-green-600 dark:text-green-400" />
 							</div>
+							<p className="text-neutral-600 dark:text-neutral-400 mb-6">
+								Verify your email and enter the invite code from your administrator
+							</p>
+						</div>
 
-							<div>
+						{/* Email Input & Verification */}
+						<div>
+							<label className="block text-sm font-medium mb-2">
+								Email Address <span className="text-red-500">*</span>
+							</label>
+							<div className="flex gap-2">
+								<Input
+									type="email"
+									placeholder="your.email@company.com"
+									value={data.email}
+									onChange={(e) => handleChange('email', e.target.value)}
+									disabled={isEmailVerified}
+									className={isEmailVerified ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : ''}
+								/>
+								{!isEmailVerified && (
+									<Button
+										onClick={handleSendCode}
+										variant="outline"
+										disabled={isCodeSent && timeLeft > 0}
+										className="whitespace-nowrap"
+									>
+										{isCodeSent && timeLeft > 0 ? `Resend (${timeLeft}s)` : 'Send Code'}
+									</Button>
+								)}
+								{isEmailVerified && (
+									<Button variant="outline" disabled className="bg-green-50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-400">
+										✓ Verified
+									</Button>
+								)}
+							</div>
+							{!isEmailVerified && (
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+									💡 Use your company email address
+								</p>
+							)}
+							{isEmailVerified && (
+								<p className="text-xs text-green-600 dark:text-green-400 mt-2">
+									✓ Email verified successfully
+								</p>
+							)}
+						</div>
+
+						{/* Email Verification Code Input */}
+						{isCodeSent && !isEmailVerified && (
+							<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Verification Code <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="text"
+										placeholder="Enter 6-digit code"
+										value={verificationCode}
+										onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+										className="text-center text-lg font-mono tracking-wider"
+										maxLength={6}
+									/>
+									<div className="flex items-center justify-between mt-2">
+										<p className="text-xs text-neutral-500 dark:text-neutral-400">
+											Code sent to {data.email}
+										</p>
+										{timeLeft > 0 ? (
+											<p className="text-xs text-orange-600 dark:text-orange-400 font-mono">
+												{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+											</p>
+										) : (
+											<button
+												onClick={handleResendCode}
+												className="text-xs text-green-600 dark:text-green-400 hover:underline"
+											>
+												Resend code
+											</button>
+										)}
+									</div>
+								</div>
+								<Button onClick={handleVerifyEmailCode} className="w-full">
+									Verify Email
+								</Button>
+							</div>
+						)}
+
+						{/* Invite Code Input - Only show after email verification */}
+						{isEmailVerified && (
+							<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
 								<label className="block text-sm font-medium mb-2">
 									Invite Code <span className="text-red-500">*</span>
 								</label>
@@ -267,38 +422,43 @@ export default function EmployeeSignUpPage() {
 									className="text-center text-lg font-mono tracking-wider"
 								/>
 								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-									Invite codes are case-insensitive
+									Enter the invite code from your administrator
 								</p>
 							</div>
+						)}
 
+						{isEmailVerified && (
 							<Button onClick={handleVerifyCode} className="w-full">
-								Verify Code
+								Verify & Continue
 							</Button>
+						)}
 
-							{/* Development: Skip to Step 2 */}
-							{isDevelopment && (
-								<div className="pt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
-									<p className="text-xs text-neutral-500 mb-2 text-center">
-										🔧 Development Mode
-									</p>
-									<Button
-										variant="outline"
-										onClick={() => {
-											setCompanyInfo({
-												name: 'Tech Company Inc.',
-												industry: 'IT/Software',
-											})
-											setStep(2)
-											toast.info('Skipped to Step 2 (Dev Mode)')
-										}}
-										className="w-full border-dashed"
-									>
-										⚡ Skip to Step 2
-									</Button>
-								</div>
-							)}
-						</div>
-					)}
+						{/* Development: Skip to Step 2 */}
+						{isDevelopment && (
+							<div className="pt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+								<p className="text-xs text-neutral-500 mb-2 text-center">
+									🔧 Development Mode
+								</p>
+								<Button
+									variant="outline"
+									onClick={() => {
+										setData(prev => ({ ...prev, email: 'employee@company.com' }))
+										setIsEmailVerified(true)
+										setCompanyInfo({
+											name: 'Tech Company Inc.',
+											industry: 'IT/Software',
+										})
+										setStep(2)
+										toast.info('Skipped to Step 2 (Dev Mode)')
+									}}
+									className="w-full border-dashed"
+								>
+									⚡ Skip to Step 2
+								</Button>
+							</div>
+						)}
+					</div>
+				)}
 
 					{/* Step 2: Employee Info */}
 					{step === 2 && (
@@ -316,34 +476,56 @@ export default function EmployeeSignUpPage() {
 										{companyInfo.industry}
 									</p>
 								</div>
-							)}
+						)}
 
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<User className="inline h-4 w-4 mr-1" />
-										Full Name <span className="text-red-500">*</span>
-									</label>
-									<Input
-										type="text"
-										placeholder="Enter your full name"
-										value={data.name}
-										onChange={(e) => handleChange('name', e.target.value)}
-									/>
-								</div>
+						<div className="space-y-4">
+							{/* Username Field */}
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<UserCog className="inline h-4 w-4 mr-1" />
+									User Name <span className="text-red-500">*</span>
+								</label>
+								<Input
+									type="text"
+									placeholder="Enter your username (e.g., john.doe)"
+									value={data.username}
+									onChange={(e) => handleChange('username', e.target.value.toLowerCase().replace(/\s/g, ''))}
+									className="font-mono"
+								/>
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+									💡 This will be your unique ID for login
+								</p>
+							</div>
 
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Mail className="inline h-4 w-4 mr-1" />
-										Email <span className="text-red-500">*</span>
-									</label>
-									<Input
-										type="email"
-										placeholder="your.email@company.com"
-										value={data.email}
-										onChange={(e) => handleChange('email', e.target.value)}
-									/>
-								</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<User className="inline h-4 w-4 mr-1" />
+									Full Name <span className="text-red-500">*</span>
+								</label>
+								<Input
+									type="text"
+									placeholder="Enter your full name"
+									value={data.name}
+									onChange={(e) => handleChange('name', e.target.value)}
+								/>
+							</div>
+
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<Mail className="inline h-4 w-4 mr-1" />
+									Email <span className="text-green-600 dark:text-green-400 text-xs">(Verified)</span>
+								</label>
+								<Input
+									type="email"
+									placeholder="your.email@company.com"
+									value={data.email}
+									disabled
+									className="bg-green-50 dark:bg-green-900/20 border-green-500"
+								/>
+								<p className="text-xs text-green-600 dark:text-green-400 mt-1">
+									✓ This email has been verified
+								</p>
+							</div>
 
 								<div>
 									<label className="block text-sm font-medium mb-2">

@@ -1014,49 +1014,39 @@ export default function UsersManagementPage() {
 								key={member.id}
 								className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:shadow-md transition-shadow"
 							>
-								<div className="flex items-center gap-3 flex-1">
-									<div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
-										{member.name[0]}
+							<div className="flex items-center flex-1">
+								<div className="flex-1 min-w-0">
+									<div className="flex items-center gap-2 mb-0.5">
+										<h3 className="font-bold text-sm">{member.name}</h3>
+										{getRoleBadge(member.role)}
+										{getStatusBadge(member.status)}
 									</div>
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2 mb-0.5">
-											<h3 className="font-bold text-sm">{member.name}</h3>
-											{getRoleBadge(member.role)}
-											{getStatusBadge(member.status)}
-										</div>
-										<div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-											<span className="truncate">{member.email}</span>
-											<span>•</span>
-											<span>{member.department}</span>
-											<span>•</span>
-											<span>{member.position}</span>
-										</div>
+									<div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
+										<span className="truncate">{member.email}</span>
+										<span>•</span>
+										<span>{member.department}</span>
+										<span>•</span>
+										<span>{member.position}</span>
 									</div>
 								</div>
+							</div>
 
-								<div className="flex items-center gap-2">
-									<select
-										value={member.role}
-										onChange={(e) => handleRoleChange(member.id, e.target.value as UserRole)}
-										className="px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900"
-									>
-										<option value="user">User</option>
-										<option value="admin">Admin</option>
-										<option value="executive">Executive</option>
-									</select>
-									<button
-										className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
-										onClick={() => handleEditClick(member)}
-									>
-										<Edit className="h-4 w-4" />
-									</button>
-									<button
-										className="p-2 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
-										onClick={() => handleDelete(member.id, member.name)}
-									>
-										<Trash2 className="h-4 w-4" />
-									</button>
-								</div>
+							<div className="flex items-center gap-2">
+								<button
+									className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
+									onClick={() => handleEditClick(member)}
+									title="Edit user"
+								>
+									<Edit className="h-4 w-4" />
+								</button>
+								<button
+									className="p-2 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
+									onClick={() => handleDelete(member.id, member.name)}
+									title="Delete user"
+								>
+									<Trash2 className="h-4 w-4" />
+								</button>
+							</div>
 							</div>
 						))}
 

@@ -118,6 +118,8 @@ export default function InputPage() {
 	const [title, setTitle] = useState('')
 	const [description, setDescription] = useState('')
 	const [category, setCategory] = useState('')
+	const [customCategory, setCustomCategory] = useState('')
+	const [showCustomCategory, setShowCustomCategory] = useState(false)
 	const [selectedProject, setSelectedProject] = useState('')
 	const [selectedObjective, setSelectedObjective] = useState('')
 	const [selectedKeyResult, setSelectedKeyResult] = useState('')
@@ -287,11 +289,14 @@ export default function InputPage() {
 		const timer = setTimeout(() => {
 			setAutoSaveStatus('saving')
 			
+			// Use custom category if "Other" is selected
+			const finalCategory = showCustomCategory ? customCategory.trim() : category
+			
 			const autoDraft: DraftData = {
 				id: 'auto-save',
 				title: title || 'Untitled',
 				description,
-				category,
+				category: finalCategory,
 				projectId: selectedProject || undefined,
 				objectiveId: selectedObjective || undefined,
 				tags,
@@ -322,7 +327,7 @@ export default function InputPage() {
 		}, 2000)
 		
 		return () => clearTimeout(timer)
-	}, [title, description, category, selectedProject, selectedObjective, tags, files, links, isConfidential, editingEntryId])
+	}, [title, description, category, customCategory, showCustomCategory, selectedProject, selectedObjective, tags, files, links, isConfidential, editingEntryId])
 
 	// Keyboard shortcuts
 	useEffect(() => {
@@ -453,12 +458,15 @@ export default function InputPage() {
 			toast.error('Please enter at least a title or description')
 			return
 		}
+		
+		// Use custom category if "Other" is selected
+		const finalCategory = showCustomCategory ? customCategory.trim() : category
 
 		const draft: DraftData = {
 			id: editingEntryId || `draft-${Date.now()}`,
 			title: title || 'Untitled',
 			description,
-			category,
+			category: finalCategory,
 			projectId: selectedProject || undefined,
 			objectiveId: selectedObjective || undefined,
 			keyResultId: selectedKeyResult || undefined,
@@ -491,7 +499,26 @@ export default function InputPage() {
 	const loadDraft = (draft: DraftData) => {
 		setTitle(draft.title)
 		setDescription(draft.description)
-		setCategory(draft.category || '')
+		
+		// Check if category is a predefined one or custom
+		const draftCategory = draft.category || ''
+		const isPredefinedCategory = categories.some(cat => cat.id === draftCategory)
+		
+		if (isPredefinedCategory) {
+			setCategory(draftCategory)
+			setShowCustomCategory(false)
+			setCustomCategory('')
+		} else if (draftCategory) {
+			// Custom category
+			setCategory('other')
+			setShowCustomCategory(true)
+			setCustomCategory(draftCategory)
+		} else {
+			setCategory('')
+			setShowCustomCategory(false)
+			setCustomCategory('')
+		}
+		
 		setSelectedProject(draft.projectId || '')
 		setSelectedObjective(draft.objectiveId || '')
 		setSelectedKeyResult(draft.keyResultId || '')
@@ -527,6 +554,8 @@ export default function InputPage() {
 		setTitle('')
 		setDescription('')
 		setCategory('')
+		setCustomCategory('')
+		setShowCustomCategory(false)
 		setSelectedProject('')
 		setSelectedObjective('')
 		setSelectedKeyResult('')
@@ -552,15 +581,24 @@ export default function InputPage() {
 			toast.error('Please enter a description')
 			return
 		}
+		
+		// Validate custom category if "Other" is selected
+		if (showCustomCategory && !customCategory.trim()) {
+			toast.error('Please enter a custom category name')
+			return
+		}
 
 		// Use custom duration if provided
 		const finalDuration = showCustomDuration ? customDuration : duration
+		
+		// Use custom category if "Other" is selected
+		const finalCategory = showCustomCategory ? customCategory.trim() : category
 
 		const workEntry: WorkEntry = {
 			id: editingEntryId || `work-${Date.now()}`,
 			title: title.trim(),
 			description: description.trim(),
-			category,
+			category: finalCategory,
 			projectId: selectedProject || undefined,
 			objectiveId: selectedObjective || undefined,
 			keyResultId: selectedKeyResult || undefined,
@@ -660,7 +698,8 @@ export default function InputPage() {
 
 	// Calculate progress
 	const requiredFields = [title, description]
-	const optionalFields = [category, selectedProject, selectedObjective, duration, tags.length > 0]
+	const finalCategoryValue = showCustomCategory ? customCategory : category
+	const optionalFields = [finalCategoryValue, selectedProject, selectedObjective, duration, tags.length > 0]
 	const requiredFieldsFilled = requiredFields.filter(Boolean).length
 	const optionalFieldsFilled = optionalFields.filter(Boolean).length
 	const totalRequiredFields = requiredFields.length
@@ -814,26 +853,45 @@ export default function InputPage() {
 								</p>
 							</div>
 
-							{/* Category & Duration */}
-							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-semibold mb-2">
-										<Calendar className="inline h-4 w-4 mr-1" />
-										Category
-									</label>
-									<select
-										value={category}
-										onChange={(e) => setCategory(e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="">Select category</option>
-										{categories.map((cat) => (
-											<option key={cat.id} value={cat.id}>
-												{cat.name}
-											</option>
-										))}
-									</select>
-								</div>
+						{/* Category & Duration */}
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<label className="block text-sm font-semibold mb-2">
+									<Calendar className="inline h-4 w-4 mr-1" />
+									Category
+								</label>
+								<select
+									value={showCustomCategory ? 'other' : category}
+									onChange={(e) => {
+										const value = e.target.value
+										if (value === 'other') {
+											setShowCustomCategory(true)
+											setCategory('other')
+										} else {
+											setShowCustomCategory(false)
+											setCategory(value)
+											setCustomCategory('')
+										}
+									}}
+									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+								>
+									<option value="">Select category</option>
+									{categories.map((cat) => (
+										<option key={cat.id} value={cat.id}>
+											{cat.name}
+										</option>
+									))}
+								</select>
+								{showCustomCategory && (
+									<Input
+										type="text"
+										placeholder="Enter custom category name"
+										value={customCategory}
+										onChange={(e) => setCustomCategory(e.target.value)}
+										className="mt-2"
+									/>
+								)}
+							</div>
 
 								<div>
 									<label className="block text-sm font-semibold mb-2">

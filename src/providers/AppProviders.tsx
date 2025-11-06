@@ -7,7 +7,6 @@ import CompanySignUpPage from '../app/auth/company-signup/page'
 import EmployeeSignUpPage from '../app/auth/employee-signup/page'
 import JoinWorkspacePage from '../app/auth/join/page'
 import OnboardingPage from '../app/auth/onboarding/page'
-import WorkspaceSetupPage from '../app/org/setup/page'
 import IntegrationsPage from '../app/integrations/page'
 import { I18nProvider } from '../i18n/I18nProvider'
 import { ThemeProvider } from '../theme/ThemeProvider'
@@ -15,18 +14,15 @@ import { IntegrationsProvider } from '../app/_providers/IntegrationsContext'
 import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../components/layout/AppLayout'
 import DashboardPage from '../pages/DashboardPage'
-import PolicyPage from '../pages/PolicyPage'
 import InputPage from '../pages/InputPage'
 import WorkHistoryPage from '../app/work-history/page'
-import HelpPage from '../pages/HelpPage'
 import LandingPage from '../pages/LandingPage'
 import InboxPage from '../app/inbox/page'
 import UsersManagementPage from '../app/admin/users/page'
 import CompanySettingsPage from '../app/admin/company-settings/page'
 import SystemSettingsPage from '../app/admin/system-settings/page'
-import AnalyticsPage from '../app/analytics/page'
+import ExecutiveDashboardPage from '../app/executive/page'
 import PerformancePage from '../app/performance/page'
-import ExecutiveDashboardPage from '../pages/ExecutiveDashboardPage'
 import OKRPage from '../app/okr/page'
 import AIRecommendationsPage from '../app/ai-recommendations/page'
 import ExecutiveGoalsPage from '../app/executive/goals/page'
@@ -91,14 +87,12 @@ const router = createBrowserRouter([
 			// 임원 메뉴
 			{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
 			{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
-			{ path: '/app/analytics', element: <AnalyticsPage /> },
+			{ path: '/app/analytics', element: <Navigate to="/app/executive" replace /> },
 			{ path: '/app/performance', element: <PerformancePage /> },
 			// 기타
-			{ path: '/app/org/setup', element: <WorkspaceSetupPage /> },
+			{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 			{ path: '/app/integrations', element: <IntegrationsPage /> },
 			{ path: '/app/settings', element: <SettingsPage /> },
-			{ path: '/app/policy', element: <PolicyPage /> },
-			{ path: '/app/help', element: <HelpPage /> },
 		],
 	},
 	// Legacy routes - redirect to new paths
@@ -114,15 +108,13 @@ const router = createBrowserRouter([
 	{ path: '/admin/company-settings', element: <Navigate to="/app/admin/company-settings" replace /> },
 	{ path: '/executive', element: <Navigate to="/app/executive" replace /> },
 	{ path: '/executive/goals', element: <Navigate to="/app/executive/goals" replace /> },
-	{ path: '/analytics', element: <Navigate to="/app/analytics" replace /> },
+	{ path: '/analytics', element: <Navigate to="/app/executive" replace /> },
 	{ path: '/performance', element: <Navigate to="/app/performance" replace /> },
 	{ path: '/expenses', element: <Navigate to="/app/expenses" replace /> },
-	{ path: '/org/setup', element: <Navigate to="/app/org/setup" replace /> },
+	{ path: '/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 	{ path: '/integrations', element: <Navigate to="/app/integrations" replace /> },
 	{ path: '/finance', element: <Navigate to="/app/finance" replace /> },
 	{ path: '/settings', element: <Navigate to="/app/settings" replace /> },
-	{ path: '/policy', element: <Navigate to="/app/policy" replace /> },
-	{ path: '/help', element: <Navigate to="/app/help" replace /> },
 	// 404 - Catch all
 	{ path: '*', element: <NotFoundPage /> },
 ])

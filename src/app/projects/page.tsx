@@ -6,6 +6,9 @@ import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
+import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	FolderKanban,
 	Plus,
@@ -25,6 +28,7 @@ import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import type { Project, ProjectMember } from './_types/projects.types'
 import { initializeMockProjects } from './_mocks/projectsApi'
+import TimelineView from './_components/TimelineView'
 
 interface WorkEntry {
 	id: string
@@ -40,6 +44,7 @@ export default function ProjectsPage() {
 	const [projects, setProjects] = useState<Project[]>([])
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 	const [filterStatus, setFilterStatus] = useState<string>('all')
+	const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list')
 	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
 
 	// Form states
@@ -54,6 +59,14 @@ export default function ProjectsPage() {
 	const [memberName, setMemberName] = useState('')
 	const [memberEmail, setMemberEmail] = useState('')
 	const [memberRole, setMemberRole] = useState<'leader' | 'member'>('member')
+
+	// Keyboard shortcuts
+	useKeyboardShortcuts({
+		newProject: () => setShowCreateDialog(true),
+		cancel: () => setShowCreateDialog(false),
+		dashboard: () => navigate('/app/dashboard'),
+		newWork: () => navigate('/app/input'),
+	})
 
 	useEffect(() => {
 		// 목업 데이터 초기화 (localStorage가 비어있으면)
@@ -299,9 +312,37 @@ export default function ProjectsPage() {
 				</Card>
 			</div>
 
-			{/* Filter */}
-			<Card>
-				<CardContent className="p-4">
+		{/* View Tabs & Filter */}
+		<Card>
+			<CardContent className="p-4">
+				<div className="flex items-center justify-between">
+					{/* View Mode Tabs */}
+					<div className="flex items-center gap-2">
+						<button
+							onClick={() => setViewMode('list')}
+							className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+								viewMode === 'list'
+									? 'bg-primary text-white'
+									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+							}`}
+						>
+							<FolderKanban className="h-4 w-4" />
+							List View
+						</button>
+						<button
+							onClick={() => setViewMode('timeline')}
+							className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+								viewMode === 'timeline'
+									? 'bg-primary text-white'
+									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+							}`}
+						>
+							<Calendar className="h-4 w-4" />
+							Timeline View
+						</button>
+					</div>
+
+					{/* Filter */}
 					<div className="flex items-center gap-2">
 						<Filter className="h-5 w-5 text-neutral-500" />
 						<span className="text-sm font-medium mr-2">Filter:</span>
@@ -321,24 +362,34 @@ export default function ProjectsPage() {
 							))}
 						</div>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</CardContent>
+		</Card>
 
-			{/* Projects List */}
-			{filteredProjects.length === 0 ? (
-				<Card>
-					<CardContent className="p-12 text-center">
-						<FolderKanban className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
-						<h3 className="text-lg font-bold mb-2">No Projects Yet</h3>
-						<p className="text-neutral-600 dark:text-neutral-400 mb-4">
-							Create your first project to get started
-						</p>
+		{/* Timeline View */}
+		{viewMode === 'timeline' && (
+			<TimelineView
+				projects={filteredProjects}
+				onProjectClick={(project) => {
+					toast.info(`Clicked on ${project.name}`)
+				}}
+			/>
+		)}
+
+		{/* List View */}
+		{viewMode === 'list' && (
+			filteredProjects.length === 0 ? (
+				<EmptyState
+					icon={<FolderKanban className="h-12 w-12" />}
+					title="No Projects Yet"
+					description="Create your first project to start organizing your work"
+					action={
 						<Button onClick={() => setShowCreateDialog(true)}>
 							<Plus className="h-4 w-4 mr-2" />
 							Create Project
 						</Button>
-					</CardContent>
-				</Card>
+					}
+				/>
 			) : (
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{filteredProjects.map((project) => (
@@ -517,7 +568,8 @@ export default function ProjectsPage() {
 						</Card>
 					))}
 				</div>
-			)}
+			)
+		)}
 
 			{/* Create Project Dialog */}
 			{showCreateDialog && (

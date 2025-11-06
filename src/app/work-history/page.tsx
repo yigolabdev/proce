@@ -4,6 +4,9 @@ import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
+import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	FileText,
 	Calendar,
@@ -70,6 +73,13 @@ export default function WorkHistoryPage() {
 	const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
 	const [objectives, setObjectives] = useState<Array<{ id: string; title: string }>>([])
 	const [showFilters, setShowFilters] = useState(false)
+	const [loading, setLoading] = useState(true)
+
+	// Keyboard shortcuts
+	useKeyboardShortcuts({
+		newWork: () => navigate('/app/input'),
+		dashboard: () => navigate('/app/dashboard'),
+	})
 
 	// Categories
 	const categories = [
@@ -84,38 +94,40 @@ export default function WorkHistoryPage() {
 
 	// Load entries from localStorage
 	useEffect(() => {
-		try {
-			// Load projects
-			const savedProjects = localStorage.getItem('projects')
-			if (savedProjects) {
-				const parsedProjects = JSON.parse(savedProjects).map((p: any) => ({
-					id: p.id,
-					name: p.name,
-				}))
-				setProjects(parsedProjects)
-			}
+		const loadData = async () => {
+			try {
+				setLoading(true)
+				// Load projects
+				const savedProjects = localStorage.getItem('projects')
+				if (savedProjects) {
+					const parsedProjects = JSON.parse(savedProjects).map((p: any) => ({
+						id: p.id,
+						name: p.name,
+					}))
+					setProjects(parsedProjects)
+				}
 
-			// Load OKR objectives (mock for now)
-			const mockObjectives = [
-				{ id: '1', title: 'Increase Product Market Fit' },
-				{ id: '2', title: 'Scale Revenue Growth' },
-				{ id: '3', title: 'Enhance Team Productivity' },
-			]
-			setObjectives(mockObjectives)
+				// Load OKR objectives (mock for now)
+				const mockObjectives = [
+					{ id: '1', title: 'Increase Product Market Fit' },
+					{ id: '2', title: 'Scale Revenue Growth' },
+					{ id: '3', title: 'Enhance Team Productivity' },
+				]
+				setObjectives(mockObjectives)
 
-			const saved = localStorage.getItem('workEntries')
-			if (saved) {
-				const parsed = JSON.parse(saved)
-				const entriesWithDates = parsed.map((entry: any) => ({
-					...entry,
-					date: new Date(entry.date),
-					links: entry.links?.map((link: any) => ({
-						...link,
-						addedAt: new Date(link.addedAt),
-					})) || [],
-				}))
-				setEntries(entriesWithDates)
-			} else {
+				const saved = localStorage.getItem('workEntries')
+				if (saved) {
+					const parsed = JSON.parse(saved)
+					const entriesWithDates = parsed.map((entry: any) => ({
+						...entry,
+						date: new Date(entry.date),
+						links: entry.links?.map((link: any) => ({
+							...link,
+							addedAt: new Date(link.addedAt),
+						})) || [],
+					}))
+					setEntries(entriesWithDates)
+				} else {
 				// Mock data for demonstration
 				const mockEntries: WorkEntry[] = [
 					{
@@ -169,12 +181,17 @@ export default function WorkHistoryPage() {
 						status: 'submitted',
 					},
 				]
-				setEntries(mockEntries)
-				localStorage.setItem('workEntries', JSON.stringify(mockEntries))
+					setEntries(mockEntries)
+					localStorage.setItem('workEntries', JSON.stringify(mockEntries))
+				}
+			} catch (error) {
+				console.error('Failed to load work entries:', error)
+			} finally {
+				setLoading(false)
 			}
-		} catch (error) {
-			console.error('Failed to load work entries:', error)
 		}
+		
+		loadData()
 	}, [])
 
 	// Filter and sort entries
@@ -361,6 +378,25 @@ export default function WorkHistoryPage() {
 		if (days === 1) return 'Yesterday'
 		if (days < 7) return `${days} days ago`
 		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+	}
+
+	if (loading) {
+		return (
+			<div className="space-y-6">
+				<div className="flex items-center justify-between">
+					<div>
+						<h1 className="text-3xl font-bold flex items-center gap-3">
+							<FileText className="h-8 w-8 text-primary" />
+							Work History
+						</h1>
+						<p className="mt-2 text-neutral-600 dark:text-neutral-400">
+							View and manage your submitted work entries
+						</p>
+					</div>
+				</div>
+				<LoadingState type="list" count={5} />
+			</div>
+		)
 	}
 
 	return (
@@ -614,21 +650,23 @@ export default function WorkHistoryPage() {
 
 			{/* Entries List */}
 			{filteredEntries.length === 0 ? (
-				<Card>
-					<CardContent className="p-12 text-center">
-						<FileText className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-						<h3 className="text-lg font-bold mb-2">No Work Entries Found</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-							{searchQuery || selectedCategory !== 'all'
-								? 'Try adjusting your filters'
-								: 'Start by creating your first work entry'}
-						</p>
-						<Button onClick={() => (window.location.href = '/input')}>
-							<FileText className="h-4 w-4 mr-2" />
-							Create Work Entry
-						</Button>
-					</CardContent>
-				</Card>
+				<EmptyState
+					icon={<FileText className="h-12 w-12" />}
+					title="No Work Entries Found"
+					description={
+						searchQuery || selectedCategory !== 'all' || selectedProject !== 'all' || selectedObjective !== 'all'
+							? 'Try adjusting your filters to see more results'
+							: 'Start logging your work to build your history'
+					}
+					action={
+						!(searchQuery || selectedCategory !== 'all' || selectedProject !== 'all' || selectedObjective !== 'all') ? (
+							<Button onClick={() => navigate('/app/input')}>
+								<FileText className="h-4 w-4 mr-2" />
+								Add Work Entry
+							</Button>
+						) : undefined
+					}
+				/>
 			) : (
 				<div className="space-y-4">
 					{filteredEntries.map((entry) => {

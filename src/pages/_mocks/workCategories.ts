@@ -11,116 +11,78 @@ export interface WorkCategory {
 }
 
 export const mockWorkCategories: WorkCategory[] = [
-	// Completion/Report
+	// Completion & Progress
 	{
 		id: 'completed-work',
-		name: 'Report Completed Work',
+		name: 'Completed Work',
 		color: '#10B981', // green
-		description: 'Share completed tasks, achievements, and finished projects',
+		description: 'Report completed tasks, achievements, and finished projects',
 	},
 	{
 		id: 'progress-update',
-		name: 'Share Progress Update',
+		name: 'Progress Update',
 		color: '#3B82F6', // blue
-		description: 'Update current work status, progress, and intermediate results',
+		description: 'Share current work status, progress, and intermediate results',
 	},
 
-	// Requests
+	// Requests (Consolidated)
 	{
-		id: 'approval-request',
-		name: 'Request Approval',
+		id: 'request',
+		name: 'Request',
 		color: '#F59E0B', // amber
-		description: 'Request approval for decisions, budgets, plans, etc.',
-	},
-	{
-		id: 'feedback-request',
-		name: 'Request Feedback',
-		color: '#8B5CF6', // purple
-		description: 'Seek feedback and advice on ideas, work products, or proposals',
-	},
-	{
-		id: 'review-request',
-		name: 'Request Review',
-		color: '#6366F1', // indigo
-		description: 'Request review of documents, code, design, or other deliverables',
-	},
-	{
-		id: 'help-request',
-		name: 'Request Help',
-		color: '#EF4444', // red
-		description: 'Need assistance with problem-solving, technical support, or collaboration',
+		description: 'Request approval, feedback, review, or help from team members',
 	},
 
-	// Proposals/Issues
+	// Proposals & Issues
 	{
 		id: 'proposal',
-		name: 'Make Proposal',
+		name: 'Proposal',
 		color: '#A855F7', // purple
 		description: 'Present new projects, improvements, or business ideas',
 	},
 	{
 		id: 'issue-report',
-		name: 'Report Issue',
+		name: 'Issue Report',
 		color: '#DC2626', // red
-		description: 'Report errors, issues, or problems and request resolution',
+		description: 'Report errors, issues, or problems that need resolution',
 	},
 
-	// Information Sharing
+	// Information & Knowledge (Consolidated)
 	{
-		id: 'info-sharing',
-		name: 'Share Information',
+		id: 'information-sharing',
+		name: 'Information Sharing',
 		color: '#06B6D4', // cyan
-		description: 'Share news, materials, and reference information with team',
-	},
-	{
-		id: 'knowledge-sharing',
-		name: 'Share Knowledge',
-		color: '#8B5CF6', // violet
-		description: 'Share learnings, know-how, and best practices',
+		description: 'Share news, knowledge, learnings, and best practices with team',
 	},
 
-	// Recording/Documentation
+	// Recording & Documentation
 	{
 		id: 'meeting-notes',
-		name: 'Record Meeting Notes',
+		name: 'Meeting Notes',
 		color: '#7C3AED', // violet
 		description: 'Document meeting minutes, discussions, decisions, and action items',
 	},
 	{
 		id: 'documentation',
-		name: 'Create Documentation',
+		name: 'Documentation',
 		color: '#6366F1', // indigo
 		description: 'Create manuals, guides, and process documents',
 	},
 
-	// Questions/Planning
-	{
-		id: 'question',
-		name: 'Ask Question',
-		color: '#14B8A6', // teal
-		description: 'Ask questions and seek answers on matters that need clarification',
-	},
+	// Planning
 	{
 		id: 'planning',
-		name: 'Create Plan',
+		name: 'Planning',
 		color: '#3B82F6', // blue
-		description: 'Establish and share schedules, work plans, and roadmaps',
+		description: 'Create schedules, work plans, and roadmaps',
 	},
 
-	// Async Discussion
-	{
-		id: 'async-discussion',
-		name: 'Async Discussion (NoMeet)',
-		color: '#EC4899', // pink
-		description: 'Structured asynchronous discussion to replace meetings and enable decision-making without synchronous gatherings',
-	},
-
-	// Other
+	// Other (with custom input)
 	{
 		id: 'other',
 		name: 'Other',
 		color: '#9CA3AF', // gray
-		description: 'Content that does not fit into the above categories',
+		description: 'Custom category for content that does not fit above categories',
 	},
 ]
 
@@ -284,7 +246,7 @@ export const mockWorkTemplates: WorkTemplate[] = [
  * Initialize mock data to localStorage
  * Automatic update on category structure changes through version control
  */
-const WORK_CATEGORIES_VERSION = '3.1' // Added Async Discussion (NoMeet)
+const WORK_CATEGORIES_VERSION = '4.0' // Consolidated to 10 core categories
 
 export const initializeMockWorkCategories = (): void => {
 	try {
@@ -298,7 +260,7 @@ export const initializeMockWorkCategories = (): void => {
 			localStorage.setItem('workCategoriesVersion', WORK_CATEGORIES_VERSION)
 			
 			console.log('✅ Work categories updated to version', WORK_CATEGORIES_VERSION)
-			console.log('📝 Optimized to 15 core categories (이모티콘 제거, 핵심 항목만 유지)')
+			console.log('📝 Consolidated to 10 core categories with custom "Other" option')
 		} else {
 			// 버전이 같으면 기존 데이터가 없을 때만 초기화
 			const existingCategories = localStorage.getItem('workCategories')

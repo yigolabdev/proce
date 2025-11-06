@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
+import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	Inbox,
 	Mail,
@@ -52,19 +55,16 @@ interface TaskRecommendation {
 	description: string
 	priority: 'high' | 'medium' | 'low'
 	category: string
-	estimatedTime: string
 	deadline?: string
-	reason: string
-	relatedSkills: string[]
-	confidence: number
+	dataSource: string // 추천 근거가 되는 데이터 출처
 	status: 'pending' | 'accepted' | 'rejected'
 }
 
 interface RecommendationInsight {
-	type: 'productivity' | 'skill' | 'deadline' | 'workload'
-	title: string
-	description: string
-	icon: React.ReactNode
+	type: 'gap' | 'inactive' | 'deadline' | 'info'
+	metric: string
+	value: string
+	status: 'warning' | 'info' | 'urgent'
 }
 
 export default function InboxPage() {
@@ -180,47 +180,50 @@ export default function InboxPage() {
 			// Load actual data from localStorage
 			const projectsData = localStorage.getItem('projects')
 			const workEntriesData = localStorage.getItem('workEntries')
+			const objectivesData = localStorage.getItem('objectives')
 			
 			const projects = projectsData ? JSON.parse(projectsData) : []
 			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: any) => ({
 				...e,
 				date: new Date(e.date)
 			})) : []
-			
-			// Mock OKR data (would come from localStorage in production)
-			const objectives = [
-				{ id: '1', title: 'Increase Product Market Fit', progress: 45, target: 80 },
-				{ id: '2', title: 'Scale Revenue Growth', progress: 30, target: 100 },
-				{ id: '3', title: 'Enhance Team Productivity', progress: 70, target: 90 },
-			]
+			const objectives = objectivesData ? JSON.parse(objectivesData) : []
 			
 			// Analyze and generate recommendations
 			const generatedRecommendations: TaskRecommendation[] = []
+			const generatedInsights: RecommendationInsight[] = []
 			
-			// 1. Check for low-progress objectives
-			objectives.forEach(objective => {
-				if (objective.progress < 50) {
-					const gap = objective.target - objective.progress
+			// 1. OKR Progress Gap Analysis
+			objectives.forEach((objective: any) => {
+				const avgProgress = objective.keyResults?.reduce((sum: number, kr: any) => 
+					sum + ((kr.current / kr.target) * 100), 0) / (objective.keyResults?.length || 1)
+				
+				if (avgProgress < 50) {
 					generatedRecommendations.push({
 						id: `okr-${objective.id}`,
-						title: `Boost Progress on "${objective.title}"`,
-						description: `Your goal "${objective.title}" is at ${objective.progress}% (target: ${objective.target}%). Focus on key results to close the ${gap}% gap.`,
-						priority: objective.progress < 30 ? 'high' : 'medium',
-						category: 'goal-progress',
-						estimatedTime: '2-4 hours',
-						deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-						reason: `AI detected low progress (${objective.progress}%) on this critical goal. Recommended action to avoid falling behind.`,
-						relatedSkills: ['Strategic Planning', 'Goal Management', 'Execution'],
-						confidence: 90,
+						title: `Update OKR: ${objective.title}`,
+						description: `Current progress: ${Math.round(avgProgress)}%. Update key results to improve overall goal achievement.`,
+						priority: avgProgress < 30 ? 'high' : 'medium',
+						category: 'OKR Update',
+						deadline: objective.endDate,
+						dataSource: `OKR Data (${objective.keyResults?.length || 0} Key Results)`,
 						status: 'pending',
+					})
+					
+					generatedInsights.push({
+						type: 'gap',
+						metric: objective.title,
+						value: `${Math.round(avgProgress)}% complete`,
+						status: avgProgress < 30 ? 'urgent' : 'warning',
 					})
 				}
 			})
 			
-			// 2. Check for projects with no recent activity
+			// 2. Inactive Projects Detection
 			const sevenDaysAgo = new Date()
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 			
+			let inactiveProjectCount = 0
 			projects
 				.filter((p: any) => p.status === 'active')
 				.forEach((project: any) => {
@@ -229,136 +232,69 @@ export default function InboxPage() {
 					)
 					
 					if (recentWork.length === 0) {
+						inactiveProjectCount++
 						generatedRecommendations.push({
 							id: `project-${project.id}`,
 							title: `Update Project: ${project.name}`,
-							description: `No activity recorded for "${project.name}" in the last 7 days. Consider updating progress or scheduling next steps.`,
+							description: `No activity in 7 days. Consider logging progress or updating status.`,
 							priority: 'medium',
-							category: 'project-update',
-							estimatedTime: '1-2 hours',
-							deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-							reason: 'AI detected no recent activity on this active project. Regular updates ensure project momentum.',
-							relatedSkills: ['Project Management', 'Communication', 'Planning'],
-							confidence: 85,
+							category: 'Project Update',
+							dataSource: `Project Status (Last activity: 7+ days ago)`,
 							status: 'pending',
 						})
 					}
 				})
 			
-			// 3. Add some standard recommendations
-			const standardRecommendations: TaskRecommendation[] = [
-				{
-					id: '1',
-					title: 'Review Q4 Financial Reports',
-					description: 'Analyze financial performance and prepare summary for stakeholders',
-					priority: 'high',
-					category: 'Finance',
-					estimatedTime: '2 hours',
-					deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-					reason: 'Based on your expertise in financial analysis and upcoming board meeting',
-					relatedSkills: ['Financial Analysis', 'Data Interpretation', 'Reporting'],
-					confidence: 92,
-					status: 'pending',
-				},
-				{
-					id: '2',
-					title: 'Update Customer Database',
-					description: 'Clean and update customer contact information in CRM system',
-					priority: 'medium',
-					category: 'Data Management',
-					estimatedTime: '1.5 hours',
-					reason: 'Your recent work on data quality improvement makes you ideal for this task',
-					relatedSkills: ['Data Entry', 'CRM Systems', 'Attention to Detail'],
-					confidence: 85,
-					status: 'pending',
-				},
-				{
-					id: '3',
-					title: 'Prepare Team Meeting Agenda',
-					description: 'Create agenda for next week\'s team sync meeting',
-					priority: 'medium',
-					category: 'Meeting',
-					estimatedTime: '30 minutes',
-					deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-					reason: 'You have consistently organized effective team meetings',
-					relatedSkills: ['Communication', 'Organization', 'Leadership'],
-					confidence: 88,
-					status: 'pending',
-				},
-				{
-					id: '4',
-					title: 'Code Review: Authentication Module',
-					description: 'Review pull request for new authentication implementation',
-					priority: 'high',
-					category: 'Development',
-					estimatedTime: '1 hour',
-					deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-					reason: 'Your security expertise is needed for this critical review',
-					relatedSkills: ['Security', 'Code Review', 'Authentication'],
-					confidence: 95,
-					status: 'pending',
-				},
-				{
-					id: '5',
-					title: 'Document API Endpoints',
-					description: 'Create comprehensive documentation for new API endpoints',
-					priority: 'low',
-					category: 'Documentation',
-					estimatedTime: '3 hours',
-					reason: 'You have experience writing clear technical documentation',
-					relatedSkills: ['Technical Writing', 'API Design', 'Documentation'],
-					confidence: 78,
-					status: 'pending',
-				},
-			]
-
-			const mockInsights: RecommendationInsight[] = [
-				{
-					type: 'productivity',
-					title: 'Peak Productivity Time',
-					description: 'Your productivity is highest between 9 AM - 11 AM. Schedule important tasks during this time.',
-					icon: <TrendingUp className="h-5 w-5 text-green-600" />,
-				},
-				{
-					type: 'skill',
-					title: 'Skill Match',
-					description: 'These recommendations match your top skills: Financial Analysis, Data Management, Code Review.',
-					icon: <Target className="h-5 w-5 text-blue-600" />,
-				},
-				{
+			if (inactiveProjectCount > 0) {
+				generatedInsights.push({
+					type: 'inactive',
+					metric: 'Projects',
+					value: `${inactiveProjectCount} inactive ${inactiveProjectCount === 1 ? 'project' : 'projects'}`,
+					status: 'warning',
+				})
+			}
+			
+			// 3. Upcoming Deadlines Analysis
+			const now = new Date()
+			const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
+			
+			const upcomingDeadlines = objectives.filter((obj: any) => {
+				const endDate = new Date(obj.endDate)
+				return endDate >= now && endDate <= twoDaysFromNow
+			})
+			
+			if (upcomingDeadlines.length > 0) {
+				upcomingDeadlines.forEach((obj: any) => {
+					generatedRecommendations.push({
+						id: `deadline-${obj.id}`,
+						title: `Deadline Alert: ${obj.title}`,
+						description: `OKR deadline: ${new Date(obj.endDate).toLocaleDateString()}. Finalize key results.`,
+						priority: 'high',
+						category: 'Deadline',
+						deadline: obj.endDate,
+						dataSource: `OKR Deadline Tracking`,
+						status: 'pending',
+					})
+				})
+				
+				generatedInsights.push({
 					type: 'deadline',
-					title: 'Upcoming Deadlines',
-					description: '2 high-priority tasks have deadlines within 48 hours.',
-					icon: <Clock className="h-5 w-5 text-orange-600" />,
-				},
-				{
-					type: 'workload',
-					title: 'Balanced Workload',
-					description: 'Your current workload is well-balanced. You can take on 1-2 more tasks this week.',
-					icon: <Zap className="h-5 w-5 text-purple-600" />,
-				},
-			]
+					metric: 'Deadlines',
+					value: `${upcomingDeadlines.length} in next 48 hours`,
+					status: 'urgent',
+				})
+			}
 			
-			// Combine AI-generated and standard recommendations
-			const allRecommendations = [
-				...generatedRecommendations,
-				...standardRecommendations.slice(0, Math.max(0, 5 - generatedRecommendations.length))
-			]
+			// 4. Data Summary Insight
+			generatedInsights.unshift({
+				type: 'info',
+				metric: 'Data Sources',
+				value: `${projects.length} projects, ${objectives.length} OKRs, ${workEntries.length} work entries`,
+				status: 'info',
+			})
 
-			setRecommendations(allRecommendations)
-			
-			// Update insights based on actual data
-			const updatedInsights: RecommendationInsight[] = [
-				{
-					type: 'productivity',
-					title: 'AI Analysis Active',
-					description: `Analyzed ${projects.length} projects and ${objectives.length} goals to generate personalized recommendations.`,
-					icon: <Brain className="h-5 w-5 text-blue-600" />,
-				},
-				...mockInsights.slice(0, 3)
-			]
-			
-			setInsights(updatedInsights)
+			setRecommendations(generatedRecommendations)
+			setInsights(generatedInsights)
 			setLastUpdated(new Date())
 			setIsLoading(false)
 		}, 1000)
@@ -421,11 +357,8 @@ export default function InboxPage() {
 			title: task.title,
 			description: task.description,
 			category: task.category.toLowerCase().replace(/\s+/g, '-'),
-			estimatedTime: task.estimatedTime,
 			priority: task.priority,
 			deadline: task.deadline,
-			skills: task.relatedSkills,
-			aiReason: task.reason,
 			source: 'ai-recommendation'
 		}))
 
@@ -618,16 +551,19 @@ export default function InboxPage() {
 					{/* Messages List */}
 					<div className="space-y-2">
 						{filteredMessages.length === 0 ? (
-							<Card>
-								<CardContent className="p-12 text-center">
-									<Inbox className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
-									<p className="text-neutral-600 dark:text-neutral-400">
-										{filter === 'unread' && 'No unread messages'}
-										{filter === 'starred' && 'No starred messages'}
-										{filter === 'all' && 'No messages'}
-									</p>
-								</CardContent>
-							</Card>
+							<EmptyState
+								icon={<Inbox className="h-12 w-12" />}
+								title={
+									filter === 'unread' ? 'No Unread Messages' : 
+									filter === 'starred' ? 'No Starred Messages' : 
+									'No Messages'
+								}
+								description={
+									filter === 'all' ? "You're all caught up! Messages will appear here when they arrive." :
+									filter === 'unread' ? 'All messages have been read.' :
+									'Star important messages to find them here later.'
+								}
+							/>
 						) : (
 							filteredMessages.map((message) => (
 								<Card
@@ -726,58 +662,76 @@ export default function InboxPage() {
 			{/* AI Recommendations Tab */}
 			{activeTab === 'recommendations' && (
 				<>
-					{/* Stats */}
-					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-						<Card>
-							<CardContent className="p-4">
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Pending</div>
-								<div className="text-2xl font-bold">{pendingRecommendations.length}</div>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardContent className="p-4">
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Accepted</div>
-								<div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardContent className="p-4">
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Avg Confidence</div>
-								<div className="text-2xl font-bold text-blue-600">
-									{Math.round(recommendations.reduce((acc, r) => acc + r.confidence, 0) / recommendations.length || 0)}%
-								</div>
-							</CardContent>
-						</Card>
-						<Card>
-							<CardContent className="p-4">
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Last Updated</div>
-								<div className="text-sm font-medium">
-									{lastUpdated ? formatTimestamp(lastUpdated) : 'Never'}
-								</div>
-							</CardContent>
-						</Card>
-					</div>
+				{/* Stats */}
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<Card>
+						<CardContent className="p-4">
+							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Pending Tasks</div>
+							<div className="text-2xl font-bold">{pendingRecommendations.length}</div>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardContent className="p-4">
+							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Accepted</div>
+							<div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardContent className="p-4">
+							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Last Updated</div>
+							<div className="text-sm font-medium">
+								{lastUpdated ? formatTimestamp(lastUpdated) : 'Never'}
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 
-					{/* AI Insights */}
-					{insights.length > 0 && (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-							{insights.map((insight, index) => (
-								<Card key={index} className="border-l-4 border-l-primary">
+				{/* AI Insights */}
+				{insights.length > 0 && (
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+						{insights.map((insight, index) => {
+							const getStatusColor = (status: string) => {
+								switch (status) {
+									case 'urgent':
+										return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10'
+									case 'warning':
+										return 'border-l-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10'
+									default:
+										return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10'
+								}
+							}
+							
+							const getIcon = (type: string) => {
+								switch (type) {
+									case 'gap':
+										return <TrendingUp className="h-4 w-4 text-orange-600" />
+									case 'inactive':
+										return <Clock className="h-4 w-4 text-yellow-600" />
+									case 'deadline':
+										return <Calendar className="h-4 w-4 text-red-600" />
+									default:
+										return <Brain className="h-4 w-4 text-blue-600" />
+								}
+							}
+							
+							return (
+								<Card key={index} className={`border-l-4 ${getStatusColor(insight.status)}`}>
 									<CardContent className="p-4">
 										<div className="flex items-start gap-3">
-											<div className="flex-shrink-0 mt-0.5">{insight.icon}</div>
+											<div className="flex-shrink-0 mt-0.5">{getIcon(insight.type)}</div>
 											<div className="flex-1 min-w-0">
-												<h3 className="font-bold text-sm mb-1">{insight.title}</h3>
+												<h3 className="font-bold text-sm mb-1">{insight.metric}</h3>
 												<p className="text-xs text-neutral-600 dark:text-neutral-400">
-													{insight.description}
+													{insight.value}
 												</p>
 											</div>
 										</div>
 									</CardContent>
 								</Card>
-							))}
-						</div>
-					)}
+							)
+						})}
+					</div>
+				)}
 
 					{/* Recommendations List */}
 					<div className="space-y-4">
@@ -821,10 +775,6 @@ export default function InboxPage() {
 													<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
 														{task.category}
 													</span>
-													<div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
-														<Brain className="h-3 w-3" />
-														{task.confidence}% match
-													</div>
 												</div>
 												<h3 className="text-lg font-bold mb-1">{task.title}</h3>
 												<p className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -836,56 +786,29 @@ export default function InboxPage() {
 									<CardContent className="p-4">
 										<div className="space-y-4">
 											{/* Task Details */}
-											<div className="grid grid-cols-2 gap-4">
+											{task.deadline && (
 												<div className="flex items-center gap-2 text-sm">
-													<Clock className="h-4 w-4 text-neutral-500" />
+													<Calendar className="h-4 w-4 text-neutral-500" />
 													<span className="text-neutral-600 dark:text-neutral-400">
-														Est. {task.estimatedTime}
+														Deadline: {new Date(task.deadline).toLocaleDateString()}
 													</span>
 												</div>
-												{task.deadline && (
-													<div className="flex items-center gap-2 text-sm">
-														<Calendar className="h-4 w-4 text-neutral-500" />
-														<span className="text-neutral-600 dark:text-neutral-400">
-															Due: {new Date(task.deadline).toLocaleDateString()}
-														</span>
-													</div>
-												)}
-											</div>
-
-											{/* AI Reason */}
-											<div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
-												<div className="flex items-start gap-2">
-													<Brain className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-purple-900 dark:text-purple-100 mb-1">
-															Why this task?
-														</p>
-														<p className="text-xs text-purple-700 dark:text-purple-300">
-															{task.reason}
-														</p>
-													</div>
-												</div>
-											</div>
-
-											{/* Related Skills */}
-											{task.relatedSkills.length > 0 && (
-												<div>
-													<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-														Related Skills:
-													</p>
-													<div className="flex flex-wrap gap-2">
-														{task.relatedSkills.map((skill, index) => (
-															<span
-																key={index}
-																className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full"
-															>
-																{skill}
-															</span>
-														))}
-													</div>
-												</div>
 											)}
+
+											{/* Data Source */}
+											<div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+												<div className="flex items-start gap-2">
+													<Brain className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+													<div className="flex-1 min-w-0">
+														<p className="text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">
+															Data Source
+														</p>
+														<p className="text-xs text-blue-700 dark:text-blue-300">
+															{task.dataSource}
+														</p>
+													</div>
+												</div>
+											</div>
 
 											{/* Actions */}
 											<div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
