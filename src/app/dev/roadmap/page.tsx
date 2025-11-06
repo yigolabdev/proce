@@ -15,7 +15,7 @@ import {
 	Zap,
 } from 'lucide-react'
 import { roadmapPhases, getPhaseStats, getRoadmapStats } from './_data/roadmapData'
-import type { Feature, Phase } from './_data/roadmapData'
+import type { Feature } from './_data/roadmapData'
 
 export default function DevelopmentRoadmapPage() {
 	const [activePhase, setActivePhase] = useState('phase-4a')
@@ -53,17 +53,6 @@ export default function DevelopmentRoadmapPage() {
 
 	const currentPhase = roadmapPhases.find((p) => p.id === activePhase)
 	const overallStats = getRoadmapStats()
-
-	const getStatusColor = (status: Feature['status']) => {
-		switch (status) {
-			case 'completed':
-				return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20'
-			case 'in-progress':
-				return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-			default:
-				return 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50'
-		}
-	}
 
 	const getStatusIcon = (status: Feature['status']) => {
 		switch (status) {
