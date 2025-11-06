@@ -47,8 +47,9 @@ export default function EmployeeSignUpPage() {
 	const [customDepartment, setCustomDepartment] = useState('')
 	const [customPosition, setCustomPosition] = useState('')
 	
+	// TODO: Remove development features before production deployment
 	// Development mode check
-	const isDevelopment = import.meta.env.DEV
+	const isDevelopment = true // import.meta.env.DEV
 	
 	// Country codes for phone numbers
 	const countryCodes = [

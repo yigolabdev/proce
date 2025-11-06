@@ -36,10 +36,11 @@ export function DevMemo({ content, pagePath }: DevMemoProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isExpanded, setIsExpanded] = useState(false)
 	
+	// TODO: Remove this component before production deployment
 	// Show only in development mode
-	if (import.meta.env.PROD) {
-		return null
-	}
+	// if (import.meta.env.PROD) {
+	// 	return null
+	// }
 
 	return (
 		<>

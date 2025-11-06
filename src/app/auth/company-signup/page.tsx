@@ -179,38 +179,39 @@ export default function CompanySignUpPage() {
 					<span>Back to Home</span>
 				</button>
 				
-				<div className="flex items-center gap-4">
-					{/* Dev Mode: Skip All Steps */}
-					{import.meta.env.DEV && step < 4 && (
-						<Button
-							onClick={() => {
-								setData({
-									email: 'test@company.com',
-									verificationCode: '123456',
-									companyName: 'Test Company Inc.',
-									businessNumber: '123-45-67890',
-									industry: 'IT / SaaS / Software',
-									employeeCount: '10-49',
-									employeeCountExact: '',
-									adminName: 'Admin User',
-									adminEmail: 'test@company.com',
-									adminPassword: 'password123',
-									adminPasswordConfirm: 'password123',
-									adminPhone: '010-1234-5678',
-								})
-								setSentCode('123456')
-								setIsCodeSent(true)
-								setIsEmailVerified(true)
-								setStep(4)
-								toast.success('⚡ Dev Mode: All steps completed')
-							}}
-							size="sm"
-							variant="outline"
-							className="text-orange-600 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-						>
-							⚡ Skip All Steps
-						</Button>
-					)}
+			<div className="flex items-center gap-4">
+				{/* TODO: Remove development features before production deployment */}
+				{/* Dev Mode: Skip All Steps */}
+				{true && step < 4 && (
+					<Button
+						onClick={() => {
+							setData({
+								email: 'test@company.com',
+								verificationCode: '123456',
+								companyName: 'Test Company Inc.',
+								businessNumber: '123-45-67890',
+								industry: 'IT / SaaS / Software',
+								employeeCount: '10-49',
+								employeeCountExact: '',
+								adminName: 'Admin User',
+								adminEmail: 'test@company.com',
+								adminPassword: 'password123',
+								adminPasswordConfirm: 'password123',
+								adminPhone: '010-1234-5678',
+							})
+							setSentCode('123456')
+							setIsCodeSent(true)
+							setIsEmailVerified(true)
+							setStep(4)
+							toast.success('⚡ Dev Mode: All steps completed')
+						}}
+						size="sm"
+						variant="outline"
+						className="text-orange-600 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+					>
+						⚡ Skip All Steps
+					</Button>
+				)}
 					
 					{step > 1 && step < 4 && (
 						<button
@@ -342,24 +343,24 @@ export default function CompanySignUpPage() {
 							)}
 						</div>
 
-						{/* Dev Mode: Skip Email Verification */}
-						{import.meta.env.DEV && !isEmailVerified && (
-							<div className="pt-4 border-t border-orange-200 dark:border-orange-800">
-								<Button
-									onClick={() => {
-										setData(prev => ({ ...prev, email: 'test@company.com', verificationCode: '123456' }))
-										setSentCode('123456')
-										setIsCodeSent(true)
-										setIsEmailVerified(true)
-										toast.success('⚡ Dev Mode: Email verification skipped')
-									}}
-									variant="outline"
-									className="w-full h-10 text-sm text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-								>
-									⚡ Skip Email Verification (Dev Only)
-								</Button>
-							</div>
-						)}
+					{/* Dev Mode: Skip Email Verification */}
+					{true && !isEmailVerified && (
+						<div className="pt-4 border-t border-orange-200 dark:border-orange-800">
+							<Button
+								onClick={() => {
+									setData(prev => ({ ...prev, email: 'test@company.com', verificationCode: '123456' }))
+									setSentCode('123456')
+									setIsCodeSent(true)
+									setIsEmailVerified(true)
+									toast.success('⚡ Dev Mode: Email verification skipped')
+								}}
+								variant="outline"
+								className="w-full h-10 text-sm text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+							>
+								⚡ Skip Email Verification (Dev Only)
+							</Button>
+						</div>
+					)}
 
 								{isCodeSent && !isEmailVerified && (
 									<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
@@ -534,27 +535,27 @@ export default function CompanySignUpPage() {
 									Next
 									<ArrowRight className="h-5 w-5" />
 								</Button>
-								
-								{/* Dev Mode: Auto-fill and Skip */}
-								{import.meta.env.DEV && (
-									<Button 
-										onClick={() => {
-											setData(prev => ({
-												...prev,
-												companyName: 'Test Company Inc.',
-												businessNumber: '123-45-67890',
-												industry: 'IT / SaaS / Software',
-												employeeCount: '10-49',
-											}))
-											toast.success('⚡ Dev Mode: Company info auto-filled')
-											setTimeout(() => setStep(3), 300)
-										}} 
-										variant="outline" 
-										className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-									>
-										⚡ Auto-fill & Next (Dev Only)
-									</Button>
-								)}
+							
+							{/* Dev Mode: Auto-fill and Skip */}
+							{true && (
+								<Button 
+									onClick={() => {
+										setData(prev => ({
+											...prev,
+											companyName: 'Test Company Inc.',
+											businessNumber: '123-45-67890',
+											industry: 'IT / SaaS / Software',
+											employeeCount: '10-49',
+										}))
+										toast.success('⚡ Dev Mode: Company info auto-filled')
+										setTimeout(() => setStep(3), 300)
+									}} 
+									variant="outline" 
+									className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+								>
+									⚡ Auto-fill & Next (Dev Only)
+								</Button>
+							)}
 							</div>
 							</div>
 					)}
@@ -627,27 +628,27 @@ export default function CompanySignUpPage() {
 									Next
 									<ArrowRight className="h-5 w-5" />
 								</Button>
-								
-								{/* Dev Mode: Auto-fill and Skip */}
-								{import.meta.env.DEV && (
-									<Button 
-										onClick={() => {
-											setData(prev => ({
-												...prev,
-												adminName: 'Admin User',
-												adminPassword: 'password123',
-												adminPasswordConfirm: 'password123',
-												adminPhone: '010-1234-5678',
-											}))
-											toast.success('⚡ Dev Mode: Admin info auto-filled')
-											setTimeout(() => setStep(4), 300)
-										}} 
-										variant="outline" 
-										className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-									>
-										⚡ Auto-fill & Next (Dev Only)
-									</Button>
-								)}
+							
+							{/* Dev Mode: Auto-fill and Skip */}
+							{true && (
+								<Button 
+									onClick={() => {
+										setData(prev => ({
+											...prev,
+											adminName: 'Admin User',
+											adminPassword: 'password123',
+											adminPasswordConfirm: 'password123',
+											adminPhone: '010-1234-5678',
+										}))
+										toast.success('⚡ Dev Mode: Admin info auto-filled')
+										setTimeout(() => setStep(4), 300)
+									}} 
+									variant="outline" 
+									className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+								>
+									⚡ Auto-fill & Next (Dev Only)
+								</Button>
+							)}
 							</div>
 							</div>
 					)}
