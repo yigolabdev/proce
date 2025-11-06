@@ -502,13 +502,6 @@ export default function UsersManagementPage() {
 		}
 	}
 
-	const handleRoleChange = (id: string, newRole: UserRole) => {
-		setMembers((prev) =>
-			prev.map((m) => (m.id === id ? { ...m, role: newRole } : m))
-		)
-		toast.success('Role updated successfully')
-	}
-
 	const handleEditClick = (member: TeamMember) => {
 		setEditingMember(member)
 		setEditForm({

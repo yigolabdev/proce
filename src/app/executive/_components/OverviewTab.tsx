@@ -1,20 +1,7 @@
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { TrendingUp, TrendingDown, Users, Clock, Target, FolderKanban, AlertCircle, CheckCircle2, ArrowUp, ArrowDown, Minus } from 'lucide-react'
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import type { TrendData, CategoryBreakdown, InsightCard, ComparisonPeriod } from '../_types/analytics.types'
-
-// Recharts Tooltip/Legend payload types
-interface TooltipPayload {
-	payload: CategoryBreakdown
-	value: number
-	name: string
-}
-
-interface LegendPayload {
-	payload: {
-		category: string
-	}
-}
 
 interface OverviewTabProps {
 	dateRange: { start: Date; end: Date }
@@ -25,7 +12,7 @@ interface OverviewTabProps {
 }
 
 export default function OverviewTab({
-	dateRange,
+	dateRange: _dateRange,
 	workEntriesTrend,
 	categoryBreakdown,
 	insights,
@@ -210,26 +197,26 @@ export default function OverviewTab({
 										<Cell key={`cell-${index}`} fill={entry.color} />
 									))}
 								</Pie>
-								<Tooltip
-									contentStyle={{
-										backgroundColor: 'rgba(255, 255, 255, 0.95)',
-										border: '1px solid #e5e7eb',
-										borderRadius: '8px',
-									}}
-									formatter={(value: number, _name: string, props: TooltipPayload) => [
-										`${value} entries (${props.payload.percentage.toFixed(1)}%)`,
-										props.payload.category
-									]}
-								/>
-								<Legend
-									verticalAlign="bottom"
-									height={36}
-									iconType="circle"
-									formatter={(_value, entry: LegendPayload) => {
-										const item = categoryBreakdown.find(c => c.category === entry.payload.category)
-										return `${entry.payload.category} (${item?.count || 0})`
-									}}
-								/>
+							<Tooltip
+								contentStyle={{
+									backgroundColor: 'rgba(255, 255, 255, 0.95)',
+									border: '1px solid #e5e7eb',
+									borderRadius: '8px',
+								}}
+								formatter={(value: number, _name: string, props: any) => [
+									`${value} entries (${props.payload.percentage.toFixed(1)}%)`,
+									props.payload.category
+								]}
+							/>
+							<Legend
+								verticalAlign="bottom"
+								height={36}
+								iconType="circle"
+								formatter={(_value: any, entry: any) => {
+									const item = categoryBreakdown.find((c: CategoryBreakdown) => c.category === entry.payload?.category)
+									return `${entry.payload?.category || ''} (${item?.count || 0})`
+								}}
+							/>
 							</PieChart>
 						</ResponsiveContainer>
 					</CardContent>

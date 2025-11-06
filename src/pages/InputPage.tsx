@@ -34,7 +34,24 @@ import { toast } from 'sonner'
 import { initializeMockDrafts } from './_mocks/workInputDrafts'
 import { initializeMockWorkCategories } from './_mocks/workCategories'
 import { initializeMockTeamMembers } from './_mocks/teamMembers'
-import type { UploadedFile, LinkedResource } from '../types/common.types'
+
+// Local interfaces
+interface UploadedFile {
+	id: string
+	name: string
+	size: number
+	type: string
+	url?: string
+	uploadedAt?: string
+	createdAt?: string
+}
+
+interface LinkedResource {
+	id: string
+	title: string
+	url: string
+	addedAt: string
+}
 
 // OKR Interfaces (from OKR page)
 interface KeyResult {

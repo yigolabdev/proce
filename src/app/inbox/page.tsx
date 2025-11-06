@@ -5,8 +5,6 @@ import { Button } from '../../components/ui/Button'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
 import { EmptyState } from '../../components/common/EmptyState'
-import { LoadingState } from '../../components/common/LoadingState'
-import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	Inbox,
 	Mail,
@@ -21,11 +19,9 @@ import {
 	FileText,
 	ArrowRight,
 	TrendingUp,
-	Target,
 	XCircle,
 	RefreshCw,
 	Brain,
-	Zap,
 	Calendar,
 } from 'lucide-react'
 import { toast } from 'sonner'

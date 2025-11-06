@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from '../../../../components/ui/Card'
 import Input from '../../../../components/ui/Input'
 import Textarea from '../../../../components/ui/Textarea'
 import { Target, Plus, X, Trash2, Edit2, TrendingUp, AlertTriangle, CheckCircle2, BarChart3 } from 'lucide-react'
-import type { CompanyKPI } from '../page'
+import type { CompanyKPI } from '../_types/types'
 
 interface KPITabProps {
 	kpis: CompanyKPI[]

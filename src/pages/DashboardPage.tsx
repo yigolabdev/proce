@@ -9,7 +9,6 @@ import { LoadingState } from '../components/common/LoadingState'
 import useKeyboardShortcuts from '../hooks/useKeyboardShortcuts'
 import { 
 	TrendingUp, 
-	TrendingDown,
 	Plus,
 	Calendar,
 	ArrowRight,
@@ -23,7 +22,7 @@ import {
 	BarChart3,
 	Sparkles
 } from 'lucide-react'
-import { format, isToday, differenceInDays, addDays, startOfDay, parseISO } from 'date-fns'
+import { format, differenceInDays, addDays, startOfDay, parseISO } from 'date-fns'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface WorkEntry {
@@ -409,12 +408,12 @@ export default function DashboardPage() {
 						<CardHeader>
 							<div className="flex items-center justify-between">
 								<h2 className="text-xl font-semibold">Recent Activity</h2>
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => navigate('/app/work-history')}
-								>
-									View All
+							<Button
+								variant="secondary"
+								size="sm"
+								onClick={() => navigate('/app/work-history')}
+							>
+								View All
 									<ArrowRight className="h-4 w-4 ml-2" />
 								</Button>
 							</div>

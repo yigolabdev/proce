@@ -59,6 +59,7 @@ export interface CategoryBreakdown {
 	hours: number
 	percentage: number
 	color: string
+	[key: string]: string | number // Index signature for Recharts compatibility
 }
 
 export interface ProjectAnalytics {

@@ -6,7 +6,7 @@
  */
 
 import { toast } from 'sonner'
-import type { STORAGE_KEYS, StorageTypeMap } from '../types/common.types'
+import type { StorageTypeMap } from '../types/common.types'
 
 export interface StorageResult<T> {
 	success: boolean
@@ -193,7 +193,7 @@ export function getTypedArray<K extends keyof StorageTypeMap>(
 	key: K
 ): StorageTypeMap[K] extends Array<infer T> ? T[] : never {
 	const data = safeGetItem<any>(key)
-	return Array.isArray(data) ? data : ([] as any)
+	return (Array.isArray(data) ? data : []) as any
 }
 
 /**

@@ -78,7 +78,7 @@ export default function WorkHistoryPage() {
 	// Keyboard shortcuts
 	useKeyboardShortcuts({
 		newWork: () => navigate('/app/input'),
-		dashboard: () => navigate('/app/dashboard'),
+		goToDashboard: () => navigate('/app/dashboard'),
 	})
 
 	// Categories

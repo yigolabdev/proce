@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
-import { Calendar, ChevronLeft, ChevronRight, Target, Users, Clock, AlertCircle } from 'lucide-react'
+import { Calendar, ChevronLeft, ChevronRight, Users, Clock } from 'lucide-react'
 import type { Project } from '../_types/projects.types'
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isWithinInterval, differenceInDays } from 'date-fns'
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, isWithinInterval, differenceInDays } from 'date-fns'
 
 interface TimelineViewProps {
 	projects: Project[]
@@ -20,11 +20,6 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 		const end = endOfMonth(viewMode === 'month' ? currentMonth : addMonths(currentMonth, viewMode === 'quarter' ? 1 : 5))
 		return { start, end }
 	}, [currentMonth, viewMode])
-
-	// Get all days in the date range
-	const days = useMemo(() => {
-		return eachDayOfInterval(dateRange)
-	}, [dateRange])
 
 	// Filter projects that are within the date range
 	const visibleProjects = useMemo(() => {
@@ -124,27 +119,27 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
-							<Button
-								onClick={() => setViewMode('month')}
-								variant={viewMode === 'month' ? 'default' : 'outline'}
-								size="sm"
-							>
-								Month
-							</Button>
-							<Button
-								onClick={() => setViewMode('quarter')}
-								variant={viewMode === 'quarter' ? 'default' : 'outline'}
-								size="sm"
-							>
-								Quarter
-							</Button>
-							<Button
-								onClick={() => setViewMode('year')}
-								variant={viewMode === 'year' ? 'default' : 'outline'}
-								size="sm"
-							>
-								Year
-							</Button>
+						<Button
+							onClick={() => setViewMode('month')}
+							variant={viewMode === 'month' ? 'primary' : 'outline'}
+							size="sm"
+						>
+							Month
+						</Button>
+						<Button
+							onClick={() => setViewMode('quarter')}
+							variant={viewMode === 'quarter' ? 'primary' : 'outline'}
+							size="sm"
+						>
+							Quarter
+						</Button>
+						<Button
+							onClick={() => setViewMode('year')}
+							variant={viewMode === 'year' ? 'primary' : 'outline'}
+							size="sm"
+						>
+							Year
+						</Button>
 						</div>
 					</div>
 				</CardHeader>

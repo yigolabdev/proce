@@ -17,7 +17,8 @@
  * ```
  */
 
-import { useState, useEffect, useCallback, Dispatch, SetStateAction } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { safeGetItem, safeSetItem } from '../utils/safeStorage'
 
 export function usePersistedState<T>(

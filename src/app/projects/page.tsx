@@ -7,7 +7,6 @@ import Textarea from '../../components/ui/Textarea'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
 import { EmptyState } from '../../components/common/EmptyState'
-import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	FolderKanban,
@@ -64,7 +63,7 @@ export default function ProjectsPage() {
 	useKeyboardShortcuts({
 		newProject: () => setShowCreateDialog(true),
 		cancel: () => setShowCreateDialog(false),
-		dashboard: () => navigate('/app/dashboard'),
+		goToDashboard: () => navigate('/app/dashboard'),
 		newWork: () => navigate('/app/input'),
 	})
 

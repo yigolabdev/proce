@@ -79,11 +79,11 @@ export interface CompanyKPI {
 
 export interface FinancialData {
 	year: string
-	revenue: string
-	operatingProfit: string
-	netProfit: string
+	totalRevenue: string
+	netIncome: string
 	totalAssets: string
-	uploadedFiles?: Array<{
+	totalLiabilities: string
+	documents?: Array<{
 		id: string
 		name: string
 		size: number
@@ -96,7 +96,7 @@ export interface UploadedDocument {
 	name: string
 	size: number
 	type: string
-	category: string
+	category?: string
 	uploadedAt: string
 	uploadedBy?: string
 }

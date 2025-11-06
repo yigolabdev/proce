@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
-import { BarChart3, Calendar, Filter, Download, RefreshCw, TrendingUp, LineChart, PieChart as PieChartIcon, FileText } from 'lucide-react'
+import { BarChart3, Calendar, RefreshCw, TrendingUp, LineChart, FileText } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import { LoadingState } from '../../components/common/LoadingState'
-import { subDays, subMonths, subYears, startOfDay, endOfDay } from 'date-fns'
+import { subDays, startOfDay, endOfDay } from 'date-fns'
 
 // Import tab components
 import OverviewTab from './_components/OverviewTab'
@@ -36,10 +36,11 @@ export default function ExecutivePage() {
 	// State
 	const [activeTab, setActiveTab] = useState<TabType>('overview')
 	const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last30days')
-	const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date }>({
+	const [customDateRange] = useState<{ start: Date; end: Date }>({
 		start: subDays(new Date(), 30),
 		end: new Date(),
 	})
+	// Note: setCustomDateRange will be used for custom date picker feature
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -207,7 +208,7 @@ export default function ExecutivePage() {
 						</p>
 					</div>
 				</div>
-				<LoadingState type="dashboard" />
+				<LoadingState type="card" count={4} />
 			</div>
 		)
 	}

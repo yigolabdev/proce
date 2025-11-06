@@ -28,7 +28,6 @@ import Toaster from '../../components/ui/Toaster'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
 import { EmptyState } from '../../components/common/EmptyState'
-import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 
@@ -118,7 +117,6 @@ export default function OKRPage() {
 	const [objectives, setObjectives] = useState<Objective[]>([])
 	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
 	const [expandedObjectives, setExpandedObjectives] = useState<string[]>([])
-	const [loading, setLoading] = useState(true)
 	
 	// Keyboard shortcuts
 	useKeyboardShortcuts({

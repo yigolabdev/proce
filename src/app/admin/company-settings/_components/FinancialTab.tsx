@@ -10,27 +10,14 @@ import {
 	Upload,
 	File,
 } from 'lucide-react'
-
-interface FinancialYear {
-	year: string
-	totalRevenue: string
-	netIncome: string
-	totalAssets: string
-	totalLiabilities: string
-	documents?: Array<{
-		id: string
-		name: string
-		size: number
-		uploadedAt: string | Date
-	}>
-}
+import type { FinancialData } from '../_types/types'
 
 interface FinancialTabProps {
-	financialData: FinancialYear[]
+	financialData: FinancialData[]
 	isAddingFinancial: boolean
-	newFinancialYear: Omit<FinancialYear, 'documents'> & { documents?: any[] }
+	newFinancialYear: Omit<FinancialData, 'documents'> & { documents?: any[] }
 	onSetIsAddingFinancial: (value: boolean) => void
-	onSetNewFinancialYear: (year: Omit<FinancialYear, 'documents'> & { documents?: any[] }) => void
+	onSetNewFinancialYear: (year: Omit<FinancialData, 'documents'> & { documents?: any[] }) => void
 	onAddFinancialData: () => void
 	onDeleteFinancialData: (year: string) => void
 	onFileUpload: (event: React.ChangeEvent<HTMLInputElement>, year: string) => void

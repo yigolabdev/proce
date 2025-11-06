@@ -191,10 +191,10 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 										</div>
 									</div>
 								</div>
-								<div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
-									{metric.change > 0 ? 'Increased' : metric.change < 0 ? 'Decreased' : 'No change'} by{' '}
-									{Math.abs(parseFloat(metric.current) - parseFloat(metric.previous)).toFixed(1)}{metric.unit}
-								</div>
+							<div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
+								{metric.change > 0 ? 'Increased' : metric.change < 0 ? 'Decreased' : 'No change'} by{' '}
+								{Math.abs(parseFloat(String(metric.current)) - parseFloat(String(metric.previous))).toFixed(1)}{metric.unit}
+							</div>
 							</div>
 						))}
 					</div>

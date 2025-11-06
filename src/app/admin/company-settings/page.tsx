@@ -1,29 +1,13 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
-import { Button } from '../../../components/ui/Button'
-import Input from '../../../components/ui/Input'
-import Textarea from '../../../components/ui/Textarea'
+import { Card, CardContent } from '../../../components/ui/Card'
 import {
 	Building2,
 	DollarSign,
 	Target,
-	Save,
-	X,
-	Plus,
-	Trash2,
 	Users,
 	Briefcase,
 	CheckCircle2,
-	MapPin,
-	Globe,
-	Phone,
-	Mail,
-	UserCircle,
-	Edit2,
-	Upload,
 	FileText,
-	Download,
-	File,
 	Clock
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -37,125 +21,14 @@ import CompanyInfoTab from './_components/CompanyInfoTab'
 import DocumentsTab from './_components/DocumentsTab'
 import LeadershipTab from './_components/LeadershipTab'
 import FinancialTab from './_components/FinancialTab'
-
-interface CompanyInfo {
-	// Basic Info
-	name: string
-	legalName: string
-	businessNumber: string
-	industry: string
-	companySize: string
-	foundedYear: string
-	foundedDate: string
-	
-	// Contact
-	address: string
-	city: string
-	postalCode: string
-	country: string
-	phone: string
-	email: string
-	website: string
-	socialLinks: Array<{ platform: string; url: string }>
-	
-	// Business
-	description: string
-	vision: string
-	mission: string
-	mainProducts: string
-	mainServices: string
-	targetMarket: string
-	targetCustomers: string
-	competitiveAdvantage: string
-	
-	// Workforce
-	employeeCount: string
-	fullTimeCount: string
-	partTimeCount: string
-}
-
-interface LeadershipMember {
-	id: string
-	name: string
-	position: string
-	email: string
-	phone: string
-	department?: string
-}
-
-export interface CompanyKPI {
-	id: string
-	name: string
-	description: string
-	category: 'Financial' | 'Customer' | 'Operational' | 'HR' | 'Growth' | 'Strategic'
-	
-	// Target & Progress
-	targetValue: number
-	currentValue: number
-	unit: string
-	
-	// Period
-	period: 'monthly' | 'quarterly' | 'annual'
-	startDate: string
-	endDate: string
-	
-	// Responsibility
-	owner: string
-	department: string
-	
-	// Measurement
-	measurementFrequency: 'daily' | 'weekly' | 'monthly' | 'quarterly'
-	dataSource: string
-	
-	// Status
-	status: 'on-track' | 'at-risk' | 'behind' | 'achieved'
-	priority: 'high' | 'medium' | 'low'
-	
-	createdAt: Date
-	updatedAt: Date
-}
-
-interface FinancialData {
-	year: string
-	totalRevenue: string
-	netIncome: string
-	totalAssets: string
-	totalLiabilities: string
-	documents: UploadedDocument[]
-}
-
-interface UploadedDocument {
-	id: string
-	name: string
-	size: number
-	type: string
-	category?: string
-	uploadedAt: Date
-	description?: string
-}
-
-interface WorkplaceSettings {
-	// Locale
-	language: 'en' | 'ko'
-	timezone: string
-	workingDays: number[]
-	workingHours: {
-		start: string
-		end: string
-	}
-	holidays: Array<{ name: string; date: string }>
-	quietHours?: {
-		start: string
-		end: string
-	}
-	
-	// Decision Defaults
-	decisionMode: 'hybrid' | 'ai' | 'human'
-	requireEvidence: boolean
-	showConfidence: boolean
-	autoApproveLowRisk: boolean
-	escalationWindow: '4h' | '8h' | '24h'
-}
+import type {
+	CompanyInfo,
+	LeadershipMember,
+	CompanyKPI,
+	FinancialData,
+	UploadedDocument,
+	WorkplaceSettings,
+} from './_types/types'
 
 export default function CompanySettingsPage() {
 	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'goals' | 'financial' | 'documents' | 'workplace'>('company')
@@ -245,18 +118,17 @@ export default function CompanySettingsPage() {
 	// Financial State
 	const [financialData, setFinancialData] = useState<FinancialData[]>([])
 	const [isAddingFinancial, setIsAddingFinancial] = useState(false)
-	const [newFinancialYear, setNewFinancialYear] = useState({
+	const [newFinancialYear, setNewFinancialYear] = useState<Omit<FinancialData, 'documents'> & { documents?: UploadedDocument[] }>({
 		year: new Date().getFullYear().toString(),
 		totalRevenue: '',
 		netIncome: '',
 		totalAssets: '',
 		totalLiabilities: '',
-		documents: [] as UploadedDocument[],
+		documents: [],
 	})
 
 	// Documents State
 	const [documents, setDocuments] = useState<UploadedDocument[]>([])
-	const [uploadingDocument, setUploadingDocument] = useState(false)
 
 	// Workplace State
 	const [workplaceSettings, setWorkplaceSettings] = useState<WorkplaceSettings>({
@@ -575,7 +447,7 @@ export default function CompanySettingsPage() {
 			name: file.name,
 			size: file.size,
 			type: file.type,
-			uploadedAt: new Date(),
+			uploadedAt: new Date().toISOString(),
 		}))
 
 		const updatedData = financialData.map(data => 
@@ -609,7 +481,7 @@ export default function CompanySettingsPage() {
 			size: file.size,
 			type: file.type,
 			category: category || 'General',
-			uploadedAt: new Date(),
+			uploadedAt: new Date().toISOString(),
 		}))
 
 		const updatedDocuments = [...documents, ...newDocuments]
@@ -659,45 +531,10 @@ export default function CompanySettingsPage() {
 		}).format(Number(value))
 	}
 
-	const industries = [
-		'IT / SaaS / Software',
-		'Manufacturing / Production',
-		'Finance / Insurance / Securities',
-		'Distribution / Retail / Trading',
-		'Service / Consulting',
-		'Construction / Engineering',
-		'Medical / Pharmaceutical / Bio',
-		'Education / Research',
-		'Media / Content / Entertainment',
-		'Other'
-	]
-
-	const companySizes = [
-		'Startup (1-10)',
-		'Small (11-50)',
-		'Medium (51-200)',
-		'Large (201-1000)',
-		'Enterprise (1000+)'
-	]
-
-	const commonPositions = ['CEO', 'CFO', 'CTO', 'COO', 'CMO', 'CPO', 'VP', 'Director', 'Manager', 'Lead']
-
-	const documentCategories = [
-		'Financial Reports',
-		'Legal Documents',
-		'Contracts',
-		'Certificates',
-		'Presentations',
-		'Business Plans',
-		'Marketing Materials',
-		'Policies',
-		'Other'
-	]
-
 	return (
 		<div className="space-y-6">
 			{/* DevMemo */}
-			<DevMemo memo={DEV_MEMOS.COMPANY_SETTINGS} />
+			<DevMemo content={DEV_MEMOS.COMPANY_SETTINGS} pagePath="/app/admin/company-settings/page.tsx" />
 
 			{/* Header */}
 			<div className="flex items-center justify-between">

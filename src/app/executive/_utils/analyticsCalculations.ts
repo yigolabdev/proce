@@ -1,4 +1,4 @@
-import { differenceInDays, eachDayOfInterval, format, isWithinInterval, startOfDay } from 'date-fns'
+import { differenceInDays, eachDayOfInterval, format, isWithinInterval } from 'date-fns'
 import type {
 	TrendData,
 	ComparisonPeriod,
@@ -304,6 +304,13 @@ export const analyzeOKRs = (): OKRAnalytics[] => {
 		const completedKRs = obj.keyResults?.filter((kr) => kr.current >= kr.target).length || 0
 		const endDate = obj.endDate ? new Date(obj.endDate) : new Date()
 		const daysRemaining = Math.max(0, differenceInDays(endDate, new Date()))
+		
+		// Map status to allowed OKRAnalytics statuses
+		let mappedStatus: 'on-track' | 'at-risk' | 'behind' | 'completed' = 'on-track'
+		if (obj.status === 'completed') mappedStatus = 'completed'
+		else if (obj.status === 'behind') mappedStatus = 'behind'
+		else if (obj.status === 'at-risk') mappedStatus = 'at-risk'
+		else mappedStatus = 'on-track' // 'not-started' or undefined -> 'on-track'
 
 		return {
 			objectiveId: obj.id,
@@ -311,7 +318,7 @@ export const analyzeOKRs = (): OKRAnalytics[] => {
 			owner: obj.owner || 'Unassigned',
 			team: obj.team || 'Unassigned',
 			progress: obj.progress || 0,
-			status: obj.status || 'on-track',
+			status: mappedStatus,
 			keyResultsTotal: totalKRs,
 			keyResultsCompleted: completedKRs,
 			daysRemaining,
