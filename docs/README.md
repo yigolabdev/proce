@@ -1,255 +1,86 @@
-# 📚 Proce Frontend Documentation
+# 📚 Proce 개발 문서 허브
 
-> **Complete documentation for developer handoff**  
-> **Last Updated:** November 2, 2024
+> **Proce** — AI 기반 Decision Operating System: 회의·보고·결재를 데이터·정책 기반으로 대체하는 공정한 의사결정 운영체계
 
----
+이 문서는 Proce 프로젝트의 **문서 우선(Documentation First)** 개발을 위한 중앙 허브입니다. 모든 개발은 문서 완성 후 시작하며, 문서-코드 일치성을 유지합니다.
 
-## 📖 Documentation Index
+## 🚨 중요: 문서 기반 개발 선언
 
-This folder contains all technical documentation for the Proce frontend application.
-
-### 🎯 Main Documents
-
-1. **[DEVELOPMENT_STATUS.md](./DEVELOPMENT_STATUS.md)** - **Detailed Development Status**
-   - Complete page list (40+ pages)
-   - Feature-by-feature descriptions
-   - Implementation status (95% complete)
-   - Recent improvements (3 phases)
-   - Technical stack details
-   - Development guidelines
-   - Next steps for backend team
-
-2. **[PAGES_CHECKLIST.md](./PAGES_CHECKLIST.md)** - **Quick Reference Checklist**
-   - Page completion status at a glance
-   - Category-wise organization
-   - Priority levels (Critical/Important/Nice-to-have)
-   - Recent improvements timeline
-   - Key metrics and statistics
-   - Handoff readiness indicators
-
-3. **[HANDOFF_GUIDE.md](./HANDOFF_GUIDE.md)** - **Backend Integration Guide**
-   - Quick start instructions
-   - Backend integration points
-   - Data models (TypeScript interfaces)
-   - localStorage → API migration guide
-   - Security considerations
-   - Performance optimization tips
-   - Testing strategy
-   - Deployment checklist
-   - Day-by-day implementation plan
+> 본 프로젝트는 `PROJECT_DECLARATION.md`의 원칙을 따릅니다. 문서 100% → 개발 시작.
 
 ---
 
-## 🚀 Quick Navigation
+## 🎯 프로젝트 개요
 
-### For Project Managers
-→ Start with **[PAGES_CHECKLIST.md](./PAGES_CHECKLIST.md)** for quick overview
+### Proce란?
+- **정의**: 조직의 모든 산출물을 단일 데이터 허브로 모으고, AI와 정책 엔진이 의사결정을 자동화하는 운영체계
+- **핵심 아이디어**: "모두가 일하고, 시스템은 학습하며, AI가 더 빠르고 정확하게 결정한다"
 
-### For Backend Developers
-→ Start with **[HANDOFF_GUIDE.md](./HANDOFF_GUIDE.md)** for integration guide
-
-### For Full Context
-→ Read **[DEVELOPMENT_STATUS.md](./DEVELOPMENT_STATUS.md)** for complete details
+### 핵심 차별화 요소
+- 🔄 **NoMeet Engine**: 동기 회의 → 비동기 구조화 토론으로 대체
+- 🧭 **Policy Decision Engine**: 정책(DSL)로 자동 승인/보류/거절 + 근거/신뢰도 로깅
+- 🧾 **Reporting-Free Input**: 형식 없는 입력 → AI가 KPI/작업으로 정규화
+- 🫥 **공정성(익명 Alias)**: 직급·부서 비노출, 콘텐츠 가치 평가 중심
+- 🧠 **Central Performance OS**: 피드백/결정 → 조직 지식 그래프 축적
 
 ---
 
-## 📊 Current Status Summary
+## 📋 핵심 문서 구조
 
+### 🎨 기획 & 디자인
+| 문서 | 설명 | 완성도 | 우선순위 |
+| --- | --- | --- | --- |
+| [서비스 기획서](./service-planning.md) | 비전, 목표, 기능, 대상, 임팩트 | [ ] 진행중 | [x] 높음 |
+| [디자인 시스템](./design-system.md) | Promptor DS 적용: 컬러, 타이포, 컴포넌트 | [ ] 진행중 | [x] 중간 |
+| [페이지 정의서](./page-specification.md) | NoMeet/Policy/Input/대시보드 구조 | [ ] 진행중 | [x] 높음 |
+
+### 🛠️ 개발 & 기술
+| 문서 | 설명 | 완성도 | 우선순위 |
+| --- | --- | --- | --- |
+| [개발 지시서](./development-guide.md) | React+Vite+TS, Router, Query, 품질 기준 | [ ] 진행중 | [x] 높음 |
+| [개발 계획서](./development-plan.md) | Phase 로드맵, 마일스톤, KPI | [ ] 진행중 | [x] 중간 |
+| [TypeScript 가이드](./typescript-code-guide.md) | TS/폴더 구조/패턴/테스팅 | [ ] 진행중 | [x] 중간 |
+| [Cursor 규칙](../.cursorrules) | IDE 규칙·체크리스트 | [ ] 진행중 | [ ] 설정필요 |
+
+---
+
+## 🚀 빠른 시작 가이드
+
+### 1단계: 문서 이해
 ```
-✅ Frontend Development: 95% Complete
-🚀 38/40 pages implemented
-⚡ Latest UX improvements applied
-💯 Code quality: A+
-🎯 Ready for backend integration
+1. service-planning.md     # 비전/목표/기능/타겟/임팩트
+2. page-specification.md   # NoMeet/Policy/Input/대시보드 구조
+3. development-guide.md    # 기술 스택, 품질 기준, 통합 패턴
+4. design-system.md        # 브랜드/컴포넌트 가이드
+5. typescript-code-guide.md # TS/코드 구조/테스트
 ```
 
-### Key Achievements
-- ✅ All core features implemented
-- ✅ Work management workflow complete
-- ✅ AI-powered recommendations
-- ✅ Advanced UX improvements (Auto-save, Progress tracking, Keyboard shortcuts)
-- ✅ Data flow consistency verified
-
----
-
-## 🎨 Recent Enhancements (November 2024)
-
-### Quick Win Package ⚡
-1. **Auto-Save** - Auto-save every 5 seconds
-2. **Progress Indicator** - Real-time completion tracking
-3. **Keyboard Shortcuts** - Ctrl+S, Ctrl+Enter, Ctrl+K
-4. **Recent Items** - Smart dropdown with recently used items
-5. **Image Paste** - Ctrl+V to paste images directly
-
-### Data Flow Improvements 📊
-- Dashboard: Recent Work section
-- Work History: Statistics dashboard
-- Projects/OKR: Related Work display
-- AI: Enhanced recommendations based on real data
-- Edit/Delete: Improved user experience
-
----
-
-## 💻 Tech Stack Overview
-
-### Frontend
-- **React 18** with TypeScript
-- **React Router DOM** v6
-- **Vite** for build tooling
-- **Tailwind CSS** for styling
-- **Lucide React** for icons
-- **Sonner** for notifications
-
-### State Management
-- React Hooks (useState, useEffect, useMemo)
-- Context API for global state
-- localStorage for data persistence (MVP)
-
-### Code Quality
-- TypeScript strict mode
-- Consistent naming conventions
-- Comprehensive interfaces
-- Error handling throughout
-- Dark mode support
-- Responsive design
-
----
-
-## 📁 Project Structure
-
+### 2단계: 개발 환경 (프론트 전용)
 ```
-proce_frontend/
-├── docs/                       ← You are here
-│   ├── README.md              ← This file
-│   ├── DEVELOPMENT_STATUS.md  ← Detailed status
-│   ├── PAGES_CHECKLIST.md     ← Quick checklist
-│   └── HANDOFF_GUIDE.md       ← Integration guide
-│
-└── frontend/
-    └── src/
-        ├── app/               ← Feature pages (38+)
-        │   ├── auth/         ← Authentication
-        │   ├── admin/        ← Admin pages
-        │   ├── okr/          ← OKR management
-        │   ├── projects/     ← Project management
-        │   └── ...
-        ├── pages/            ← Standalone pages
-        ├── components/       ← Reusable components
-        └── _mocks/          ← Mock data
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
 
-## 🔧 For Backend Developers
-
-### Integration Checklist
-- [ ] Review [HANDOFF_GUIDE.md](./HANDOFF_GUIDE.md)
-- [ ] Map localStorage keys to API endpoints
-- [ ] Design database schema from TypeScript interfaces
-- [ ] Implement authentication flow
-- [ ] Set up file upload service
-- [ ] Configure WebSocket for real-time updates
-- [ ] Test integration with frontend
-
-### Key localStorage Keys to Replace
-```typescript
-'workEntries'       → POST /api/work-entries
-'projects'          → GET/POST /api/projects
-'objectives'        → GET/POST /api/okr/objectives
-'currentUser'       → GET /api/users/me
-'teamMembers'       → GET /api/users
-'companySettings'   → GET/PUT /api/settings/company
-```
+## 🎯 개발 우선순위 가이드
+- Phase 1: UI 스켈레톤, NoMeet 기획 흐름, 정책 DSL 스키마 초안
+- Phase 2: 데이터 허브 구조, 익명 Alias UX, KPI 매핑 UX
+- Phase 3: 최적화·접근성·성능, 운영 지표 대시보드
 
 ---
 
-## 🧪 Testing Recommendations
-
-### Unit Tests
-- Work entry validation
-- ID generation
-- Date formatting
-- Data transformations
-
-### Integration Tests
-- Work input → Work history flow
-- Project creation → Work linking
-- OKR setting → Progress tracking
-
-### E2E Tests
-- Complete user journey
-- Authentication flow
-- Core workflows
+## 🔧 워크플로우 요약
+- 문서 변경 → 즉시 반영 → PR 설명에 문서 링크 첨부
+- 새 기능 착수 전 페이지 정의서에 구조/컴포넌트 추가
+- 디자인 변경 시 디자인 시스템 업데이트 필수
 
 ---
 
-## 📈 Performance Metrics
+## 🔗 링크
+- 개발 허브: `docs/`
+- 서비스 개요: 루트 `README.md`
+- 베이스 선언서: `PROJECT_DECLARATION.md`
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Initial Load | <3s | TBD |
-| Bundle Size | <500KB | TBD |
-| Lighthouse Score | >90 | TBD |
-| Time to Interactive | <3s | TBD |
-
----
-
-## 🎯 Next Steps
-
-### Phase 1: Backend Setup (Week 1-2)
-- Set up API server
-- Implement authentication
-- Design database schema
-- Create basic endpoints
-
-### Phase 2: Integration (Week 3-4)
-- Replace localStorage with API calls
-- Implement file upload
-- Add WebSocket for real-time
-- Test integration
-
-### Phase 3: Testing & QA (Week 5-6)
-- Write unit tests
-- Integration testing
-- E2E testing
-- Performance optimization
-
-### Phase 4: Production (Week 7-8)
-- Security audit
-- Performance tuning
-- Deployment setup
-- Monitoring setup
-
----
-
-## 📞 Support
-
-### Questions?
-- Review inline code comments
-- Check TypeScript interfaces
-- Refer to these documentation files
-- Contact project lead
-
-### Known Limitations
-- No backend (MVP uses localStorage)
-- No real authentication (mock tokens)
-- No file storage (blob URLs)
-- No real-time updates (no WebSocket)
-
----
-
-## 🎉 Ready for Handoff!
-
-All documentation is complete and organized.  
-Frontend is production-ready (MVP).  
-Backend team can start integration immediately.
-
-**Good luck! 🚀**
-
----
-
-**Version:** 1.0.0 (MVP)  
-**Last Updated:** November 2, 2024  
-**Status:** ✅ Ready for Developer Handoff
-
+**Happy Building Proce!**
