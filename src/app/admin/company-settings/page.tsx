@@ -145,6 +145,9 @@ export default function CompanySettingsPage() {
 		escalationWindow: '8h',
 	})
 
+	// Available departments from system settings
+	const [availableDepartments, setAvailableDepartments] = useState<{ id: string; name: string }[]>([])
+
 	// Load data from localStorage
 	useEffect(() => {
 		try {
@@ -206,6 +209,26 @@ export default function CompanySettingsPage() {
 			}
 		} catch (error) {
 			console.error('Failed to load workplace settings:', error)
+		}
+		
+		// Load departments from system settings
+		try {
+			const savedDepartments = localStorage.getItem('departments')
+			if (savedDepartments) {
+				const depts = JSON.parse(savedDepartments)
+				setAvailableDepartments(depts.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })))
+			} else {
+				// Fallback to mock data
+				const mockDepts = [
+					{ id: '1', name: 'Executive' },
+					{ id: '2', name: 'Engineering' },
+					{ id: '3', name: 'Product' },
+					{ id: '4', name: 'Marketing' },
+				]
+				setAvailableDepartments(mockDepts)
+			}
+		} catch (error) {
+			console.error('Failed to load departments:', error)
 		}
 	}, [])
 
@@ -324,8 +347,8 @@ export default function CompanySettingsPage() {
 	}
 
 	const handleAddKPI = () => {
-		if (!newKPI.name || !newKPI.targetValue || !newKPI.owner) {
-			toast.error('Please fill in required fields (Name, Target Value, Owner)')
+		if (!newKPI.name || !newKPI.owner) {
+			toast.error('Please fill in required fields (Name, Owner)')
 			return
 		}
 		
@@ -334,7 +357,7 @@ export default function CompanySettingsPage() {
 			name: newKPI.name!,
 			description: newKPI.description || '',
 			category: newKPI.category || 'Financial',
-			targetValue: newKPI.targetValue!,
+			targetValue: newKPI.targetValue || 0,
 			currentValue: newKPI.currentValue || 0,
 			unit: newKPI.unit || '%',
 			period: newKPI.period || 'quarterly',
@@ -615,6 +638,7 @@ export default function CompanySettingsPage() {
 						isAddingLeader={isAddingLeader}
 						editingLeader={editingLeader}
 						newLeader={newLeader}
+						availableDepartments={availableDepartments}
 						onSetIsAddingLeader={setIsAddingLeader}
 						onSetEditingLeader={setEditingLeader}
 						onSetNewLeader={setNewLeader}
@@ -650,6 +674,8 @@ export default function CompanySettingsPage() {
 						isAdding={isAddingKPI}
 						editingId={editingKPI}
 						newKPI={newKPI}
+						availableDepartments={availableDepartments}
+						leadership={leadership}
 						setNewKPI={setNewKPI}
 						setIsAdding={setIsAddingKPI}
 						setEditingId={setEditingKPI}

@@ -164,6 +164,81 @@ export default function FinancialTab({
 								</div>
 							</div>
 
+							{/* File Upload Section */}
+							<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+								<label className="block text-sm font-medium mb-3">
+									<FileText className="inline h-4 w-4 mr-1" />
+									Financial Documents (Optional)
+								</label>
+								<div className="space-y-3">
+									<label className="cursor-pointer">
+										<input
+											type="file"
+											multiple
+											onChange={(e) => {
+												const files = e.target.files
+												if (files && files.length > 0) {
+													const newDocs = Array.from(files).map(file => ({
+														id: `${Date.now()}-${Math.random()}`,
+														name: file.name,
+														size: file.size,
+														type: file.type,
+														uploadedAt: new Date().toISOString(),
+													}))
+													onSetNewFinancialYear({
+														...newFinancialYear,
+														documents: [...(newFinancialYear.documents || []), ...newDocs]
+													})
+												}
+											}}
+											className="hidden"
+											accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
+										/>
+										<div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-xl hover:border-primary hover:bg-primary/5 transition-colors">
+											<Upload className="h-5 w-5 text-neutral-500" />
+											<span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+												Click to upload documents
+											</span>
+										</div>
+									</label>
+
+									{/* Uploaded Files List */}
+									{newFinancialYear.documents && newFinancialYear.documents.length > 0 && (
+										<div className="space-y-2">
+											{newFinancialYear.documents.map((doc: any) => (
+												<div
+													key={doc.id}
+													className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+												>
+													<div className="flex items-center gap-3 flex-1 min-w-0">
+														<File className="h-5 w-5 text-primary shrink-0" />
+														<div className="min-w-0 flex-1">
+															<p className="font-medium text-sm truncate">{doc.name}</p>
+															<p className="text-xs text-neutral-500">
+																{formatFileSize(doc.size)}
+															</p>
+														</div>
+													</div>
+													<Button
+														variant="outline"
+														size="sm"
+														onClick={() => {
+															onSetNewFinancialYear({
+																...newFinancialYear,
+																documents: newFinancialYear.documents?.filter((d: any) => d.id !== doc.id) || []
+															})
+														}}
+														className="ml-2"
+													>
+														<X className="h-4 w-4" />
+													</Button>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+							</div>
+
 							<div className="flex justify-end gap-3">
 								<Button variant="outline" onClick={() => onSetIsAddingFinancial(false)}>
 									Cancel

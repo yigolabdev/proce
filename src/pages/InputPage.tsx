@@ -1448,48 +1448,6 @@ export default function InputPage() {
 						</CardContent>
 					</Card>
 
-					{/* Quick Actions */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-sm font-bold">Quick Actions</h2>
-						</CardHeader>
-						<CardContent className="space-y-2">
-							<Button
-								variant="outline"
-								className="w-full justify-start"
-								onClick={() => {
-									setTitle('Weekly Report')
-									setCategory('meeting')
-								}}
-							>
-								<FileText className="h-4 w-4 mr-2" />
-								Weekly Report Template
-							</Button>
-							<Button
-								variant="outline"
-								className="w-full justify-start"
-								onClick={() => {
-									setTitle('Bug Fix: ')
-									setCategory('development')
-								}}
-							>
-								<AlertCircle className="h-4 w-4 mr-2" />
-								Bug Fix Template
-							</Button>
-							<Button
-								variant="outline"
-								className="w-full justify-start"
-								onClick={() => {
-									setTitle('Feature: ')
-									setCategory('development')
-								}}
-							>
-								<Sparkles className="h-4 w-4 mr-2" />
-								Feature Template
-							</Button>
-						</CardContent>
-					</Card>
-
 					{/* Tips */}
 					<Card className="border-neutral-200 dark:border-neutral-800">
 						<CardHeader>

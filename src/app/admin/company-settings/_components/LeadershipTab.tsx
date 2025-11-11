@@ -20,6 +20,7 @@ interface LeadershipTabProps {
 	isAddingLeader: boolean
 	editingLeader: string | null
 	newLeader: Partial<LeadershipMember>
+	availableDepartments: { id: string; name: string }[]
 	onSetIsAddingLeader: (value: boolean) => void
 	onSetEditingLeader: (id: string | null) => void
 	onSetNewLeader: (leader: Partial<LeadershipMember>) => void
@@ -34,6 +35,7 @@ export default function LeadershipTab({
 	isAddingLeader,
 	editingLeader,
 	newLeader,
+	availableDepartments,
 	onSetIsAddingLeader,
 	onSetEditingLeader,
 	onSetNewLeader,
@@ -135,13 +137,20 @@ export default function LeadershipTab({
 								</div>
 								<div className="md:col-span-2">
 									<label className="block text-sm font-medium mb-2">Department</label>
-									<Input
+									<select
 										value={newLeader.department || ''}
 										onChange={(e) =>
 											onSetNewLeader({ ...newLeader, department: e.target.value })
 										}
-										placeholder="Executive, Engineering, etc."
-									/>
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">Select department</option>
+										{availableDepartments.map((dept) => (
+											<option key={dept.id} value={dept.name}>
+												{dept.name}
+											</option>
+										))}
+									</select>
 								</div>
 							</div>
 
@@ -208,14 +217,20 @@ export default function LeadershipTab({
 														}
 														placeholder="Phone"
 													/>
-													<Input
+													<select
 														value={leader.department || ''}
 														onChange={(e) =>
 															onUpdateLeader(leader.id, 'department', e.target.value)
 														}
-														placeholder="Department"
-														className="md:col-span-2"
-													/>
+														className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900 md:col-span-2"
+													>
+														<option value="">Select department</option>
+														{availableDepartments.map((dept) => (
+															<option key={dept.id} value={dept.name}>
+																{dept.name}
+															</option>
+														))}
+													</select>
 												</div>
 												<Button variant="outline" size="sm" onClick={onSaveEdit}>
 													<Save className="h-4 w-4 mr-2" />

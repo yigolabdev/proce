@@ -10,6 +10,8 @@ interface KPITabProps {
 	isAdding: boolean
 	editingId: string | null
 	newKPI: Partial<CompanyKPI>
+	availableDepartments: { id: string; name: string }[]
+	leadership: Array<{ id: string; name: string; position: string }>
 	setNewKPI: (kpi: Partial<CompanyKPI>) => void
 	setIsAdding: (value: boolean) => void
 	setEditingId: (id: string | null) => void
@@ -21,10 +23,13 @@ interface KPITabProps {
 
 const kpiCategories = [
 	{ value: 'Financial', label: 'Financial', icon: '💰', description: 'Revenue, profit, costs, ROI' },
+	{ value: 'Sales', label: 'Sales', icon: '💼', description: 'Deals, pipeline, conversion, revenue' },
+	{ value: 'Marketing', label: 'Marketing', icon: '📢', description: 'Campaigns, leads, brand, reach' },
 	{ value: 'Customer', label: 'Customer', icon: '👥', description: 'Satisfaction, retention, NPS, CAC' },
 	{ value: 'Operational', label: 'Operational', icon: '⚙️', description: 'Efficiency, quality, productivity' },
 	{ value: 'HR', label: 'HR & People', icon: '🎯', description: 'Engagement, turnover, training' },
-	{ value: 'Growth', label: 'Growth', icon: '📈', description: 'Market share, expansion, innovation' },
+	{ value: 'Growth', label: 'Growth', icon: '📈', description: 'Market share, expansion, new markets' },
+	{ value: 'Innovation', label: 'Innovation', icon: '💡', description: 'R&D, new products, patents' },
 	{ value: 'Strategic', label: 'Strategic', icon: '🎲', description: 'Long-term goals, initiatives' },
 ]
 
@@ -42,10 +47,13 @@ const kpiUnits = [
 
 const kpiExamples: Record<string, string[]> = {
 	Financial: ['Annual Revenue', 'Net Profit Margin', 'Operating Cash Flow', 'EBITDA', 'ROI'],
+	Sales: ['Sales Revenue', 'Deal Closing Rate', 'Average Deal Size', 'Sales Pipeline Value', 'Win Rate'],
+	Marketing: ['Marketing ROI', 'Lead Generation', 'Conversion Rate', 'Brand Awareness', 'Campaign Performance'],
 	Customer: ['Customer Satisfaction Score', 'Net Promoter Score (NPS)', 'Customer Retention Rate', 'Customer Lifetime Value'],
 	Operational: ['Production Efficiency', 'Quality Rate', 'On-time Delivery Rate', 'Cycle Time'],
 	HR: ['Employee Satisfaction', 'Turnover Rate', 'Training Hours per Employee', 'Time to Hire'],
-	Growth: ['Market Share', 'New Customer Acquisition', 'Product Launch Success Rate', 'Innovation Index'],
+	Growth: ['Market Share', 'New Customer Acquisition', 'Geographic Expansion', 'Revenue Growth Rate'],
+	Innovation: ['R&D Investment Rate', 'New Product Launch', 'Patent Applications', 'Innovation Revenue %'],
 	Strategic: ['Strategic Initiative Completion', 'Partnership Development', 'Brand Value Growth'],
 }
 
@@ -54,6 +62,8 @@ export default function KPITab({
 	isAdding,
 	editingId,
 	newKPI,
+	availableDepartments,
+	leadership,
 	setNewKPI,
 	setIsAdding,
 	setEditingId,
@@ -202,7 +212,7 @@ export default function KPITab({
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<div>
 									<label className="block text-sm font-medium mb-2">
-										Target Value <span className="text-red-500">*</span>
+										Target Value
 									</label>
 									<Input
 										type="number"
@@ -210,6 +220,9 @@ export default function KPITab({
 										onChange={(e) => setNewKPI({ ...newKPI, targetValue: Number(e.target.value) })}
 										placeholder="100"
 									/>
+									<p className="text-xs text-neutral-500 mt-1">
+										💡 Optional: Leave empty for qualitative goals
+									</p>
 								</div>
 								<div>
 									<label className="block text-sm font-medium mb-2">Current Value</label>
@@ -272,19 +285,38 @@ export default function KPITab({
 									<label className="block text-sm font-medium mb-2">
 										Owner/Responsible Person <span className="text-red-500">*</span>
 									</label>
-									<Input
-										value={newKPI.owner}
+									<select
+										value={newKPI.owner || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, owner: e.target.value })}
-										placeholder="e.g., John Doe, CFO"
-									/>
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">Select owner</option>
+										{leadership.map((leader) => (
+											<option key={leader.id} value={`${leader.name}, ${leader.position}`}>
+												{leader.name} - {leader.position}
+											</option>
+										))}
+									</select>
+									{leadership.length === 0 && (
+										<p className="text-xs text-neutral-500 mt-1">
+											💡 Add leaders in the Leadership tab first
+										</p>
+									)}
 								</div>
 								<div>
 									<label className="block text-sm font-medium mb-2">Department</label>
-									<Input
-										value={newKPI.department}
+									<select
+										value={newKPI.department || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, department: e.target.value })}
-										placeholder="e.g., Finance, Sales"
-									/>
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									>
+										<option value="">Select department</option>
+										{availableDepartments.map((dept) => (
+											<option key={dept.id} value={dept.name}>
+												{dept.name}
+											</option>
+										))}
+									</select>
 								</div>
 							</div>
 
