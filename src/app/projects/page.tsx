@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
@@ -22,12 +22,19 @@ import {
 	FileText,
 	ArrowRight,
 	Clock,
+	Upload,
+	Link2,
+	Image as ImageIcon,
+	FileSpreadsheet,
+	File,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
-import type { Project, ProjectMember } from './_types/projects.types'
+import type { Project, ProjectMember, UploadedFile, LinkedResource } from './_types/projects.types'
 import { initializeMockProjects } from './_mocks/projectsApi'
 import TimelineView from './_components/TimelineView'
+import type { TeamMember } from '../../pages/_mocks/teamMembers'
+import { initializeMockTeamMembers } from '../../pages/_mocks/teamMembers'
 
 interface WorkEntry {
 	id: string
@@ -55,9 +62,18 @@ export default function ProjectsPage() {
 	const [startDate, setStartDate] = useState('')
 	const [endDate, setEndDate] = useState('')
 	const [members, setMembers] = useState<ProjectMember[]>([])
-	const [memberName, setMemberName] = useState('')
-	const [memberEmail, setMemberEmail] = useState('')
-	const [memberRole, setMemberRole] = useState<'leader' | 'member'>('member')
+	
+	// Team Members states
+	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+	const [selectedDepartment, setSelectedDepartment] = useState('')
+	const [selectedMemberId, setSelectedMemberId] = useState('')
+	
+	// Files and Links states
+	const [files, setFiles] = useState<UploadedFile[]>([])
+	const [links, setLinks] = useState<LinkedResource[]>([])
+	const [linkInput, setLinkInput] = useState('')
+	const [isDragging, setIsDragging] = useState(false)
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	// Keyboard shortcuts
 	useKeyboardShortcuts({
@@ -70,8 +86,10 @@ export default function ProjectsPage() {
 	useEffect(() => {
 		// 목업 데이터 초기화 (localStorage가 비어있으면)
 		initializeMockProjects()
+		initializeMockTeamMembers()
 		loadProjects()
 		loadWorkEntries()
+		loadTeamMembers()
 	}, [])
 
 	const loadWorkEntries = () => {
@@ -114,6 +132,17 @@ export default function ProjectsPage() {
 			console.error('Failed to load projects:', error)
 		}
 	}
+	
+	const loadTeamMembers = () => {
+		try {
+			const saved = localStorage.getItem('teamMembers')
+			if (saved) {
+				setTeamMembers(JSON.parse(saved))
+			}
+		} catch (error) {
+			console.error('Failed to load team members:', error)
+		}
+	}
 
 	const saveProjects = (updatedProjects: Project[]) => {
 		try {
@@ -135,33 +164,134 @@ export default function ProjectsPage() {
 	}
 
 	const handleAddMember = () => {
-		if (!memberName.trim() || !memberEmail.trim()) {
-			toast.error('Please enter member name and email')
+		if (!selectedDepartment || !selectedMemberId) {
+			toast.error('Please select department and member')
 			return
 		}
 
-		if (members.some((m) => m.email === memberEmail.trim())) {
+		const selectedTeamMember = teamMembers.find((m) => m.id === selectedMemberId)
+		if (!selectedTeamMember) {
+			toast.error('Member not found')
+			return
+		}
+
+		if (members.some((m) => m.email === selectedTeamMember.email)) {
 			toast.error('Member already added')
 			return
 		}
 
 		const newMember: ProjectMember = {
 			id: Date.now().toString(),
-			name: memberName.trim(),
-			email: memberEmail.trim(),
-			role: memberRole,
+			name: selectedTeamMember.name,
+			email: selectedTeamMember.email,
+			role: 'member',
+			department: selectedTeamMember.department,
 			joinedAt: new Date(),
 		}
 
 		setMembers([...members, newMember])
-		setMemberName('')
-		setMemberEmail('')
-		setMemberRole('member')
+		setSelectedDepartment('')
+		setSelectedMemberId('')
 		toast.success('Member added')
 	}
 
 	const handleRemoveMember = (memberId: string) => {
 		setMembers(members.filter((m) => m.id !== memberId))
+	}
+	
+	// File Upload Functions
+	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedFiles = e.target.files
+		if (selectedFiles) {
+			const newFiles: UploadedFile[] = Array.from(selectedFiles).map((file) => ({
+				id: `${Date.now()}-${file.name}`,
+				name: file.name,
+				size: file.size,
+				type: file.type,
+				uploadedAt: new Date().toISOString(),
+			}))
+			setFiles([...files, ...newFiles])
+			toast.success(`${newFiles.length} file(s) added`)
+		}
+		if (e.target) e.target.value = ''
+	}
+	
+	const handleDragOver = (e: React.DragEvent) => {
+		e.preventDefault()
+		setIsDragging(true)
+	}
+	
+	const handleDragLeave = (e: React.DragEvent) => {
+		e.preventDefault()
+		setIsDragging(false)
+	}
+	
+	const handleDrop = (e: React.DragEvent) => {
+		e.preventDefault()
+		setIsDragging(false)
+		
+		const droppedFiles = e.dataTransfer.files
+		if (droppedFiles) {
+			const newFiles: UploadedFile[] = Array.from(droppedFiles).map((file) => ({
+				id: `${Date.now()}-${file.name}`,
+				name: file.name,
+				size: file.size,
+				type: file.type,
+				uploadedAt: new Date().toISOString(),
+			}))
+			setFiles([...files, ...newFiles])
+			toast.success(`${newFiles.length} file(s) added`)
+		}
+	}
+	
+	const removeFile = (fileId: string) => {
+		setFiles(files.filter((f) => f.id !== fileId))
+		toast.success('File removed')
+	}
+	
+	const formatFileSize = (bytes: number): string => {
+		if (bytes === 0) return '0 Bytes'
+		const k = 1024
+		const sizes = ['Bytes', 'KB', 'MB', 'GB']
+		const i = Math.floor(Math.log(bytes) / Math.log(k))
+		return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+	}
+	
+	const getFileIcon = (type: string) => {
+		if (type.startsWith('image/')) return <ImageIcon className="h-5 w-5 text-blue-500" />
+		if (type.includes('spreadsheet') || type.includes('excel')) return <FileSpreadsheet className="h-5 w-5 text-green-500" />
+		if (type.includes('pdf')) return <FileText className="h-5 w-5 text-red-500" />
+		return <File className="h-5 w-5 text-neutral-500" />
+	}
+	
+	// Link Functions
+	const addLink = () => {
+		const url = linkInput.trim()
+		if (!url) {
+			toast.error('Please enter a URL')
+			return
+		}
+		
+		if (!url.startsWith('http://') && !url.startsWith('https://')) {
+			toast.error('Please enter a valid URL (must start with http:// or https://)')
+			return
+		}
+		
+		const newLink: LinkedResource = {
+			id: Date.now().toString(),
+			title: url,
+			url: url,
+			addedAt: new Date().toISOString(),
+		}
+		
+		setLinks([...links, newLink])
+		setLinkInput('')
+		toast.success('Link added')
+	}
+	
+	const removeLink = (linkId: string) => {
+		setLinks(links.filter((l) => l.id !== linkId))
+		toast.success('Link removed')
 	}
 
 	const handleCreateProject = () => {
@@ -193,6 +323,8 @@ export default function ProjectsPage() {
 			progress: 0,
 			createdAt: new Date(),
 			createdBy: 'Current User', // Replace with actual user
+			files,
+			links,
 		}
 
 		const updatedProjects = [newProject, ...projects]
@@ -207,6 +339,11 @@ export default function ProjectsPage() {
 		setStartDate('')
 		setEndDate('')
 		setMembers([])
+		setFiles([])
+		setLinks([])
+		setLinkInput('')
+		setSelectedDepartment('')
+		setSelectedMemberId('')
 		setShowCreateDialog(false)
 
 		toast.success('Project created successfully!')
@@ -695,38 +832,49 @@ export default function ProjectsPage() {
 									</div>
 								</div>
 
-								{/* Team Members */}
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Users className="inline h-4 w-4 mr-1" />
-										Team Members
-									</label>
-									<div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 mb-3">
-										<Input
-											value={memberName}
-											onChange={(e) => setMemberName(e.target.value)}
-											placeholder="Name"
-										/>
-										<Input
-											type="email"
-											value={memberEmail}
-											onChange={(e) => setMemberEmail(e.target.value)}
-											placeholder="Email"
-										/>
-										<select
-											value={memberRole}
-											onChange={(e) => setMemberRole(e.target.value as 'leader' | 'member')}
-											className="px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 text-sm"
-										>
-											<option value="member">Member</option>
-											<option value="leader">Leader</option>
-										</select>
-										<Button onClick={handleAddMember} size="sm">
-											<Plus className="h-4 w-4" />
-										</Button>
-									</div>
-									{members.length > 0 && (
-										<div className="space-y-2">
+							{/* Team Members */}
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<Users className="inline h-4 w-4 mr-1" />
+									Team Members
+								</label>
+								<div className="grid grid-cols-[1fr_1fr_auto] gap-2 mb-3">
+									<select
+										value={selectedDepartment}
+										onChange={(e) => {
+											setSelectedDepartment(e.target.value)
+											setSelectedMemberId('')
+										}}
+										className="px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 text-sm"
+									>
+										<option value="">Select Department</option>
+										{Array.from(new Set(teamMembers.map((m) => m.department))).map((dept) => (
+											<option key={dept} value={dept}>
+												{dept}
+											</option>
+										))}
+									</select>
+									<select
+										value={selectedMemberId}
+										onChange={(e) => setSelectedMemberId(e.target.value)}
+										disabled={!selectedDepartment}
+										className="px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										<option value="">Select Member</option>
+										{teamMembers
+											.filter((m) => m.department === selectedDepartment)
+											.map((member) => (
+												<option key={member.id} value={member.id}>
+													{member.name} ({member.role})
+												</option>
+											))}
+									</select>
+									<Button onClick={handleAddMember} size="sm">
+										<Plus className="h-4 w-4" />
+									</Button>
+								</div>
+								{members.length > 0 && (
+									<div className="space-y-2">
 											{members.map((member) => (
 												<div
 													key={member.id}
@@ -741,31 +889,142 @@ export default function ProjectsPage() {
 														<p className="text-xs text-neutral-600 dark:text-neutral-400">{member.email}</p>
 													</div>
 													</div>
-													<div className="flex items-center gap-2">
-														<span
-															className={`text-xs px-2 py-1 rounded-full font-medium ${
-																member.role === 'leader'
-																	? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-																	: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-															}`}
-														>
-															{member.role.charAt(0).toUpperCase() + member.role.slice(1)}
-														</span>
-														<button
-															onClick={() => handleRemoveMember(member.id)}
-															className="text-red-500 hover:text-red-600"
-														>
-															<X className="h-4 w-4" />
-														</button>
-													</div>
+													<button
+														onClick={() => handleRemoveMember(member.id)}
+														className="text-red-500 hover:text-red-600"
+													>
+														<X className="h-4 w-4" />
+													</button>
 												</div>
 											))}
 										</div>
 									)}
-								</div>
+							</div>
 
-								{/* Info Box */}
-								<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+							{/* File Upload */}
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<Upload className="inline h-4 w-4 mr-1" />
+									File Attachments
+									<span className="text-xs font-normal text-neutral-500 ml-2">Optional</span>
+								</label>
+								
+								{/* Display Files */}
+								{files.length > 0 && (
+									<div className="space-y-2 mb-3">
+										{files.map((file) => (
+											<div
+												key={file.id}
+												className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-neutral-200 dark:border-neutral-800"
+											>
+												{getFileIcon(file.type)}
+												<div className="flex-1 min-w-0">
+													<p className="text-sm font-medium truncate">{file.name}</p>
+													<p className="text-xs text-neutral-500">{formatFileSize(file.size)}</p>
+												</div>
+												<button
+													onClick={() => removeFile(file.id)}
+													className="text-neutral-400 hover:text-red-500 shrink-0"
+												>
+													<X className="h-4 w-4" />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
+
+								{/* Drag & Drop Zone */}
+								<div
+									onDragOver={handleDragOver}
+									onDragLeave={handleDragLeave}
+									onDrop={handleDrop}
+									className={`relative border-2 border-dashed rounded-2xl p-6 text-center transition-all ${
+										isDragging
+											? 'border-primary bg-primary/5 scale-[1.02]'
+											: 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600'
+									}`}
+								>
+									<input
+										ref={fileInputRef}
+										type="file"
+										multiple
+										onChange={handleFileSelect}
+										className="hidden"
+									/>
+									<Upload className={`h-8 w-8 mx-auto mb-2 transition-colors ${
+										isDragging ? 'text-primary' : 'text-neutral-400'
+									}`} />
+									<p className="text-sm font-medium mb-1">
+										{isDragging ? 'Drop files here' : 'Drag & drop files here'}
+									</p>
+									<p className="text-xs text-neutral-500 mb-3">
+										or click the button below to browse
+									</p>
+									<Button
+										variant="outline"
+										onClick={() => fileInputRef.current?.click()}
+										className="w-full"
+									>
+										<Upload className="h-4 w-4 mr-2" />
+										Browse Files
+									</Button>
+								</div>
+							</div>
+
+							{/* Linked Resources */}
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									<Link2 className="inline h-4 w-4 mr-1" />
+									Linked Resources
+									<span className="text-xs font-normal text-neutral-500 ml-2">Optional</span>
+								</label>
+								
+								{/* Display Links */}
+								{links.length > 0 && (
+									<div className="space-y-2 mb-3">
+										{links.map((link) => (
+											<div
+												key={link.id}
+												className="flex items-center gap-2 p-3 bg-neutral-50 dark:bg-neutral-900/50 rounded-xl border border-neutral-200 dark:border-neutral-800"
+											>
+												<Link2 className="h-4 w-4 text-primary shrink-0" />
+												<a
+													href={link.url}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="flex-1 text-sm text-primary hover:underline truncate"
+												>
+													{link.title}
+												</a>
+												<button
+													onClick={() => removeLink(link.id)}
+													className="text-neutral-400 hover:text-red-500 shrink-0"
+												>
+													<X className="h-4 w-4" />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
+
+								{/* Add Link */}
+								<div className="flex items-center gap-2">
+									<Input
+										type="url"
+										placeholder="https://example.com/resource"
+										value={linkInput}
+										onChange={(e) => setLinkInput(e.target.value)}
+										onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addLink())}
+										className="flex-1"
+									/>
+									<Button onClick={addLink} variant="outline">
+										<Plus className="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+
+							{/* Info Box */}
+							<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
 									<div className="flex items-start gap-3">
 									<AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
 									<div>

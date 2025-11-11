@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Inbox, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket } from 'lucide-react'
+import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -34,7 +34,8 @@ export default function AppLayout() {
 		items: [
 			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/inbox', label: 'Notifications', icon: Inbox, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/messages', label: 'Messages', icon: Mail, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/ai-recommendations', label: 'AI Recommendations', icon: Sparkles, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },

@@ -1,4 +1,27 @@
 /**
+ * 첨부 파일 인터페이스
+ */
+export interface UploadedFile {
+	id: string
+	name: string
+	size: number
+	type: string
+	url?: string
+	uploadedAt?: string
+	createdAt?: string
+}
+
+/**
+ * 링크된 리소스 인터페이스
+ */
+export interface LinkedResource {
+	id: string
+	title: string
+	url: string
+	addedAt: string
+}
+
+/**
  * 프로젝트 멤버 인터페이스
  */
 export interface ProjectMember {
@@ -6,6 +29,7 @@ export interface ProjectMember {
 	name: string
 	email: string
 	role: 'leader' | 'member'
+	department: string
 	joinedAt: Date
 }
 
@@ -30,6 +54,8 @@ export interface Project {
 	progress: number
 	createdAt: Date
 	createdBy: string
+	files?: UploadedFile[]
+	links?: LinkedResource[]
 	
 	// 일정 및 리소스 관리 (선택적)
 	schedule?: {

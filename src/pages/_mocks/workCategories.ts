@@ -33,48 +33,12 @@ export const mockWorkCategories: WorkCategory[] = [
 		description: 'Request approval, feedback, review, or help from team members',
 	},
 
-	// Proposals & Issues
-	{
-		id: 'proposal',
-		name: 'Proposal',
-		color: '#A855F7', // purple
-		description: 'Present new projects, improvements, or business ideas',
-	},
+	// Issues
 	{
 		id: 'issue-report',
 		name: 'Issue Report',
 		color: '#DC2626', // red
 		description: 'Report errors, issues, or problems that need resolution',
-	},
-
-	// Information & Knowledge (Consolidated)
-	{
-		id: 'information-sharing',
-		name: 'Information Sharing',
-		color: '#06B6D4', // cyan
-		description: 'Share news, knowledge, learnings, and best practices with team',
-	},
-
-	// Recording & Documentation
-	{
-		id: 'meeting-notes',
-		name: 'Meeting Notes',
-		color: '#7C3AED', // violet
-		description: 'Document meeting minutes, discussions, decisions, and action items',
-	},
-	{
-		id: 'documentation',
-		name: 'Documentation',
-		color: '#6366F1', // indigo
-		description: 'Create manuals, guides, and process documents',
-	},
-
-	// Planning
-	{
-		id: 'planning',
-		name: 'Planning',
-		color: '#3B82F6', // blue
-		description: 'Create schedules, work plans, and roadmaps',
 	},
 
 	// Other (with custom input)
@@ -246,7 +210,7 @@ export const mockWorkTemplates: WorkTemplate[] = [
  * Initialize mock data to localStorage
  * Automatic update on category structure changes through version control
  */
-const WORK_CATEGORIES_VERSION = '4.0' // Consolidated to 10 core categories
+const WORK_CATEGORIES_VERSION = '5.0' // Consolidated to 5 essential categories
 
 export const initializeMockWorkCategories = (): void => {
 	try {
@@ -260,7 +224,7 @@ export const initializeMockWorkCategories = (): void => {
 			localStorage.setItem('workCategoriesVersion', WORK_CATEGORIES_VERSION)
 			
 			console.log('✅ Work categories updated to version', WORK_CATEGORIES_VERSION)
-			console.log('📝 Consolidated to 10 core categories with custom "Other" option')
+			console.log('📝 Consolidated to 5 essential categories with custom "Other" option')
 		} else {
 			// 버전이 같으면 기존 데이터가 없을 때만 초기화
 			const existingCategories = localStorage.getItem('workCategories')

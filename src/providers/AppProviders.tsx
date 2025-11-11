@@ -17,7 +17,7 @@ import DashboardPage from '../pages/DashboardPage'
 import InputPage from '../pages/InputPage'
 import WorkHistoryPage from '../app/work-history/page'
 import LandingPage from '../pages/LandingPage'
-import InboxPage from '../app/inbox/page'
+import MessagesPage from '../app/messages/page'
 import UsersManagementPage from '../app/admin/users/page'
 import CompanySettingsPage from '../app/admin/company-settings/page'
 import SystemSettingsPage from '../app/admin/system-settings/page'
@@ -69,9 +69,10 @@ const appRoutes = [
 	{ path: '/app/input', element: <InputPage /> },
 	{ path: '/app/projects', element: <ProjectsPage /> },
 	{ path: '/app/work-history', element: <WorkHistoryPage /> },
-	{ path: '/app/inbox', element: <InboxPage /> },
-	{ path: '/app/okr', element: <OKRPage /> },
+	{ path: '/app/messages', element: <MessagesPage /> },
 	{ path: '/app/ai-recommendations', element: <AIRecommendationsPage /> },
+	{ path: '/app/inbox', element: <Navigate to="/app/messages" replace /> },
+	{ path: '/app/okr', element: <OKRPage /> },
 	// 관리자 메뉴
 	{ path: '/app/admin/users', element: <UsersManagementPage /> },
 	{ path: '/app/admin/system-settings', element: <SystemSettingsPage /> },
@@ -108,7 +109,8 @@ const router = createBrowserRouter([
 	{ path: '/input', element: <Navigate to="/app/input" replace /> },
 	{ path: '/projects', element: <Navigate to="/app/projects" replace /> },
 	{ path: '/work-history', element: <Navigate to="/app/work-history" replace /> },
-	{ path: '/inbox', element: <Navigate to="/app/inbox" replace /> },
+	{ path: '/inbox', element: <Navigate to="/app/messages" replace /> },
+	{ path: '/messages', element: <Navigate to="/app/messages" replace /> },
 	{ path: '/okr', element: <Navigate to="/app/okr" replace /> },
 	{ path: '/ai-recommendations', element: <Navigate to="/app/ai-recommendations" replace /> },
 	{ path: '/admin/users', element: <Navigate to="/app/admin/users" replace /> },
