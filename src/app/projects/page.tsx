@@ -97,7 +97,7 @@ export default function ProjectsPage() {
 			const saved = localStorage.getItem('workEntries')
 			if (saved) {
 				const parsed = JSON.parse(saved)
-				const entriesWithDates = parsed.map((entry: any) => ({
+				const entriesWithDates = parsed.map((entry: { id: string; title: string; category: string; projectId?: string; date: string; duration?: string }) => ({
 					id: entry.id,
 					title: entry.title,
 					category: entry.category,
@@ -116,12 +116,12 @@ export default function ProjectsPage() {
 		try {
 			const saved = localStorage.getItem('projects')
 			if (saved) {
-				const parsed = JSON.parse(saved).map((proj: any) => ({
+				const parsed = JSON.parse(saved).map((proj: { startDate: string; endDate: string; createdAt: string; members: Array<{ joinedAt: string }> }) => ({
 					...proj,
 					startDate: new Date(proj.startDate),
 					endDate: new Date(proj.endDate),
 					createdAt: new Date(proj.createdAt),
-					members: proj.members.map((m: any) => ({
+					members: proj.members.map((m: { joinedAt: string }) => ({
 						...m,
 						joinedAt: new Date(m.joinedAt),
 					})),

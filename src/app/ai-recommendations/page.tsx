@@ -60,7 +60,7 @@ export default function AIRecommendationsPage() {
 			const objectivesData = localStorage.getItem('objectives')
 			
 			const projects = projectsData ? JSON.parse(projectsData) : []
-			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: any) => ({
+			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: { date: string; [key: string]: unknown }) => ({
 				...e,
 				date: new Date(e.date)
 			})) : []
@@ -71,9 +71,11 @@ export default function AIRecommendationsPage() {
 			const generatedInsights: RecommendationInsight[] = []
 			
 			// 1. OKR Progress Gap Analysis
-			objectives.forEach((objective: any) => {
-				const avgProgress = objective.keyResults?.reduce((sum: number, kr: any) => 
-					sum + ((kr.current / kr.target) * 100), 0) / (objective.keyResults?.length || 1)
+			objectives.forEach((objective: { id: string; title: string; endDate: string; keyResults?: Array<{ current: number; target: number }> }) => {
+				if (!objective.keyResults || objective.keyResults.length === 0) return
+				
+				const avgProgress = objective.keyResults.reduce((sum: number, kr: { current: number; target: number }) => 
+					sum + ((kr.current / kr.target) * 100), 0) / objective.keyResults.length
 				
 				if (avgProgress < 50) {
 					generatedRecommendations.push({
@@ -83,7 +85,7 @@ export default function AIRecommendationsPage() {
 						priority: avgProgress < 30 ? 'high' : 'medium',
 						category: 'OKR Update',
 						deadline: objective.endDate,
-						dataSource: `OKR Data (${objective.keyResults?.length || 0} Key Results)`,
+						dataSource: `OKR Data (${objective.keyResults.length} Key Results)`,
 						status: 'pending',
 					})
 					
@@ -102,9 +104,9 @@ export default function AIRecommendationsPage() {
 			
 			let inactiveProjectCount = 0
 			projects
-				.filter((p: any) => p.status === 'active')
-				.forEach((project: any) => {
-					const recentWork = workEntries.filter((e: any) => 
+				.filter((p: { status: string }) => p.status === 'active')
+				.forEach((project: { id: string; name: string }) => {
+					const recentWork = workEntries.filter((e: { projectId?: string; date: Date }) => 
 						e.projectId === project.id && new Date(e.date) >= sevenDaysAgo
 					)
 					
@@ -135,13 +137,13 @@ export default function AIRecommendationsPage() {
 			const now = new Date()
 			const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
 			
-			const upcomingDeadlines = objectives.filter((obj: any) => {
+			const upcomingDeadlines = objectives.filter((obj: { endDate: string }) => {
 				const endDate = new Date(obj.endDate)
 				return endDate >= now && endDate <= twoDaysFromNow
 			})
 			
 			if (upcomingDeadlines.length > 0) {
-				upcomingDeadlines.forEach((obj: any) => {
+				upcomingDeadlines.forEach((obj: { id: string; title: string; endDate: string }) => {
 					generatedRecommendations.push({
 						id: `deadline-${obj.id}`,
 						title: `Deadline Alert: ${obj.title}`,

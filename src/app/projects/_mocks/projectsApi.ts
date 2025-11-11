@@ -24,6 +24,7 @@ export const mockProjects: Project[] = [
 				name: '김민수',
 				email: 'minsu.kim@proce.com',
 				role: 'leader',
+				department: 'Engineering',
 				joinedAt: new Date('2024-01-15'),
 			},
 			{
@@ -31,6 +32,7 @@ export const mockProjects: Project[] = [
 				name: '이지은',
 				email: 'jieun.lee@proce.com',
 				role: 'member',
+				department: 'Engineering',
 				joinedAt: new Date('2024-01-15'),
 			},
 			{
@@ -38,6 +40,7 @@ export const mockProjects: Project[] = [
 				name: '박준호',
 				email: 'junho.park@proce.com',
 				role: 'member',
+				department: 'Engineering',
 				joinedAt: new Date('2024-01-20'),
 			},
 			{
@@ -45,6 +48,7 @@ export const mockProjects: Project[] = [
 				name: '최수진',
 				email: 'sujin.choi@proce.com',
 				role: 'member',
+				department: 'Engineering',
 				joinedAt: new Date('2024-01-25'),
 			},
 		],
@@ -99,6 +103,7 @@ export const mockProjects: Project[] = [
 				name: '정현우',
 				email: 'hyunwoo.jung@proce.com',
 				role: 'leader',
+				department: 'Product',
 				joinedAt: new Date('2024-02-01'),
 			},
 			{
@@ -106,6 +111,7 @@ export const mockProjects: Project[] = [
 				name: '강서연',
 				email: 'seoyeon.kang@proce.com',
 				role: 'member',
+				department: 'Product',
 				joinedAt: new Date('2024-02-01'),
 			},
 			{
@@ -113,6 +119,7 @@ export const mockProjects: Project[] = [
 				name: '윤태영',
 				email: 'taeyoung.yoon@proce.com',
 				role: 'member',
+				department: 'Product',
 				joinedAt: new Date('2024-02-05'),
 			},
 		],
@@ -166,6 +173,7 @@ export const mockProjects: Project[] = [
 				name: '송민재',
 				email: 'minjae.song@proce.com',
 				role: 'leader',
+				department: 'Data',
 				joinedAt: new Date('2024-03-01'),
 			},
 			{
@@ -173,6 +181,7 @@ export const mockProjects: Project[] = [
 				name: '한지우',
 				email: 'jiwoo.han@proce.com',
 				role: 'member',
+				department: 'Data',
 				joinedAt: new Date('2024-03-01'),
 			},
 			{
@@ -180,6 +189,7 @@ export const mockProjects: Project[] = [
 				name: '오승훈',
 				email: 'seunghoon.oh@proce.com',
 				role: 'member',
+				department: 'Data',
 				joinedAt: new Date('2024-03-05'),
 			},
 			{
@@ -187,6 +197,7 @@ export const mockProjects: Project[] = [
 				name: '임다은',
 				email: 'daeun.lim@proce.com',
 				role: 'member',
+				department: 'Data',
 				joinedAt: new Date('2024-03-05'),
 			},
 			{
@@ -194,6 +205,7 @@ export const mockProjects: Project[] = [
 				name: '서준영',
 				email: 'junyoung.seo@proce.com',
 				role: 'member',
+				department: 'Data',
 				joinedAt: new Date('2024-03-10'),
 			},
 		],
@@ -246,6 +258,7 @@ export const mockProjects: Project[] = [
 				name: '배수아',
 				email: 'sua.bae@proce.com',
 				role: 'leader',
+				department: 'Engineering',
 				joinedAt: new Date('2023-11-01'),
 			},
 			{
@@ -253,6 +266,7 @@ export const mockProjects: Project[] = [
 				name: '남궁현',
 				email: 'hyun.namgung@proce.com',
 				role: 'member',
+				department: 'Engineering',
 				joinedAt: new Date('2023-11-01'),
 			},
 		],
@@ -309,6 +323,7 @@ export const mockProjects: Project[] = [
 				name: '차은우',
 				email: 'eunwoo.cha@proce.com',
 				role: 'leader',
+				department: 'DevOps',
 				joinedAt: new Date('2024-01-10'),
 			},
 			{
@@ -316,6 +331,7 @@ export const mockProjects: Project[] = [
 				name: '홍지훈',
 				email: 'jihoon.hong@proce.com',
 				role: 'member',
+				department: 'DevOps',
 				joinedAt: new Date('2024-01-10'),
 			},
 			{
@@ -323,6 +339,7 @@ export const mockProjects: Project[] = [
 				name: '노예진',
 				email: 'yejin.noh@proce.com',
 				role: 'member',
+				department: 'DevOps',
 				joinedAt: new Date('2024-01-15'),
 			},
 		],
@@ -376,6 +393,7 @@ export const mockProjects: Project[] = [
 				name: '안재현',
 				email: 'jaehyun.ahn@proce.com',
 				role: 'leader',
+				department: 'Security',
 				joinedAt: new Date('2024-02-15'),
 			},
 			{
@@ -383,6 +401,7 @@ export const mockProjects: Project[] = [
 				name: '유하늘',
 				email: 'haneul.yoo@proce.com',
 				role: 'member',
+				department: 'Security',
 				joinedAt: new Date('2024-02-15'),
 			},
 		],
