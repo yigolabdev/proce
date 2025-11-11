@@ -1,48 +1,19 @@
 import { useState, useEffect } from 'react'
-import { Settings, Tag, Folder, FileText, Building } from 'lucide-react'
+import { Settings, Activity, Briefcase, Building } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import DevMemo from '../../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../../constants/devMemos'
 
 // Import types and components
-import type { WorkCategory, WorkTag, WorkTemplate, Department } from './_types/types'
-import { DEFAULT_CATEGORIES, DEFAULT_TAGS, DEFAULT_TEMPLATES, DEFAULT_DEPARTMENTS } from './_types/types'
+import type { WorkCategory, Department, Position, Job } from './_types/types'
+import { DEFAULT_CATEGORIES, DEFAULT_DEPARTMENTS, DEFAULT_POSITIONS, DEFAULT_JOBS } from './_types/types'
 import CategoriesTab from './_components/CategoriesTab'
-import TagsTab from './_components/TagsTab'
-import TemplatesTab from './_components/TemplatesTab'
 import DepartmentsTab from './_components/DepartmentsTab'
+import PositionsJobsTab from './_components/PositionsJobsTab'
 
 export default function SystemSettingsPage() {
-	const [activeTab, setActiveTab] = useState<'categories' | 'tags' | 'templates' | 'departments'>('categories')
-
-	// Categories
-	const [categories, setCategories] = useState<WorkCategory[]>([])
-	const [showAddCategory, setShowAddCategory] = useState(false)
-	const [editingCategory, setEditingCategory] = useState<WorkCategory | null>(null)
-	const [newCategory, setNewCategory] = useState<Omit<WorkCategory, 'id'>>({
-		name: '',
-		color: '#3B82F6',
-		description: '',
-	})
-
-	// Tags
-	const [tags, setTags] = useState<WorkTag[]>([])
-	const [showAddTag, setShowAddTag] = useState(false)
-	const [newTag, setNewTag] = useState<Omit<WorkTag, 'id'>>({
-		name: '',
-		category: '',
-	})
-
-	// Templates
-	const [templates, setTemplates] = useState<WorkTemplate[]>([])
-	const [showAddTemplate, setShowAddTemplate] = useState(false)
-	const [editingTemplate, setEditingTemplate] = useState<WorkTemplate | null>(null)
-	const [newTemplate, setNewTemplate] = useState<Omit<WorkTemplate, 'id'>>({
-		title: '',
-		description: '',
-		category: '',
-	})
+	const [activeTab, setActiveTab] = useState<'departments' | 'positions' | 'status'>('departments')
 
 	// Departments
 	const [departments, setDepartments] = useState<Department[]>([])
@@ -50,43 +21,45 @@ export default function SystemSettingsPage() {
 	const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
 	const [newDepartment, setNewDepartment] = useState<Omit<Department, 'id'>>({
 		name: '',
-		code: '',
-		parentId: '',
-		managerId: '',
-		managerName: '',
 		description: '',
-		employeeCount: '',
-		location: '',
+	})
+
+	// Positions
+	const [positions, setPositions] = useState<Position[]>([])
+	const [showAddPosition, setShowAddPosition] = useState(false)
+	const [editingPosition, setEditingPosition] = useState<Position | null>(null)
+	const [newPosition, setNewPosition] = useState<Omit<Position, 'id'>>({
+		name: '',
+		description: '',
+	})
+
+	// Jobs
+	const [jobs, setJobs] = useState<Job[]>([])
+	const [showAddJob, setShowAddJob] = useState(false)
+	const [editingJob, setEditingJob] = useState<Job | null>(null)
+	const [newJob, setNewJob] = useState<Omit<Job, 'id'>>({
+		title: '',
+		description: '',
+		responsibilities: '',
+	})
+
+	// Status (formerly Categories)
+	const [statuses, setStatuses] = useState<WorkCategory[]>([])
+	const [showAddStatus, setShowAddStatus] = useState(false)
+	const [editingStatus, setEditingStatus] = useState<WorkCategory | null>(null)
+	const [newStatus, setNewStatus] = useState<Omit<WorkCategory, 'id'>>({
+		name: '',
+		color: '#3B82F6',
+		description: '',
 	})
 
 	// Load data from localStorage
 	useEffect(() => {
 		try {
-			const savedCategories = localStorage.getItem('workCategories')
-			const savedTags = localStorage.getItem('workTags')
-			const savedTemplates = localStorage.getItem('workTemplates')
 			const savedDepartments = localStorage.getItem('departments')
-
-			if (savedCategories) {
-				setCategories(JSON.parse(savedCategories))
-			} else {
-				setCategories(DEFAULT_CATEGORIES)
-				localStorage.setItem('workCategories', JSON.stringify(DEFAULT_CATEGORIES))
-			}
-
-			if (savedTags) {
-				setTags(JSON.parse(savedTags))
-			} else {
-				setTags(DEFAULT_TAGS)
-				localStorage.setItem('workTags', JSON.stringify(DEFAULT_TAGS))
-			}
-
-			if (savedTemplates) {
-				setTemplates(JSON.parse(savedTemplates))
-			} else {
-				setTemplates(DEFAULT_TEMPLATES)
-				localStorage.setItem('workTemplates', JSON.stringify(DEFAULT_TEMPLATES))
-			}
+			const savedPositions = localStorage.getItem('positions')
+			const savedJobs = localStorage.getItem('jobs')
+			const savedStatuses = localStorage.getItem('workStatuses')
 
 			if (savedDepartments) {
 				setDepartments(JSON.parse(savedDepartments))
@@ -94,126 +67,36 @@ export default function SystemSettingsPage() {
 				setDepartments(DEFAULT_DEPARTMENTS)
 				localStorage.setItem('departments', JSON.stringify(DEFAULT_DEPARTMENTS))
 			}
+
+			if (savedPositions) {
+				setPositions(JSON.parse(savedPositions))
+			} else {
+				setPositions(DEFAULT_POSITIONS)
+				localStorage.setItem('positions', JSON.stringify(DEFAULT_POSITIONS))
+			}
+
+			if (savedJobs) {
+				setJobs(JSON.parse(savedJobs))
+			} else {
+				setJobs(DEFAULT_JOBS)
+				localStorage.setItem('jobs', JSON.stringify(DEFAULT_JOBS))
+			}
+
+			if (savedStatuses) {
+				setStatuses(JSON.parse(savedStatuses))
+			} else {
+				setStatuses(DEFAULT_CATEGORIES)
+				localStorage.setItem('workStatuses', JSON.stringify(DEFAULT_CATEGORIES))
+			}
 		} catch (error) {
 			console.error('Failed to load settings:', error)
 		}
 	}, [])
 
-	// Category handlers
-	const handleAddCategory = () => {
-		if (!newCategory.name) {
-			toast.error('Please enter a category name')
-			return
-		}
-
-		const category: WorkCategory = {
-			id: Date.now().toString(),
-			...newCategory,
-		}
-
-		const updated = [...categories, category]
-		setCategories(updated)
-		localStorage.setItem('workCategories', JSON.stringify(updated))
-		setNewCategory({ name: '', color: '#3B82F6', description: '' })
-		setShowAddCategory(false)
-		toast.success('Category added successfully')
-	}
-
-	const handleUpdateCategory = () => {
-		if (!editingCategory) return
-
-		const updated = categories.map((cat) =>
-			cat.id === editingCategory.id ? editingCategory : cat
-		)
-		setCategories(updated)
-		localStorage.setItem('workCategories', JSON.stringify(updated))
-		setEditingCategory(null)
-		toast.success('Category updated successfully')
-	}
-
-	const handleDeleteCategory = (id: string) => {
-		if (confirm('Are you sure you want to delete this category?')) {
-			const updated = categories.filter((cat) => cat.id !== id)
-			setCategories(updated)
-			localStorage.setItem('workCategories', JSON.stringify(updated))
-			toast.success('Category deleted')
-		}
-	}
-
-	// Tag handlers
-	const handleAddTag = () => {
-		if (!newTag.name) {
-			toast.error('Please enter a tag name')
-			return
-		}
-
-		const tag: WorkTag = {
-			id: Date.now().toString(),
-			...newTag,
-		}
-
-		const updated = [...tags, tag]
-		setTags(updated)
-		localStorage.setItem('workTags', JSON.stringify(updated))
-		setNewTag({ name: '', category: '' })
-		setShowAddTag(false)
-		toast.success('Tag added successfully')
-	}
-
-	const handleDeleteTag = (id: string) => {
-		if (confirm('Are you sure you want to delete this tag?')) {
-			const updated = tags.filter((tag) => tag.id !== id)
-			setTags(updated)
-			localStorage.setItem('workTags', JSON.stringify(updated))
-			toast.success('Tag deleted')
-		}
-	}
-
-	// Template handlers
-	const handleAddTemplate = () => {
-		if (!newTemplate.title || !newTemplate.description) {
-			toast.error('Please fill in all required fields')
-			return
-		}
-
-		const template: WorkTemplate = {
-			id: Date.now().toString(),
-			...newTemplate,
-		}
-
-		const updated = [...templates, template]
-		setTemplates(updated)
-		localStorage.setItem('workTemplates', JSON.stringify(updated))
-		setNewTemplate({ title: '', description: '', category: '' })
-		setShowAddTemplate(false)
-		toast.success('Template added successfully')
-	}
-
-	const handleUpdateTemplate = () => {
-		if (!editingTemplate) return
-
-		const updated = templates.map((tmpl) =>
-			tmpl.id === editingTemplate.id ? editingTemplate : tmpl
-		)
-		setTemplates(updated)
-		localStorage.setItem('workTemplates', JSON.stringify(updated))
-		setEditingTemplate(null)
-		toast.success('Template updated successfully')
-	}
-
-	const handleDeleteTemplate = (id: string) => {
-		if (confirm('Are you sure you want to delete this template?')) {
-			const updated = templates.filter((tmpl) => tmpl.id !== id)
-			setTemplates(updated)
-			localStorage.setItem('workTemplates', JSON.stringify(updated))
-			toast.success('Template deleted')
-		}
-	}
-
 	// Department handlers
 	const handleAddDepartment = () => {
-		if (!newDepartment.name || !newDepartment.code) {
-			toast.error('Please enter department name and code')
+		if (!newDepartment.name) {
+			toast.error('Please enter department name')
 			return
 		}
 
@@ -227,13 +110,7 @@ export default function SystemSettingsPage() {
 		localStorage.setItem('departments', JSON.stringify(updated))
 		setNewDepartment({
 			name: '',
-			code: '',
-			parentId: '',
-			managerId: '',
-			managerName: '',
 			description: '',
-			employeeCount: '',
-			location: '',
 		})
 		setShowAddDepartment(false)
 		toast.success('Department added successfully')
@@ -260,6 +137,130 @@ export default function SystemSettingsPage() {
 		}
 	}
 
+	// Position handlers
+	const handleAddPosition = () => {
+		if (!newPosition.name) {
+			toast.error('Please enter position name')
+			return
+		}
+
+		const position: Position = {
+			id: Date.now().toString(),
+			...newPosition,
+		}
+
+		const updated = [...positions, position]
+		setPositions(updated)
+		localStorage.setItem('positions', JSON.stringify(updated))
+		setNewPosition({
+			name: '',
+			description: '',
+		})
+		setShowAddPosition(false)
+		toast.success('Position added successfully')
+	}
+
+	const handleUpdatePosition = () => {
+		if (!editingPosition) return
+
+		const updated = positions.map((pos) => (pos.id === editingPosition.id ? editingPosition : pos))
+		setPositions(updated)
+		localStorage.setItem('positions', JSON.stringify(updated))
+		setEditingPosition(null)
+		toast.success('Position updated successfully')
+	}
+
+	const handleDeletePosition = (id: string) => {
+		if (confirm('Are you sure you want to delete this position?')) {
+			const updated = positions.filter((pos) => pos.id !== id)
+			setPositions(updated)
+			localStorage.setItem('positions', JSON.stringify(updated))
+			toast.success('Position deleted')
+		}
+	}
+
+	// Job handlers
+	const handleAddJob = () => {
+		if (!newJob.title) {
+			toast.error('Please enter job title')
+			return
+		}
+
+		const job: Job = {
+			id: Date.now().toString(),
+			...newJob,
+		}
+
+		const updated = [...jobs, job]
+		setJobs(updated)
+		localStorage.setItem('jobs', JSON.stringify(updated))
+		setNewJob({
+			title: '',
+			description: '',
+			responsibilities: '',
+		})
+		setShowAddJob(false)
+		toast.success('Job added successfully')
+	}
+
+	const handleUpdateJob = () => {
+		if (!editingJob) return
+
+		const updated = jobs.map((job) => (job.id === editingJob.id ? editingJob : job))
+		setJobs(updated)
+		localStorage.setItem('jobs', JSON.stringify(updated))
+		setEditingJob(null)
+		toast.success('Job updated successfully')
+	}
+
+	const handleDeleteJob = (id: string) => {
+		if (confirm('Are you sure you want to delete this job?')) {
+			const updated = jobs.filter((job) => job.id !== id)
+			setJobs(updated)
+			localStorage.setItem('jobs', JSON.stringify(updated))
+			toast.success('Job deleted')
+		}
+	}
+
+	// Status handlers
+	const handleAddStatus = () => {
+		if (!newStatus.name) {
+			toast.error('Please enter a status name')
+			return
+		}
+
+		const status: WorkCategory = {
+			id: Date.now().toString(),
+			...newStatus,
+		}
+
+		const updated = [...statuses, status]
+		setStatuses(updated)
+		localStorage.setItem('workStatuses', JSON.stringify(updated))
+		setNewStatus({ name: '', color: '#3B82F6', description: '' })
+		setShowAddStatus(false)
+		toast.success('Status added successfully')
+	}
+
+	const handleUpdateStatus = () => {
+		if (!editingStatus) return
+
+		const updated = statuses.map((status) => (status.id === editingStatus.id ? editingStatus : status))
+		setStatuses(updated)
+		localStorage.setItem('workStatuses', JSON.stringify(updated))
+		setEditingStatus(null)
+		toast.success('Status updated successfully')
+	}
+
+	const handleDeleteStatus = (id: string) => {
+		if (confirm('Are you sure you want to delete this status?')) {
+			const updated = statuses.filter((status) => status.id !== id)
+			setStatuses(updated)
+			localStorage.setItem('workStatuses', JSON.stringify(updated))
+			toast.success('Status deleted')
+		}
+	}
+
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.ADMIN_SYSTEM_SETTINGS} pagePath="/app/admin/system-settings/page.tsx" />
@@ -272,46 +273,13 @@ export default function SystemSettingsPage() {
 							System Settings
 						</h1>
 						<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-							Configure work categories, tags, templates, and departments
+							Configure departments, positions, jobs, and work status
 						</p>
 					</div>
 				</div>
 
 				{/* Tabs */}
 				<div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800">
-					<button
-						onClick={() => setActiveTab('categories')}
-						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-							activeTab === 'categories'
-								? 'border-primary text-primary'
-								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-						}`}
-					>
-						<Folder className="inline h-4 w-4 mr-2" />
-						Work Categories
-					</button>
-					<button
-						onClick={() => setActiveTab('tags')}
-						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-							activeTab === 'tags'
-								? 'border-primary text-primary'
-								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-						}`}
-					>
-						<Tag className="inline h-4 w-4 mr-2" />
-						Tags
-					</button>
-					<button
-						onClick={() => setActiveTab('templates')}
-						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-							activeTab === 'templates'
-								? 'border-primary text-primary'
-								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-						}`}
-					>
-						<FileText className="inline h-4 w-4 mr-2" />
-						Templates
-					</button>
 					<button
 						onClick={() => setActiveTab('departments')}
 						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -323,53 +291,29 @@ export default function SystemSettingsPage() {
 						<Building className="inline h-4 w-4 mr-2" />
 						Departments
 					</button>
+					<button
+						onClick={() => setActiveTab('positions')}
+						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+							activeTab === 'positions'
+								? 'border-primary text-primary'
+								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+						}`}
+					>
+						<Briefcase className="inline h-4 w-4 mr-2" />
+						Positions & Jobs
+					</button>
+					<button
+						onClick={() => setActiveTab('status')}
+						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+							activeTab === 'status'
+								? 'border-primary text-primary'
+								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+						}`}
+					>
+						<Activity className="inline h-4 w-4 mr-2" />
+						Status
+					</button>
 				</div>
-
-				{/* Categories Tab */}
-				{activeTab === 'categories' && (
-					<CategoriesTab
-						categories={categories}
-						editingCategory={editingCategory}
-						showAddCategory={showAddCategory}
-						newCategory={newCategory}
-						onSetEditingCategory={setEditingCategory}
-						onSetShowAddCategory={setShowAddCategory}
-						onSetNewCategory={setNewCategory}
-						onAdd={handleAddCategory}
-						onUpdate={handleUpdateCategory}
-						onDelete={handleDeleteCategory}
-					/>
-				)}
-
-				{/* Tags Tab */}
-				{activeTab === 'tags' && (
-					<TagsTab
-						tags={tags}
-						showAddTag={showAddTag}
-						newTag={newTag}
-						onSetShowAddTag={setShowAddTag}
-						onSetNewTag={setNewTag}
-						onAdd={handleAddTag}
-						onDelete={handleDeleteTag}
-					/>
-				)}
-
-				{/* Templates Tab */}
-				{activeTab === 'templates' && (
-					<TemplatesTab
-						templates={templates}
-						categories={categories}
-						editingTemplate={editingTemplate}
-						showAddTemplate={showAddTemplate}
-						newTemplate={newTemplate}
-						onSetEditingTemplate={setEditingTemplate}
-						onSetShowAddTemplate={setShowAddTemplate}
-						onSetNewTemplate={setNewTemplate}
-						onAdd={handleAddTemplate}
-						onUpdate={handleUpdateTemplate}
-						onDelete={handleDeleteTemplate}
-					/>
-				)}
 
 				{/* Departments Tab */}
 				{activeTab === 'departments' && (
@@ -384,6 +328,48 @@ export default function SystemSettingsPage() {
 						onAdd={handleAddDepartment}
 						onUpdate={handleUpdateDepartment}
 						onDelete={handleDeleteDepartment}
+					/>
+				)}
+
+				{/* Positions & Jobs Tab */}
+				{activeTab === 'positions' && (
+					<PositionsJobsTab
+						positions={positions}
+						jobs={jobs}
+						editingPosition={editingPosition}
+						editingJob={editingJob}
+						showAddPosition={showAddPosition}
+						showAddJob={showAddJob}
+						newPosition={newPosition}
+						newJob={newJob}
+						onSetEditingPosition={setEditingPosition}
+						onSetEditingJob={setEditingJob}
+						onSetShowAddPosition={setShowAddPosition}
+						onSetShowAddJob={setShowAddJob}
+						onSetNewPosition={setNewPosition}
+						onSetNewJob={setNewJob}
+						onAddPosition={handleAddPosition}
+						onAddJob={handleAddJob}
+						onUpdatePosition={handleUpdatePosition}
+						onUpdateJob={handleUpdateJob}
+						onDeletePosition={handleDeletePosition}
+						onDeleteJob={handleDeleteJob}
+					/>
+				)}
+
+				{/* Status Tab */}
+				{activeTab === 'status' && (
+					<CategoriesTab
+						categories={statuses}
+						editingCategory={editingStatus}
+						showAddCategory={showAddStatus}
+						newCategory={newStatus}
+						onSetEditingCategory={setEditingStatus}
+						onSetShowAddCategory={setShowAddStatus}
+						onSetNewCategory={setNewStatus}
+						onAdd={handleAddStatus}
+						onUpdate={handleUpdateStatus}
+						onDelete={handleDeleteStatus}
 					/>
 				)}
 

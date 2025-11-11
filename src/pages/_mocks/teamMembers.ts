@@ -9,6 +9,7 @@ export interface TeamMember {
 	email: string
 	role: string
 	department: string
+	jobs?: string[] // Multiple jobs support
 }
 
 export const mockTeamMembers: TeamMember[] = [
@@ -18,6 +19,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'john.kim@company.com',
 		role: 'Product Manager',
 		department: 'Product',
+		jobs: ['Frontend Development', 'Backend Development'],
 	},
 	{
 		id: '2',
@@ -25,6 +27,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'sarah.lee@company.com',
 		role: 'Senior Developer',
 		department: 'Engineering',
+		jobs: ['Frontend Development'],
 	},
 	{
 		id: '3',
@@ -32,6 +35,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'michael.park@company.com',
 		role: 'UX Designer',
 		department: 'Design',
+		jobs: ['Frontend Development'],
 	},
 	{
 		id: '4',
@@ -39,6 +43,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'emily.chen@company.com',
 		role: 'Marketing Manager',
 		department: 'Marketing',
+		jobs: ['Frontend Development', 'Backend Development'],
 	},
 	{
 		id: '5',
@@ -46,6 +51,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'david.choi@company.com',
 		role: 'DevOps Engineer',
 		department: 'Engineering',
+		jobs: ['Backend Development'],
 	},
 	{
 		id: '6',
@@ -53,6 +59,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'jessica.jung@company.com',
 		role: 'Data Analyst',
 		department: 'Data',
+		jobs: ['Backend Development'],
 	},
 	{
 		id: '7',
@@ -60,6 +67,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'tom.wilson@company.com',
 		role: 'Sales Director',
 		department: 'Sales',
+		jobs: ['Frontend Development'],
 	},
 	{
 		id: '8',
@@ -67,6 +75,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'lisa.wang@company.com',
 		role: 'HR Manager',
 		department: 'Human Resources',
+		jobs: ['Frontend Development', 'Backend Development'],
 	},
 	{
 		id: '9',
@@ -74,6 +83,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'chris.anderson@company.com',
 		role: 'Backend Developer',
 		department: 'Engineering',
+		jobs: ['Backend Development'],
 	},
 	{
 		id: '10',
@@ -81,6 +91,7 @@ export const mockTeamMembers: TeamMember[] = [
 		email: 'anna.martinez@company.com',
 		role: 'Content Writer',
 		department: 'Marketing',
+		jobs: ['Frontend Development'],
 	},
 ]
 

@@ -23,13 +23,20 @@ export interface WorkTemplate {
 export interface Department {
 	id: string
 	name: string
-	code: string
-	parentId: string
-	managerId: string
-	managerName: string
 	description: string
-	employeeCount: string
-	location: string
+}
+
+export interface Position {
+	id: string
+	name: string
+	description: string
+}
+
+export interface Job {
+	id: string
+	title: string
+	description: string
+	responsibilities: string
 }
 
 // Color options for categories
@@ -87,35 +94,50 @@ export const DEFAULT_DEPARTMENTS: Department[] = [
 	{
 		id: '1',
 		name: 'Engineering',
-		code: 'ENG',
-		parentId: '',
-		managerId: '',
-		managerName: '',
 		description: 'Software engineering and development',
-		employeeCount: '50',
-		location: 'Seoul HQ',
 	},
 	{
 		id: '2',
 		name: 'Product',
-		code: 'PRD',
-		parentId: '',
-		managerId: '',
-		managerName: '',
 		description: 'Product management and strategy',
-		employeeCount: '15',
-		location: 'Seoul HQ',
 	},
 	{
 		id: '3',
 		name: 'Marketing',
-		code: 'MKT',
-		parentId: '',
-		managerId: '',
-		managerName: '',
 		description: 'Marketing and communications',
-		employeeCount: '20',
-		location: 'Seoul HQ',
+	},
+]
+
+export const DEFAULT_POSITIONS: Position[] = [
+	{
+		id: '1',
+		name: 'Software Engineer',
+		description: 'Entry-level software developer',
+	},
+	{
+		id: '2',
+		name: 'Senior Software Engineer',
+		description: 'Experienced software developer',
+	},
+	{
+		id: '3',
+		name: 'Product Manager',
+		description: 'Product strategy and roadmap',
+	},
+]
+
+export const DEFAULT_JOBS: Job[] = [
+	{
+		id: '1',
+		title: 'Frontend Development',
+		description: 'Build user interfaces and web applications',
+		responsibilities: 'Develop responsive web applications\nImplement UI/UX designs\nOptimize performance',
+	},
+	{
+		id: '2',
+		title: 'Backend Development',
+		description: 'Build APIs and server-side logic',
+		responsibilities: 'Design and implement APIs\nDatabase management\nServer optimization',
 	},
 ]
 

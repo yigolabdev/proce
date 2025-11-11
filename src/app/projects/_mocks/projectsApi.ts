@@ -8,7 +8,7 @@ export const mockProjects: Project[] = [
 		id: '1',
 		name: 'AI 챗봇 서비스 개발',
 		description: '고객 상담을 자동화하기 위한 AI 챗봇 서비스를 개발합니다. 자연어 처리와 머신러닝을 활용하여 고객 문의에 즉각 응답하는 시스템을 구축합니다.',
-		department: 'Engineering',
+		departments: ['Engineering'],
 		objectives: [
 			'자연어 처리 모델 개발 및 학습',
 			'챗봇 UI/UX 디자인 및 구현',
@@ -87,7 +87,7 @@ export const mockProjects: Project[] = [
 		id: '2',
 		name: '모바일 앱 리뉴얼',
 		description: '사용자 경험 개선을 위한 모바일 앱 전면 리뉴얼 프로젝트입니다. 최신 디자인 트렌드를 반영하고 성능을 최적화합니다.',
-		department: 'Product',
+		departments: ['Product'],
 		objectives: [
 			'사용자 리서치 및 페르소나 정의',
 			'새로운 디자인 시스템 구축',
@@ -157,7 +157,7 @@ export const mockProjects: Project[] = [
 		id: '3',
 		name: '데이터 분석 플랫폼 구축',
 		description: '비즈니스 인텔리전스를 위한 통합 데이터 분석 플랫폼을 구축합니다. 실시간 데이터 시각화 및 리포팅 기능을 제공합니다.',
-		department: 'Data',
+		departments: ['Data'],
 		objectives: [
 			'데이터 파이프라인 설계 및 구축',
 			'실시간 대시보드 개발',
@@ -242,7 +242,7 @@ export const mockProjects: Project[] = [
 		id: '4',
 		name: 'API 문서화 시스템',
 		description: '개발자 경험 향상을 위한 인터랙티브 API 문서화 시스템을 구축합니다. Swagger/OpenAPI 기반으로 자동 생성되는 문서를 제공합니다.',
-		department: 'Engineering',
+		departments: ['Engineering'],
 		objectives: [
 			'OpenAPI 3.0 스펙 적용',
 			'인터랙티브 API 테스트 기능 구현',
@@ -307,7 +307,7 @@ export const mockProjects: Project[] = [
 		id: '5',
 		name: '클라우드 마이그레이션',
 		description: '온프레미스 인프라를 AWS 클라우드로 마이그레이션합니다. 고가용성과 확장성을 확보하고 운영 비용을 최적화합니다.',
-		department: 'DevOps',
+		departments: ['DevOps'],
 		objectives: [
 			'현재 인프라 분석 및 마이그레이션 계획 수립',
 			'AWS 아키텍처 설계',
@@ -377,7 +377,7 @@ export const mockProjects: Project[] = [
 		id: '6',
 		name: '보안 강화 프로젝트',
 		description: '전사 보안 수준 향상을 위한 종합적인 보안 강화 프로젝트입니다. 침투 테스트, 취약점 분석, 보안 정책 수립을 진행합니다.',
-		department: 'Security',
+		departments: ['Security'],
 		objectives: [
 			'보안 취약점 분석 및 패치',
 			'2단계 인증(2FA) 도입',

@@ -18,16 +18,13 @@ import {
 	AlertCircle,
 	Bell,
 	Globe,
-	Shield,
-	Palette,
 	Clock,
 	Briefcase,
-	MapPin,
 	Upload,
 	Camera,
 	Languages,
-	Moon,
-	Sun,
+	Plus,
+	X,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
@@ -39,11 +36,11 @@ interface UserProfile {
 	email: string
 	phone: string
 	birthDate: string
-	gender: 'male' | 'female' | 'other' | ''
 	
 	// Work Info
 	department: string
 	position: string
+	jobs: string[] // Multiple jobs support
 	employeeId: string
 	joinDate: string
 	manager: string
@@ -85,25 +82,9 @@ interface NotificationSettings {
 	comments: boolean
 }
 
-interface PrivacySettings {
-	profileVisibility: 'public' | 'team' | 'private'
-	showEmail: boolean
-	showPhone: boolean
-	showBirthday: boolean
-	allowMessages: boolean
-	allowMentions: boolean
-}
-
-interface AppearanceSettings {
-	theme: 'light' | 'dark' | 'auto'
-	compactMode: boolean
-	fontSize: 'small' | 'medium' | 'large'
-	sidebarCollapsed: boolean
-}
-
 export default function SettingsPage() {
 	const { user } = useAuth()
-	const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'notifications' | 'privacy' | 'appearance'>('profile')
+	const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'notifications'>('profile')
 	
 	// Profile states
 	const [profile, setProfile] = useState<UserProfile>({
@@ -111,9 +92,9 @@ export default function SettingsPage() {
 		email: '',
 		phone: '',
 		birthDate: '',
-		gender: '',
 		department: '',
 		position: '',
+		jobs: [], // Multiple jobs support
 		employeeId: '',
 		joinDate: '',
 		manager: '',
@@ -137,6 +118,10 @@ export default function SettingsPage() {
 	})
 	const [originalProfile, setOriginalProfile] = useState<UserProfile>(profile)
 	const [skillInput, setSkillInput] = useState('')
+	const [availableJobs, setAvailableJobs] = useState<{id: string, title: string}[]>([])
+	const [departments, setDepartments] = useState<{id: string, name: string}[]>([])
+	const [positions, setPositions] = useState<{id: string, name: string}[]>([])
+	const [customJobInput, setCustomJobInput] = useState('')
 
 	// Password states
 	const [currentPassword, setCurrentPassword] = useState('')
@@ -160,26 +145,11 @@ export default function SettingsPage() {
 		comments: true,
 	})
 
-	// Privacy states
-	const [privacy, setPrivacy] = useState<PrivacySettings>({
-		profileVisibility: 'team',
-		showEmail: false,
-		showPhone: false,
-		showBirthday: false,
-		allowMessages: true,
-		allowMentions: true,
-	})
-
-	// Appearance states
-	const [appearance, setAppearance] = useState<AppearanceSettings>({
-		theme: 'light',
-		compactMode: false,
-		fontSize: 'medium',
-		sidebarCollapsed: false,
-	})
-
 	useEffect(() => {
 		loadSettings()
+		loadAvailableJobs()
+		loadDepartments()
+		loadPositions()
 	}, [user])
 
 	const loadSettings = () => {
@@ -195,9 +165,9 @@ export default function SettingsPage() {
 				email: user?.email || 'john.doe@company.com',
 				phone: '+1 (555) 123-4567',
 				birthDate: '1990-01-15',
-				gender: 'male',
 				department: 'Engineering',
 				position: 'Senior Developer',
+				jobs: ['Frontend Development', 'Backend Development'],
 				employeeId: 'EMP-2023-001',
 				joinDate: '2023-01-15',
 				manager: 'Jane Smith',
@@ -228,22 +198,111 @@ export default function SettingsPage() {
 		if (savedNotifications) {
 			setNotifications(JSON.parse(savedNotifications))
 		}
+	}
 
-		// Load privacy
-		const savedPrivacy = localStorage.getItem('privacySettings')
-		if (savedPrivacy) {
-			setPrivacy(JSON.parse(savedPrivacy))
+	const loadAvailableJobs = () => {
+		try {
+			const savedJobs = localStorage.getItem('jobs')
+			if (savedJobs) {
+				const jobs = JSON.parse(savedJobs)
+				setAvailableJobs(jobs)
+			} else {
+				// Fallback to mock data
+				const mockJobs = [
+					{ id: '1', title: 'Frontend Development' },
+					{ id: '2', title: 'Backend Development' },
+					{ id: '3', title: 'UI/UX Design' },
+					{ id: '4', title: 'Product Management' },
+					{ id: '5', title: 'Data Analysis' },
+					{ id: '6', title: 'DevOps Engineering' },
+					{ id: '7', title: 'Quality Assurance' },
+					{ id: '8', title: 'Technical Writing' },
+					{ id: '9', title: 'Project Management' },
+					{ id: '10', title: 'Business Analysis' },
+					{ id: '11', title: 'Database Administration' },
+					{ id: '12', title: 'Security Engineering' },
+					{ id: '13', title: 'Mobile Development' },
+					{ id: '14', title: 'Machine Learning' },
+					{ id: '15', title: 'System Architecture' },
+				]
+				setAvailableJobs(mockJobs)
+			}
+		} catch (error) {
+			console.error('Failed to load jobs:', error)
 		}
+	}
 
-		// Load appearance
-		const savedAppearance = localStorage.getItem('appearanceSettings')
-		if (savedAppearance) {
-			setAppearance(JSON.parse(savedAppearance))
+	const loadDepartments = () => {
+		try {
+			const savedDepartments = localStorage.getItem('departments')
+			if (savedDepartments) {
+				const depts = JSON.parse(savedDepartments)
+				setDepartments(depts.map((d: any) => ({ id: d.id, name: d.name })))
+			} else {
+				// Fallback to mock data
+				const mockDepts = [
+					{ id: '1', name: 'Engineering' },
+					{ id: '2', name: 'Product' },
+					{ id: '3', name: 'Marketing' },
+				]
+				setDepartments(mockDepts)
+			}
+		} catch (error) {
+			console.error('Failed to load departments:', error)
+		}
+	}
+
+	const loadPositions = () => {
+		try {
+			const savedPositions = localStorage.getItem('positions')
+			if (savedPositions) {
+				const pos = JSON.parse(savedPositions)
+				setPositions(pos.map((p: any) => ({ id: p.id, name: p.name })))
+			} else {
+				// Fallback to mock data
+				const mockPos = [
+					{ id: '1', name: 'Software Engineer' },
+					{ id: '2', name: 'Senior Software Engineer' },
+					{ id: '3', name: 'Product Manager' },
+				]
+				setPositions(mockPos)
+			}
+		} catch (error) {
+			console.error('Failed to load positions:', error)
 		}
 	}
 
 	const handleProfileChange = (field: keyof UserProfile, value: any) => {
 		setProfile((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleRemoveJob = (jobTitle: string) => {
+		setProfile((prev) => ({
+			...prev,
+			jobs: prev.jobs.filter((j) => j !== jobTitle),
+		}))
+	}
+
+	const handleAddCustomJob = () => {
+		if (!customJobInput.trim()) {
+			toast.error('Please select a job')
+			return
+		}
+
+		// Check if job already exists in profile
+		if (profile.jobs.includes(customJobInput.trim())) {
+			toast.error('This job is already selected')
+			return
+		}
+
+		// Add to profile
+		setProfile((prev) => ({
+			...prev,
+			jobs: [...prev.jobs, customJobInput.trim()],
+		}))
+
+		setCustomJobInput('')
+		toast.success('Job added successfully!')
 	}
 
 	const handleAddSkill = () => {
@@ -310,26 +369,6 @@ export default function SettingsPage() {
 		}
 	}
 
-	const handleSavePrivacy = () => {
-		try {
-			localStorage.setItem('privacySettings', JSON.stringify(privacy))
-			toast.success('Privacy settings saved!')
-		} catch (error) {
-			console.error('Failed to save privacy:', error)
-			toast.error('Failed to save settings')
-		}
-	}
-
-	const handleSaveAppearance = () => {
-		try {
-			localStorage.setItem('appearanceSettings', JSON.stringify(appearance))
-			toast.success('Appearance settings saved!')
-		} catch (error) {
-			console.error('Failed to save appearance:', error)
-			toast.error('Failed to save settings')
-		}
-	}
-
 	const isProfileChanged = JSON.stringify(profile) !== JSON.stringify(originalProfile)
 
 	return (
@@ -351,8 +390,6 @@ export default function SettingsPage() {
 					{ id: 'profile', label: 'Profile', icon: User },
 					{ id: 'account', label: 'Account & Security', icon: Lock },
 					{ id: 'notifications', label: 'Notifications', icon: Bell },
-					{ id: 'privacy', label: 'Privacy', icon: Shield },
-					{ id: 'appearance', label: 'Appearance', icon: Palette },
 				].map((tab) => (
 					<button
 						key={tab.id}
@@ -459,19 +496,6 @@ export default function SettingsPage() {
 										onChange={(e) => handleProfileChange('birthDate', e.target.value)}
 									/>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Gender</label>
-									<select
-										value={profile.gender}
-										onChange={(e) => handleProfileChange('gender', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="">Select gender</option>
-										<option value="male">Male</option>
-										<option value="female">Female</option>
-										<option value="other">Other</option>
-									</select>
-								</div>
 							</div>
 						</CardContent>
 					</Card>
@@ -488,30 +512,129 @@ export default function SettingsPage() {
 										<Building className="inline h-4 w-4 mr-1" />
 										Department
 									</label>
-									<Input
+									<select
 										value={profile.department}
 										onChange={(e) => handleProfileChange('department', e.target.value)}
-										placeholder="e.g., Engineering"
-									/>
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="">Select department</option>
+										{departments.map((dept) => (
+											<option key={dept.id} value={dept.name}>
+												{dept.name}
+											</option>
+										))}
+									</select>
 								</div>
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										<Briefcase className="inline h-4 w-4 mr-1" />
 										Position
 									</label>
-									<Input
+									<select
 										value={profile.position}
 										onChange={(e) => handleProfileChange('position', e.target.value)}
-										placeholder="e.g., Senior Developer"
-									/>
+										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="">Select position</option>
+										{positions.map((pos) => (
+											<option key={pos.id} value={pos.name}>
+												{pos.name}
+											</option>
+										))}
+									</select>
 								</div>
+							</div>
+
+							{/* Jobs Selection */}
+							<div className="mt-5">
+								<label className="block text-sm font-medium mb-2">
+									<Briefcase className="inline h-4 w-4 mr-1" />
+									Jobs <span className="text-neutral-500 text-xs">(Add multiple)</span>
+								</label>
+								<div className="space-y-3">
+									{/* Dropdown and Add Button */}
+									<div className="flex gap-2">
+										<select
+											value={customJobInput}
+											onChange={(e) => setCustomJobInput(e.target.value)}
+											className="flex-1 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">-- Select a job to add --</option>
+											{availableJobs
+												.filter((job) => !profile.jobs.includes(job.title))
+												.map((job) => (
+													<option key={job.id} value={job.title}>
+														{job.title}
+													</option>
+												))}
+										</select>
+										<Button 
+											onClick={handleAddCustomJob} 
+											size="sm"
+											disabled={!customJobInput}
+											className="px-4"
+										>
+											<Plus className="h-4 w-4 mr-1" />
+											Add
+										</Button>
+									</div>
+
+									{/* Selected Jobs Display */}
+									{profile.jobs.length > 0 ? (
+										<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
+											<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
+												Selected Jobs ({profile.jobs.length})
+											</p>
+											<div className="flex flex-wrap gap-2">
+												{profile.jobs.map((job) => (
+													<div
+														key={job}
+														className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20"
+													>
+														<span className="font-medium">{job}</span>
+														<button
+															onClick={() => handleRemoveJob(job)}
+															className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+															type="button"
+														>
+															<X className="h-3 w-3" />
+														</button>
+													</div>
+												))}
+											</div>
+										</div>
+									) : (
+										<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
+											<p className="text-sm text-neutral-500 dark:text-neutral-400">
+												No jobs added yet. Select from the dropdown above.
+											</p>
+										</div>
+									)}
+
+									{availableJobs.length === 0 && (
+										<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+											💡 No jobs available yet. Contact your administrator.
+										</p>
+									)}
+								</div>
+							</div>
+
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
 								<div>
-									<label className="block text-sm font-medium mb-2">Employee ID</label>
+									<label className="block text-sm font-medium mb-2">
+										Employee ID
+										<span className="text-xs text-neutral-500 ml-2">(System Generated)</span>
+									</label>
 									<Input
 										value={profile.employeeId}
-										onChange={(e) => handleProfileChange('employeeId', e.target.value)}
+										readOnly
+										disabled
 										placeholder="EMP-2023-001"
+										className="bg-neutral-100 dark:bg-neutral-800 cursor-not-allowed"
 									/>
+									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										🔒 This is a unique identifier assigned by the system
+									</p>
 								</div>
 								<div>
 									<label className="block text-sm font-medium mb-2">Join Date</label>
@@ -519,25 +642,6 @@ export default function SettingsPage() {
 										type="date"
 										value={profile.joinDate}
 										onChange={(e) => handleProfileChange('joinDate', e.target.value)}
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Manager</label>
-									<Input
-										value={profile.manager}
-										onChange={(e) => handleProfileChange('manager', e.target.value)}
-										placeholder="Manager name"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<MapPin className="inline h-4 w-4 mr-1" />
-										Work Location
-									</label>
-									<Input
-										value={profile.workLocation}
-										onChange={(e) => handleProfileChange('workLocation', e.target.value)}
-										placeholder="e.g., New York Office"
 									/>
 								</div>
 							</div>
@@ -998,275 +1102,8 @@ export default function SettingsPage() {
 						</CardContent>
 					</Card>
 
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Reports</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								{[
-									{ key: 'weeklyReport', label: 'Weekly Report', desc: 'Summary of your weekly activities' },
-									{ key: 'monthlyReport', label: 'Monthly Report', desc: 'Monthly performance summary' },
-								].map((item) => (
-									<div key={item.key} className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-										<div className="flex-1">
-											<h3 className="font-medium mb-1">{item.label}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400">{item.desc}</p>
-										</div>
-										<label className="relative inline-flex items-center cursor-pointer ml-4">
-											<input
-												type="checkbox"
-												checked={notifications[item.key as keyof NotificationSettings] as boolean}
-												onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-												className="sr-only peer"
-											/>
-											<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-										</label>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
 					<div className="flex items-center gap-3">
 						<Button onClick={handleSaveNotifications} className="flex items-center gap-2">
-							<Save className="h-4 w-4" />
-							Save Preferences
-						</Button>
-					</div>
-				</div>
-			)}
-
-			{/* Privacy Tab */}
-			{activeTab === 'privacy' && (
-				<div className="space-y-6">
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Profile Visibility</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-3">Who can see your profile?</label>
-									<div className="space-y-2">
-										{[
-											{ value: 'public', label: 'Public', desc: 'Anyone can view your profile' },
-											{ value: 'team', label: 'Team Only', desc: 'Only your team members' },
-											{ value: 'private', label: 'Private', desc: 'Only you' },
-										].map((option) => (
-											<label
-												key={option.value}
-												className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${
-													privacy.profileVisibility === option.value
-														? 'border-primary bg-primary/5'
-														: 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-												}`}
-											>
-												<input
-													type="radio"
-													name="profileVisibility"
-													value={option.value}
-													checked={privacy.profileVisibility === option.value}
-													onChange={(e) => setPrivacy((prev) => ({ ...prev, profileVisibility: e.target.value as any }))}
-													className="mt-1"
-												/>
-												<div>
-													<p className="font-medium">{option.label}</p>
-													<p className="text-sm text-neutral-600 dark:text-neutral-400">{option.desc}</p>
-												</div>
-											</label>
-										))}
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Contact Information</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								{[
-									{ key: 'showEmail', label: 'Show Email', desc: 'Display your email on your profile' },
-									{ key: 'showPhone', label: 'Show Phone', desc: 'Display your phone number' },
-									{ key: 'showBirthday', label: 'Show Birthday', desc: 'Display your birth date' },
-								].map((item) => (
-									<div key={item.key} className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-										<div className="flex-1">
-											<h3 className="font-medium mb-1">{item.label}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400">{item.desc}</p>
-										</div>
-										<label className="relative inline-flex items-center cursor-pointer ml-4">
-											<input
-												type="checkbox"
-												checked={privacy[item.key as keyof PrivacySettings] as boolean}
-												onChange={(e) => setPrivacy((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-												className="sr-only peer"
-											/>
-											<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-										</label>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Communication</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								{[
-									{ key: 'allowMessages', label: 'Allow Messages', desc: 'Let others send you direct messages' },
-									{ key: 'allowMentions', label: 'Allow Mentions', desc: 'Let others mention you in comments' },
-								].map((item) => (
-									<div key={item.key} className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-										<div className="flex-1">
-											<h3 className="font-medium mb-1">{item.label}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400">{item.desc}</p>
-										</div>
-										<label className="relative inline-flex items-center cursor-pointer ml-4">
-											<input
-												type="checkbox"
-												checked={privacy[item.key as keyof PrivacySettings] as boolean}
-												onChange={(e) => setPrivacy((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-												className="sr-only peer"
-											/>
-											<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-										</label>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
-					<div className="flex items-center gap-3">
-						<Button onClick={handleSavePrivacy} className="flex items-center gap-2">
-							<Save className="h-4 w-4" />
-							Save Settings
-						</Button>
-					</div>
-				</div>
-			)}
-
-			{/* Appearance Tab */}
-			{activeTab === 'appearance' && (
-				<div className="space-y-6">
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Theme</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="grid grid-cols-3 gap-4">
-								{[
-									{ value: 'light', label: 'Light', icon: Sun },
-									{ value: 'dark', label: 'Dark', icon: Moon },
-									{ value: 'auto', label: 'Auto', icon: Palette },
-								].map((option) => (
-									<label
-										key={option.value}
-										className={`flex flex-col items-center gap-3 p-6 border rounded-xl cursor-pointer transition-colors ${
-											appearance.theme === option.value
-												? 'border-primary bg-primary/5'
-												: 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-										}`}
-									>
-										<input
-											type="radio"
-											name="theme"
-											value={option.value}
-											checked={appearance.theme === option.value}
-											onChange={(e) => setAppearance((prev) => ({ ...prev, theme: e.target.value as any }))}
-											className="sr-only"
-										/>
-										<option.icon className="h-8 w-8" />
-										<p className="font-medium">{option.label}</p>
-									</label>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Display</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-3">Font Size</label>
-									<div className="grid grid-cols-3 gap-4">
-										{[
-											{ value: 'small', label: 'Small' },
-											{ value: 'medium', label: 'Medium' },
-											{ value: 'large', label: 'Large' },
-										].map((option) => (
-											<label
-												key={option.value}
-												className={`flex items-center justify-center p-4 border rounded-xl cursor-pointer transition-colors ${
-													appearance.fontSize === option.value
-														? 'border-primary bg-primary/5'
-														: 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-												}`}
-											>
-												<input
-													type="radio"
-													name="fontSize"
-													value={option.value}
-													checked={appearance.fontSize === option.value}
-													onChange={(e) => setAppearance((prev) => ({ ...prev, fontSize: e.target.value as any }))}
-													className="sr-only"
-												/>
-												<p className="font-medium">{option.label}</p>
-											</label>
-										))}
-									</div>
-								</div>
-
-								<div className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-									<div className="flex-1">
-										<h3 className="font-medium mb-1">Compact Mode</h3>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
-											Reduce spacing for a more compact interface
-										</p>
-									</div>
-									<label className="relative inline-flex items-center cursor-pointer ml-4">
-										<input
-											type="checkbox"
-											checked={appearance.compactMode}
-											onChange={(e) => setAppearance((prev) => ({ ...prev, compactMode: e.target.checked }))}
-											className="sr-only peer"
-										/>
-										<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-									</label>
-								</div>
-
-								<div className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-									<div className="flex-1">
-										<h3 className="font-medium mb-1">Collapsed Sidebar</h3>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
-											Keep sidebar collapsed by default
-										</p>
-									</div>
-									<label className="relative inline-flex items-center cursor-pointer ml-4">
-										<input
-											type="checkbox"
-											checked={appearance.sidebarCollapsed}
-											onChange={(e) => setAppearance((prev) => ({ ...prev, sidebarCollapsed: e.target.checked }))}
-											className="sr-only peer"
-										/>
-										<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-									</label>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<div className="flex items-center gap-3">
-						<Button onClick={handleSaveAppearance} className="flex items-center gap-2">
 							<Save className="h-4 w-4" />
 							Save Preferences
 						</Button>

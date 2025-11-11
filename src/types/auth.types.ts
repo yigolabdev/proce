@@ -7,6 +7,7 @@ export interface User {
 	role: UserRole
 	department?: string
 	position?: string
+	jobs?: string[] // Multiple jobs support
 	avatar?: string
 }
 

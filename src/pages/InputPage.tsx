@@ -196,17 +196,17 @@ export default function InputPage() {
 				setObjectives(JSON.parse(savedObjectives))
 			}
 
-			// Load categories
-			const savedCategories = localStorage.getItem('workCategories')
-			if (savedCategories) {
-				setCategories(JSON.parse(savedCategories))
-			} else {
-				initializeMockWorkCategories()
-				const initialCategories = localStorage.getItem('workCategories')
-				if (initialCategories) {
-					setCategories(JSON.parse(initialCategories))
-				}
+		// Load statuses (formerly categories)
+		const savedStatuses = localStorage.getItem('workStatuses')
+		if (savedStatuses) {
+			setCategories(JSON.parse(savedStatuses))
+		} else {
+			initializeMockWorkCategories()
+			const initialStatuses = localStorage.getItem('workStatuses')
+			if (initialStatuses) {
+				setCategories(JSON.parse(initialStatuses))
 			}
+		}
 
 			// Initialize team members (for future use)
 			const savedTeamMembers = localStorage.getItem('teamMembers')
@@ -599,9 +599,9 @@ export default function InputPage() {
 			return
 		}
 		
-		// Validate custom category if "Other" is selected
+		// Validate custom status if "Other" is selected
 		if (showCustomCategory && !customCategory.trim()) {
-			toast.error('Please enter a custom category name')
+			toast.error('Please enter a custom status name')
 			return
 		}
 
@@ -870,45 +870,45 @@ export default function InputPage() {
 								</p>
 							</div>
 
-						{/* Category & Duration */}
-						<div className="grid grid-cols-2 gap-4">
-							<div>
-								<label className="block text-sm font-semibold mb-2">
-									<Calendar className="inline h-4 w-4 mr-1" />
-									Category
-								</label>
-								<select
-									value={showCustomCategory ? 'other' : category}
-									onChange={(e) => {
-										const value = e.target.value
-										if (value === 'other') {
-											setShowCustomCategory(true)
-											setCategory('other')
-										} else {
-											setShowCustomCategory(false)
-											setCategory(value)
-											setCustomCategory('')
-										}
-									}}
-									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-								>
-									<option value="">Select category</option>
-									{categories.map((cat) => (
-										<option key={cat.id} value={cat.id}>
-											{cat.name}
-										</option>
-									))}
-								</select>
-								{showCustomCategory && (
-									<Input
-										type="text"
-										placeholder="Enter custom category name"
-										value={customCategory}
-										onChange={(e) => setCustomCategory(e.target.value)}
-										className="mt-2"
-									/>
-								)}
-							</div>
+					{/* Status & Duration */}
+					<div className="grid grid-cols-2 gap-4">
+						<div>
+							<label className="block text-sm font-semibold mb-2">
+								<Calendar className="inline h-4 w-4 mr-1" />
+								Status
+							</label>
+							<select
+								value={showCustomCategory ? 'other' : category}
+								onChange={(e) => {
+									const value = e.target.value
+									if (value === 'other') {
+										setShowCustomCategory(true)
+										setCategory('other')
+									} else {
+										setShowCustomCategory(false)
+										setCategory(value)
+										setCustomCategory('')
+									}
+								}}
+								className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+							>
+								<option value="">Select status</option>
+								{categories.map((cat) => (
+									<option key={cat.id} value={cat.id}>
+										{cat.name}
+									</option>
+								))}
+							</select>
+							{showCustomCategory && (
+								<Input
+									type="text"
+									placeholder="Enter custom status name"
+									value={customCategory}
+									onChange={(e) => setCustomCategory(e.target.value)}
+									className="mt-2"
+								/>
+							)}
+						</div>
 
 								<div>
 									<label className="block text-sm font-semibold mb-2">

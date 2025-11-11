@@ -45,7 +45,7 @@ export interface Project {
 	id: string
 	name: string
 	description: string
-	department: string
+	departments: string[]
 	objectives: string[]
 	startDate: Date
 	endDate: Date

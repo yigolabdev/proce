@@ -36,11 +36,11 @@ export default function CategoriesTab({
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
 					<p className="text-sm text-neutral-600 dark:text-neutral-400">
-						Manage work categories used in Work Input
+						Manage work status used in Work Input
 					</p>
 					<Button onClick={() => onSetShowAddCategory(true)}>
 						<Plus className="h-4 w-4 mr-2" />
-						Add Category
+						Add Status
 					</Button>
 				</div>
 
@@ -50,13 +50,13 @@ export default function CategoriesTab({
 							<CardContent className="p-4">
 								{editingCategory?.id === category.id ? (
 									<div className="space-y-3">
-										<Input
-											value={editingCategory.name}
-											onChange={(e) =>
-												onSetEditingCategory({ ...editingCategory, name: e.target.value })
-											}
-											placeholder="Category name"
-										/>
+									<Input
+										value={editingCategory.name}
+										onChange={(e) =>
+											onSetEditingCategory({ ...editingCategory, name: e.target.value })
+										}
+										placeholder="Status name"
+									/>
 										<Textarea
 											value={editingCategory.description}
 											onChange={(e) =>
@@ -135,16 +135,16 @@ export default function CategoriesTab({
 				</div>
 			</div>
 
-			{/* Add Category Dialog */}
-			{showAddCategory && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-md">
-						<div className="p-6">
-							<div className="flex items-center justify-between mb-4">
-								<h3 className="text-xl font-bold flex items-center gap-2">
-									<Plus className="h-5 w-5 text-primary" />
-									Add Category
-								</h3>
+		{/* Add Status Dialog */}
+		{showAddCategory && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+				<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-md">
+					<div className="p-6">
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="text-xl font-bold flex items-center gap-2">
+								<Plus className="h-5 w-5 text-primary" />
+								Add Status
+							</h3>
 								<button
 									onClick={() => onSetShowAddCategory(false)}
 									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
@@ -158,11 +158,11 @@ export default function CategoriesTab({
 									<label className="block text-sm font-medium mb-2">
 										Name <span className="text-red-500">*</span>
 									</label>
-									<Input
-										value={newCategory.name}
-										onChange={(e) => onSetNewCategory({ ...newCategory, name: e.target.value })}
-										placeholder="e.g., Development"
-									/>
+								<Input
+									value={newCategory.name}
+									onChange={(e) => onSetNewCategory({ ...newCategory, name: e.target.value })}
+									placeholder="e.g., Completed Work"
+								/>
 								</div>
 
 								<div>
@@ -172,7 +172,7 @@ export default function CategoriesTab({
 										onChange={(e) =>
 											onSetNewCategory({ ...newCategory, description: e.target.value })
 										}
-										placeholder="Brief description of this category"
+										placeholder="Brief description of this status"
 										rows={3}
 									/>
 								</div>
@@ -192,18 +192,18 @@ export default function CategoriesTab({
 									</select>
 								</div>
 
-								<div className="flex items-center gap-2 pt-4">
-									<Button onClick={onAdd} className="flex-1">
-										Add Category
-									</Button>
-									<Button
-										variant="outline"
-										onClick={() => onSetShowAddCategory(false)}
-										className="flex-1"
-									>
-										Cancel
-									</Button>
-								</div>
+							<div className="flex items-center gap-2 pt-4">
+								<Button onClick={onAdd} className="flex-1">
+									Add Status
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => onSetShowAddCategory(false)}
+									className="flex-1"
+								>
+									Cancel
+								</Button>
+							</div>
 							</div>
 						</div>
 					</div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Users, ArrowLeft, Key, Building2, Mail, Lock, User, Phone, Briefcase, UserCog } from 'lucide-react'
+import { Users, ArrowLeft, Key, Building2, Mail, Lock, User, Phone, Briefcase, UserCog, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
 import DevMemo from '../../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../../constants/devMemos'
@@ -25,6 +25,7 @@ interface EmployeeData {
 	countryCode: string
 	department: string
 	position: string
+	jobs: string[] // Multiple jobs support
 }
 
 export default function EmployeeSignUpPage() {
@@ -41,13 +42,16 @@ export default function EmployeeSignUpPage() {
 		countryCode: '+82', // Default to South Korea
 		department: '',
 		position: '',
+		jobs: [], // Multiple jobs support
 	})
 	const [companyInfo, setCompanyInfo] = useState<{ name: string; industry: string } | null>(null)
 	const [departments, setDepartments] = useState<Department[]>([])
+	const [availableJobs, setAvailableJobs] = useState<{id: string, title: string}[]>([])
 	const [showCustomDepartment, setShowCustomDepartment] = useState(false)
 	const [showCustomPosition, setShowCustomPosition] = useState(false)
 	const [customDepartment, setCustomDepartment] = useState('')
 	const [customPosition, setCustomPosition] = useState('')
+	const [selectedJobId, setSelectedJobId] = useState('')
 	
 	// Email verification states
 	const [isCodeSent, setIsCodeSent] = useState(false)
@@ -106,7 +110,7 @@ export default function EmployeeSignUpPage() {
 		{ value: 'custom', label: '✏️ Custom (Enter manually)' },
 	]
 	
-	// Load departments from Organization Setup
+	// Load departments and jobs from Organization Setup
 	useEffect(() => {
 		const loadDepartments = () => {
 			try {
@@ -147,8 +151,59 @@ export default function EmployeeSignUpPage() {
 			}
 		}
 		
+		const loadJobs = () => {
+			try {
+				const savedJobs = localStorage.getItem('jobs')
+				if (savedJobs) {
+					const jobs = JSON.parse(savedJobs)
+					setAvailableJobs(jobs)
+				} else {
+					// Fallback to mock data
+					const mockJobs = [
+						{ id: '1', title: 'Frontend Development' },
+						{ id: '2', title: 'Backend Development' },
+						{ id: '3', title: 'UI/UX Design' },
+						{ id: '4', title: 'Product Management' },
+						{ id: '5', title: 'Data Analysis' },
+						{ id: '6', title: 'DevOps Engineering' },
+						{ id: '7', title: 'Quality Assurance' },
+						{ id: '8', title: 'Technical Writing' },
+						{ id: '9', title: 'Project Management' },
+						{ id: '10', title: 'Business Analysis' },
+						{ id: '11', title: 'Database Administration' },
+						{ id: '12', title: 'Security Engineering' },
+						{ id: '13', title: 'Mobile Development' },
+						{ id: '14', title: 'Machine Learning' },
+						{ id: '15', title: 'System Architecture' },
+					]
+					setAvailableJobs(mockJobs)
+				}
+			} catch (error) {
+				console.error('Failed to load jobs:', error)
+				const mockJobs = [
+					{ id: '1', title: 'Frontend Development' },
+					{ id: '2', title: 'Backend Development' },
+					{ id: '3', title: 'UI/UX Design' },
+					{ id: '4', title: 'Product Management' },
+					{ id: '5', title: 'Data Analysis' },
+					{ id: '6', title: 'DevOps Engineering' },
+					{ id: '7', title: 'Quality Assurance' },
+					{ id: '8', title: 'Technical Writing' },
+					{ id: '9', title: 'Project Management' },
+					{ id: '10', title: 'Business Analysis' },
+					{ id: '11', title: 'Database Administration' },
+					{ id: '12', title: 'Security Engineering' },
+					{ id: '13', title: 'Mobile Development' },
+					{ id: '14', title: 'Machine Learning' },
+					{ id: '15', title: 'System Architecture' },
+				]
+				setAvailableJobs(mockJobs)
+			}
+		}
+		
 		if (step === 2) {
 			loadDepartments()
+			loadJobs()
 		}
 	}, [step])
 
@@ -256,6 +311,7 @@ export default function EmployeeSignUpPage() {
 			...data,
 			department: finalDepartment,
 			position: finalPosition,
+			jobs: data.jobs,
 		})
 		
 		toast.success('Employee registration completed successfully! Please sign in.')
@@ -284,6 +340,38 @@ export default function EmployeeSignUpPage() {
 			setCustomPosition('')
 			handleChange('position', value)
 		}
+	}
+
+	const handleAddJob = () => {
+		if (!selectedJobId) {
+			toast.error('Please select a job')
+			return
+		}
+
+		const selectedJob = availableJobs.find((job) => job.id === selectedJobId)
+		if (!selectedJob) return
+
+		// Check if job already exists
+		if (data.jobs.includes(selectedJob.title)) {
+			toast.error('This job is already added')
+			return
+		}
+
+		// Add to jobs array
+		setData((prev) => ({
+			...prev,
+			jobs: [...prev.jobs, selectedJob.title],
+		}))
+
+		setSelectedJobId('')
+		toast.success('Job added successfully!')
+	}
+
+	const handleRemoveJob = (jobTitle: string) => {
+		setData((prev) => ({
+			...prev,
+			jobs: prev.jobs.filter((j) => j !== jobTitle),
+		}))
 	}
 
 	return (
@@ -641,6 +729,81 @@ export default function EmployeeSignUpPage() {
 										)}
 									</div>
 								</div>
+
+								{/* Jobs Selection */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										<Briefcase className="inline h-4 w-4 mr-1" />
+										Jobs <span className="text-neutral-500 text-xs">(Add multiple)</span>
+									</label>
+									<div className="space-y-3">
+										{/* Dropdown and Add Button */}
+										<div className="flex gap-2">
+											<select
+												value={selectedJobId}
+												onChange={(e) => setSelectedJobId(e.target.value)}
+												className="flex-1 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+											>
+												<option value="">-- Select a job to add --</option>
+												{availableJobs
+													.filter((job) => !data.jobs.includes(job.title))
+													.map((job) => (
+														<option key={job.id} value={job.id}>
+															{job.title}
+														</option>
+													))}
+											</select>
+											<Button 
+												type="button"
+												onClick={handleAddJob} 
+												size="sm"
+												disabled={!selectedJobId}
+												className="px-4"
+											>
+												<Plus className="h-4 w-4 mr-1" />
+												Add
+											</Button>
+										</div>
+
+										{/* Selected Jobs Display */}
+										{data.jobs.length > 0 ? (
+											<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
+												<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
+													Selected Jobs ({data.jobs.length})
+												</p>
+												<div className="flex flex-wrap gap-2">
+													{data.jobs.map((job) => (
+														<div
+															key={job}
+															className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20"
+														>
+															<span className="font-medium">{job}</span>
+															<button
+																onClick={() => handleRemoveJob(job)}
+																className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+																type="button"
+															>
+																<X className="h-3 w-3" />
+															</button>
+														</div>
+													))}
+												</div>
+											</div>
+										) : (
+											<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
+												<p className="text-sm text-neutral-500 dark:text-neutral-400">
+													No jobs added yet. Select from the dropdown above.
+												</p>
+											</div>
+										)}
+
+										{availableJobs.length === 0 && (
+											<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+												💡 No jobs available yet. Contact your administrator.
+											</p>
+										)}
+									</div>
+								</div>
 							</div>
 
 							<Button onClick={handleSubmit} className="w-full mt-6">
@@ -666,16 +829,17 @@ export default function EmployeeSignUpPage() {
 										</Button>
 										<Button
 											variant="outline"
-											onClick={() => {
-												// Simulate successful login for development
-							const mockUser = {
-								id: 'dev-user-001',
-								name: 'Dev User',
-								email: 'dev@example.com',
-								role: 'user' as const,
-								department: 'Engineering',
-								position: 'Developer',
-							}
+										onClick={() => {
+											// Simulate successful login for development
+						const mockUser = {
+							id: 'dev-user-001',
+							name: 'Dev User',
+							email: 'dev@example.com',
+							role: 'user' as const,
+							department: 'Engineering',
+							position: 'Developer',
+							jobs: ['Frontend Development', 'Backend Development'],
+						}
 												localStorage.setItem('proce:user', JSON.stringify(mockUser))
 												toast.success('Auto-logged in (Dev Mode)')
 												navigate('/app/dashboard')

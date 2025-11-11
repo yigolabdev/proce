@@ -210,30 +210,30 @@ export const mockWorkTemplates: WorkTemplate[] = [
  * Initialize mock data to localStorage
  * Automatic update on category structure changes through version control
  */
-const WORK_CATEGORIES_VERSION = '5.0' // Consolidated to 5 essential categories
+const WORK_STATUSES_VERSION = '6.0' // Renamed to Status and synced with System Settings
 
 export const initializeMockWorkCategories = (): void => {
 	try {
-		const currentVersion = localStorage.getItem('workCategoriesVersion')
+		const currentVersion = localStorage.getItem('workStatusesVersion')
 		
 		// 버전이 다르거나 없으면 강제 재초기화
-		if (currentVersion !== WORK_CATEGORIES_VERSION) {
-			localStorage.setItem('workCategories', JSON.stringify(mockWorkCategories))
+		if (currentVersion !== WORK_STATUSES_VERSION) {
+			localStorage.setItem('workStatuses', JSON.stringify(mockWorkCategories))
 			localStorage.setItem('workTags', JSON.stringify(mockWorkTags))
 			localStorage.setItem('workTemplates', JSON.stringify(mockWorkTemplates))
-			localStorage.setItem('workCategoriesVersion', WORK_CATEGORIES_VERSION)
+			localStorage.setItem('workStatusesVersion', WORK_STATUSES_VERSION)
 			
-			console.log('✅ Work categories updated to version', WORK_CATEGORIES_VERSION)
-			console.log('📝 Consolidated to 5 essential categories with custom "Other" option')
+			console.log('✅ Work statuses updated to version', WORK_STATUSES_VERSION)
+			console.log('📝 Renamed to Status and synced with System Settings')
 		} else {
 			// 버전이 같으면 기존 데이터가 없을 때만 초기화
-			const existingCategories = localStorage.getItem('workCategories')
+			const existingStatuses = localStorage.getItem('workStatuses')
 			const existingTags = localStorage.getItem('workTags')
 			const existingTemplates = localStorage.getItem('workTemplates')
 
-			if (!existingCategories) {
-				localStorage.setItem('workCategories', JSON.stringify(mockWorkCategories))
-				console.log('✅ Mock work categories initialized')
+			if (!existingStatuses) {
+				localStorage.setItem('workStatuses', JSON.stringify(mockWorkCategories))
+				console.log('✅ Mock work statuses initialized')
 			}
 
 			if (!existingTags) {
@@ -247,7 +247,7 @@ export const initializeMockWorkCategories = (): void => {
 			}
 		}
 	} catch (error) {
-		console.error('Failed to initialize mock work categories:', error)
+		console.error('Failed to initialize mock work statuses:', error)
 	}
 }
 

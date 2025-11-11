@@ -27,6 +27,7 @@ import {
 	Image as ImageIcon,
 	FileSpreadsheet,
 	File,
+	Building2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
@@ -56,7 +57,7 @@ export default function ProjectsPage() {
 	// Form states
 	const [projectName, setProjectName] = useState('')
 	const [projectDescription, setProjectDescription] = useState('')
-	const [projectDepartment, setProjectDepartment] = useState('')
+	const [projectDepartments, setProjectDepartments] = useState<string[]>([])
 	const [projectObjectives, setProjectObjectives] = useState<string[]>([])
 	const [objectiveInput, setObjectiveInput] = useState('')
 	const [startDate, setStartDate] = useState('')
@@ -67,6 +68,10 @@ export default function ProjectsPage() {
 	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
 	const [selectedDepartment, setSelectedDepartment] = useState('')
 	const [selectedMemberId, setSelectedMemberId] = useState('')
+	
+	// Available departments from system settings
+	const [availableDepartments, setAvailableDepartments] = useState<{id: string, name: string}[]>([])
+	const [selectedDeptForProject, setSelectedDeptForProject] = useState('')
 	
 	// Files and Links states
 	const [files, setFiles] = useState<UploadedFile[]>([])
@@ -90,7 +95,28 @@ export default function ProjectsPage() {
 		loadProjects()
 		loadWorkEntries()
 		loadTeamMembers()
+		loadDepartments()
 	}, [])
+	
+	const loadDepartments = () => {
+		try {
+			const savedDepartments = localStorage.getItem('departments')
+			if (savedDepartments) {
+				const depts = JSON.parse(savedDepartments)
+				setAvailableDepartments(depts.map((d: {id: string, name: string}) => ({ id: d.id, name: d.name })))
+			} else {
+				// Fallback to mock data
+				const mockDepts = [
+					{ id: '1', name: 'Engineering' },
+					{ id: '2', name: 'Product' },
+					{ id: '3', name: 'Marketing' },
+				]
+				setAvailableDepartments(mockDepts)
+			}
+		} catch (error) {
+			console.error('Failed to load departments:', error)
+		}
+	}
 
 	const loadWorkEntries = () => {
 		try {
@@ -116,16 +142,26 @@ export default function ProjectsPage() {
 		try {
 			const saved = localStorage.getItem('projects')
 			if (saved) {
-				const parsed = JSON.parse(saved).map((proj: { startDate: string; endDate: string; createdAt: string; members: Array<{ joinedAt: string }> }) => ({
-					...proj,
-					startDate: new Date(proj.startDate),
-					endDate: new Date(proj.endDate),
-					createdAt: new Date(proj.createdAt),
-					members: proj.members.map((m: { joinedAt: string }) => ({
-						...m,
-						joinedAt: new Date(m.joinedAt),
-					})),
-				}))
+				const parsed = JSON.parse(saved).map((proj: any) => {
+					// Migrate old 'department' (string) to 'departments' (array)
+					const departments = proj.departments 
+						? proj.departments 
+						: proj.department 
+							? [proj.department] 
+							: ['General']
+					
+					return {
+						...proj,
+						departments,
+						startDate: new Date(proj.startDate),
+						endDate: new Date(proj.endDate),
+						createdAt: new Date(proj.createdAt),
+						members: proj.members.map((m: { joinedAt: string }) => ({
+							...m,
+							joinedAt: new Date(m.joinedAt),
+						})),
+					}
+				})
 				setProjects(parsed)
 			}
 		} catch (error) {
@@ -161,6 +197,33 @@ export default function ProjectsPage() {
 
 	const handleRemoveObjective = (objective: string) => {
 		setProjectObjectives(projectObjectives.filter((o) => o !== objective))
+	}
+
+	const handleAddDepartment = () => {
+		if (!selectedDeptForProject) {
+			toast.error('Please select a department')
+			return
+		}
+
+		const selectedDept = availableDepartments.find((d) => d.id === selectedDeptForProject)
+		if (!selectedDept) {
+			toast.error('Department not found')
+			return
+		}
+
+		if (projectDepartments.includes(selectedDept.name)) {
+			toast.error('Department already added')
+			return
+		}
+
+		setProjectDepartments([...projectDepartments, selectedDept.name])
+		setSelectedDeptForProject('')
+		toast.success('Department added')
+	}
+
+	const handleRemoveDepartment = (departmentName: string) => {
+		setProjectDepartments(projectDepartments.filter((d) => d !== departmentName))
+		toast.success('Department removed')
 	}
 
 	const handleAddMember = () => {
@@ -314,7 +377,7 @@ export default function ProjectsPage() {
 			id: Date.now().toString(),
 			name: projectName.trim(),
 			description: projectDescription.trim(),
-			department: projectDepartment.trim() || 'General',
+			departments: projectDepartments.length > 0 ? projectDepartments : ['General'],
 			objectives: projectObjectives,
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
@@ -334,7 +397,7 @@ export default function ProjectsPage() {
 		// Reset form
 		setProjectName('')
 		setProjectDescription('')
-		setProjectDepartment('')
+		setProjectDepartments([])
 		setProjectObjectives([])
 		setStartDate('')
 		setEndDate('')
@@ -344,6 +407,7 @@ export default function ProjectsPage() {
 		setLinkInput('')
 		setSelectedDepartment('')
 		setSelectedMemberId('')
+		setSelectedDeptForProject('')
 		setShowCreateDialog(false)
 
 		toast.success('Project created successfully!')
@@ -533,13 +597,15 @@ export default function ProjectsPage() {
 							<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
 								<div className="flex items-start justify-between">
 									<div className="flex-1 min-w-0">
-										<h3 className="font-bold text-lg mb-2 truncate">{project.name}</h3>
-										<div className="flex items-center gap-2 flex-wrap">
-											{getStatusBadge(project.status)}
-											<span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full font-medium">
-												{project.department}
+									<h3 className="font-bold text-lg mb-2 truncate">{project.name}</h3>
+									<div className="flex items-center gap-2 flex-wrap">
+										{getStatusBadge(project.status)}
+										{(project.departments || []).map((dept, idx) => (
+											<span key={idx} className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full font-medium">
+												{dept}
 											</span>
-										</div>
+										))}
+									</div>
 									</div>
 									<div className="flex items-center gap-1 ml-2">
 										<button
@@ -752,15 +818,79 @@ export default function ProjectsPage() {
 									/>
 								</div>
 
-								{/* Department */}
+								{/* Departments */}
 								<div>
-									<label className="block text-sm font-medium mb-2">Department</label>
-									<Input
-										value={projectDepartment}
-										onChange={(e) => setProjectDepartment(e.target.value)}
-										placeholder="e.g., Engineering, Marketing, Product..."
-										className="text-base"
-									/>
+									<label className="block text-sm font-medium mb-2">
+										<Building2 className="inline h-4 w-4 mr-1" />
+										Departments
+									</label>
+									<div className="space-y-3">
+										{/* Dropdown and Add Button */}
+										<div className="flex gap-2">
+											<select
+												value={selectedDeptForProject}
+												onChange={(e) => setSelectedDeptForProject(e.target.value)}
+												className="flex-1 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+											>
+												<option value="">-- Select a department to add --</option>
+												{availableDepartments
+													.filter((dept) => !projectDepartments.includes(dept.name))
+													.map((dept) => (
+														<option key={dept.id} value={dept.id}>
+															{dept.name}
+														</option>
+													))}
+											</select>
+											<Button
+												type="button"
+												onClick={handleAddDepartment}
+												size="sm"
+												disabled={!selectedDeptForProject}
+												className="px-4"
+											>
+												<Plus className="h-4 w-4 mr-1" />
+												Add
+											</Button>
+										</div>
+
+										{/* Selected Departments Display */}
+										{projectDepartments.length > 0 ? (
+											<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
+												<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
+													Selected Departments ({projectDepartments.length})
+												</p>
+												<div className="flex flex-wrap gap-2">
+													{projectDepartments.map((dept) => (
+														<div
+															key={dept}
+															className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20"
+														>
+															<span className="font-medium">{dept}</span>
+															<button
+																onClick={() => handleRemoveDepartment(dept)}
+																className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+																type="button"
+															>
+																<X className="h-3 w-3" />
+															</button>
+														</div>
+													))}
+												</div>
+											</div>
+										) : (
+											<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
+												<p className="text-sm text-neutral-500 dark:text-neutral-400">
+													No departments added yet. Select from the dropdown above.
+												</p>
+											</div>
+										)}
+
+										{availableDepartments.length === 0 && (
+											<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+												💡 No departments available yet. Contact your administrator.
+											</p>
+										)}
+									</div>
 								</div>
 
 								{/* Objectives */}
