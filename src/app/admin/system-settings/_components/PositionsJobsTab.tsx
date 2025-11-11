@@ -204,23 +204,23 @@ export default function PositionsJobsTab({
 				</div>
 			)}
 
-			{/* Jobs Section */}
-			<div className="space-y-4 pt-8 border-t-2 border-neutral-200 dark:border-neutral-800">
-				<div className="flex items-center justify-between">
-					<div>
-						<h3 className="text-lg font-bold flex items-center gap-2">
-							<Briefcase className="h-5 w-5 text-primary" />
-							Jobs
-						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-							Define specific job roles and responsibilities
-						</p>
-					</div>
-					<Button onClick={() => onSetShowAddJob(true)}>
-						<Plus className="h-4 w-4 mr-2" />
-						Add Job
-					</Button>
+		{/* Roles & Responsibilities Section */}
+		<div className="space-y-4 pt-8 border-t-2 border-neutral-200 dark:border-neutral-800">
+			<div className="flex items-center justify-between">
+				<div>
+					<h3 className="text-lg font-bold flex items-center gap-2">
+						<Briefcase className="h-5 w-5 text-primary" />
+						Roles & Responsibilities
+					</h3>
+					<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+						Define specific roles and their responsibilities
+					</p>
 				</div>
+				<Button onClick={() => onSetShowAddJob(true)}>
+					<Plus className="h-4 w-4 mr-2" />
+					Add Role
+				</Button>
+			</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{jobs.map((job) => (
@@ -228,11 +228,11 @@ export default function PositionsJobsTab({
 							<CardContent className="p-4">
 							{editingJob?.id === job.id ? (
 								<div className="space-y-3">
-									<Input
-										value={editingJob.title}
-										onChange={(e) => onSetEditingJob({ ...editingJob, title: e.target.value })}
-										placeholder="Job title"
-									/>
+							<Input
+								value={editingJob.title}
+								onChange={(e) => onSetEditingJob({ ...editingJob, title: e.target.value })}
+								placeholder="Role name"
+							/>
 									<Textarea
 										value={editingJob.description}
 										onChange={(e) =>
@@ -316,16 +316,16 @@ export default function PositionsJobsTab({
 			</div>
 		</div>
 
-		{/* Add Job Dialog */}
-			{showAddJob && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-lg">
-						<div className="p-6">
-							<div className="flex items-center justify-between mb-4">
-								<h3 className="text-xl font-bold flex items-center gap-2">
-									<Plus className="h-5 w-5 text-primary" />
-									Add Job
-								</h3>
+		{/* Add Role & Responsibilities Dialog */}
+		{showAddJob && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+				<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-lg">
+					<div className="p-6">
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="text-xl font-bold flex items-center gap-2">
+								<Plus className="h-5 w-5 text-primary" />
+								Add Role & Responsibilities
+							</h3>
 								<button
 									onClick={() => onSetShowAddJob(false)}
 									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
@@ -334,27 +334,27 @@ export default function PositionsJobsTab({
 								</button>
 							</div>
 
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										Job Title <span className="text-red-500">*</span>
-									</label>
-									<Input
-										value={newJob.title}
-										onChange={(e) => onSetNewJob({ ...newJob, title: e.target.value })}
-										placeholder="e.g., Frontend Development"
-									/>
-								</div>
+						<div className="space-y-4">
+							<div>
+								<label className="block text-sm font-medium mb-2">
+									Role Name <span className="text-red-500">*</span>
+								</label>
+								<Input
+									value={newJob.title}
+									onChange={(e) => onSetNewJob({ ...newJob, title: e.target.value })}
+									placeholder="e.g., Frontend Development"
+								/>
+							</div>
 
-								<div>
-									<label className="block text-sm font-medium mb-2">Description</label>
-									<Textarea
-										value={newJob.description}
-										onChange={(e) => onSetNewJob({ ...newJob, description: e.target.value })}
-										placeholder="Brief description of this job role"
-										rows={3}
-									/>
-								</div>
+							<div>
+								<label className="block text-sm font-medium mb-2">Description</label>
+								<Textarea
+									value={newJob.description}
+									onChange={(e) => onSetNewJob({ ...newJob, description: e.target.value })}
+									placeholder="Brief description of this role"
+									rows={3}
+								/>
+							</div>
 
 								<div>
 									<label className="block text-sm font-medium mb-2">Responsibilities</label>
@@ -366,18 +366,18 @@ export default function PositionsJobsTab({
 									/>
 								</div>
 
-								<div className="flex items-center gap-2 pt-4">
-									<Button onClick={onAddJob} className="flex-1">
-										Add Job
-									</Button>
-									<Button
-										variant="outline"
-										onClick={() => onSetShowAddJob(false)}
-										className="flex-1"
-									>
-										Cancel
-									</Button>
-								</div>
+							<div className="flex items-center gap-2 pt-4">
+								<Button onClick={onAddJob} className="flex-1">
+									Add Role
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => onSetShowAddJob(false)}
+									className="flex-1"
+								>
+									Cancel
+								</Button>
+							</div>
 							</div>
 						</div>
 					</div>

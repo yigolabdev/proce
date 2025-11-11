@@ -545,12 +545,12 @@ export default function SettingsPage() {
 								</div>
 							</div>
 
-							{/* Jobs Selection */}
-							<div className="mt-5">
-								<label className="block text-sm font-medium mb-2">
-									<Briefcase className="inline h-4 w-4 mr-1" />
-									Jobs <span className="text-neutral-500 text-xs">(Add multiple)</span>
-								</label>
+						{/* Roles & Responsibilities Selection */}
+						<div className="mt-5">
+							<label className="block text-sm font-medium mb-2">
+								<Briefcase className="inline h-4 w-4 mr-1" />
+								Roles & Responsibilities <span className="text-neutral-500 text-xs">(Add multiple)</span>
+							</label>
 								<div className="space-y-3">
 									{/* Dropdown and Add Button */}
 									<div className="flex gap-2">
@@ -579,12 +579,12 @@ export default function SettingsPage() {
 										</Button>
 									</div>
 
-									{/* Selected Jobs Display */}
-									{profile.jobs.length > 0 ? (
-										<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
-											<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
-												Selected Jobs ({profile.jobs.length})
-											</p>
+								{/* Selected Roles Display */}
+								{profile.jobs.length > 0 ? (
+									<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
+										<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
+											Selected Roles ({profile.jobs.length})
+										</p>
 											<div className="flex flex-wrap gap-2">
 												{profile.jobs.map((job) => (
 													<div
@@ -603,19 +603,19 @@ export default function SettingsPage() {
 												))}
 											</div>
 										</div>
-									) : (
-										<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
-											<p className="text-sm text-neutral-500 dark:text-neutral-400">
-												No jobs added yet. Select from the dropdown above.
-											</p>
-										</div>
-									)}
-
-									{availableJobs.length === 0 && (
-										<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-											💡 No jobs available yet. Contact your administrator.
+								) : (
+									<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
+										<p className="text-sm text-neutral-500 dark:text-neutral-400">
+											No roles added yet. Select from the dropdown above.
 										</p>
-									)}
+									</div>
+								)}
+
+								{availableJobs.length === 0 && (
+									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+										💡 No roles available yet. Contact your administrator.
+									</p>
+								)}
 								</div>
 							</div>
 

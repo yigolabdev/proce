@@ -299,9 +299,9 @@ export default function SystemSettingsPage() {
 								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
 						}`}
 					>
-						<Briefcase className="inline h-4 w-4 mr-2" />
-						Positions & Jobs
-					</button>
+					<Briefcase className="inline h-4 w-4 mr-2" />
+					Positions & Roles
+				</button>
 					<button
 						onClick={() => setActiveTab('status')}
 						className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -331,7 +331,7 @@ export default function SystemSettingsPage() {
 					/>
 				)}
 
-				{/* Positions & Jobs Tab */}
+				{/* Positions & Roles Tab */}
 				{activeTab === 'positions' && (
 					<PositionsJobsTab
 						positions={positions}
