@@ -12,8 +12,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
-import DevMemo from '../../../components/dev/DevMemo'
-import { DEV_MEMOS } from '../../../constants/devMemos'
+import { storage } from '../../../utils/storage'
 import KPITab from './_components/KPITab'
 import WorkplaceTab from './_components/WorkplaceTab'
 import BusinessTab from './_components/BusinessTab'
@@ -151,10 +150,9 @@ export default function CompanySettingsPage() {
 	// Load data from localStorage
 	useEffect(() => {
 		try {
-			const savedInfo = localStorage.getItem('companyInfo')
+			const savedInfo = storage.get<any>('companyInfo')
 			if (savedInfo) {
-				const parsed = JSON.parse(savedInfo)
-				setCompanyInfo(parsed)
+				setCompanyInfo(savedInfo)
 			}
 		} catch (error) {
 			console.error('Failed to load company info:', error)
@@ -162,50 +160,45 @@ export default function CompanySettingsPage() {
 		}
 		
 		try {
-			const savedLeadership = localStorage.getItem('leadership')
+			const savedLeadership = storage.get<any>('leadership')
 			if (savedLeadership) {
-				const parsed = JSON.parse(savedLeadership)
-				setLeadership(parsed)
+				setLeadership(savedLeadership)
 			}
 		} catch (error) {
 			console.error('Failed to load leadership:', error)
 		}
 		
 		try {
-			const savedKPIs = localStorage.getItem('companyKPIs')
+			const savedKPIs = storage.get<any>('companyKPIs')
 			if (savedKPIs) {
-				const parsed = JSON.parse(savedKPIs)
-				setCompanyKPIs(parsed)
+				setCompanyKPIs(savedKPIs)
 			}
 		} catch (error) {
 			console.error('Failed to load KPIs:', error)
 		}
 		
 		try {
-			const savedFinancial = localStorage.getItem('financialData')
+			const savedFinancial = storage.get<any>('financialData')
 			if (savedFinancial) {
-				const parsed = JSON.parse(savedFinancial)
-				setFinancialData(parsed)
+				setFinancialData(savedFinancial)
 			}
 		} catch (error) {
 			console.error('Failed to load financial data:', error)
 		}
 		
 		try {
-			const savedDocuments = localStorage.getItem('companyDocuments')
+			const savedDocuments = storage.get<any>('companyDocuments')
 			if (savedDocuments) {
-				const parsed = JSON.parse(savedDocuments)
-				setDocuments(parsed)
+				setDocuments(savedDocuments)
 			}
 		} catch (error) {
 			console.error('Failed to load documents:', error)
 		}
 		
 		try {
-			const savedWorkplace = localStorage.getItem('workplaceSettings')
+			const savedWorkplace = storage.get<any>('workplaceSettings')
 			if (savedWorkplace) {
-				const parsed = JSON.parse(savedWorkplace)
-				setWorkplaceSettings(parsed)
+				setWorkplaceSettings(savedWorkplace)
 			}
 		} catch (error) {
 			console.error('Failed to load workplace settings:', error)
@@ -213,9 +206,9 @@ export default function CompanySettingsPage() {
 		
 		// Load departments from system settings
 		try {
-			const savedDepartments = localStorage.getItem('departments')
+			const savedDepartments = storage.get<any>('departments')
 			if (savedDepartments) {
-				const depts = JSON.parse(savedDepartments)
+				const depts = savedDepartments
 				setAvailableDepartments(depts.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })))
 			} else {
 				// Fallback to mock data
@@ -556,8 +549,6 @@ export default function CompanySettingsPage() {
 
 	return (
 		<div className="space-y-6">
-			{/* DevMemo */}
-			<DevMemo content={DEV_MEMOS.COMPANY_SETTINGS} pagePath="/app/admin/company-settings/page.tsx" />
 
 			{/* Header */}
 			<div className="flex items-center justify-between">

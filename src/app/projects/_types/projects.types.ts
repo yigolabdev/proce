@@ -54,6 +54,7 @@ export interface Project {
 	progress: number
 	createdAt: Date
 	createdBy: string
+	tags?: string[]
 	files?: UploadedFile[]
 	links?: LinkedResource[]
 	

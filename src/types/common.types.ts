@@ -74,7 +74,9 @@ export interface Project {
 	progress: number
 	startDate: Date | string
 	endDate: Date | string
-	department?: string
+	department?: string // Legacy: single department (deprecated)
+	departments?: string[] // New: multiple departments
+	objectives?: string[] // Project objectives/goals
 	members?: ProjectMember[]
 	tags?: string[]
 	priority?: 'low' | 'medium' | 'high'
@@ -82,6 +84,8 @@ export interface Project {
 	createdAt: Date | string
 	createdBy: string
 	schedule?: ProjectSchedule
+	files?: FileAttachment[] // Attached files
+	links?: LinkResource[] // Related links
 }
 
 // ==================== OKR Types ====================
