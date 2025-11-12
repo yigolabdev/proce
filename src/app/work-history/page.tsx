@@ -1,3 +1,4 @@
+import { storage } from '../../utils/storage'
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '../../components/ui/Card'
@@ -98,7 +99,7 @@ export default function WorkHistoryPage() {
 			try {
 				setLoading(true)
 				// Load projects
-				const savedProjects = localStorage.getItem('projects')
+				const savedProjects = storage.get<any>('projects')
 				if (savedProjects) {
 					const parsedProjects = JSON.parse(savedProjects).map((p: any) => ({
 						id: p.id,
@@ -115,7 +116,7 @@ export default function WorkHistoryPage() {
 				]
 				setObjectives(mockObjectives)
 
-				const saved = localStorage.getItem('workEntries')
+				const saved = storage.get<any>('workEntries')
 				if (saved) {
 					const parsed = JSON.parse(saved)
 					const entriesWithDates = parsed.map((entry: any) => ({

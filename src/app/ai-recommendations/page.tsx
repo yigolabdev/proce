@@ -1,3 +1,4 @@
+import { storage } from '../../utils/storage'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
@@ -76,9 +77,9 @@ export default function AIRecommendationsPage() {
 
 		setTimeout(() => {
 			// Load actual data from localStorage
-			const projectsData = localStorage.getItem('projects')
-			const workEntriesData = localStorage.getItem('workEntries')
-			const objectivesData = localStorage.getItem('objectives')
+			const projectsData = storage.get<any>('projects')
+			const workEntriesData = storage.get<any>('workEntries')
+			const objectivesData = storage.get<any>('objectives')
 			
 			const projects = projectsData ? JSON.parse(projectsData) : []
 			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: { date: string; [key: string]: unknown }) => ({

@@ -1,3 +1,4 @@
+import { storage } from '../../utils/storage'
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
@@ -154,7 +155,7 @@ export default function SettingsPage() {
 
 	const loadSettings = () => {
 		// Load profile
-		const savedProfile = localStorage.getItem('userProfile')
+		const savedProfile = storage.get<any>('userProfile')
 		if (savedProfile) {
 			const parsed = JSON.parse(savedProfile)
 			setProfile(parsed)
@@ -194,7 +195,7 @@ export default function SettingsPage() {
 		}
 
 		// Load notifications
-		const savedNotifications = localStorage.getItem('notificationSettings')
+		const savedNotifications = storage.get<any>('notificationSettings')
 		if (savedNotifications) {
 			setNotifications(JSON.parse(savedNotifications))
 		}
@@ -202,7 +203,7 @@ export default function SettingsPage() {
 
 	const loadAvailableJobs = () => {
 		try {
-			const savedJobs = localStorage.getItem('jobs')
+			const savedJobs = storage.get<any>('jobs')
 			if (savedJobs) {
 				const jobs = JSON.parse(savedJobs)
 				setAvailableJobs(jobs)
@@ -234,7 +235,7 @@ export default function SettingsPage() {
 
 	const loadDepartments = () => {
 		try {
-			const savedDepartments = localStorage.getItem('departments')
+			const savedDepartments = storage.get<any>('departments')
 			if (savedDepartments) {
 				const depts = JSON.parse(savedDepartments)
 				setDepartments(depts.map((d: any) => ({ id: d.id, name: d.name })))
@@ -254,7 +255,7 @@ export default function SettingsPage() {
 
 	const loadPositions = () => {
 		try {
-			const savedPositions = localStorage.getItem('positions')
+			const savedPositions = storage.get<any>('positions')
 			if (savedPositions) {
 				const pos = JSON.parse(savedPositions)
 				setPositions(pos.map((p: any) => ({ id: p.id, name: p.name })))

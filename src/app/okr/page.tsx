@@ -1,3 +1,4 @@
+import { storage } from '../../utils/storage'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
@@ -224,7 +225,7 @@ export default function OKRPage() {
 
 	const loadObjectives = () => {
 		try {
-			const saved = localStorage.getItem('objectives')
+			const saved = storage.get<any>('objectives')
 			if (saved) {
 				setObjectives(JSON.parse(saved))
 			} else {
@@ -1382,7 +1383,7 @@ export default function OKRPage() {
 
 	const loadWorkEntries = () => {
 		try {
-			const saved = localStorage.getItem('workEntries')
+			const saved = storage.get<any>('workEntries')
 			if (saved) {
 				const parsed = JSON.parse(saved)
 				const entriesWithDates = parsed.map((entry: any) => ({

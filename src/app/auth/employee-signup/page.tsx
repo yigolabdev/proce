@@ -1,3 +1,4 @@
+import { storage } from '../../../utils/storage'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
@@ -114,7 +115,7 @@ export default function EmployeeSignUpPage() {
 	useEffect(() => {
 		const loadDepartments = () => {
 			try {
-				const savedSettings = localStorage.getItem('workspaceSettings')
+				const savedSettings = storage.get<any>('workspaceSettings')
 				if (savedSettings) {
 					const settings = JSON.parse(savedSettings)
 					if (settings.deptRole && settings.deptRole.departments && settings.deptRole.departments.length > 0) {
@@ -153,7 +154,7 @@ export default function EmployeeSignUpPage() {
 		
 		const loadJobs = () => {
 			try {
-				const savedJobs = localStorage.getItem('jobs')
+				const savedJobs = storage.get<any>('jobs')
 				if (savedJobs) {
 					const jobs = JSON.parse(savedJobs)
 					setAvailableJobs(jobs)

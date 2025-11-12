@@ -1,36 +1,61 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import SignUpPage from '../app/auth/sign-up/page'
-import ForgotPasswordPage from '../app/auth/forgot-password/page'
-import CompanySignUpPage from '../app/auth/company-signup/page'
-import EmployeeSignUpPage from '../app/auth/employee-signup/page'
-import JoinWorkspacePage from '../app/auth/join/page'
-import OnboardingPage from '../app/auth/onboarding/page'
-import IntegrationsPage from '../app/integrations/page'
 import { I18nProvider } from '../i18n/I18nProvider'
 import { ThemeProvider } from '../theme/ThemeProvider'
 import { IntegrationsProvider } from '../app/_providers/IntegrationsContext'
 import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../components/layout/AppLayout'
-import DashboardPage from '../pages/DashboardPage'
-import InputPage from '../pages/InputPage'
-import WorkHistoryPage from '../app/work-history/page'
-import LandingPage from '../pages/LandingPage'
-import MessagesPage from '../app/messages/page'
-import UsersManagementPage from '../app/admin/users/page'
-import CompanySettingsPage from '../app/admin/company-settings/page'
-import SystemSettingsPage from '../app/admin/system-settings/page'
-import ExecutiveDashboardPage from '../app/executive/page'
-import PerformancePage from '../app/performance/page'
-import OKRPage from '../app/okr/page'
-import AIRecommendationsPage from '../app/ai-recommendations/page'
-import ExecutiveGoalsPage from '../app/executive/goals/page'
-import ProjectsPage from '../app/projects/page'
-import SettingsPage from '../app/settings/page'
+
+// Loading component for code splitting
+function PageLoader() {
+	return (
+		<div className="flex items-center justify-center min-h-[60vh]">
+			<div className="flex flex-col items-center gap-4">
+				<div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+				<p className="text-sm text-neutral-600 dark:text-neutral-400">Loading...</p>
+			</div>
+		</div>
+	)
+}
+
+// Lazy load pages for better performance (Code Splitting)
+const LandingPage = lazy(() => import('../pages/LandingPage'))
+
+// Auth Pages
+const SignUpPage = lazy(() => import('../app/auth/sign-up/page'))
+const ForgotPasswordPage = lazy(() => import('../app/auth/forgot-password/page'))
+const CompanySignUpPage = lazy(() => import('../app/auth/company-signup/page'))
+const EmployeeSignUpPage = lazy(() => import('../app/auth/employee-signup/page'))
+const JoinWorkspacePage = lazy(() => import('../app/auth/join/page'))
+const OnboardingPage = lazy(() => import('../app/auth/onboarding/page'))
+
+// Work Pages
+const DashboardPage = lazy(() => import('../pages/DashboardPage'))
+const InputPage = lazy(() => import('../pages/InputPage'))
+const ProjectsPage = lazy(() => import('../app/projects/page'))
+const WorkHistoryPage = lazy(() => import('../app/work-history/page'))
+const MessagesPage = lazy(() => import('../app/messages/page'))
+const AIRecommendationsPage = lazy(() => import('../app/ai-recommendations/page'))
+const OKRPage = lazy(() => import('../app/okr/page'))
+
+// Admin Pages
+const UsersManagementPage = lazy(() => import('../app/admin/users/page'))
+const SystemSettingsPage = lazy(() => import('../app/admin/system-settings/page'))
+const CompanySettingsPage = lazy(() => import('../app/admin/company-settings/page'))
+
+// Executive Pages
+const ExecutiveDashboardPage = lazy(() => import('../app/executive/page'))
+const ExecutiveGoalsPage = lazy(() => import('../app/executive/goals/page'))
+const PerformancePage = lazy(() => import('../app/performance/page'))
+
+// Other Pages
+const IntegrationsPage = lazy(() => import('../app/integrations/page'))
+const SettingsPage = lazy(() => import('../app/settings/page'))
 
 // Development Pages (only in dev mode)
-import DevelopmentRoadmapPage from '../app/dev/roadmap/page'
+const DevelopmentRoadmapPage = lazy(() => import('../app/dev/roadmap/page'))
 
 // 404 Not Found Page Component
 function NotFoundPage() {
@@ -62,43 +87,50 @@ const queryClient = new QueryClient({
 	},
 })
 
+// Helper to wrap lazy components with Suspense
+const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType>) => (
+	<Suspense fallback={<PageLoader />}>
+		<Component />
+	</Suspense>
+)
+
 // Build app routes with conditional dev routes
 const appRoutes = [
 	// 작업자 메뉴
-	{ path: '/app/dashboard', element: <DashboardPage /> },
-	{ path: '/app/input', element: <InputPage /> },
-	{ path: '/app/projects', element: <ProjectsPage /> },
-	{ path: '/app/work-history', element: <WorkHistoryPage /> },
-	{ path: '/app/messages', element: <MessagesPage /> },
-	{ path: '/app/ai-recommendations', element: <AIRecommendationsPage /> },
+	{ path: '/app/dashboard', element: withSuspense(DashboardPage) },
+	{ path: '/app/input', element: withSuspense(InputPage) },
+	{ path: '/app/projects', element: withSuspense(ProjectsPage) },
+	{ path: '/app/work-history', element: withSuspense(WorkHistoryPage) },
+	{ path: '/app/messages', element: withSuspense(MessagesPage) },
+	{ path: '/app/ai-recommendations', element: withSuspense(AIRecommendationsPage) },
 	{ path: '/app/inbox', element: <Navigate to="/app/messages" replace /> },
-	{ path: '/app/okr', element: <OKRPage /> },
+	{ path: '/app/okr', element: withSuspense(OKRPage) },
 	// 관리자 메뉴
-	{ path: '/app/admin/users', element: <UsersManagementPage /> },
-	{ path: '/app/admin/system-settings', element: <SystemSettingsPage /> },
-	{ path: '/app/admin/company-settings', element: <CompanySettingsPage /> },
+	{ path: '/app/admin/users', element: withSuspense(UsersManagementPage) },
+	{ path: '/app/admin/system-settings', element: withSuspense(SystemSettingsPage) },
+	{ path: '/app/admin/company-settings', element: withSuspense(CompanySettingsPage) },
 	// 임원 메뉴
-	{ path: '/app/executive', element: <ExecutiveDashboardPage /> },
-	{ path: '/app/executive/goals', element: <ExecutiveGoalsPage /> },
+	{ path: '/app/executive', element: withSuspense(ExecutiveDashboardPage) },
+	{ path: '/app/executive/goals', element: withSuspense(ExecutiveGoalsPage) },
 	{ path: '/app/analytics', element: <Navigate to="/app/executive" replace /> },
-	{ path: '/app/performance', element: <PerformancePage /> },
+	{ path: '/app/performance', element: withSuspense(PerformancePage) },
 	// 기타
 	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
-	{ path: '/app/integrations', element: <IntegrationsPage /> },
-	{ path: '/app/settings', element: <SettingsPage /> },
+	{ path: '/app/integrations', element: withSuspense(IntegrationsPage) },
+	{ path: '/app/settings', element: withSuspense(SettingsPage) },
 	// Development routes (only in dev mode)
-	...(import.meta.env.DEV ? [{ path: '/app/dev/roadmap', element: <DevelopmentRoadmapPage /> }] : []),
+	...(import.meta.env.DEV ? [{ path: '/app/dev/roadmap', element: withSuspense(DevelopmentRoadmapPage) }] : []),
 ]
 
 // 라우터 설정
 const router = createBrowserRouter([
-	{ path: '/', element: <LandingPage /> },
-	{ path: '/auth/sign-up', element: <SignUpPage /> },
-	{ path: '/auth/forgot-password', element: <ForgotPasswordPage /> },
-	{ path: '/auth/company-signup', element: <CompanySignUpPage /> },
-	{ path: '/auth/employee-signup', element: <EmployeeSignUpPage /> },
-	{ path: '/auth/join', element: <JoinWorkspacePage /> },
-	{ path: '/auth/onboarding', element: <OnboardingPage /> },
+	{ path: '/', element: withSuspense(LandingPage) },
+	{ path: '/auth/sign-up', element: withSuspense(SignUpPage) },
+	{ path: '/auth/forgot-password', element: withSuspense(ForgotPasswordPage) },
+	{ path: '/auth/company-signup', element: withSuspense(CompanySignUpPage) },
+	{ path: '/auth/employee-signup', element: withSuspense(EmployeeSignUpPage) },
+	{ path: '/auth/join', element: withSuspense(JoinWorkspacePage) },
+	{ path: '/auth/onboarding', element: withSuspense(OnboardingPage) },
 	{
 		path: '/app',
 		element: <AppLayout />,
