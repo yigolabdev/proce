@@ -88,6 +88,7 @@ export default function AIRecommendationsPage() {
 		category: '',
 		deadline: '',
 		projectId: '',
+		selectedDepartment: '',
 		assignedToId: '',
 	})
 	
@@ -125,16 +126,47 @@ export default function AIRecommendationsPage() {
 		} else {
 			// Mock users if none exist
 			const mockUsers = [
+				// Engineering Team (7 members)
 				{ id: '1', name: 'John Doe', email: 'john@company.com', department: 'Engineering' },
-				{ id: '2', name: 'Sarah Chen', email: 'sarah@company.com', department: 'Product' },
 				{ id: '3', name: 'Mike Johnson', email: 'mike@company.com', department: 'Engineering' },
-				{ id: '4', name: 'Emily Davis', email: 'emily@company.com', department: 'Design' },
 				{ id: '5', name: 'David Lee', email: 'david@company.com', department: 'Engineering' },
-				{ id: '6', name: 'Lisa Park', email: 'lisa@company.com', department: 'Marketing' },
 				{ id: '7', name: 'Alex Kim', email: 'alex@company.com', department: 'Engineering' },
-				{ id: '8', name: 'Rachel Green', email: 'rachel@company.com', department: 'Sales' },
-				{ id: '9', name: 'Tom Wilson', email: 'tom@company.com', department: 'Operations' },
 				{ id: '10', name: 'Chris Brown', email: 'chris@company.com', department: 'Engineering' },
+				{ id: '11', name: 'Jennifer Wang', email: 'jennifer@company.com', department: 'Engineering' },
+				{ id: '12', name: 'Ryan Martinez', email: 'ryan@company.com', department: 'Engineering' },
+				
+				// Product Team (4 members)
+				{ id: '2', name: 'Sarah Chen', email: 'sarah@company.com', department: 'Product' },
+				{ id: '13', name: 'Emma Thompson', email: 'emma@company.com', department: 'Product' },
+				{ id: '14', name: 'James Wilson', email: 'james@company.com', department: 'Product' },
+				{ id: '15', name: 'Sophie Anderson', email: 'sophie@company.com', department: 'Product' },
+				
+				// Design Team (3 members)
+				{ id: '4', name: 'Emily Davis', email: 'emily@company.com', department: 'Design' },
+				{ id: '16', name: 'Oliver Harris', email: 'oliver@company.com', department: 'Design' },
+				{ id: '17', name: 'Maya Patel', email: 'maya@company.com', department: 'Design' },
+				
+				// Marketing Team (3 members)
+				{ id: '6', name: 'Lisa Park', email: 'lisa@company.com', department: 'Marketing' },
+				{ id: '18', name: 'Daniel Kim', email: 'daniel@company.com', department: 'Marketing' },
+				{ id: '19', name: 'Isabella Rodriguez', email: 'isabella@company.com', department: 'Marketing' },
+				
+				// Sales Team (3 members)
+				{ id: '8', name: 'Rachel Green', email: 'rachel@company.com', department: 'Sales' },
+				{ id: '20', name: 'Michael Scott', email: 'michael@company.com', department: 'Sales' },
+				{ id: '21', name: 'Amy Zhang', email: 'amy@company.com', department: 'Sales' },
+				
+				// Operations Team (2 members)
+				{ id: '9', name: 'Tom Wilson', email: 'tom@company.com', department: 'Operations' },
+				{ id: '22', name: 'Laura Chen', email: 'laura@company.com', department: 'Operations' },
+				
+				// HR Team (2 members)
+				{ id: '23', name: 'Kevin Lee', email: 'kevin@company.com', department: 'HR' },
+				{ id: '24', name: 'Grace Park', email: 'grace@company.com', department: 'HR' },
+				
+				// Finance Team (2 members)
+				{ id: '25', name: 'Robert Johnson', email: 'robert@company.com', department: 'Finance' },
+				{ id: '26', name: 'Victoria Lee', email: 'victoria@company.com', department: 'Finance' },
 			]
 			setUsers(mockUsers)
 		}
@@ -738,6 +770,7 @@ export default function AIRecommendationsPage() {
 			category: '',
 			deadline: '',
 			projectId: '',
+			selectedDepartment: '',
 			assignedToId: '',
 		})
 		setShowManualTaskModal(false)
@@ -1289,25 +1322,85 @@ export default function AIRecommendationsPage() {
 								</div>
 
 								{/* Assign To */}
-								<div>
-									<label className="block text-sm font-medium mb-2">
+								<div className="space-y-4">
+									<label className="block text-sm font-medium">
 										Assign To <span className="text-red-500">*</span>
 									</label>
-									<select
-										value={manualTaskForm.assignedToId}
-										onChange={(e) => setManualTaskForm(prev => ({ ...prev, assignedToId: e.target.value }))}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
-										required
-									>
-										<option value="">Select Assignee</option>
-										{users.map((user) => (
-											<option key={user.id} value={user.id}>
-												{user.name} {user.department ? `(${user.department})` : ''}
-											</option>
-										))}
-									</select>
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-										The selected person will receive a notification in Messages
+									
+									{/* Step 1: Department Selection */}
+									<div>
+										<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+											Step 1: Select Department
+										</label>
+										<select
+											value={manualTaskForm.selectedDepartment}
+											onChange={(e) => setManualTaskForm(prev => ({ 
+												...prev, 
+												selectedDepartment: e.target.value,
+												assignedToId: '' // Reset assignee when department changes
+											}))}
+											className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">Choose a department...</option>
+											{Array.from(new Set(users.map(u => u.department).filter(Boolean))).sort().map((dept) => {
+												const deptCount = users.filter(u => u.department === dept).length
+												return (
+													<option key={dept} value={dept}>
+														{dept} ({deptCount} {deptCount === 1 ? 'person' : 'people'})
+													</option>
+												)
+											})}
+										</select>
+									</div>
+									
+									{/* Step 2: Person Selection */}
+									{manualTaskForm.selectedDepartment && (
+										<div className="animate-fadeIn">
+											<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+												Step 2: Select Person
+											</label>
+											<select
+												value={manualTaskForm.assignedToId}
+												onChange={(e) => setManualTaskForm(prev => ({ ...prev, assignedToId: e.target.value }))}
+												className="w-full px-3 py-2 border-2 border-primary/50 dark:border-primary/30 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+												required
+											>
+												<option value="">Select a person from {manualTaskForm.selectedDepartment}...</option>
+												{users
+													.filter(user => user.department === manualTaskForm.selectedDepartment)
+													.sort((a, b) => a.name.localeCompare(b.name))
+													.map((user) => (
+														<option key={user.id} value={user.id}>
+															{user.name} • {user.email}
+														</option>
+													))
+												}
+											</select>
+											
+											{/* Selected User Info */}
+											{manualTaskForm.assignedToId && (
+												<div className="mt-3 p-3 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-lg">
+													<div className="flex items-center gap-2">
+														<Users className="h-4 w-4 text-primary" />
+														<div className="flex-1">
+															<p className="text-sm font-medium">
+																{users.find(u => u.id === manualTaskForm.assignedToId)?.name}
+															</p>
+															<p className="text-xs text-neutral-600 dark:text-neutral-400">
+																{users.find(u => u.id === manualTaskForm.assignedToId)?.email}
+															</p>
+														</div>
+														<span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
+															{manualTaskForm.selectedDepartment}
+														</span>
+													</div>
+												</div>
+											)}
+										</div>
+									)}
+									
+									<p className="text-xs text-neutral-500 dark:text-neutral-400">
+										💡 The selected person will receive a notification in Messages
 									</p>
 								</div>
 							</div>
