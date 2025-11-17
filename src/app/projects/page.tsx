@@ -24,6 +24,7 @@ import ProjectFormDialog, { type ProjectFormData } from './_components/ProjectFo
 import ProjectCard from './_components/ProjectCard'
 import TimelineView from './_components/TimelineView'
 import { storage } from '../../utils/storage'
+import { createAITasksForProject } from '../ai-recommendations/_utils/aiTaskGenerator'
 
 interface WorkEntry {
 	id: string
@@ -161,12 +162,23 @@ export default function ProjectsPage() {
 				links: formData.links,
 			}
 
-			const updated = [...projects, newProject]
-			setProjects(updated)
-			storage.set('projects', updated)
-			
-			setShowCreateDialog(false)
-			toast.success('Project created successfully!')
+		const updated = [...projects, newProject]
+		setProjects(updated)
+		storage.set('projects', updated)
+		
+		// AI가 자동으로 프로젝트 관련 Task 생성
+		createAITasksForProject(newProject)
+		
+		setShowCreateDialog(false)
+		toast.success('Project created successfully!')
+		
+		// AI Task 생성 알림
+		setTimeout(() => {
+			toast.info('🤖 AI has generated recommended tasks for this project', {
+				description: 'Check AI Recommendations page to review them',
+				duration: 5000,
+			})
+		}, 1000)
 		} catch (error) {
 			console.error('Failed to create project:', error)
 			toast.error('Failed to create project')

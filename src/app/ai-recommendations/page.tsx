@@ -19,6 +19,10 @@ import {
 	Target,
 	AlertTriangle,
 	Lightbulb,
+	Plus,
+	Filter,
+	Folder,
+	Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
@@ -33,6 +37,10 @@ interface TaskRecommendation {
 	deadline?: string
 	dataSource: string // 추천 근거가 되는 데이터 출처
 	status: 'pending' | 'accepted' | 'rejected'
+	projectId?: string // 프로젝트 ID
+	projectName?: string // 프로젝트 이름
+	isManual?: boolean // 수동으로 생성된 Task 여부
+	createdAt?: string // 생성 시간
 	// 상세 정보
 	aiAnalysis?: {
 		projectName: string
@@ -42,6 +50,7 @@ interface TaskRecommendation {
 			name: string
 			role: string
 			department: string
+			memberType: 'active' | 'related' // active: 직접 참여, related: 관련됨
 		}>
 		detailedInstructions: string[]
 		expectedOutcome: string
@@ -66,14 +75,46 @@ export default function AIRecommendationsPage() {
 	const [isLoading, setIsLoading] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 	const [selectedTask, setSelectedTask] = useState<TaskRecommendation | null>(null)
+	
+	// Manual task creation state
+	const [showManualTaskModal, setShowManualTaskModal] = useState(false)
+	const [manualTaskForm, setManualTaskForm] = useState({
+		title: '',
+		description: '',
+		priority: 'medium' as 'high' | 'medium' | 'low',
+		category: '',
+		deadline: '',
+		projectId: '',
+	})
+	
+	// Project filtering state
+	const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
+	const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>('all')
 
 	useEffect(() => {
 		loadRecommendations()
+		loadProjects()
 	}, [])
+	
+	// Load projects from localStorage
+	const loadProjects = () => {
+		const projectsData = storage.get<any[]>('projects')
+		const loadedProjects = projectsData || []
+		setProjects(loadedProjects.map((p: any) => ({ id: p.id, name: p.name })))
+	}
 
 	// Load AI Recommendations
 	const loadRecommendations = () => {
 		setIsLoading(true)
+		
+		// Load manual tasks from localStorage
+		const manualTasksData = storage.get<TaskRecommendation[]>('manual_tasks')
+		const manualTasks = manualTasksData || []
+		
+		// Load AI-generated tasks from localStorage
+		const aiTasksData = storage.get<TaskRecommendation[]>('ai_recommendations')
+		const aiTasks = aiTasksData || []
+		
 		// QUICK FIX: Show mock data immediately
 		const mockRecommendations: TaskRecommendation[] = [
 			{
@@ -89,11 +130,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Quarterly Business Objectives Q4 2024",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "AI analysis shows that current progress rate (45%) is below the expected pace for meeting the end-of-quarter deadline. Based on historical data, teams typically need to be at 70% completion at this stage.",
-					relatedMembers: [
-						{name: "Sarah Johnson", role: "Product Manager", department: "Product"},
-						{name: "Michael Chen", role: "Engineering Lead", department: "Engineering"},
-						{name: "Emily Park", role: "Team Lead", department: "Operations"}
-					],
+				relatedMembers: [
+					{name: "Sarah Johnson", role: "Product Manager", department: "Product", memberType: "active"},
+					{name: "Michael Chen", role: "Engineering Lead", department: "Engineering", memberType: "active"},
+					{name: "Emily Park", role: "Team Lead", department: "Operations", memberType: "related"}
+				],
 					detailedInstructions: [
 						"Schedule urgent team meeting to review all key results and current progress",
 						"Identify blockers preventing completion of each key result",
@@ -130,11 +171,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Mobile App Redesign v2.0",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "AI has detected no work entries or progress updates for this project in the past 10 days, despite the approaching deadline. This unusual silence may indicate blocked progress, team availability issues, or scope changes that haven't been communicated.",
-					relatedMembers: [
-						{name: "David Kim", role: "UX Designer", department: "Design"},
-						{name: "Lisa Chen", role: "iOS Developer", department: "Engineering"},
-						{name: "James Park", role: "Android Developer", department: "Engineering"}
-					],
+				relatedMembers: [
+					{name: "David Kim", role: "UX Designer", department: "Design", memberType: "active"},
+					{name: "Lisa Chen", role: "iOS Developer", department: "Engineering", memberType: "active"},
+					{name: "James Park", role: "Android Developer", department: "Engineering", memberType: "related"}
+				],
 					detailedInstructions: [
 						"Contact all team members to verify current project status",
 						"Review last recorded milestone and identify what has been completed since",
@@ -170,11 +211,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Engineering Team Capacity",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "AI detected sustained high work hours for multiple team members over the past 4 weeks. This pattern often leads to burnout, decreased productivity, and increased error rates. Early intervention can prevent these issues.",
-					relatedMembers: [
-						{name: "Tom Wilson", role: "Senior Developer", department: "Engineering"},
-						{name: "Rachel Green", role: "Full Stack Engineer", department: "Engineering"},
-						{name: "Alex Martinez", role: "Backend Developer", department: "Engineering"}
-					],
+				relatedMembers: [
+					{name: "Tom Wilson", role: "Senior Developer", department: "Engineering", memberType: "active"},
+					{name: "Rachel Green", role: "Full Stack Engineer", department: "Engineering", memberType: "active"},
+					{name: "Alex Martinez", role: "Backend Developer", department: "Engineering", memberType: "active"}
+				],
 					detailedInstructions: [
 						"Review current project assignments for these team members",
 						"Identify tasks that can be delegated or deprioritized",
@@ -210,11 +251,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Customer Success Enhancement Program",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "Machine learning analysis of customer interactions over the past quarter revealed recurring themes: 25% increase in onboarding-related questions, 40% of support tickets related to feature discovery, and 15% improvement in retention for customers who completed product tours.",
-					relatedMembers: [
-						{name: "Jennifer Lee", role: "Head of Customer Success", department: "Customer Success"},
-						{name: "Mark Anderson", role: "Product Manager", department: "Product"},
-						{name: "Sophia Wang", role: "Support Team Lead", department: "Customer Support"}
-					],
+				relatedMembers: [
+					{name: "Jennifer Lee", role: "Head of Customer Success", department: "Customer Success", memberType: "active"},
+					{name: "Mark Anderson", role: "Product Manager", department: "Product", memberType: "active"},
+					{name: "Sophia Wang", role: "Support Team Lead", department: "Customer Support", memberType: "related"}
+				],
 					detailedInstructions: [
 						"Analyze detailed customer feedback and support ticket data",
 						"Design improved onboarding flow based on common pain points",
@@ -250,11 +291,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Payment Processing System",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "Automated security scanning identified multiple issues: 8 medium-severity vulnerabilities, 5 low-severity issues, and 2 high-priority code quality concerns. Given the sensitive nature of payment processing, immediate attention is warranted.",
-					relatedMembers: [
-						{name: "Robert Chang", role: "Security Engineer", department: "Security"},
-						{name: "Michelle Liu", role: "Backend Lead", department: "Engineering"},
-						{name: "Kevin Brown", role: "DevOps Engineer", department: "Infrastructure"}
-					],
+				relatedMembers: [
+					{name: "Robert Chang", role: "Security Engineer", department: "Security", memberType: "active"},
+					{name: "Michelle Liu", role: "Backend Lead", department: "Engineering", memberType: "active"},
+					{name: "Kevin Brown", role: "DevOps Engineer", department: "Infrastructure", memberType: "related"}
+				],
 					detailedInstructions: [
 						"Conduct immediate security audit of payment processing code",
 						"Prioritize fixing high-severity vulnerabilities within 48 hours",
@@ -291,11 +332,11 @@ export default function AIRecommendationsPage() {
 					projectName: "Q4 Marketing Campaign",
 					analysisDate: new Date().toISOString(),
 					analysisReason: "Predictive analysis comparing current campaign performance against historical data and industry benchmarks indicates current trajectory will miss ROI targets by approximately 35%. Early course correction can salvage campaign effectiveness.",
-					relatedMembers: [
-						{name: "Amanda Stevens", role: "Marketing Director", department: "Marketing"},
-						{name: "Chris Thompson", role: "Growth Manager", department: "Growth"},
-						{name: "Nicole Davis", role: "Content Lead", department: "Marketing"}
-					],
+				relatedMembers: [
+					{name: "Amanda Stevens", role: "Marketing Director", department: "Marketing", memberType: "active"},
+					{name: "Chris Thompson", role: "Growth Manager", department: "Growth", memberType: "active"},
+					{name: "Nicole Davis", role: "Content Lead", department: "Marketing", memberType: "related"}
+				],
 					detailedInstructions: [
 						"Analyze which campaign channels are underperforming vs. expectations",
 						"Review messaging effectiveness and A/B test results",
@@ -326,7 +367,10 @@ export default function AIRecommendationsPage() {
 			{type: "deadline", metric: "Upcoming", value: "3 deadlines in 2 weeks", status: "warning"},
 			{type: "info", metric: "Team Capacity", value: "3 members overworked", status: "warning"}
 		]
-		setRecommendations(mockRecommendations)
+		
+		// Merge all recommendations: AI-generated, manual tasks, and mock data
+		const allRecommendations = [...aiTasks, ...manualTasks, ...mockRecommendations]
+		setRecommendations(allRecommendations)
 		setInsights(mockInsights)
 		setLastUpdated(new Date())
 		setIsLoading(false)
@@ -335,16 +379,16 @@ export default function AIRecommendationsPage() {
 
 		setTimeout(() => {
 			// Load actual data from localStorage
-			const projectsData = storage.get<any>('projects')
-			const workEntriesData = storage.get<any>('workEntries')
-			const objectivesData = storage.get<any>('objectives')
+			const projectsData = storage.get<any[]>('projects')
+			const workEntriesData = storage.get<any[]>('workEntries')
+			const objectivesData = storage.get<any[]>('objectives')
 			
-			const projects = projectsData ? JSON.parse(projectsData) : []
-			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: { date: string; [key: string]: unknown }) => ({
+			const projects = projectsData || []
+			const workEntries = workEntriesData ? workEntriesData.map((e: { date: string; [key: string]: unknown }) => ({
 				...e,
 				date: new Date(e.date)
 			})) : []
-			const objectives = objectivesData ? JSON.parse(objectivesData) : []
+			const objectives = objectivesData || []
 			
 			// Analyze and generate recommendations
 			const generatedRecommendations: TaskRecommendation[] = []
@@ -371,11 +415,11 @@ export default function AIRecommendationsPage() {
 							projectName: objective.title,
 							analysisDate: new Date().toISOString(),
 							analysisReason: `AI detected that the current progress rate (${Math.round(avgProgress)}%) is significantly below the expected pace for meeting the deadline. Without intervention, there is a high risk of missing key results.`,
-							relatedMembers: [
-								{ name: 'John Kim', role: 'Team Lead', department: 'Engineering' },
-								{ name: 'Sarah Lee', role: 'Product Manager', department: 'Product' },
-								{ name: 'Mike Chen', role: 'Developer', department: 'Engineering' },
-							],
+						relatedMembers: [
+							{ name: 'John Kim', role: 'Team Lead', department: 'Engineering', memberType: 'active' },
+							{ name: 'Sarah Lee', role: 'Product Manager', department: 'Product', memberType: 'active' },
+							{ name: 'Mike Chen', role: 'Developer', department: 'Engineering', memberType: 'related' },
+						],
 							detailedInstructions: [
 								'Review current key results and identify blockers preventing progress',
 								'Schedule team sync to discuss action items and resource allocation',
@@ -433,11 +477,11 @@ export default function AIRecommendationsPage() {
 								projectName: project.name,
 								analysisDate: new Date().toISOString(),
 								analysisReason: 'AI has detected that this project has had no work activity logged for over 7 days. This could indicate stalled progress, completed work not being logged, or potential project abandonment.',
-								relatedMembers: [
-									{ name: 'Emily Park', role: 'Project Manager', department: 'Product' },
-									{ name: 'David Kim', role: 'Lead Developer', department: 'Engineering' },
-									{ name: 'Lisa Wang', role: 'Designer', department: 'Design' },
-								],
+							relatedMembers: [
+								{ name: 'Emily Park', role: 'Project Manager', department: 'Product', memberType: 'active' },
+								{ name: 'David Kim', role: 'Lead Developer', department: 'Engineering', memberType: 'active' },
+								{ name: 'Lisa Wang', role: 'Designer', department: 'Design', memberType: 'related' },
+							],
 								detailedInstructions: [
 									'Contact project team members to verify current project status',
 									'Review last recorded activity and identify next steps',
@@ -497,11 +541,11 @@ export default function AIRecommendationsPage() {
 							projectName: obj.title,
 							analysisDate: new Date().toISOString(),
 							analysisReason: `Critical deadline approaching in less than 48 hours. AI analysis shows this objective requires immediate attention to ensure timely completion and delivery of all key results.`,
-							relatedMembers: [
-								{ name: 'Alex Johnson', role: 'Program Manager', department: 'Product' },
-								{ name: 'Rachel Green', role: 'Senior Developer', department: 'Engineering' },
-								{ name: 'Tom Wilson', role: 'QA Lead', department: 'Quality Assurance' },
-							],
+						relatedMembers: [
+							{ name: 'Alex Johnson', role: 'Program Manager', department: 'Product', memberType: 'active' },
+							{ name: 'Rachel Green', role: 'Senior Developer', department: 'Engineering', memberType: 'active' },
+							{ name: 'Tom Wilson', role: 'QA Lead', department: 'Quality Assurance', memberType: 'related' },
+						],
 							detailedInstructions: [
 								'Immediately convene emergency team meeting to assess completion status',
 								'Review all key results and verify completion percentage',
@@ -588,6 +632,59 @@ export default function AIRecommendationsPage() {
 		loadRecommendations()
 		toast.success('Recommendations refreshed')
 	}
+	
+	// Handle manual task creation
+	const handleCreateManualTask = () => {
+		if (!manualTaskForm.title.trim()) {
+			toast.error('Please enter a task title')
+			return
+		}
+		
+		const selectedProject = projects.find(p => p.id === manualTaskForm.projectId)
+		
+		const newTask: TaskRecommendation = {
+			id: `manual-${Date.now()}`,
+			title: manualTaskForm.title,
+			description: manualTaskForm.description,
+			priority: manualTaskForm.priority,
+			category: manualTaskForm.category || 'Manual Task',
+			deadline: manualTaskForm.deadline || undefined,
+			dataSource: 'Manual Entry',
+			status: 'pending',
+			projectId: manualTaskForm.projectId || undefined,
+			projectName: selectedProject?.name || undefined,
+			isManual: true,
+			createdAt: new Date().toISOString(),
+		}
+		
+		// Save to localStorage
+		const existingTasks = storage.get<TaskRecommendation[]>('manual_tasks') || []
+		storage.set('manual_tasks', [...existingTasks, newTask])
+		
+		// Update state
+		setRecommendations(prev => [...prev, newTask])
+		
+		// Reset form and close modal
+		setManualTaskForm({
+			title: '',
+			description: '',
+			priority: 'medium',
+			category: '',
+			deadline: '',
+			projectId: '',
+		})
+		setShowManualTaskModal(false)
+		
+		toast.success('Manual task created successfully')
+	}
+	
+	// Filter recommendations by project
+	const getFilteredRecommendations = () => {
+		if (selectedProjectFilter === 'all') {
+			return recommendations
+		}
+		return recommendations.filter(rec => rec.projectId === selectedProjectFilter)
+	}
 
 	// Utility functions
 	const getPriorityColor = (priority: TaskRecommendation['priority']) => {
@@ -614,8 +711,11 @@ export default function AIRecommendationsPage() {
 		return date.toLocaleDateString()
 	}
 
-	const pendingRecommendations = recommendations.filter((r) => r.status === 'pending')
+	const filteredRecommendations = getFilteredRecommendations()
+	const pendingRecommendations = filteredRecommendations.filter((r) => r.status === 'pending')
 	const acceptedCount = recommendations.filter((r) => r.status === 'accepted').length
+	const manualTaskCount = recommendations.filter((r) => r.isManual).length
+	const aiGeneratedCount = recommendations.filter((r) => r.id.startsWith('ai-')).length
 
 	return (
 		<>
@@ -632,17 +732,71 @@ export default function AIRecommendationsPage() {
 							AI-powered task recommendations based on your work data
 						</p>
 					</div>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={handleRefreshRecommendations}
-						disabled={isLoading}
-						className="flex items-center gap-2"
-					>
-						<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-						Refresh
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="primary"
+							size="sm"
+							onClick={() => setShowManualTaskModal(true)}
+							className="flex items-center gap-2"
+						>
+							<Plus className="h-4 w-4" />
+							Create Task
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleRefreshRecommendations}
+							disabled={isLoading}
+							className="flex items-center gap-2"
+						>
+							<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+							Refresh
+						</Button>
+					</div>
 				</div>
+				
+				{/* Project Filter */}
+				<Card>
+					<CardContent className="p-4">
+						<div className="flex items-center gap-4">
+							<div className="flex items-center gap-2 text-sm font-medium">
+								<Filter className="h-4 w-4 text-neutral-500" />
+								Filter by Project:
+							</div>
+							<select
+								value={selectedProjectFilter}
+								onChange={(e) => setSelectedProjectFilter(e.target.value)}
+								className="flex-1 max-w-md px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+							>
+								<option value="all">All Projects ({recommendations.filter(r => r.status === 'pending').length})</option>
+								{projects.map((project) => {
+									const projectTaskCount = recommendations.filter(
+										r => r.projectId === project.id && r.status === 'pending'
+									).length
+									return (
+										<option key={project.id} value={project.id}>
+											{project.name} ({projectTaskCount})
+										</option>
+									)
+								})}
+							</select>
+						<div className="flex items-center gap-4">
+							{aiGeneratedCount > 0 && (
+								<div className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+									<Zap className="h-4 w-4" />
+									<span>{aiGeneratedCount} AI generated</span>
+								</div>
+							)}
+							{manualTaskCount > 0 && (
+								<div className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2">
+									<Plus className="h-4 w-4" />
+									<span>{manualTaskCount} manual</span>
+								</div>
+							)}
+						</div>
+						</div>
+					</CardContent>
+				</Card>
 
 				{/* Stats */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -750,7 +904,7 @@ export default function AIRecommendationsPage() {
 								<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
 									<div className="flex items-start justify-between gap-4">
 										<div className="flex-1 min-w-0">
-											<div className="flex items-center gap-2 mb-2">
+											<div className="flex items-center gap-2 mb-2 flex-wrap">
 												<span
 													className={`text-xs font-medium px-2 py-1 rounded-full ${getPriorityColor(
 														task.priority
@@ -761,6 +915,24 @@ export default function AIRecommendationsPage() {
 												<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
 													{task.category}
 												</span>
+											{task.isManual && (
+												<span className="text-xs text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded flex items-center gap-1">
+													<Plus className="h-3 w-3" />
+													Manual
+												</span>
+											)}
+											{!task.isManual && task.id.startsWith('ai-') && (
+												<span className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded flex items-center gap-1">
+													<Zap className="h-3 w-3" />
+													AI Generated
+												</span>
+											)}
+											{task.projectName && (
+												<span className="text-xs text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded flex items-center gap-1">
+													<Folder className="h-3 w-3" />
+													{task.projectName}
+												</span>
+											)}
 											</div>
 											<h3 className="text-lg font-bold mb-1">{task.title}</h3>
 											<p className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -826,6 +998,153 @@ export default function AIRecommendationsPage() {
 						))
 					)}
 				</div>
+
+				{/* Manual Task Creation Modal */}
+				{showManualTaskModal && (
+					<div 
+						className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+						onClick={() => setShowManualTaskModal(false)}
+					>
+						<div 
+							className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+							onClick={(e) => e.stopPropagation()}
+						>
+							{/* Modal Header */}
+							<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+								<div className="flex items-start justify-between gap-4">
+									<div className="flex-1">
+										<div className="flex items-center gap-2 mb-2">
+											<Plus className="h-6 w-6 text-primary" />
+											<h2 className="text-2xl font-bold">Create Manual Task</h2>
+										</div>
+										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+											Add a task manually to your recommendations list
+										</p>
+									</div>
+									<button
+										onClick={() => setShowManualTaskModal(false)}
+										className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+									>
+										<X className="h-6 w-6" />
+									</button>
+								</div>
+							</div>
+
+							{/* Modal Content */}
+							<div className="flex-1 overflow-y-auto p-6 space-y-4">
+								{/* Title */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Task Title <span className="text-red-500">*</span>
+									</label>
+									<input
+										type="text"
+										value={manualTaskForm.title}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, title: e.target.value }))}
+										placeholder="Enter task title"
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									/>
+								</div>
+
+								{/* Description */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Description
+									</label>
+									<textarea
+										value={manualTaskForm.description}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, description: e.target.value }))}
+										placeholder="Enter task description"
+										rows={4}
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+									/>
+								</div>
+
+								{/* Priority */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Priority
+									</label>
+									<select
+										value={manualTaskForm.priority}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, priority: e.target.value as 'high' | 'medium' | 'low' }))}
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="low">Low</option>
+										<option value="medium">Medium</option>
+										<option value="high">High</option>
+									</select>
+								</div>
+
+								{/* Category */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Category
+									</label>
+									<input
+										type="text"
+										value={manualTaskForm.category}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, category: e.target.value }))}
+										placeholder="e.g., Development, Design, Marketing"
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									/>
+								</div>
+
+								{/* Project */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Project
+									</label>
+									<select
+										value={manualTaskForm.projectId}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, projectId: e.target.value }))}
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									>
+										<option value="">No Project</option>
+										{projects.map((project) => (
+											<option key={project.id} value={project.id}>
+												{project.name}
+											</option>
+										))}
+									</select>
+								</div>
+
+								{/* Deadline */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Deadline
+									</label>
+									<input
+										type="date"
+										value={manualTaskForm.deadline}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									/>
+								</div>
+							</div>
+
+							{/* Modal Footer */}
+							<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+								<div className="flex items-center gap-3">
+									<Button
+										onClick={handleCreateManualTask}
+										className="flex-1 flex items-center justify-center gap-2"
+									>
+										<Plus className="h-4 w-4" />
+										Create Task
+									</Button>
+									<Button
+										variant="outline"
+										onClick={() => setShowManualTaskModal(false)}
+										className="px-6"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
 
 				{/* Task Detail Modal */}
 				{selectedTask && selectedTask.aiAnalysis && (
@@ -899,36 +1218,87 @@ export default function AIRecommendationsPage() {
 									</div>
 								</div>
 
-								{/* Related Team Members */}
-								<div>
-									<div className="flex items-center gap-2 mb-3">
-										<Users className="h-5 w-5 text-primary" />
-										<h4 className="font-bold text-lg">Related Team Members</h4>
-									</div>
-									<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-										{selectedTask.aiAnalysis.relatedMembers.map((member, index) => (
-											<div
-												key={index}
-												className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700"
-											>
-												<div className="flex items-center gap-3">
-													<div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-														{member.name[0]}
-													</div>
-													<div className="flex-1 min-w-0">
-														<p className="font-medium text-sm truncate">{member.name}</p>
-														<p className="text-xs text-neutral-600 dark:text-neutral-400 truncate">
-															{member.role}
-														</p>
-														<p className="text-xs text-neutral-500 dark:text-neutral-500 truncate">
-															{member.department}
-														</p>
-													</div>
-												</div>
-											</div>
-										))}
-									</div>
+							{/* Related Team Members */}
+							<div>
+								<div className="flex items-center gap-2 mb-3">
+									<Users className="h-5 w-5 text-primary" />
+									<h4 className="font-bold text-lg">Team Members</h4>
 								</div>
+								
+								{/* Active Participants */}
+								{selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'active').length > 0 && (
+									<div className="mb-4">
+										<div className="flex items-center gap-2 mb-2">
+											<div className="w-2 h-2 rounded-full bg-green-500"></div>
+											<h5 className="text-sm font-semibold text-green-700 dark:text-green-400">
+												Active Participants ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'active').length})
+											</h5>
+										</div>
+										<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+											{selectedTask.aiAnalysis.relatedMembers
+												.filter(member => member.memberType === 'active')
+												.map((member, index) => (
+													<div
+														key={`active-${index}`}
+														className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-200 dark:border-green-800"
+													>
+														<div className="flex items-center gap-3">
+															<div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-green-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+																{member.name[0]}
+															</div>
+															<div className="flex-1 min-w-0">
+																<p className="font-medium text-sm truncate">{member.name}</p>
+																<p className="text-xs text-green-700 dark:text-green-400 truncate font-medium">
+																	{member.role}
+																</p>
+																<p className="text-xs text-green-600 dark:text-green-500 truncate">
+																	{member.department}
+																</p>
+															</div>
+														</div>
+													</div>
+												))}
+										</div>
+									</div>
+								)}
+								
+								{/* Related Members */}
+								{selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'related').length > 0 && (
+									<div>
+										<div className="flex items-center gap-2 mb-2">
+											<div className="w-2 h-2 rounded-full bg-blue-500"></div>
+											<h5 className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+												Related Members ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'related').length})
+											</h5>
+										</div>
+										<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+											{selectedTask.aiAnalysis.relatedMembers
+												.filter(member => member.memberType === 'related')
+												.map((member, index) => (
+													<div
+														key={`related-${index}`}
+														className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
+													>
+														<div className="flex items-center gap-3">
+															<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+																{member.name[0]}
+															</div>
+															<div className="flex-1 min-w-0">
+																<p className="font-medium text-sm truncate">{member.name}</p>
+																<p className="text-xs text-blue-700 dark:text-blue-400 truncate font-medium">
+																	{member.role}
+																</p>
+																<p className="text-xs text-blue-600 dark:text-blue-500 truncate">
+																	{member.department}
+																</p>
+															</div>
+														</div>
+													</div>
+												))}
+										</div>
+									</div>
+								)}
+							</div>
 
 								{/* Detailed Instructions */}
 								<div>
