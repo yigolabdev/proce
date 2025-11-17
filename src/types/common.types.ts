@@ -16,9 +16,14 @@ export interface WorkEntry {
 	files?: FileAttachment[]
 	links?: LinkResource[]
 	department?: string
-	status?: 'draft' | 'submitted' | 'approved' | 'rejected'
+	status?: 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected'
 	createdAt?: Date | string
 	updatedAt?: Date | string
+	submittedBy?: string
+	submittedAt?: Date | string
+	reviewedBy?: string
+	reviewedAt?: Date | string
+	reviewComments?: string
 }
 
 export interface FileAttachment {

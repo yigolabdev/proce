@@ -41,6 +41,9 @@ interface TaskRecommendation {
 	projectName?: string // 프로젝트 이름
 	isManual?: boolean // 수동으로 생성된 Task 여부
 	createdAt?: string // 생성 시간
+	createdBy?: string // 생성자 이름
+	assignedTo?: string // 할당받은 사람 이름
+	assignedToId?: string // 할당받은 사람 ID
 	// 상세 정보
 	aiAnalysis?: {
 		projectName: string
@@ -85,15 +88,21 @@ export default function AIRecommendationsPage() {
 		category: '',
 		deadline: '',
 		projectId: '',
+		assignedToId: '',
 	})
 	
 	// Project filtering state
 	const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
 	const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>('all')
+	
+	// Users state
+	const [users, setUsers] = useState<Array<{ id: string; name: string; email: string; department?: string }>>([])
+
 
 	useEffect(() => {
 		loadRecommendations()
 		loadProjects()
+		loadUsers()
 	}, [])
 	
 	// Load projects from localStorage
@@ -101,6 +110,34 @@ export default function AIRecommendationsPage() {
 		const projectsData = storage.get<any[]>('projects')
 		const loadedProjects = projectsData || []
 		setProjects(loadedProjects.map((p: any) => ({ id: p.id, name: p.name })))
+	}
+	
+	// Load users from localStorage
+	const loadUsers = () => {
+		const usersData = storage.get<any[]>('users')
+		if (usersData && usersData.length > 0) {
+			setUsers(usersData.map((u: any) => ({ 
+				id: u.id, 
+				name: u.name, 
+				email: u.email,
+				department: u.department 
+			})))
+		} else {
+			// Mock users if none exist
+			const mockUsers = [
+				{ id: '1', name: 'John Doe', email: 'john@company.com', department: 'Engineering' },
+				{ id: '2', name: 'Sarah Chen', email: 'sarah@company.com', department: 'Product' },
+				{ id: '3', name: 'Mike Johnson', email: 'mike@company.com', department: 'Engineering' },
+				{ id: '4', name: 'Emily Davis', email: 'emily@company.com', department: 'Design' },
+				{ id: '5', name: 'David Lee', email: 'david@company.com', department: 'Engineering' },
+				{ id: '6', name: 'Lisa Park', email: 'lisa@company.com', department: 'Marketing' },
+				{ id: '7', name: 'Alex Kim', email: 'alex@company.com', department: 'Engineering' },
+				{ id: '8', name: 'Rachel Green', email: 'rachel@company.com', department: 'Sales' },
+				{ id: '9', name: 'Tom Wilson', email: 'tom@company.com', department: 'Operations' },
+				{ id: '10', name: 'Chris Brown', email: 'chris@company.com', department: 'Engineering' },
+			]
+			setUsers(mockUsers)
+		}
 	}
 
 	// Load AI Recommendations
@@ -640,7 +677,13 @@ export default function AIRecommendationsPage() {
 			return
 		}
 		
+		if (!manualTaskForm.assignedToId) {
+			toast.error('Please select an assignee')
+			return
+		}
+		
 		const selectedProject = projects.find(p => p.id === manualTaskForm.projectId)
+		const assignedUser = users.find(u => u.id === manualTaskForm.assignedToId)
 		
 		const newTask: TaskRecommendation = {
 			id: `manual-${Date.now()}`,
@@ -655,6 +698,9 @@ export default function AIRecommendationsPage() {
 			projectName: selectedProject?.name || undefined,
 			isManual: true,
 			createdAt: new Date().toISOString(),
+			createdBy: 'Current User', // TODO: Get from auth context
+			assignedTo: assignedUser?.name,
+			assignedToId: manualTaskForm.assignedToId,
 		}
 		
 		// Save to localStorage
@@ -664,6 +710,26 @@ export default function AIRecommendationsPage() {
 		// Update state
 		setRecommendations(prev => [...prev, newTask])
 		
+		// Send notification to assignee via Messages
+		if (assignedUser) {
+			const messages = storage.get<any[]>('messages') || []
+			const newMessage = {
+				id: `msg-task-${Date.now()}`,
+				type: 'info',
+				priority: newTask.priority === 'high' ? 'high' : 'medium',
+				title: `🎯 New Task Assigned: ${newTask.title}`,
+				content: `Hi ${assignedUser.name},\n\nYou have been assigned a new task by Current User.\n\n**Task Details:**\n• Title: ${newTask.title}\n• Description: ${newTask.description}\n• Priority: ${newTask.priority.toUpperCase()}\n• Category: ${newTask.category}${newTask.deadline ? `\n• Deadline: ${new Date(newTask.deadline).toLocaleDateString()}` : ''}${newTask.projectName ? `\n• Project: ${newTask.projectName}` : ''}\n\nPlease review and take action accordingly.\n\n---\nThis is an automated notification from the Task Management system.`,
+				date: new Date(),
+				isRead: false,
+				isStarred: false,
+				isArchived: false,
+				sender: 'Current User',
+				tags: ['task-assignment', 'action-required', newTask.priority],
+			}
+			messages.unshift(newMessage)
+			storage.set('messages', messages)
+		}
+		
 		// Reset form and close modal
 		setManualTaskForm({
 			title: '',
@@ -672,10 +738,13 @@ export default function AIRecommendationsPage() {
 			category: '',
 			deadline: '',
 			projectId: '',
+			assignedToId: '',
 		})
 		setShowManualTaskModal(false)
 		
-		toast.success('Manual task created successfully')
+		toast.success(`Task assigned to ${assignedUser?.name}`, {
+			description: 'Notification sent to Messages',
+		})
 	}
 	
 	// Filter recommendations by project
@@ -753,6 +822,69 @@ export default function AIRecommendationsPage() {
 							Refresh
 						</Button>
 					</div>
+				</div>
+				
+				{/* Statistics Cards */}
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+					{/* Total Tasks */}
+					<Card className="bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 border-neutral-200 dark:border-neutral-700">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Total Pending</p>
+									<p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+										{pendingRecommendations.length}
+									</p>
+								</div>
+								<Brain className="h-8 w-8 text-neutral-600 dark:text-neutral-400" />
+							</div>
+						</CardContent>
+					</Card>
+					
+					{/* AI Generated Tasks */}
+					<Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-xs text-emerald-700 dark:text-emerald-400 mb-1 font-medium">AI Generated</p>
+									<p className="text-2xl font-bold text-emerald-900 dark:text-emerald-300">
+										{aiGeneratedCount}
+									</p>
+								</div>
+								<Sparkles className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+							</div>
+						</CardContent>
+					</Card>
+					
+					{/* Manual Tasks */}
+					<Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-xs text-blue-700 dark:text-blue-400 mb-1 font-medium">Manual Tasks</p>
+									<p className="text-2xl font-bold text-blue-900 dark:text-blue-300">
+										{manualTaskCount}
+									</p>
+								</div>
+								<Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+							</div>
+						</CardContent>
+					</Card>
+					
+					{/* Accepted Tasks */}
+					<Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-xs text-green-700 dark:text-green-400 mb-1">Accepted</p>
+									<p className="text-2xl font-bold text-green-900 dark:text-green-300">
+										{acceptedCount}
+									</p>
+								</div>
+								<CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
+							</div>
+						</CardContent>
+					</Card>
 				</div>
 				
 				{/* Project Filter */}
@@ -898,13 +1030,34 @@ export default function AIRecommendationsPage() {
 						pendingRecommendations.map((task) => (
 							<Card 
 								key={task.id} 
-								className="hover:shadow-lg transition-shadow cursor-pointer"
+								className={`hover:shadow-lg transition-shadow cursor-pointer ${
+									task.isManual 
+										? 'border-l-4 border-l-blue-500' 
+										: task.id.startsWith('ai-') 
+										? 'border-l-4 border-l-emerald-500'
+										: ''
+								}`}
 								onClick={() => setSelectedTask(task)}
 							>
 								<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
 									<div className="flex items-start justify-between gap-4">
 										<div className="flex-1 min-w-0">
 											<div className="flex items-center gap-2 mb-2 flex-wrap">
+												{/* Task Type Badge - Most Prominent */}
+												{task.isManual && (
+													<span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md flex items-center gap-1.5">
+														<Users className="h-3.5 w-3.5" />
+														MANUAL TASK
+													</span>
+												)}
+												{!task.isManual && task.id.startsWith('ai-') && (
+													<span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md flex items-center gap-1.5 animate-pulse">
+														<Sparkles className="h-3.5 w-3.5" />
+														AI GENERATED
+													</span>
+												)}
+												
+												{/* Priority Badge */}
 												<span
 													className={`text-xs font-medium px-2 py-1 rounded-full ${getPriorityColor(
 														task.priority
@@ -912,29 +1065,31 @@ export default function AIRecommendationsPage() {
 												>
 													{task.priority.toUpperCase()}
 												</span>
+												
+												{/* Category Badge */}
 												<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
 													{task.category}
 												</span>
-											{task.isManual && (
-												<span className="text-xs text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded flex items-center gap-1">
-													<Plus className="h-3 w-3" />
-													Manual
-												</span>
-											)}
-											{!task.isManual && task.id.startsWith('ai-') && (
-												<span className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded flex items-center gap-1">
-													<Zap className="h-3 w-3" />
-													AI Generated
-												</span>
-											)}
-											{task.projectName && (
-												<span className="text-xs text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded flex items-center gap-1">
-													<Folder className="h-3 w-3" />
-													{task.projectName}
-												</span>
-											)}
+												
+												{/* Project Badge */}
+												{task.projectName && (
+													<span className="text-xs text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded flex items-center gap-1">
+														<Folder className="h-3 w-3" />
+														{task.projectName}
+													</span>
+												)}
 											</div>
-											<h3 className="text-lg font-bold mb-1">{task.title}</h3>
+											
+											{/* Title with Icon */}
+											<div className="flex items-center gap-2 mb-1">
+												{task.isManual ? (
+													<Users className="h-5 w-5 text-blue-500 shrink-0" />
+												) : task.id.startsWith('ai-') ? (
+													<Sparkles className="h-5 w-5 text-emerald-500 shrink-0" />
+												) : null}
+												<h3 className="text-lg font-bold">{task.title}</h3>
+											</div>
+											
 											<p className="text-sm text-neutral-600 dark:text-neutral-400">
 												{task.description}
 											</p>
@@ -944,14 +1099,24 @@ export default function AIRecommendationsPage() {
 								<CardContent className="p-4">
 									<div className="space-y-4">
 										{/* Task Details */}
-										{task.deadline && (
-											<div className="flex items-center gap-2 text-sm">
-												<Calendar className="h-4 w-4 text-neutral-500" />
-												<span className="text-neutral-600 dark:text-neutral-400">
-													Deadline: {new Date(task.deadline).toLocaleDateString()}
-												</span>
-											</div>
-										)}
+										<div className="space-y-2">
+											{task.assignedTo && (
+												<div className="flex items-center gap-2 text-sm">
+													<Users className="h-4 w-4 text-neutral-500" />
+													<span className="text-neutral-600 dark:text-neutral-400">
+														Assigned to: <span className="font-medium text-neutral-900 dark:text-neutral-100">{task.assignedTo}</span>
+													</span>
+												</div>
+											)}
+											{task.deadline && (
+												<div className="flex items-center gap-2 text-sm">
+													<Calendar className="h-4 w-4 text-neutral-500" />
+													<span className="text-neutral-600 dark:text-neutral-400">
+														Deadline: {new Date(task.deadline).toLocaleDateString()}
+													</span>
+												</div>
+											)}
+										</div>
 
 										{/* Data Source */}
 										<div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
@@ -963,6 +1128,7 @@ export default function AIRecommendationsPage() {
 													</p>
 													<p className="text-xs text-blue-700 dark:text-blue-300">
 														{task.dataSource}
+														{task.createdBy && ` • Created by ${task.createdBy}`}
 													</p>
 												</div>
 											</div>
@@ -1120,6 +1286,29 @@ export default function AIRecommendationsPage() {
 										onChange={(e) => setManualTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
 										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 									/>
+								</div>
+
+								{/* Assign To */}
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Assign To <span className="text-red-500">*</span>
+									</label>
+									<select
+										value={manualTaskForm.assignedToId}
+										onChange={(e) => setManualTaskForm(prev => ({ ...prev, assignedToId: e.target.value }))}
+										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+										required
+									>
+										<option value="">Select Assignee</option>
+										{users.map((user) => (
+											<option key={user.id} value={user.id}>
+												{user.name} {user.department ? `(${user.department})` : ''}
+											</option>
+										))}
+									</select>
+									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										The selected person will receive a notification in Messages
+									</p>
 								</div>
 							</div>
 

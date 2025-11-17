@@ -36,6 +36,7 @@ const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const InputPage = lazy(() => import('../pages/InputPage'))
 const ProjectsPage = lazy(() => import('../app/projects/page'))
 const WorkHistoryPage = lazy(() => import('../app/work-history/page'))
+const WorkReviewPage = lazy(() => import('../app/work-review/page'))
 const MessagesPage = lazy(() => import('../app/messages/page'))
 const AIRecommendationsPage = lazy(() => import('../app/ai-recommendations/page'))
 const OKRPage = lazy(() => import('../app/okr/page'))
@@ -101,6 +102,7 @@ const appRoutes = [
 	{ path: '/app/input', element: withSuspense(InputPage) },
 	{ path: '/app/projects', element: withSuspense(ProjectsPage) },
 	{ path: '/app/work-history', element: withSuspense(WorkHistoryPage) },
+	{ path: '/app/work-review', element: withSuspense(WorkReviewPage) },
 	{ path: '/app/messages', element: withSuspense(MessagesPage) },
 	{ path: '/app/ai-recommendations', element: withSuspense(AIRecommendationsPage) },
 	{ path: '/app/inbox', element: <Navigate to="/app/messages" replace /> },

@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket } from 'lucide-react'
+import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket, CheckCircle2 } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 
@@ -37,6 +37,7 @@ export default function AppLayout() {
 			{ to: '/app/messages', label: 'Messages', icon: Mail, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/ai-recommendations', label: 'AI Recommendations', icon: Sparkles, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/work-review', label: 'Work Review', icon: CheckCircle2, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
@@ -81,7 +82,7 @@ const visibleMenuGroups = menuGroups
 			{/* 좌측 사이드바 - 고정형 */}
 			<aside className="w-64 flex flex-col border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 fixed left-0 top-0 bottom-0 z-40">
 				{/* 사이드바 헤더 */}
-				<div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
+				<div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
 					<div className="size-8 rounded-2xl bg-primary" />
 					<div className="flex-1 min-w-0">
 						<div className="text-lg font-semibold">Proce</div>
@@ -114,7 +115,7 @@ const visibleMenuGroups = menuGroups
 				</nav>
 
 			{/* Sidebar Footer - Logout */}
-			<div className="px-3 py-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2 flex-shrink-0">
+			<div className="px-3 py-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2 shrink-0">
 				{/* Logout */}
 				<Link
 					to="/"

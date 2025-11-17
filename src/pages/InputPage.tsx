@@ -130,7 +130,27 @@ interface WorkCategory {
 	name: string
 }
 
+// Task interface
+interface AssignedTask {
+	id: string
+	title: string
+	description: string
+	priority: 'high' | 'medium' | 'low'
+	category: string
+	projectId?: string
+	projectName?: string
+	assignedTo?: string
+	deadline?: string
+}
+
 export default function InputPage() {
+	// Task Progress Mode State
+	const [inputMode, setInputMode] = useState<'free' | 'task'>('free') // 'free' or 'task'
+	const [selectedTask, setSelectedTask] = useState<string>('')
+	const [assignedTasks, setAssignedTasks] = useState<AssignedTask[]>([])
+	const [taskProgress, setTaskProgress] = useState<number>(0)
+	const [progressComment, setProgressComment] = useState('')
+	
 	// Form State
 	const [title, setTitle] = useState('')
 	const [description, setDescription] = useState('')
@@ -175,6 +195,57 @@ export default function InputPage() {
 	// Refs
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
+	// Load assigned tasks
+	useEffect(() => {
+		const loadAssignedTasks = () => {
+			const manualTasks = localStorage.getItem('manual_tasks')
+			const aiTasks = localStorage.getItem('ai_recommendations')
+			
+			let tasks: AssignedTask[] = []
+			
+			// Load manual tasks
+			if (manualTasks) {
+				const parsedManual = JSON.parse(manualTasks)
+				tasks = [...tasks, ...parsedManual.filter((t: any) => 
+					t.status === 'pending' && t.assignedToId // Only pending tasks assigned to someone
+				)]
+			}
+			
+			// Load AI tasks  
+			if (aiTasks) {
+				const parsedAI = JSON.parse(aiTasks)
+				tasks = [...tasks, ...parsedAI.filter((t: any) => t.status === 'pending')]
+			}
+			
+			setAssignedTasks(tasks)
+		}
+		
+		loadAssignedTasks()
+	}, [])
+	
+	// Handle task selection
+	const handleTaskSelection = (taskId: string) => {
+		setSelectedTask(taskId)
+		
+		if (taskId) {
+			const task = assignedTasks.find(t => t.id === taskId)
+			if (task) {
+				setTitle(task.title)
+				setDescription(task.description)
+				setCategory(task.category)
+				if (task.projectId) {
+					setSelectedProject(task.projectId)
+				}
+			}
+		} else {
+			// Clear when unselected
+			if (inputMode === 'task') {
+				setTitle('')
+				setDescription('')
+			}
+		}
+	}
+	
 	// Initialize data
 	useEffect(() => {
 		try {
@@ -585,6 +656,12 @@ export default function InputPage() {
 		setLinks([])
 		setIsConfidential(false)
 		setEditingEntryId(null)
+		
+		// Clear task progress state
+		setInputMode('free')
+		setSelectedTask('')
+		setTaskProgress(0)
+		setProgressComment('')
 	}
 
 	// Submit work entry
@@ -599,6 +676,12 @@ export default function InputPage() {
 			return
 		}
 		
+		// Validate task mode requirements
+		if (inputMode === 'task' && !selectedTask) {
+			toast.error('Please select a task')
+			return
+		}
+		
 		// Validate custom status if "Other" is selected
 		if (showCustomCategory && !customCategory.trim()) {
 			toast.error('Please enter a custom status name')
@@ -610,11 +693,17 @@ export default function InputPage() {
 		
 		// Use custom category if "Other" is selected
 		const finalCategory = showCustomCategory ? customCategory.trim() : category
+		
+		// Prepare description with progress comment
+		let finalDescription = description.trim()
+		if (inputMode === 'task' && selectedTask && progressComment) {
+			finalDescription = `${description}\n\n📊 Progress Update (${taskProgress}%):\n${progressComment}`
+		}
 
 		const workEntry: WorkEntry = {
 			id: editingEntryId || `work-${Date.now()}`,
 			title: title.trim(),
-			description: description.trim(),
+			description: finalDescription,
 			category: finalCategory,
 			projectId: selectedProject || undefined,
 			objectiveId: selectedObjective || undefined,
@@ -641,7 +730,39 @@ export default function InputPage() {
 				toast.success('Work entry updated!')
 			} else {
 				entriesList.unshift(workEntry)
-				toast.success('Work entry submitted!')
+				
+				// Update task progress if in task mode
+				if (inputMode === 'task' && selectedTask) {
+					const taskMessage = taskProgress === 100 ? 'Task completed!' : `Task progress updated to ${taskProgress}%`
+					toast.success(taskMessage, {
+						description: 'Work entry submitted with task progress',
+					})
+					
+					// Update task status if completed
+					if (taskProgress === 100) {
+						// Update manual tasks
+						const manualTasks = localStorage.getItem('manual_tasks')
+						if (manualTasks) {
+							const parsedManual = JSON.parse(manualTasks)
+							const updatedManual = parsedManual.map((t: any) => 
+								t.id === selectedTask ? { ...t, status: 'accepted' } : t
+							)
+							localStorage.setItem('manual_tasks', JSON.stringify(updatedManual))
+						}
+						
+						// Update AI tasks
+						const aiTasks = localStorage.getItem('ai_recommendations')
+						if (aiTasks) {
+							const parsedAI = JSON.parse(aiTasks)
+							const updatedAI = parsedAI.map((t: any) =>
+								t.id === selectedTask ? { ...t, status: 'accepted' } : t
+							)
+							localStorage.setItem('ai_recommendations', JSON.stringify(updatedAI))
+						}
+					}
+				} else {
+					toast.success('Work entry submitted!')
+				}
 			}
 			
 			localStorage.setItem('workEntries', JSON.stringify(entriesList))
@@ -828,6 +949,153 @@ export default function InputPage() {
 			<div className="grid gap-6 lg:grid-cols-3">
 				{/* Main Input Area - 2 columns */}
 				<div className="lg:col-span-2 space-y-6">
+					{/* Input Mode Selection */}
+					<Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800">
+						<CardContent className="p-4">
+							<div className="flex items-center justify-between gap-4">
+								<div className="flex items-center gap-3">
+									<TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+									<div>
+										<h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">Input Mode</h3>
+										<p className="text-xs text-blue-700 dark:text-blue-300">Choose how you want to log your work</p>
+									</div>
+								</div>
+								<div className="flex gap-2">
+									<button
+										onClick={() => {
+											setInputMode('free')
+											setSelectedTask('')
+											setTaskProgress(0)
+											setProgressComment('')
+										}}
+										className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+											inputMode === 'free'
+												? 'bg-blue-600 text-white shadow-md'
+												: 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-blue-50 dark:hover:bg-neutral-700'
+										}`}
+									>
+										📝 Free Input
+									</button>
+									<button
+										onClick={() => setInputMode('task')}
+										className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+											inputMode === 'task'
+												? 'bg-purple-600 text-white shadow-md'
+												: 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-purple-50 dark:hover:bg-neutral-700'
+										}`}
+									>
+										✅ Task Progress
+									</button>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Task Selection (only in task mode) */}
+					{inputMode === 'task' && (
+						<Card className="border-2 border-purple-200 dark:border-purple-800">
+							<CardHeader className="border-b border-neutral-200 dark:border-neutral-800 bg-purple-50 dark:bg-purple-900/20">
+								<h2 className="text-lg font-bold flex items-center gap-2">
+									<CheckCircle2 className="h-5 w-5 text-purple-600" />
+									Task Selection
+									<span className="text-xs font-normal text-purple-600 dark:text-purple-400">Select your assigned task</span>
+								</h2>
+							</CardHeader>
+							<CardContent className="p-6 space-y-5">
+								{/* Task Dropdown */}
+								<div>
+									<label className="block text-sm font-semibold mb-2">
+										Select Task <span className="text-red-500">*</span>
+									</label>
+									<select
+										value={selectedTask}
+										onChange={(e) => handleTaskSelection(e.target.value)}
+										className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-700 rounded-xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+									>
+										<option value="">Choose a task to update...</option>
+										{assignedTasks.map((task) => (
+											<option key={task.id} value={task.id}>
+												{task.title} {task.projectName ? `(${task.projectName})` : ''}
+											</option>
+										))}
+									</select>
+									<p className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
+										<Info className="h-3 w-3" />
+										{assignedTasks.length} task(s) available
+									</p>
+								</div>
+
+								{/* Progress Slider */}
+								{selectedTask && (
+									<div className="space-y-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+										<div className="flex items-center justify-between">
+											<label className="text-sm font-semibold">Task Progress</label>
+											<span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+												{taskProgress}%
+											</span>
+										</div>
+										
+										{/* Progress Bar */}
+										<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+											<div
+												className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-300"
+												style={{ width: `${taskProgress}%` }}
+											/>
+										</div>
+										
+										{/* Slider */}
+										<input
+											type="range"
+											min="0"
+											max="100"
+											step="5"
+											value={taskProgress}
+											onChange={(e) => setTaskProgress(Number(e.target.value))}
+											className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer dark:bg-neutral-700 accent-purple-600"
+										/>
+										
+										{/* Quick Buttons */}
+										<div className="flex gap-2 flex-wrap">
+											{[0, 25, 50, 75, 100].map((value) => (
+												<button
+													key={value}
+													onClick={() => setTaskProgress(value)}
+													className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+														taskProgress === value
+															? 'bg-purple-600 text-white'
+															: 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-purple-100 dark:hover:bg-neutral-700'
+													}`}
+												>
+													{value}%
+												</button>
+											))}
+										</div>
+									</div>
+								)}
+
+								{/* Progress Comment */}
+								{selectedTask && (
+									<div>
+										<label className="block text-sm font-semibold mb-2">
+											Progress Comment <span className="text-neutral-500">(Optional)</span>
+										</label>
+										<Textarea
+											placeholder="Describe what you accomplished, any blockers you faced, or what's next..."
+											value={progressComment}
+											onChange={(e) => setProgressComment(e.target.value)}
+											rows={4}
+											className="text-sm border-purple-300 dark:border-purple-700 focus:ring-purple-500"
+										/>
+										<p className="text-xs text-neutral-500 mt-1 flex items-center gap-1">
+											<Info className="h-3 w-3" />
+											This will be added to your work description
+										</p>
+									</div>
+								)}
+							</CardContent>
+						</Card>
+					)}
+
 					{/* Basic Information */}
 					<Card>
 						<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
@@ -842,6 +1110,9 @@ export default function InputPage() {
 							<div>
 								<label className="block text-sm font-semibold mb-2">
 									Title <span className="text-red-500">*</span>
+									{inputMode === 'task' && selectedTask && (
+										<span className="ml-2 text-xs text-purple-600 dark:text-purple-400">(Auto-filled from task)</span>
+									)}
 								</label>
 								<Input
 									type="text"
@@ -849,6 +1120,7 @@ export default function InputPage() {
 									value={title}
 									onChange={(e) => setTitle(e.target.value)}
 									className="text-base"
+									disabled={inputMode === 'task' && !!selectedTask}
 								/>
 							</div>
 
@@ -856,17 +1128,29 @@ export default function InputPage() {
 							<div>
 								<label className="block text-sm font-semibold mb-2">
 									Description <span className="text-red-500">*</span>
+									{inputMode === 'task' && selectedTask && (
+										<span className="ml-2 text-xs text-purple-600 dark:text-purple-400">(Auto-filled from task)</span>
+									)}
 								</label>
 								<Textarea
-									placeholder="Describe what you worked on, challenges faced, and outcomes achieved..."
-									value={description}
+									placeholder={inputMode === 'task' && selectedTask 
+										? "Task description will be shown here. Add your progress comment above." 
+										: "Describe what you worked on, challenges faced, and outcomes achieved..."}
+									value={inputMode === 'task' && selectedTask && progressComment 
+										? `${description}\n\n📊 Progress Update (${taskProgress}%):\n${progressComment}`
+										: description
+									}
 									onChange={(e) => setDescription(e.target.value)}
 									rows={6}
 									className="text-sm"
+									disabled={inputMode === 'task' && !!selectedTask}
 								/>
 								<p className="text-xs text-neutral-500 mt-1 flex items-center gap-1">
 									<Info className="h-3 w-3" />
-									Be specific about your work, decisions made, and results
+									{inputMode === 'task' && selectedTask
+										? 'Progress comment will be automatically added to the description'
+										: 'Be specific about your work, decisions made, and results'
+									}
 								</p>
 							</div>
 
