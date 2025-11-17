@@ -217,6 +217,79 @@ export default function InputPage() {
 				tasks = [...tasks, ...parsedAI.filter((t: any) => t.status === 'pending')]
 			}
 			
+			// Add mock tasks if no tasks are loaded
+			if (tasks.length === 0) {
+				const mockTasks: AssignedTask[] = [
+					{
+						id: 'mock-task-1',
+						title: 'Implement User Authentication System',
+						description: 'Build a comprehensive user authentication module with JWT tokens, social login (Google, GitHub), password reset flow, and session management. Include security features like rate limiting and CSRF protection.',
+						priority: 'high',
+						category: 'development',
+						projectId: 'proj-2',
+						projectName: 'Mobile App Development',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+					{
+						id: 'mock-task-2',
+						title: 'Fix Payment Gateway Bug',
+						description: 'Investigate and fix the issue where payments fail for certain card types. The bug occurs when users try to pay with expired cards or international cards.',
+						priority: 'high',
+						category: 'development',
+						projectId: 'proj-3',
+						projectName: 'API Integration',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+					{
+						id: 'mock-task-3',
+						title: 'Redesign Dashboard UI',
+						description: 'Update the main dashboard with a new, more intuitive layout. Focus on improving information hierarchy, adding customizable widgets, and implementing dark mode support.',
+						priority: 'medium',
+						category: 'development',
+						projectId: 'proj-1',
+						projectName: 'Website Redesign',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+					{
+						id: 'mock-task-4',
+						title: 'Write API Documentation',
+						description: 'Create comprehensive API documentation for the REST endpoints. Include authentication methods, request/response examples, error codes, and rate limiting information.',
+						priority: 'medium',
+						category: 'documentation',
+						projectId: 'proj-3',
+						projectName: 'API Integration',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+					{
+						id: 'mock-task-5',
+						title: 'Conduct User Testing Session',
+						description: 'Organize and conduct user testing sessions for the new mobile app features. Gather feedback on usability, performance, and user experience. Prepare a detailed report with findings and recommendations.',
+						priority: 'low',
+						category: 'research',
+						projectId: 'proj-2',
+						projectName: 'Mobile App Development',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+					{
+						id: 'mock-task-6',
+						title: 'Optimize Database Performance',
+						description: 'Analyze slow-running queries and implement performance improvements. Add indexes, refactor N+1 queries, implement caching, and set up monitoring.',
+						priority: 'high',
+						category: 'development',
+						projectId: 'proj-3',
+						projectName: 'API Integration',
+						assignedTo: 'Current User',
+						deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+					},
+				]
+				tasks = mockTasks
+			}
+			
 			setAssignedTasks(tasks)
 		}
 		

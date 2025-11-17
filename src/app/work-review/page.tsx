@@ -1,7 +1,7 @@
 import { storage } from '../../utils/storage'
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardHeader } from '../../components/ui/Card'
+import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/common/EmptyState'
 import { LoadingState } from '../../components/common/LoadingState'
@@ -30,7 +30,6 @@ import {
 	ThumbsDown,
 	Lightbulb,
 	Mail,
-	Send,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
