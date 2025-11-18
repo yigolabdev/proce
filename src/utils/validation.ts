@@ -1,223 +1,88 @@
 /**
  * Validation Utilities
  * 
- * 데이터 유효성 검증을 위한 유틸리티 함수들
+ * Common validation functions for forms and data.
  */
 
 /**
- * 이메일 유효성 검증
+ * Email validation
  */
-export const isValidEmail = (email: string): boolean => {
+export function isValidEmail(email: string): boolean {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 	return emailRegex.test(email)
 }
 
 /**
- * 비밀번호 강도 검증
+ * Check if string is empty or whitespace
  */
-export const validatePassword = (password: string): {
-	isValid: boolean
-	errors: string[]
-	strength: 'weak' | 'medium' | 'strong'
-} => {
-	const errors: string[] = []
-	let strength: 'weak' | 'medium' | 'strong' = 'weak'
-	
-	if (password.length < 8) {
-		errors.push('Password must be at least 8 characters long')
-	}
-	if (!/[A-Z]/.test(password)) {
-		errors.push('Password must contain at least one uppercase letter')
-	}
-	if (!/[a-z]/.test(password)) {
-		errors.push('Password must contain at least one lowercase letter')
-	}
-	if (!/[0-9]/.test(password)) {
-		errors.push('Password must contain at least one number')
-	}
-	if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-		errors.push('Password must contain at least one special character')
-	}
-	
-	// 강도 계산
-	const hasLength = password.length >= 8
-	const hasUpper = /[A-Z]/.test(password)
-	const hasLower = /[a-z]/.test(password)
-	const hasNumber = /[0-9]/.test(password)
-	const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
-	
-	const criteriaCount = [hasLength, hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length
-	
-	if (criteriaCount >= 5) strength = 'strong'
-	else if (criteriaCount >= 3) strength = 'medium'
-	
-	return {
-		isValid: errors.length === 0,
-		errors,
-		strength,
-	}
-}
-
-/**
- * 전화번호 유효성 검증
- */
-export const isValidPhoneNumber = (phone: string): boolean => {
-	const cleaned = phone.replace(/\D/g, '')
-	return cleaned.length >= 10 && cleaned.length <= 11
-}
-
-/**
- * URL 유효성 검증
- */
-export const isValidUrl = (url: string): boolean => {
-	try {
-		new URL(url)
-		return true
-	} catch {
-		return false
-	}
-}
-
-/**
- * 숫자 범위 검증
- */
-export const isInRange = (value: number, min: number, max: number): boolean => {
-	return value >= min && value <= max
-}
-
-/**
- * 날짜 유효성 검증
- */
-export const isValidDate = (date: string | Date): boolean => {
-	const dateObj = typeof date === 'string' ? new Date(date) : date
-	return !isNaN(dateObj.getTime())
-}
-
-/**
- * 미래 날짜 검증
- */
-export const isFutureDate = (date: string | Date): boolean => {
-	const dateObj = typeof date === 'string' ? new Date(date) : date
-	return dateObj.getTime() > Date.now()
-}
-
-/**
- * 과거 날짜 검증
- */
-export const isPastDate = (date: string | Date): boolean => {
-	const dateObj = typeof date === 'string' ? new Date(date) : date
-	return dateObj.getTime() < Date.now()
-}
-
-/**
- * 빈 문자열 검증
- */
-export const isEmpty = (value: string | null | undefined): boolean => {
+export function isEmpty(value: string): boolean {
 	return !value || value.trim().length === 0
 }
 
 /**
- * 파일 타입 검증
+ * Check if value is within range
  */
-export const isValidFileType = (file: File, allowedTypes: string[]): boolean => {
-	return allowedTypes.includes(file.type)
+export function isInRange(value: number, min: number, max: number): boolean {
+	return value >= min && value <= max
 }
 
 /**
- * 파일 크기 검증
+ * Validate required field
  */
-export const isValidFileSize = (file: File, maxSizeInMB: number): boolean => {
-	const maxSizeInBytes = maxSizeInMB * 1024 * 1024
-	return file.size <= maxSizeInBytes
+export function validateRequired(value: string, fieldName: string): string | null {
+	if (isEmpty(value)) {
+		return `${fieldName} is required`
+	}
+	return null
 }
 
 /**
- * 사업자등록번호 검증 (한국)
+ * Validate minimum length
  */
-export const isValidBusinessNumber = (number: string): boolean => {
-	const cleaned = number.replace(/[^0-9]/g, '')
-	if (cleaned.length !== 10) return false
-	
-	const weights = [1, 3, 7, 1, 3, 7, 1, 3, 5]
-	let sum = 0
-	
-	for (let i = 0; i < 9; i++) {
-		sum += parseInt(cleaned[i]) * weights[i]
+export function validateMinLength(value: string, minLength: number, fieldName: string): string | null {
+	if (value.length < minLength) {
+		return `${fieldName} must be at least ${minLength} characters`
 	}
-	
-	sum += Math.floor((parseInt(cleaned[8]) * 5) / 10)
-	const checkDigit = (10 - (sum % 10)) % 10
-	
-	return checkDigit === parseInt(cleaned[9])
+	return null
 }
 
 /**
- * 신용카드 번호 검증 (Luhn 알고리즘)
+ * Validate maximum length
  */
-export const isValidCreditCard = (cardNumber: string): boolean => {
-	const cleaned = cardNumber.replace(/\D/g, '')
-	if (cleaned.length < 13 || cleaned.length > 19) return false
-	
-	let sum = 0
-	let isEven = false
-	
-	for (let i = cleaned.length - 1; i >= 0; i--) {
-		let digit = parseInt(cleaned[i])
-		
-		if (isEven) {
-			digit *= 2
-			if (digit > 9) digit -= 9
-		}
-		
-		sum += digit
-		isEven = !isEven
+export function validateMaxLength(value: string, maxLength: number, fieldName: string): string | null {
+	if (value.length > maxLength) {
+		return `${fieldName} must be no more than ${maxLength} characters`
 	}
-	
-	return sum % 10 === 0
+	return null
 }
 
 /**
- * 필수 필드 검증
+ * Validate date range
  */
-export const validateRequiredFields = <T extends Record<string, any>>(
-	data: T,
-	requiredFields: (keyof T)[]
-): { isValid: boolean; missingFields: string[] } => {
-	const missingFields: string[] = []
-	
-	for (const field of requiredFields) {
-		const value = data[field]
-		if (value === undefined || value === null || value === '') {
-			missingFields.push(String(field))
-		}
+export function validateDateRange(startDate: Date, endDate: Date): string | null {
+	if (startDate > endDate) {
+		return 'Start date must be before end date'
 	}
-	
-	return {
-		isValid: missingFields.length === 0,
-		missingFields,
-	}
+	return null
 }
 
 /**
- * 객체 깊은 비교
+ * Validate file size (in bytes)
  */
-export const deepEqual = (obj1: any, obj2: any): boolean => {
-	if (obj1 === obj2) return true
-	
-	if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
-		return false
+export function validateFileSize(file: File, maxSize: number): string | null {
+	if (file.size > maxSize) {
+		const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(2)
+		return `File size must be less than ${maxSizeMB}MB`
 	}
-	
-	const keys1 = Object.keys(obj1)
-	const keys2 = Object.keys(obj2)
-	
-	if (keys1.length !== keys2.length) return false
-	
-	for (const key of keys1) {
-		if (!keys2.includes(key)) return false
-		if (!deepEqual(obj1[key], obj2[key])) return false
-	}
-	
-	return true
+	return null
 }
 
+/**
+ * Validate file type
+ */
+export function validateFileType(file: File, allowedTypes: string[]): string | null {
+	if (!allowedTypes.includes(file.type)) {
+		return `File type must be one of: ${allowedTypes.join(', ')}`
+	}
+	return null
+}

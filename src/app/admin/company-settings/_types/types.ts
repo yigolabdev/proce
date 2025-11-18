@@ -40,9 +40,9 @@ export interface LeadershipMember {
 	id: string
 	name: string
 	position: string
-	email: string
-	phone: string
 	department?: string
+	email?: string
+	phone?: string
 }
 
 export interface CompanyKPI {
@@ -110,18 +110,10 @@ export interface WorkplaceSettings {
 		start: string
 		end: string
 	}
-	holidays: Array<{ name: string; date: string }>
 	quietHours?: {
 		start: string
 		end: string
 	}
-	
-	// Decision Defaults
-	decisionMode: 'hybrid' | 'ai' | 'human'
-	requireEvidence: boolean
-	showConfidence: boolean
-	autoApproveLowRisk: boolean
-	escalationWindow: '4h' | '8h' | '24h'
 }
 
 // Constants

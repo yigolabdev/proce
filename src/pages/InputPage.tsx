@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Textarea from '../components/ui/Textarea'
+import { useAuth } from '../context/AuthContext'
 import { 
 	FileText, 
 	Upload, 
@@ -83,6 +84,7 @@ export interface WorkEntry {
 	description: string
 	category: string
 	projectId?: string
+	projectName?: string
 	objectiveId?: string
 	keyResultId?: string
 	keyResultProgress?: number
@@ -93,6 +95,14 @@ export interface WorkEntry {
 	links: LinkedResource[]
 	status: 'draft' | 'submitted'
 	isConfidential: boolean
+	
+	// User information
+	submittedBy?: string
+	submittedById?: string
+	department?: string
+	
+	// Task relation
+	taskId?: string
 	
 	// AI Analysis (optional)
 	complexity?: 'low' | 'medium' | 'high'
@@ -144,6 +154,8 @@ interface AssignedTask {
 }
 
 export default function InputPage() {
+	const { user } = useAuth()
+	
 	// Task Progress Mode State
 	const [inputMode, setInputMode] = useState<'free' | 'task'>('free') // 'free' or 'task'
 	const [selectedTask, setSelectedTask] = useState<string>('')
@@ -170,6 +182,11 @@ export default function InputPage() {
 	const [links, setLinks] = useState<LinkedResource[]>([])
 	const [linkInput, setLinkInput] = useState('')
 	const [isConfidential, setIsConfidential] = useState(false)
+	
+	// Review Request State
+	const [selectedReviewer, setSelectedReviewer] = useState('')
+	const [requestReview, setRequestReview] = useState(false)
+	const [reviewers, setReviewers] = useState<Array<{ id: string; name: string; role: string; department: string }>>([])
 	
 	// NoMeet (Async Discussion) State
 	const [asyncAgenda, setAsyncAgenda] = useState('')
@@ -744,6 +761,12 @@ export default function InputPage() {
 			toast.error('Please enter a title')
 			return
 		}
+		
+		// Validate reviewer selection if review is requested
+		if (requestReview && !selectedReviewer) {
+			toast.error('Please select a reviewer')
+			return
+		}
 		if (!description.trim()) {
 			toast.error('Please enter a description')
 			return
@@ -773,23 +796,40 @@ export default function InputPage() {
 			finalDescription = `${description}\n\n📊 Progress Update (${taskProgress}%):\n${progressComment}`
 		}
 
-		const workEntry: WorkEntry = {
-			id: editingEntryId || `work-${Date.now()}`,
-			title: title.trim(),
-			description: finalDescription,
-			category: finalCategory,
-			projectId: selectedProject || undefined,
-			objectiveId: selectedObjective || undefined,
-			keyResultId: selectedKeyResult || undefined,
-			keyResultProgress: keyResultProgress ? parseFloat(keyResultProgress) : undefined,
-			tags,
-			date: new Date(),
-			duration: finalDuration || '1h',
-			files,
-			links,
-			status: 'submitted',
-			isConfidential,
-		}
+	// Find project name if project is selected
+	const projectName = selectedProject 
+		? projects.find(p => p.id === selectedProject)?.name 
+		: undefined
+	
+	// Find task info if in task mode
+	const taskInfo = inputMode === 'task' && selectedTask
+		? assignedTasks.find(t => t.id === selectedTask)
+		: undefined
+	
+	const workEntry: WorkEntry = {
+		id: editingEntryId || `work-${Date.now()}`,
+		title: title.trim(),
+		description: finalDescription,
+		category: finalCategory,
+		projectId: selectedProject || undefined,
+		projectName: projectName,
+		objectiveId: selectedObjective || undefined,
+		keyResultId: selectedKeyResult || undefined,
+		keyResultProgress: keyResultProgress ? parseFloat(keyResultProgress) : undefined,
+		tags,
+		date: new Date(),
+		duration: finalDuration || '1h',
+		files,
+		links,
+		status: 'submitted',
+		isConfidential,
+		// User information from AuthContext
+		submittedBy: user?.name || 'Unknown User',
+		submittedById: user?.id || '',
+		department: user?.department || '',
+		// Task ID if in task mode
+		taskId: taskInfo?.id,
+	}
 
 		try {
 			// Save work entry
@@ -832,10 +872,89 @@ export default function InputPage() {
 							)
 							localStorage.setItem('ai_recommendations', JSON.stringify(updatedAI))
 						}
+						
+						// Send task completion notification to task creator
+						const messages = localStorage.getItem('messages')
+						const messagesList = messages ? JSON.parse(messages) : []
+						messagesList.unshift({
+							id: `msg-task-complete-${Date.now()}`,
+							type: 'notification',
+							subject: `Task Completed: ${taskInfo?.title}`,
+							from: user?.name || 'Unknown User',
+							fromDepartment: user?.department,
+							preview: `${user?.name || 'Unknown User'} has completed the task`,
+							content: `Task "${taskInfo?.title}" has been marked as complete.\n\n${progressComment ? `**Progress Comment:**\n${progressComment}\n\n` : ''}Check the work entry for more details.`,
+							timestamp: new Date(),
+							isRead: false,
+							isStarred: false,
+							relatedType: 'work',
+							relatedId: workEntry.id,
+							aiSummary: '✅ Task marked as complete',
+						})
+						localStorage.setItem('messages', JSON.stringify(messagesList))
 					}
 				} else {
 					toast.success('Work entry submitted!')
 				}
+				
+			// Send review request notification if requested
+			if (requestReview && selectedReviewer && selectedProject && projectName) {
+				const reviewer = reviewers.find(r => r.id === selectedReviewer)
+				if (reviewer) {
+					// Create pending review entry
+					const pendingReviews = localStorage.getItem('pending_reviews')
+					const reviewsList = pendingReviews ? JSON.parse(pendingReviews) : []
+					reviewsList.push({
+						id: `pending-review-${Date.now()}`,
+						workEntryId: workEntry.id,
+						workTitle: title,
+						workDescription: description,
+						projectId: selectedProject,
+						projectName: projectName,
+						submittedBy: user?.name || 'Unknown User',
+						submittedById: user?.id,
+						submittedByDepartment: user?.department,
+						reviewerId: reviewer.id,
+						reviewerName: reviewer.name,
+						reviewerRole: reviewer.role,
+						reviewerDepartment: reviewer.department,
+						status: 'pending',
+						submittedAt: new Date().toISOString(),
+					})
+					localStorage.setItem('pending_reviews', JSON.stringify(reviewsList))
+					
+					// Send message to reviewer
+					const messages = localStorage.getItem('messages')
+					const messagesList = messages ? JSON.parse(messages) : []
+					messagesList.unshift({
+						id: `msg-review-req-${Date.now()}`,
+						type: 'approval',
+						priority: 'medium',
+						subject: `Review Request: ${title}`,
+						from: user?.name || 'Unknown User',
+						fromDepartment: user?.department,
+						preview: `${user?.name} requests your review on "${title}"`,
+						content: `Hi ${reviewer.name},\n\n${user?.name || 'Unknown User'} has requested your review on their work submission.\n\n**Project:** ${projectName}\n**Title:** ${title}\n**Description:**\n${description}\n\n${category ? `**Category:** ${category}\n` : ''}${duration ? `**Duration:** ${finalDuration}\n` : ''}${tags.length > 0 ? `**Tags:** ${tags.join(', ')}\n` : ''}\n\nPlease review and provide feedback at your earliest convenience.\n\n---\nThis is a review request from the Work Input system.`,
+						timestamp: new Date(),
+						isRead: false,
+						isStarred: false,
+						relatedType: 'work',
+						relatedId: workEntry.id,
+						recipientId: reviewer.id,
+						aiSummary: `${user?.name} requests your review on work for ${projectName}`,
+					})
+					localStorage.setItem('messages', JSON.stringify(messagesList))
+					
+					toast.success(`✅ Review request sent to ${reviewer.name}!`, {
+						description: 'They will be notified to review your work',
+					})
+				}
+			} else if (selectedProject && projectName && !requestReview) {
+				// Generic notification if no specific reviewer selected
+				toast.info('Work linked to project', {
+					description: 'Project team can view your work in Work History',
+				})
+			}
 			}
 			
 			localStorage.setItem('workEntries', JSON.stringify(entriesList))
@@ -920,21 +1039,22 @@ export default function InputPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.INPUT} pagePath="/pages/InputPage.tsx" />
-			<div className="space-y-6">
+			<div className="space-y-4 sm:space-y-6">
 				{/* Header */}
-				<div className="flex items-center justify-between flex-wrap gap-4">
-				<div className="flex-1 min-w-[300px]">
-					<div className="flex items-center gap-3 mb-2">
-						<FileText className="h-8 w-8 text-primary" />
-						<h1 className="text-3xl font-bold">Work Input</h1>
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+				<div className="flex-1 min-w-0">
+					<div className="flex items-center gap-2 sm:gap-3 mb-2">
+						<FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
+						<h1 className="text-2xl sm:text-3xl font-bold">Work Input</h1>
 						{editingEntryId && (
-							<span className="text-xs font-medium px-3 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
-								Editing Mode
+							<span className="text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
+								Edit
 							</span>
 						)}
 					</div>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
-						Document your work, link to projects/OKRs, and track your progress
+					<p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
+						<span className="hidden sm:inline">Document your work, link to projects/OKRs, and track your progress</span>
+						<span className="sm:hidden">Document your work & progress</span>
 					</p>
 					
 					{/* Progress Indicator */}
@@ -1075,28 +1195,138 @@ export default function InputPage() {
 								</h2>
 							</CardHeader>
 							<CardContent className="p-6 space-y-5">
-								{/* Task Dropdown */}
-								<div>
-									<label className="block text-sm font-semibold mb-2">
-										Select Task <span className="text-red-500">*</span>
-									</label>
-									<select
-										value={selectedTask}
-										onChange={(e) => handleTaskSelection(e.target.value)}
-										className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-700 rounded-xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-									>
-										<option value="">Choose a task to update...</option>
-										{assignedTasks.map((task) => (
-											<option key={task.id} value={task.id}>
-												{task.title} {task.projectName ? `(${task.projectName})` : ''}
-											</option>
-										))}
-									</select>
-									<p className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
-										<Info className="h-3 w-3" />
-										{assignedTasks.length} task(s) available
-									</p>
-								</div>
+							{/* Task Dropdown - Enhanced with Priority & Deadline */}
+							<div>
+								<label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+									Select Task <span className="text-red-500">*</span>
+									{assignedTasks.filter(t => t.priority === 'high').length > 0 && (
+										<span className="text-xs px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full">
+											{assignedTasks.filter(t => t.priority === 'high').length} Urgent
+										</span>
+									)}
+								</label>
+								<select
+									value={selectedTask}
+									onChange={(e) => handleTaskSelection(e.target.value)}
+									className="w-full px-4 py-3 border-2 border-purple-300 dark:border-purple-700 rounded-xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+								>
+									<option value="">Choose a task to update...</option>
+									
+									{/* High Priority Tasks */}
+									{assignedTasks.filter(t => t.priority === 'high').length > 0 && (
+										<optgroup label="🔥 High Priority">
+											{assignedTasks
+												.filter(t => t.priority === 'high')
+												.sort((a, b) => {
+													// Sort by deadline
+													if (a.deadline && b.deadline) {
+														return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
+													}
+													return 0
+												})
+												.map((task) => {
+													const daysLeft = task.deadline 
+														? Math.ceil((new Date(task.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+														: null
+													return (
+														<option key={task.id} value={task.id}>
+															{task.title}
+															{task.projectName ? ` (${task.projectName})` : ''}
+															{daysLeft !== null && ` - ${daysLeft}d left`}
+														</option>
+													)
+												})}
+										</optgroup>
+									)}
+									
+									{/* Medium Priority Tasks */}
+									{assignedTasks.filter(t => t.priority === 'medium').length > 0 && (
+										<optgroup label="📌 Medium Priority">
+											{assignedTasks
+												.filter(t => t.priority === 'medium')
+												.sort((a, b) => {
+													if (a.deadline && b.deadline) {
+														return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
+													}
+													return 0
+												})
+												.map((task) => {
+													const daysLeft = task.deadline 
+														? Math.ceil((new Date(task.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+														: null
+													return (
+														<option key={task.id} value={task.id}>
+															{task.title}
+															{task.projectName ? ` (${task.projectName})` : ''}
+															{daysLeft !== null && ` - ${daysLeft}d left`}
+														</option>
+													)
+												})}
+										</optgroup>
+									)}
+									
+									{/* Low Priority Tasks */}
+									{assignedTasks.filter(t => t.priority === 'low').length > 0 && (
+										<optgroup label="📝 Low Priority">
+											{assignedTasks
+												.filter(t => t.priority === 'low')
+												.map((task) => (
+													<option key={task.id} value={task.id}>
+														{task.title}
+														{task.projectName ? ` (${task.projectName})` : ''}
+													</option>
+												))}
+										</optgroup>
+									)}
+								</select>
+								<p className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
+									<Info className="h-3 w-3" />
+									{assignedTasks.length} task(s) available
+									{assignedTasks.filter(t => t.priority === 'high').length > 0 && (
+										<span className="ml-2 text-red-600 dark:text-red-400 font-medium">
+											• {assignedTasks.filter(t => t.priority === 'high').length} urgent
+										</span>
+									)}
+								</p>
+								
+								{/* Task Details Preview */}
+								{selectedTask && assignedTasks.find(t => t.id === selectedTask) && (
+									<div className="mt-3 p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+										{(() => {
+											const task = assignedTasks.find(t => t.id === selectedTask)!
+											const daysLeft = task.deadline 
+												? Math.ceil((new Date(task.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+												: null
+											return (
+												<>
+													<div className="flex items-center gap-2 mb-2">
+														<span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+															task.priority === 'high' 
+																? 'bg-red-200 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+																: task.priority === 'medium'
+																? 'bg-yellow-200 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+																: 'bg-blue-200 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+														}`}>
+															{task.priority.toUpperCase()}
+														</span>
+														{daysLeft !== null && (
+															<span className={`text-xs font-medium ${
+																daysLeft > 3 ? 'text-purple-700 dark:text-purple-300' : 'text-red-600 dark:text-red-400'
+															}`}>
+																⏰ {daysLeft > 0 ? `${daysLeft} days left` : daysLeft === 0 ? 'Due today!' : 'Overdue!'}
+															</span>
+														)}
+													</div>
+													<p className="text-xs text-purple-800 dark:text-purple-200">
+														{task.description.substring(0, 150)}
+														{task.description.length > 150 && '...'}
+													</p>
+												</>
+											)
+										})()}
+									</div>
+								)}
+							</div>
 
 								{/* Progress Slider */}
 								{selectedTask && (
@@ -1362,15 +1592,69 @@ export default function InputPage() {
 										))
 									)}
 								</select>
-								{selectedProject && (
+							{selectedProject && (
+								<>
 									<p className="text-xs text-green-600 dark:text-green-400 mt-2 flex items-center gap-1">
 										<CheckCircle2 className="h-3 w-3" />
 										This work will be linked to the selected project
 									</p>
-								)}
-							</div>
+									
+									{/* Request Review Checkbox */}
+									<div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+										<label className="flex items-start gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												checked={requestReview}
+												onChange={(e) => {
+													setRequestReview(e.target.checked)
+													if (!e.target.checked) {
+														setSelectedReviewer('')
+													}
+												}}
+												className="mt-0.5"
+											/>
+											<div className="flex-1">
+												<span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+													Request Review
+												</span>
+												<p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+													Ask a team member to review your work before marking it complete
+												</p>
+											</div>
+										</label>
+										
+										{/* Reviewer Selection */}
+										{requestReview && (
+											<div className="mt-3">
+												<label className="block text-xs font-semibold mb-2 text-blue-900 dark:text-blue-100">
+													Select Reviewer *
+												</label>
+												<select
+													value={selectedReviewer}
+													onChange={(e) => setSelectedReviewer(e.target.value)}
+													className="w-full px-3 py-2 text-sm border border-blue-300 dark:border-blue-700 rounded-xl bg-white dark:bg-neutral-900"
+													required={requestReview}
+												>
+													<option value="">Choose a reviewer...</option>
+													{reviewers.map((reviewer) => (
+														<option key={reviewer.id} value={reviewer.id}>
+															{reviewer.name} - {reviewer.role} ({reviewer.department})
+														</option>
+													))}
+												</select>
+												{!selectedReviewer && (
+													<p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+														Please select a reviewer to continue
+													</p>
+												)}
+											</div>
+										)}
+									</div>
+								</>
+							)}
+						</div>
 
-							{/* OKR - Objective & Key Result */}
+						{/* OKR - Objective & Key Result */}
 							<div className="space-y-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl border border-neutral-200 dark:border-neutral-800">
 								<div className="flex items-center gap-2 text-sm font-semibold text-primary">
 									<Target className="h-4 w-4" />

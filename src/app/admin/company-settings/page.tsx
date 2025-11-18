@@ -53,17 +53,19 @@ export default function CompanySettingsPage() {
 		website: 'https://proce.com',
 		socialLinks: [
 			{ platform: 'LinkedIn', url: 'https://linkedin.com/company/proce' },
+			{ platform: 'Twitter', url: 'https://twitter.com/proce' },
+			{ platform: 'Facebook', url: 'https://facebook.com/proce' },
 		],
 		
 		// Business
-		description: '',
-		vision: '',
-		mission: '',
-		mainProducts: '',
-		mainServices: '',
-		targetMarket: '',
-		targetCustomers: '',
-		competitiveAdvantage: '',
+		description: 'Proce는 조직의 실행 리듬을 최적화하는 AI 기반 워크플로우 플랫폼입니다. 팀의 업무 흐름을 자동화하고, 프로젝트 관리를 효율화하며, 데이터 기반 의사결정을 지원합니다.',
+		vision: '모든 조직이 자신만의 실행 리듬을 찾아 지속 가능한 성장을 이루도록 돕는다',
+		mission: 'AI와 인간의 협업을 통해 조직의 생산성과 효율성을 극대화하고, 직원들의 워크라이프 밸런스를 개선한다',
+		mainProducts: 'Proce Workflow Platform, Proce Analytics, Proce AI Assistant',
+		mainServices: '워크플로우 자동화, 프로젝트 관리, 데이터 분석 및 인사이트, AI 기반 작업 추천',
+		targetMarket: '중소기업부터 대기업까지, 프로젝트 기반 업무를 수행하는 모든 조직',
+		targetCustomers: '프로젝트 매니저, 팀 리더, 임원진, HR 담당자',
+		competitiveAdvantage: 'AI 기반 자동화, 실행 리듬 기반 UX, 실시간 협업 도구, 데이터 기반 인사이트',
 		
 		// Workforce
 		employeeCount: '247',
@@ -81,6 +83,46 @@ export default function CompanySettingsPage() {
 			phone: '+82-10-1234-5678',
 			department: 'Executive',
 		},
+		{
+			id: '2',
+			name: '이재무',
+			position: 'CFO',
+			email: 'cfo@proce.com',
+			phone: '+82-10-2345-6789',
+			department: 'Finance',
+		},
+		{
+			id: '3',
+			name: '박기술',
+			position: 'CTO',
+			email: 'cto@proce.com',
+			phone: '+82-10-3456-7890',
+			department: 'Engineering',
+		},
+		{
+			id: '4',
+			name: '최운영',
+			position: 'COO',
+			email: 'coo@proce.com',
+			phone: '+82-10-4567-8901',
+			department: 'Operations',
+		},
+		{
+			id: '5',
+			name: '정마케팅',
+			position: 'CMO',
+			email: 'cmo@proce.com',
+			phone: '+82-10-5678-9012',
+			department: 'Marketing',
+		},
+		{
+			id: '6',
+			name: '강인사',
+			position: 'CHRO',
+			email: 'chro@proce.com',
+			phone: '+82-10-6789-0123',
+			department: 'HR',
+		},
 	])
 	const [isAddingLeader, setIsAddingLeader] = useState(false)
 	const [newLeader, setNewLeader] = useState<Partial<LeadershipMember>>({
@@ -93,7 +135,128 @@ export default function CompanySettingsPage() {
 	const [editingLeader, setEditingLeader] = useState<string | null>(null)
 
 	// KPIs State
-	const [companyKPIs, setCompanyKPIs] = useState<CompanyKPI[]>([])
+	const [companyKPIs, setCompanyKPIs] = useState<CompanyKPI[]>([
+		{
+			id: '1',
+			name: 'Annual Revenue Growth',
+			description: '연간 매출 성장률 목표',
+			category: 'Financial',
+			targetValue: 50,
+			currentValue: 42,
+			unit: '%',
+			period: 'annual',
+			startDate: '2024-01-01',
+			endDate: '2024-12-31',
+			owner: '이재무, CFO',
+			department: 'Finance',
+			measurementFrequency: 'monthly',
+			dataSource: 'Salesforce, Internal Accounting System',
+			status: 'on-track',
+			priority: 'high',
+			createdAt: new Date('2024-01-01'),
+			updatedAt: new Date('2024-11-15'),
+		},
+		{
+			id: '2',
+			name: 'Customer Satisfaction Score',
+			description: '고객 만족도 점수 (NPS 기반)',
+			category: 'Customer',
+			targetValue: 80,
+			currentValue: 75,
+			unit: 'points',
+			period: 'quarterly',
+			startDate: '2024-10-01',
+			endDate: '2024-12-31',
+			owner: '정마케팅, CMO',
+			department: 'Marketing',
+			measurementFrequency: 'monthly',
+			dataSource: 'Customer Survey Platform',
+			status: 'on-track',
+			priority: 'high',
+			createdAt: new Date('2024-10-01'),
+			updatedAt: new Date('2024-11-10'),
+		},
+		{
+			id: '3',
+			name: 'Employee Retention Rate',
+			description: '직원 이직률 감소 목표',
+			category: 'HR',
+			targetValue: 90,
+			currentValue: 87,
+			unit: '%',
+			period: 'annual',
+			startDate: '2024-01-01',
+			endDate: '2024-12-31',
+			owner: '강인사, CHRO',
+			department: 'HR',
+			measurementFrequency: 'quarterly',
+			dataSource: 'HRIS',
+			status: 'on-track',
+			priority: 'medium',
+			createdAt: new Date('2024-01-01'),
+			updatedAt: new Date('2024-10-31'),
+		},
+		{
+			id: '4',
+			name: 'Product Development Velocity',
+			description: '제품 개발 속도 (스프린트 완료율)',
+			category: 'Operational',
+			targetValue: 95,
+			currentValue: 88,
+			unit: '%',
+			period: 'monthly',
+			startDate: '2024-11-01',
+			endDate: '2024-11-30',
+			owner: '박기술, CTO',
+			department: 'Engineering',
+			measurementFrequency: 'weekly',
+			dataSource: 'Jira, GitHub',
+			status: 'at-risk',
+			priority: 'high',
+			createdAt: new Date('2024-11-01'),
+			updatedAt: new Date('2024-11-14'),
+		},
+		{
+			id: '5',
+			name: 'Monthly Active Users',
+			description: '월간 활성 사용자 수 증가',
+			category: 'Growth',
+			targetValue: 10000,
+			currentValue: 8500,
+			unit: 'users',
+			period: 'monthly',
+			startDate: '2024-11-01',
+			endDate: '2024-11-30',
+			owner: '정마케팅, CMO',
+			department: 'Marketing',
+			measurementFrequency: 'daily',
+			dataSource: 'Google Analytics, Internal Analytics',
+			status: 'on-track',
+			priority: 'high',
+			createdAt: new Date('2024-11-01'),
+			updatedAt: new Date('2024-11-15'),
+		},
+		{
+			id: '6',
+			name: 'Market Share Expansion',
+			description: '목표 시장 점유율 확대',
+			category: 'Strategic',
+			targetValue: 15,
+			currentValue: 12,
+			unit: '%',
+			period: 'annual',
+			startDate: '2024-01-01',
+			endDate: '2024-12-31',
+			owner: '김대표, CEO',
+			department: 'Executive',
+			measurementFrequency: 'quarterly',
+			dataSource: 'Market Research Reports',
+			status: 'on-track',
+			priority: 'medium',
+			createdAt: new Date('2024-01-01'),
+			updatedAt: new Date('2024-10-31'),
+		},
+	])
 	const [isAddingKPI, setIsAddingKPI] = useState(false)
 	const [editingKPI, setEditingKPI] = useState<string | null>(null)
 	const [newKPI, setNewKPI] = useState<Partial<CompanyKPI>>({
@@ -115,7 +278,59 @@ export default function CompanySettingsPage() {
 	})
 
 	// Financial State
-	const [financialData, setFinancialData] = useState<FinancialData[]>([])
+	const [financialData, setFinancialData] = useState<FinancialData[]>([
+		{
+			year: '2024',
+			totalRevenue: '50000000000',
+			netIncome: '8000000000',
+			totalAssets: '120000000000',
+			totalLiabilities: '70000000000',
+			documents: [
+				{
+					id: '1',
+					name: '2024_Q3_Financial_Report.pdf',
+					size: 2456789,
+					uploadedAt: '2024-10-15T10:30:00Z',
+				},
+				{
+					id: '2',
+					name: '2024_Annual_Budget.xlsx',
+					size: 1234567,
+					uploadedAt: '2024-01-10T09:00:00Z',
+				},
+			],
+		},
+		{
+			year: '2023',
+			totalRevenue: '35000000000',
+			netIncome: '5000000000',
+			totalAssets: '90000000000',
+			totalLiabilities: '55000000000',
+			documents: [
+				{
+					id: '3',
+					name: '2023_Annual_Report.pdf',
+					size: 3456789,
+					uploadedAt: '2024-02-20T14:00:00Z',
+				},
+			],
+		},
+		{
+			year: '2022',
+			totalRevenue: '25000000000',
+			netIncome: '3000000000',
+			totalAssets: '60000000000',
+			totalLiabilities: '35000000000',
+			documents: [
+				{
+					id: '4',
+					name: '2022_Financial_Statement.pdf',
+					size: 2234567,
+					uploadedAt: '2023-03-15T11:00:00Z',
+				},
+			],
+		},
+	])
 	const [isAddingFinancial, setIsAddingFinancial] = useState(false)
 	const [newFinancialYear, setNewFinancialYear] = useState<Omit<FinancialData, 'documents'> & { documents?: UploadedDocument[] }>({
 		year: new Date().getFullYear().toString(),
@@ -127,7 +342,62 @@ export default function CompanySettingsPage() {
 	})
 
 	// Documents State
-	const [documents, setDocuments] = useState<UploadedDocument[]>([])
+	const [documents, setDocuments] = useState<UploadedDocument[]>([
+		{
+			id: '1',
+			name: 'Company_Registration_Certificate.pdf',
+			size: 1234567,
+			type: 'application/pdf',
+			category: 'legal',
+			uploadedAt: '2024-01-15T10:00:00Z',
+			uploadedBy: '김대표',
+		},
+		{
+			id: '2',
+			name: 'Employee_Handbook_2024.pdf',
+			size: 2345678,
+			type: 'application/pdf',
+			category: 'hr',
+			uploadedAt: '2024-02-01T14:30:00Z',
+			uploadedBy: '강인사',
+		},
+		{
+			id: '3',
+			name: 'Partnership_Agreement_ABC_Corp.pdf',
+			size: 3456789,
+			type: 'application/pdf',
+			category: 'contracts',
+			uploadedAt: '2024-03-10T09:15:00Z',
+			uploadedBy: '이재무',
+		},
+		{
+			id: '4',
+			name: 'Marketing_Strategy_2024.pptx',
+			size: 4567890,
+			type: 'application/vnd.ms-powerpoint',
+			category: 'strategy',
+			uploadedAt: '2024-04-05T16:45:00Z',
+			uploadedBy: '정마케팅',
+		},
+		{
+			id: '5',
+			name: 'Technical_Architecture_Document.pdf',
+			size: 5678901,
+			type: 'application/pdf',
+			category: 'technical',
+			uploadedAt: '2024-05-20T11:20:00Z',
+			uploadedBy: '박기술',
+		},
+		{
+			id: '6',
+			name: 'Compliance_Report_Q3_2024.pdf',
+			size: 2345678,
+			type: 'application/pdf',
+			category: 'compliance',
+			uploadedAt: '2024-10-15T13:00:00Z',
+			uploadedBy: '최운영',
+		},
+	])
 
 	// Workplace State
 	const [workplaceSettings, setWorkplaceSettings] = useState<WorkplaceSettings>({
@@ -135,13 +405,7 @@ export default function CompanySettingsPage() {
 		timezone: 'Asia/Seoul',
 		workingDays: [1, 2, 3, 4, 5],
 		workingHours: { start: '09:00', end: '18:00' },
-		holidays: [],
-		quietHours: { start: '', end: '' },
-		decisionMode: 'hybrid',
-		requireEvidence: true,
-		showConfidence: true,
-		autoApproveLowRisk: false,
-		escalationWindow: '8h',
+		quietHours: { start: '22:00', end: '08:00' },
 	})
 
 	// Available departments from system settings
@@ -151,7 +415,7 @@ export default function CompanySettingsPage() {
 	useEffect(() => {
 		try {
 			const savedInfo = storage.get<any>('companyInfo')
-			if (savedInfo) {
+			if (savedInfo && Object.keys(savedInfo).length > 0) {
 				setCompanyInfo(savedInfo)
 			}
 		} catch (error) {
@@ -161,7 +425,7 @@ export default function CompanySettingsPage() {
 		
 		try {
 			const savedLeadership = storage.get<any>('leadership')
-			if (savedLeadership) {
+			if (savedLeadership && Array.isArray(savedLeadership) && savedLeadership.length > 0) {
 				setLeadership(savedLeadership)
 			}
 		} catch (error) {
@@ -170,7 +434,7 @@ export default function CompanySettingsPage() {
 		
 		try {
 			const savedKPIs = storage.get<any>('companyKPIs')
-			if (savedKPIs) {
+			if (savedKPIs && Array.isArray(savedKPIs) && savedKPIs.length > 0) {
 				setCompanyKPIs(savedKPIs)
 			}
 		} catch (error) {
@@ -179,7 +443,7 @@ export default function CompanySettingsPage() {
 		
 		try {
 			const savedFinancial = storage.get<any>('financialData')
-			if (savedFinancial) {
+			if (savedFinancial && Array.isArray(savedFinancial) && savedFinancial.length > 0) {
 				setFinancialData(savedFinancial)
 			}
 		} catch (error) {
@@ -188,7 +452,7 @@ export default function CompanySettingsPage() {
 		
 		try {
 			const savedDocuments = storage.get<any>('companyDocuments')
-			if (savedDocuments) {
+			if (savedDocuments && Array.isArray(savedDocuments) && savedDocuments.length > 0) {
 				setDocuments(savedDocuments)
 			}
 		} catch (error) {
@@ -197,7 +461,7 @@ export default function CompanySettingsPage() {
 		
 		try {
 			const savedWorkplace = storage.get<any>('workplaceSettings')
-			if (savedWorkplace) {
+			if (savedWorkplace && Object.keys(savedWorkplace).length > 0) {
 				setWorkplaceSettings(savedWorkplace)
 			}
 		} catch (error) {
@@ -340,8 +604,8 @@ export default function CompanySettingsPage() {
 	}
 
 	const handleAddKPI = () => {
-		if (!newKPI.name || !newKPI.owner) {
-			toast.error('Please fill in required fields (Name, Owner)')
+		if (!newKPI.name) {
+			toast.error('Please enter a KPI name')
 			return
 		}
 		
@@ -667,6 +931,7 @@ export default function CompanySettingsPage() {
 						newKPI={newKPI}
 						availableDepartments={availableDepartments}
 						leadership={leadership}
+						companyIndustry={companyInfo.industry}
 						setNewKPI={setNewKPI}
 						setIsAdding={setIsAddingKPI}
 						setEditingId={setEditingKPI}

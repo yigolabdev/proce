@@ -2,8 +2,40 @@ import { Button } from '../../../../components/ui/Button'
 import { Card, CardContent, CardHeader } from '../../../../components/ui/Card'
 import Input from '../../../../components/ui/Input'
 import Textarea from '../../../../components/ui/Textarea'
-import { Target, Plus, X, Trash2, Edit2, TrendingUp, AlertTriangle, CheckCircle2, BarChart3 } from 'lucide-react'
+import { Select } from '../../../../components/ui/Select'
+import { Target, Plus, X, Trash2, Edit2, TrendingUp, AlertTriangle, CheckCircle2, BarChart3, Building2 } from 'lucide-react'
+import { useState } from 'react'
 import type { CompanyKPI } from '../_types/types'
+
+// 산업군 목록
+const industries = [
+	{ value: 'IT/SaaS', label: 'IT / SaaS / Software' },
+	{ value: 'Consulting', label: 'Consulting' },
+	{ value: 'Marketing', label: 'Marketing / Advertising' },
+	{ value: 'Design', label: 'Design' },
+	{ value: 'Retail HQ', label: 'Retail / E-commerce' },
+	{ value: 'Logistics', label: 'Logistics / Transportation' },
+	{ value: 'Manufacturing', label: 'Manufacturing' },
+	{ value: 'Healthcare', label: 'Healthcare' },
+	{ value: 'Public', label: 'Public Sector / Government' },
+	{ value: 'Education', label: 'Education' },
+	{ value: 'Other', label: 'Other' },
+]
+
+// 산업군별 KPI 프리셋
+const industryKPIPresets: Record<string, string[]> = {
+	'IT/SaaS': ['Revenue', 'Active Users', 'Churn Rate', 'NPS', 'Cycle Time', 'Deployment Frequency', 'MRR', 'ARR', 'CAC', 'LTV'],
+	'Consulting': ['Revenue', 'Utilization Rate', 'Client Satisfaction', 'Project Margin', 'Win Rate', 'Billable Hours', 'Repeat Client Rate'],
+	'Marketing': ['Lead Generation', 'Conversion Rate', 'ROI', 'Engagement Rate', 'Brand Awareness', 'Cost per Lead', 'MQL to SQL'],
+	'Design': ['Project Completion', 'Client Satisfaction', 'Design Quality Score', 'Iteration Cycle', 'On-time Delivery'],
+	'Retail HQ': ['Revenue', 'Inventory Turnover', 'Margin', 'Same-Store Sales', 'Customer Satisfaction', 'GMV', 'AOV'],
+	'Logistics': ['On-Time Delivery', 'Cost per Shipment', 'Inventory Accuracy', 'Order Fulfillment Rate', 'Delivery Time'],
+	'Manufacturing': ['Production Output', 'Quality Rate', 'Downtime', 'On-Time Delivery', 'Cost per Unit', 'OEE'],
+	'Healthcare': ['Patient Satisfaction', 'Wait Time', 'Treatment Success Rate', 'Cost per Patient', 'Readmission Rate'],
+	'Public': ['Service Delivery Time', 'Citizen Satisfaction', 'Budget Utilization', 'Compliance Rate'],
+	'Education': ['Student Satisfaction', 'Graduation Rate', 'Enrollment', 'Faculty Retention', 'Course Completion Rate'],
+	'Other': ['Revenue', 'Customer Satisfaction', 'Cost Efficiency', 'On-Time Delivery'],
+}
 
 interface KPITabProps {
 	kpis: CompanyKPI[]
@@ -12,6 +44,7 @@ interface KPITabProps {
 	newKPI: Partial<CompanyKPI>
 	availableDepartments: { id: string; name: string }[]
 	leadership: Array<{ id: string; name: string; position: string }>
+	companyIndustry?: string // 회사 산업군 정보
 	setNewKPI: (kpi: Partial<CompanyKPI>) => void
 	setIsAdding: (value: boolean) => void
 	setEditingId: (id: string | null) => void
@@ -64,6 +97,7 @@ export default function KPITab({
 	newKPI,
 	availableDepartments,
 	leadership,
+	companyIndustry,
 	setNewKPI,
 	setIsAdding,
 	setEditingId,
@@ -72,6 +106,19 @@ export default function KPITab({
 	onDelete,
 	calculateProgress,
 }: KPITabProps) {
+	// 회사 산업군 정보를 기반으로 초기값 설정
+	const getInitialIndustry = () => {
+		if (companyIndustry) {
+			// 회사 정보의 산업군과 매칭
+			const matched = industries.find(ind => 
+				companyIndustry.includes(ind.value) || 
+				ind.label.toLowerCase().includes(companyIndustry.toLowerCase())
+			)
+			return matched?.value || ''
+		}
+		return ''
+	}
+	const [selectedIndustry, setSelectedIndustry] = useState<string>(getInitialIndustry())
 	const getStatusColor = (status: string) => {
 		switch (status) {
 			case 'achieved': return 'text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30'
@@ -139,10 +186,57 @@ export default function KPITab({
 					</CardHeader>
 					<CardContent>
 						<div className="space-y-6">
+							{/* Industry Selection */}
+							<div>
+								<label className="flex items-center gap-2 text-sm font-medium mb-2">
+									<Building2 className="h-4 w-4" />
+									Industry (Optional)
+								</label>
+								<Select
+									value={selectedIndustry}
+									onChange={(e) => {
+										const industry = e.target.value
+										setSelectedIndustry(industry)
+										// 산업군 선택 시 해당 산업군의 KPI 프리셋 표시를 위해 상태 업데이트
+									}}
+									className="w-full"
+								>
+									<option value="">Select industry (optional)</option>
+									{industries.map((ind) => (
+										<option key={ind.value} value={ind.value}>
+											{ind.label}
+										</option>
+									))}
+								</Select>
+								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+									💡 Select your industry to see relevant KPI suggestions
+								</p>
+							</div>
+
+							{/* Industry-specific KPI Presets */}
+							{selectedIndustry && industryKPIPresets[selectedIndustry] && (
+								<div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+									<p className="text-sm font-medium text-purple-900 dark:text-purple-200 mb-3">
+										💡 Common KPIs for {industries.find(i => i.value === selectedIndustry)?.label}:
+									</p>
+									<div className="flex flex-wrap gap-2">
+										{industryKPIPresets[selectedIndustry].map((preset) => (
+											<button
+												key={preset}
+												onClick={() => setNewKPI({ ...newKPI, name: preset })}
+												className="px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-neutral-900 border border-purple-300 dark:border-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors font-medium"
+											>
+												{preset}
+											</button>
+										))}
+									</div>
+								</div>
+							)}
+
 							{/* Category Selection */}
 							<div>
 								<label className="block text-sm font-medium mb-3">
-									KPI Category <span className="text-red-500">*</span>
+									KPI Category (Optional)
 								</label>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
 									{kpiCategories.map((cat) => (
@@ -165,7 +259,7 @@ export default function KPITab({
 								</div>
 							</div>
 
-							{/* KPI Examples */}
+							{/* Category-specific KPI Examples */}
 							{newKPI.category && kpiExamples[newKPI.category] && (
 								<div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
 									<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
@@ -192,15 +286,18 @@ export default function KPITab({
 										KPI Name <span className="text-red-500">*</span>
 									</label>
 									<Input
-										value={newKPI.name}
+										value={newKPI.name || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, name: e.target.value })}
-										placeholder="e.g., Annual Revenue Growth"
+										placeholder="e.g., Annual Revenue Growth, Customer Satisfaction Score..."
 									/>
+									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										💡 Only required field - everything else is optional
+									</p>
 								</div>
 								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">Description</label>
+									<label className="block text-sm font-medium mb-2">Description (Optional)</label>
 									<Textarea
-										value={newKPI.description}
+										value={newKPI.description || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, description: e.target.value })}
 										placeholder="Describe the KPI, how it's measured, and why it's important..."
 										rows={3}
@@ -247,114 +344,110 @@ export default function KPITab({
 								</div>
 							</div>
 
-							{/* Period */}
+							{/* Period - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">Period</label>
-									<select
-										value={newKPI.period}
+									<label className="block text-sm font-medium mb-2">Period (Optional)</label>
+									<Select
+										value={newKPI.period || 'quarterly'}
 										onChange={(e) => setNewKPI({ ...newKPI, period: e.target.value as any })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
 										<option value="monthly">Monthly</option>
 										<option value="quarterly">Quarterly</option>
 										<option value="annual">Annual</option>
-									</select>
+									</Select>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Start Date</label>
+									<label className="block text-sm font-medium mb-2">Start Date (Optional)</label>
 									<Input
 										type="date"
-										value={newKPI.startDate}
+										value={newKPI.startDate || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, startDate: e.target.value })}
 									/>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">End Date</label>
+									<label className="block text-sm font-medium mb-2">End Date (Optional)</label>
 									<Input
 										type="date"
-										value={newKPI.endDate}
+										value={newKPI.endDate || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, endDate: e.target.value })}
 									/>
 								</div>
 							</div>
 
-							{/* Responsibility */}
+							{/* Responsibility - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
 									<label className="block text-sm font-medium mb-2">
-										Owner/Responsible Person <span className="text-red-500">*</span>
+										Owner/Responsible Person (Optional)
 									</label>
-									<select
+									<Select
 										value={newKPI.owner || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, owner: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
-										<option value="">Select owner</option>
+										<option value="">Not assigned</option>
 										{leadership.map((leader) => (
 											<option key={leader.id} value={`${leader.name}, ${leader.position}`}>
 												{leader.name} - {leader.position}
 											</option>
 										))}
-									</select>
+									</Select>
 									{leadership.length === 0 && (
-										<p className="text-xs text-neutral-500 mt-1">
-											💡 Add leaders in the Leadership tab first
+										<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+											💡 Add leaders in the Leadership tab to assign owners
 										</p>
 									)}
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Department</label>
-									<select
+									<label className="block text-sm font-medium mb-2">Department (Optional)</label>
+									<Select
 										value={newKPI.department || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, department: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
-										<option value="">Select department</option>
+										<option value="">Not assigned</option>
 										{availableDepartments.map((dept) => (
 											<option key={dept.id} value={dept.name}>
 												{dept.name}
 											</option>
 										))}
-									</select>
+									</Select>
 								</div>
 							</div>
 
-							{/* Measurement */}
+							{/* Measurement - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">Measurement Frequency</label>
-									<select
-										value={newKPI.measurementFrequency}
+									<label className="block text-sm font-medium mb-2">Measurement Frequency (Optional)</label>
+									<Select
+										value={newKPI.measurementFrequency || 'monthly'}
 										onChange={(e) => setNewKPI({ ...newKPI, measurementFrequency: e.target.value as any })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
 										<option value="daily">Daily</option>
 										<option value="weekly">Weekly</option>
 										<option value="monthly">Monthly</option>
 										<option value="quarterly">Quarterly</option>
-									</select>
+									</Select>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Data Source</label>
+									<label className="block text-sm font-medium mb-2">Data Source (Optional)</label>
 									<Input
-										value={newKPI.dataSource}
+										value={newKPI.dataSource || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, dataSource: e.target.value })}
 										placeholder="e.g., Salesforce, Google Analytics, Internal DB"
 									/>
 								</div>
 							</div>
 
-							{/* Priority */}
+							{/* Priority - Optional */}
 							<div>
-								<label className="block text-sm font-medium mb-2">Priority</label>
+								<label className="block text-sm font-medium mb-2">Priority (Optional)</label>
 								<div className="flex gap-3">
 									{['high', 'medium', 'low'].map((p) => (
 										<button
 											key={p}
 											onClick={() => setNewKPI({ ...newKPI, priority: p as any })}
 											className={`flex-1 px-4 py-2 rounded-xl border-2 transition-all ${
-												newKPI.priority === p
+												(newKPI.priority || 'medium') === p
 													? 'border-primary bg-primary/10'
 													: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
 											}`}

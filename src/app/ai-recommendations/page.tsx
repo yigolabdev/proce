@@ -3,8 +3,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
+import { PageHeader } from '../../components/common/PageHeader'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
+import { useAuth } from '../../context/AuthContext'
+import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
 import {
 	Sparkles,
 	CheckCircle2,
@@ -71,6 +74,8 @@ interface RecommendationInsight {
 
 export default function AIRecommendationsPage() {
 	const navigate = useNavigate()
+	const { user } = useAuth()
+	const { updateAfterTaskChange } = useRhythmUpdate()
 	
 	// AI Recommendations state
 	const [recommendations, setRecommendations] = useState<TaskRecommendation[]>([])
@@ -666,34 +671,66 @@ export default function AIRecommendationsPage() {
 	}
 
 	// Recommendation handlers
-	const handleAcceptTask = (id: string) => {
+	const handleAcceptTask = (id: string, startImmediately: boolean = false) => {
 		const task = recommendations.find((rec) => rec.id === id)
 		if (!task) return
-
-		// Work Input으로 이동하면서 추천 정보 전달
-		sessionStorage.setItem('workInputData', JSON.stringify({
-			title: task.title,
-			description: task.description,
-			category: task.category.toLowerCase().replace(/\s+/g, '-'),
-			priority: task.priority,
-			deadline: task.deadline,
-			source: 'ai-recommendation'
-		}))
 
 		// 상태 업데이트
 		setRecommendations((prev) =>
 			prev.map((rec) => (rec.id === id ? { ...rec, status: 'accepted' } : rec))
 		)
+		
+		// manual_tasks 또는 ai_recommendations에 저장
+		const taskData = {
+			...task,
+			status: 'accepted' as const,
+			acceptedAt: new Date().toISOString(),
+		}
+		
+		if (task.isManual) {
+			const manualTasks = storage.get<any[]>('manual_tasks') || []
+			const updatedTasks = manualTasks.map(t => t.id === id ? taskData : t)
+			storage.set('manual_tasks', updatedTasks)
+		} else {
+			const aiTasks = storage.get<any[]>('ai_recommendations') || []
+			const updatedTasks = aiTasks.map(t => t.id === id ? taskData : t)
+			storage.set('ai_recommendations', updatedTasks)
+		}
+		
+		// 리듬 상태 업데이트
+		updateAfterTaskChange()
 
-		// Work Input 페이지로 이동
-		navigate('/app/input')
-		toast.success('Redirecting to Work Input to complete task details...')
+		if (startImmediately) {
+			// Work Input으로 이동하면서 Task 정보 전달
+			sessionStorage.setItem('workInputData', JSON.stringify({
+				taskId: task.id,
+				title: task.title,
+				description: task.description,
+				category: task.category.toLowerCase().replace(/\s+/g, '-'),
+				priority: task.priority,
+				deadline: task.deadline,
+				projectId: task.projectId,
+				projectName: task.projectName,
+				source: task.isManual ? 'manual-task' : 'ai-recommendation',
+				mode: 'task-progress', // Task Progress Mode로 시작
+			}))
+
+			// Work Input 페이지로 이동
+			navigate('/app/input')
+			toast.success('🚀 Starting task now! Redirecting to Work Input...')
+		} else {
+			toast.success('✅ Task accepted! You can start it from Work Rhythm or Work Input.')
+		}
 	}
 
 	const handleRejectTask = (id: string) => {
 		setRecommendations((prev) =>
 			prev.map((rec) => (rec.id === id ? { ...rec, status: 'rejected' } : rec))
 		)
+		
+		// 리듬 상태 업데이트
+		updateAfterTaskChange()
+		
 		toast.info('Task declined. We\'ll adjust future recommendations.')
 	}
 
@@ -730,7 +767,7 @@ export default function AIRecommendationsPage() {
 			projectName: selectedProject?.name || undefined,
 			isManual: true,
 			createdAt: new Date().toISOString(),
-			createdBy: 'Current User', // TODO: Get from auth context
+			createdBy: user?.name || 'Unknown User',
 			assignedTo: assignedUser?.name,
 			assignedToId: manualTaskForm.assignedToId,
 		}
@@ -742,21 +779,24 @@ export default function AIRecommendationsPage() {
 		// Update state
 		setRecommendations(prev => [...prev, newTask])
 		
-		// Send notification to assignee via Messages
+		// Send notification to assignee via Messages (with unified structure)
 		if (assignedUser) {
 			const messages = storage.get<any[]>('messages') || []
 			const newMessage = {
 				id: `msg-task-${Date.now()}`,
-				type: 'info',
-				priority: newTask.priority === 'high' ? 'high' : 'medium',
-				title: `🎯 New Task Assigned: ${newTask.title}`,
-				content: `Hi ${assignedUser.name},\n\nYou have been assigned a new task by Current User.\n\n**Task Details:**\n• Title: ${newTask.title}\n• Description: ${newTask.description}\n• Priority: ${newTask.priority.toUpperCase()}\n• Category: ${newTask.category}${newTask.deadline ? `\n• Deadline: ${new Date(newTask.deadline).toLocaleDateString()}` : ''}${newTask.projectName ? `\n• Project: ${newTask.projectName}` : ''}\n\nPlease review and take action accordingly.\n\n---\nThis is an automated notification from the Task Management system.`,
-				date: new Date(),
+				type: 'task',
+				priority: newTask.priority === 'high' ? 'urgent' : 'normal',
+				subject: `New Task Assigned: ${newTask.title}`,
+				from: user?.name || 'Unknown User',
+				fromDepartment: user?.department,
+				preview: `Task: ${newTask.title} - Priority: ${newTask.priority.toUpperCase()}`,
+				content: `Hi ${assignedUser.name},\n\nYou have been assigned a new task by ${user?.name || 'Unknown User'}.\n\n**Task Details:**\n• Title: ${newTask.title}\n• Description: ${newTask.description}\n• Priority: ${newTask.priority.toUpperCase()}\n• Category: ${newTask.category}${newTask.deadline ? `\n• Deadline: ${new Date(newTask.deadline).toLocaleDateString()}` : ''}${newTask.projectName ? `\n• Project: ${newTask.projectName}` : ''}\n\nPlease review and take action accordingly.\n\n---\nThis is an automated notification from the Task Management system.`,
+				timestamp: new Date(),
 				isRead: false,
 				isStarred: false,
-				isArchived: false,
-				sender: 'Current User',
-				tags: ['task-assignment', 'action-required', newTask.priority],
+				relatedType: 'task',
+				relatedId: newTask.id,
+				aiSummary: `New task assigned with ${newTask.priority} priority${newTask.deadline ? `, deadline: ${new Date(newTask.deadline).toLocaleDateString()}` : ''}`,
 			}
 			messages.unshift(newMessage)
 			storage.set('messages', messages)
@@ -774,6 +814,9 @@ export default function AIRecommendationsPage() {
 			assignedToId: '',
 		})
 		setShowManualTaskModal(false)
+		
+		// 리듬 상태 업데이트
+		updateAfterTaskChange()
 		
 		toast.success(`Task assigned to ${assignedUser?.name}`, {
 			description: 'Notification sent to Messages',
@@ -822,40 +865,36 @@ export default function AIRecommendationsPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.INBOX} pagePath="/app/ai-recommendations/page.tsx" />
-			<div className="space-y-6">
+			<div className="space-y-4 sm:space-y-6">
 				{/* Header */}
-				<div className="flex items-center justify-between">
-					<div>
-						<h1 className="text-3xl font-bold flex items-center gap-3">
-							<Sparkles className="h-8 w-8 text-primary" />
-							AI Recommendations
-						</h1>
-						<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-							AI-powered task recommendations based on your work data
-						</p>
-					</div>
-					<div className="flex items-center gap-2">
-						<Button
-							variant="primary"
-							size="sm"
-							onClick={() => setShowManualTaskModal(true)}
-							className="flex items-center gap-2"
-						>
-							<Plus className="h-4 w-4" />
-							Create Task
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={handleRefreshRecommendations}
-							disabled={isLoading}
-							className="flex items-center gap-2"
-						>
-							<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-							Refresh
-						</Button>
-					</div>
-				</div>
+				<PageHeader
+					title="AI Recommendations"
+					description="AI-powered task recommendations based on your work data"
+					icon={Sparkles}
+					actions={
+						<>
+							<Button
+								variant="primary"
+								size="sm"
+								onClick={() => setShowManualTaskModal(true)}
+								className="flex items-center gap-2"
+							>
+								<Plus className="h-4 w-4" />
+								<span className="hidden sm:inline">Create Task</span>
+							</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleRefreshRecommendations}
+								disabled={isLoading}
+								className="flex items-center gap-2"
+							>
+								<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+								<span className="hidden sm:inline">Refresh</span>
+							</Button>
+						</>
+					}
+				/>
 				
 				{/* Statistics Cards */}
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1167,30 +1206,43 @@ export default function AIRecommendationsPage() {
 											</div>
 										</div>
 
-										{/* Actions */}
-										<div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+									{/* Actions */}
+									<div className="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+										<div className="flex items-center gap-2">
 											<Button
 												onClick={(e) => {
 													e.stopPropagation()
-													handleAcceptTask(task.id)
+													handleAcceptTask(task.id, true)
 												}}
 												className="flex-1 flex items-center justify-center gap-2"
 											>
-												<CheckCircle2 className="h-4 w-4" />
-												Accept Task
+												<Zap className="h-4 w-4" />
+												Accept & Start
 											</Button>
 											<Button
 												variant="outline"
 												onClick={(e) => {
 													e.stopPropagation()
-													handleRejectTask(task.id)
+													handleAcceptTask(task.id, false)
 												}}
 												className="flex-1 flex items-center justify-center gap-2"
 											>
-												<XCircle className="h-4 w-4" />
-												Not Now
+												<CheckCircle2 className="h-4 w-4" />
+												Accept
 											</Button>
 										</div>
+									<Button
+										variant="outline"
+										onClick={(e) => {
+											e.stopPropagation()
+											handleRejectTask(task.id)
+										}}
+										className="w-full flex items-center justify-center gap-2 text-neutral-600 hover:text-neutral-900"
+									>
+										<XCircle className="h-4 w-4" />
+										Not Now
+									</Button>
+									</div>
 									</div>
 								</CardContent>
 							</Card>
@@ -1699,3 +1751,4 @@ export default function AIRecommendationsPage() {
 		</>
 	)
 }
+

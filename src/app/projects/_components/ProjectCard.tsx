@@ -17,16 +17,35 @@ import {
 	AlertCircle,
 	Clock,
 	Building2,
+	FileText,
+	User as UserIcon,
 } from 'lucide-react'
 import type { Project } from '../_types/projects.types'
+
+interface LatestWorkEntry {
+	title: string
+	submittedBy?: string
+	date: Date
+}
 
 interface ProjectCardProps {
 	project: Project
 	workEntriesCount?: number
+	latestWorkEntry?: LatestWorkEntry
 }
 
-export default function ProjectCard({ project, workEntriesCount = 0 }: ProjectCardProps) {
+export default function ProjectCard({ project, workEntriesCount = 0, latestWorkEntry }: ProjectCardProps) {
 	const navigate = useNavigate()
+
+	const formatTimeAgo = (date: Date) => {
+		const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+		
+		if (seconds < 60) return 'Just now'
+		if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+		if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
+		return date.toLocaleDateString()
+	}
 
 	const getStatusBadge = (status: string) => {
 		const statusConfig = {
@@ -128,7 +147,7 @@ export default function ProjectCard({ project, workEntriesCount = 0 }: ProjectCa
 					<div className="grid grid-cols-2 gap-3 text-sm">
 						{/* Start Date */}
 						<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
-							<Calendar className="h-4 w-4 flex-shrink-0" />
+							<Calendar className="h-4 w-4 shrink-0" />
 							<div>
 								<p className="text-xs text-neutral-500 dark:text-neutral-500">Start</p>
 								<p className="font-medium text-neutral-900 dark:text-neutral-100">
@@ -139,7 +158,7 @@ export default function ProjectCard({ project, workEntriesCount = 0 }: ProjectCa
 
 						{/* End Date */}
 						<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
-							<Calendar className="h-4 w-4 flex-shrink-0" />
+							<Calendar className="h-4 w-4 shrink-0" />
 							<div>
 								<p className="text-xs text-neutral-500 dark:text-neutral-500">End</p>
 								<p className="font-medium text-neutral-900 dark:text-neutral-100">
@@ -153,6 +172,33 @@ export default function ProjectCard({ project, workEntriesCount = 0 }: ProjectCa
 					{getDepartmentsList() && (
 						<div className="flex flex-wrap gap-2">
 							{getDepartmentsList()}
+						</div>
+					)}
+
+					{/* Latest Work Entry */}
+					{latestWorkEntry && (
+						<div className="p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+							<div className="flex items-start gap-2">
+								<FileText className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+								<div className="flex-1 min-w-0">
+									<p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-0.5">Latest Update</p>
+									<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+										{latestWorkEntry.title}
+									</p>
+									<div className="flex items-center gap-2 mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+										{latestWorkEntry.submittedBy && (
+											<span className="flex items-center gap-1">
+												<UserIcon className="h-3 w-3" />
+												{latestWorkEntry.submittedBy}
+											</span>
+										)}
+										<span className="flex items-center gap-1">
+											<Clock className="h-3 w-3" />
+											{formatTimeAgo(latestWorkEntry.date)}
+										</span>
+									</div>
+								</div>
+							</div>
 						</div>
 					)}
 

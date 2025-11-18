@@ -177,6 +177,46 @@ export interface User {
 	createdAt?: Date | string
 }
 
+// ==================== Task Recommendation Types ====================
+
+export interface TaskRecommendation {
+	id: string
+	title: string
+	description: string
+	priority: 'high' | 'medium' | 'low'
+	category?: string
+	deadline?: string
+	dataSource?: string // 추천 근거가 되는 데이터 출처
+	status: 'pending' | 'accepted' | 'rejected' | 'completed'
+	projectId?: string // 프로젝트 ID
+	projectName?: string // 프로젝트 이름
+	source?: 'ai' | 'manual' // AI 생성 또는 수동 생성
+	createdAt?: string // 생성 시간
+	createdBy?: string // 생성자 ID
+	createdByName?: string // 생성자 이름
+	assignedTo?: string // 할당받은 사람 ID
+	assignedToName?: string // 할당받은 사람 이름
+	tags?: string[]
+	relatedMembers?: Array<{
+		id: string
+		name: string
+		role: string
+		department: string
+		memberType?: 'active' | 'related'
+	}>
+	aiAnalysis?: {
+		projectName: string
+		analysisDate: string
+		analysisReason: string
+		relatedMembers: Array<{
+			name: string
+			role: string
+			department: string
+			memberType: 'active' | 'related'
+		}>
+	}
+}
+
 // ==================== Draft & Settings Types ====================
 
 export interface WorkDraft {

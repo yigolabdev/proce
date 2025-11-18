@@ -2,64 +2,14 @@
  * Storage Utilities
  * 
  * localStorage 관리를 위한 중앙화된 유틸리티
+ * common.types.ts의 STORAGE_KEYS를 재export
  */
 
-/**
- * Storage 키 상수
- */
-export const STORAGE_KEYS = {
-	// Auth
-	AUTH_USER: 'auth_user',
-	AUTH_TOKEN: 'auth_token',
-	
-	// User Data
-	USER_PROFILE: 'user_profile',
-	USER_SETTINGS: 'user_settings',
-	USER_PREFERENCES: 'user_preferences',
-	
-	// Work
-	WORK_ENTRIES: 'work_entries',
-	WORK_DRAFTS: 'work_drafts',
-	WORK_CATEGORIES: 'work_categories',
-	WORK_TAGS: 'work_tags',
-	WORK_TEMPLATES: 'work_templates',
-	
-	// Projects
-	PROJECTS: 'projects',
-	
-	// OKR
-	OKRS: 'okrs',
-	
-	// Financial
-	FINANCIAL_RECORDS: 'financial_records',
-	FINANCIAL_DOCUMENTS: 'financial_documents',
-	
-	// Expenses
-	EXPENSES: 'expenses',
-	
-	// Company
-	COMPANY_INFO: 'company_info',
-	COMPANY_KPIS: 'company_kpis',
-	
-	// Departments
-	DEPARTMENTS: 'departments',
-	
-	// Users
-	USERS: 'users',
-	
-	// Messages
-	MESSAGES: 'messages',
-	AI_RECOMMENDATIONS: 'ai_recommendations',
-	
-	// Goals
-	ANNUAL_GOALS: 'annualGoals',
-	
-	// System
-	SYSTEM_SETTINGS: 'system_settings',
-	
-	// Notifications
-	NOTIFICATIONS: 'notifications',
-} as const
+import { STORAGE_KEYS } from '../types/common.types'
+import type { WorkEntry, WorkDraft, Project } from '../types/common.types'
+
+// STORAGE_KEYS를 재export
+export { STORAGE_KEYS }
 
 /**
  * 타입 안전한 localStorage 래퍼
@@ -88,7 +38,9 @@ class StorageManager {
 			if (item === null) return defaultValue ?? null
 			return JSON.parse(item) as T
 		} catch (error) {
-			console.error(`Failed to read from localStorage (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to read from localStorage (key: ${key}):`, error)
+			}
 			return defaultValue ?? null
 		}
 	}
@@ -101,7 +53,9 @@ class StorageManager {
 			localStorage.removeItem(key)
 			return true
 		} catch (error) {
-			console.error(`Failed to remove from localStorage (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to remove from localStorage (key: ${key}):`, error)
+			}
 			return false
 		}
 	}
@@ -114,7 +68,9 @@ class StorageManager {
 			localStorage.clear()
 			return true
 		} catch (error) {
-			console.error('Failed to clear localStorage:', error)
+			if (import.meta.env.DEV) {
+				console.error('Failed to clear localStorage:', error)
+			}
 			return false
 		}
 	}
@@ -155,7 +111,9 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			console.error(`Failed to remove from array (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to remove from array (key: ${key}):`, error)
+			}
 			return false
 		}
 	}
@@ -174,7 +132,9 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			console.error(`Failed to update in array (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to update in array (key: ${key}):`, error)
+			}
 			return false
 		}
 	}
@@ -195,7 +155,9 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			console.error(`Failed to update field (key: ${key}, field: ${String(field)}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to update field (key: ${key}, field: ${String(field)}):`, error)
+			}
 			return false
 		}
 	}
@@ -230,7 +192,9 @@ class StorageManager {
 			}
 			return this.set(key, item)
 		} catch (error) {
-			console.error(`Failed to save with expiry (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to save with expiry (key: ${key}):`, error)
+			}
 			return false
 		}
 	}
@@ -253,7 +217,9 @@ class StorageManager {
 			
 			return item.value as T
 		} catch (error) {
-			console.error(`Failed to get with expiry (key: ${key}):`, error)
+			if (import.meta.env.DEV) {
+				console.error(`Failed to get with expiry (key: ${key}):`, error)
+			}
 			return null
 		}
 	}
@@ -293,7 +259,9 @@ class StorageManager {
 			}
 			return true
 		} catch (error) {
-			console.error('Failed to set multiple:', error)
+			if (import.meta.env.DEV) {
+				console.error('Failed to set multiple:', error)
+			}
 			return false
 		}
 	}
@@ -302,11 +270,22 @@ class StorageManager {
 // 싱글톤 인스턴스 export
 export const storage = new StorageManager()
 
-// 편의 함수들
-export const saveWorkEntry = (entry: any) => storage.pushToArray(STORAGE_KEYS.WORK_ENTRIES, entry)
-export const getWorkEntries = () => storage.get<any[]>(STORAGE_KEYS.WORK_ENTRIES, [])
-export const saveDraft = (draft: any) => storage.set(STORAGE_KEYS.WORK_DRAFTS, draft)
-export const getDrafts = () => storage.get<any[]>(STORAGE_KEYS.WORK_DRAFTS, [])
-export const saveProject = (project: any) => storage.pushToArray(STORAGE_KEYS.PROJECTS, project)
-export const getProjects = () => storage.get<any[]>(STORAGE_KEYS.PROJECTS, [])
+// 편의 함수들 - 타입 안전한 버전
+export const saveWorkEntry = (entry: WorkEntry): boolean => 
+	storage.pushToArray<WorkEntry>(STORAGE_KEYS.WORK_ENTRIES, entry)
+
+export const getWorkEntries = (): WorkEntry[] => 
+	storage.get<WorkEntry[]>(STORAGE_KEYS.WORK_ENTRIES, []) || []
+
+export const saveDraft = (draft: WorkDraft): boolean => 
+	storage.set<WorkDraft>(STORAGE_KEYS.WORK_DRAFTS, draft)
+
+export const getDrafts = (): WorkDraft[] => 
+	storage.get<WorkDraft[]>(STORAGE_KEYS.WORK_DRAFTS, []) || []
+
+export const saveProject = (project: Project): boolean => 
+	storage.pushToArray<Project>(STORAGE_KEYS.PROJECTS, project)
+
+export const getProjects = (): Project[] => 
+	storage.get<Project[]>(STORAGE_KEYS.PROJECTS, []) || []
 

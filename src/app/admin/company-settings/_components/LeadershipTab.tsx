@@ -83,6 +83,7 @@ export default function LeadershipTab({
 					<CardContent>
 						<div className="space-y-4">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								{/* Name */}
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										Name <span className="text-red-500">*</span>
@@ -95,6 +96,8 @@ export default function LeadershipTab({
 										placeholder="John Doe"
 									/>
 								</div>
+								
+								{/* Position */}
 								<div>
 									<label className="block text-sm font-medium mb-2">
 										Position <span className="text-red-500">*</span>
@@ -114,27 +117,8 @@ export default function LeadershipTab({
 										))}
 									</select>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Email</label>
-									<Input
-										type="email"
-										value={newLeader.email || ''}
-										onChange={(e) =>
-											onSetNewLeader({ ...newLeader, email: e.target.value })
-										}
-										placeholder="john.doe@company.com"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Phone</label>
-									<Input
-										value={newLeader.phone || ''}
-										onChange={(e) =>
-											onSetNewLeader({ ...newLeader, phone: e.target.value })
-										}
-										placeholder="+82-10-1234-5678"
-									/>
-								</div>
+								
+								{/* Department */}
 								<div className="md:col-span-2">
 									<label className="block text-sm font-medium mb-2">Department</label>
 									<select
@@ -151,6 +135,31 @@ export default function LeadershipTab({
 											</option>
 										))}
 									</select>
+								</div>
+								
+								{/* Email */}
+								<div>
+									<label className="block text-sm font-medium mb-2">Email</label>
+									<Input
+										type="email"
+										value={newLeader.email || ''}
+										onChange={(e) =>
+											onSetNewLeader({ ...newLeader, email: e.target.value })
+										}
+										placeholder="john.doe@company.com"
+									/>
+								</div>
+								
+								{/* Phone */}
+								<div>
+									<label className="block text-sm font-medium mb-2">Phone</label>
+									<Input
+										value={newLeader.phone || ''}
+										onChange={(e) =>
+											onSetNewLeader({ ...newLeader, phone: e.target.value })
+										}
+										placeholder="+82-10-1234-5678"
+									/>
 								</div>
 							</div>
 
@@ -182,6 +191,7 @@ export default function LeadershipTab({
 										{editingLeader === leader.id ? (
 											<>
 												<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+													{/* Name */}
 													<Input
 														value={leader.name}
 														onChange={(e) =>
@@ -189,6 +199,8 @@ export default function LeadershipTab({
 														}
 														placeholder="Name"
 													/>
+													
+													{/* Position */}
 													<select
 														value={leader.position}
 														onChange={(e) =>
@@ -202,21 +214,8 @@ export default function LeadershipTab({
 															</option>
 														))}
 													</select>
-													<Input
-														type="email"
-														value={leader.email}
-														onChange={(e) =>
-															onUpdateLeader(leader.id, 'email', e.target.value)
-														}
-														placeholder="Email"
-													/>
-													<Input
-														value={leader.phone}
-														onChange={(e) =>
-															onUpdateLeader(leader.id, 'phone', e.target.value)
-														}
-														placeholder="Phone"
-													/>
+													
+													{/* Department */}
 													<select
 														value={leader.department || ''}
 														onChange={(e) =>
@@ -231,6 +230,25 @@ export default function LeadershipTab({
 															</option>
 														))}
 													</select>
+													
+													{/* Email */}
+													<Input
+														type="email"
+														value={leader.email || ''}
+														onChange={(e) =>
+															onUpdateLeader(leader.id, 'email', e.target.value)
+														}
+														placeholder="Email"
+													/>
+													
+													{/* Phone */}
+													<Input
+														value={leader.phone || ''}
+														onChange={(e) =>
+															onUpdateLeader(leader.id, 'phone', e.target.value)
+														}
+														placeholder="Phone"
+													/>
 												</div>
 												<Button variant="outline" size="sm" onClick={onSaveEdit}>
 													<Save className="h-4 w-4 mr-2" />

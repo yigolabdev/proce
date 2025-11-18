@@ -6,6 +6,7 @@ import { I18nProvider } from '../i18n/I18nProvider'
 import { ThemeProvider } from '../theme/ThemeProvider'
 import { IntegrationsProvider } from '../app/_providers/IntegrationsContext'
 import { AuthProvider } from '../context/AuthContext'
+import { RhythmProvider } from '../context/RhythmContext'
 import AppLayout from '../components/layout/AppLayout'
 
 // Loading component for code splitting
@@ -54,6 +55,11 @@ const PerformancePage = lazy(() => import('../app/performance/page'))
 // Other Pages
 const IntegrationsPage = lazy(() => import('../app/integrations/page'))
 const SettingsPage = lazy(() => import('../app/settings/page'))
+const GuidePage = lazy(() => import('../app/guide/page'))
+const WorkflowPage = lazy(() => import('../app/workflow/page'))
+
+// Rhythm Pages
+const WorkRhythmPage = lazy(() => import('../app/rhythm/page'))
 
 // Development Pages (only in dev mode)
 const DevelopmentRoadmapPage = lazy(() => import('../app/dev/roadmap/page'))
@@ -119,8 +125,13 @@ const appRoutes = [
 	// 기타
 	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 	{ path: '/app/integrations', element: withSuspense(IntegrationsPage) },
-	{ path: '/app/settings', element: withSuspense(SettingsPage) },
-	// Development routes (only in dev mode)
+		{ path: '/app/guide', element: withSuspense(GuidePage) },
+		{ path: '/app/workflow', element: withSuspense(WorkflowPage) },
+		{ path: '/app/settings', element: withSuspense(SettingsPage) },
+		
+	// Work Rhythm Page
+	{ path: '/app/rhythm', element: withSuspense(WorkRhythmPage) },
+// Development routes (only in dev mode)
 	...(import.meta.env.DEV ? [{ path: '/app/dev/roadmap', element: withSuspense(DevelopmentRoadmapPage) }] : []),
 ]
 
@@ -180,9 +191,11 @@ export function AppProviders() {
 			<I18nProvider>
 				<ThemeProvider>
 					<AuthProvider>
-						<IntegrationsProvider>
-							<RouterProvider router={router} />
-						</IntegrationsProvider>
+						<RhythmProvider>
+							<IntegrationsProvider>
+								<RouterProvider router={router} />
+							</IntegrationsProvider>
+						</RhythmProvider>
 					</AuthProvider>
 				</ThemeProvider>
 			</I18nProvider>

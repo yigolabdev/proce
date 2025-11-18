@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui/Button'
+import { PageHeader } from '../../components/common/PageHeader'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import {
 	FolderKanban,
@@ -198,6 +199,22 @@ export default function ProjectsPage() {
 		return workEntries.filter((entry) => entry.projectId === projectId).length
 	}
 
+	// Get latest work entry for each project
+	const getLatestWorkEntry = (projectId: string) => {
+		const projectEntries = workEntries
+			.filter((entry) => entry.projectId === projectId)
+			.sort((a, b) => b.date.getTime() - a.date.getTime())
+		
+		if (projectEntries.length === 0) return undefined
+		
+		const latest = projectEntries[0]
+		return {
+			title: latest.title,
+			submittedBy: (latest as any).submittedBy,
+			date: latest.date,
+		}
+	}
+
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
@@ -211,22 +228,18 @@ export default function ProjectsPage() {
 			<Toaster />
 			
 			{/* Header */}
-			<div className="max-w-7xl mx-auto mb-8">
-				<div className="flex items-center justify-between mb-6">
-					<div>
-						<h1 className="text-3xl font-bold flex items-center gap-3">
-							<FolderKanban className="h-8 w-8 text-primary" />
-							Projects
-						</h1>
-						<p className="text-neutral-600 dark:text-neutral-400 mt-1">
-							Manage and track your projects
-						</p>
-					</div>
-					<Button onClick={() => setShowCreateDialog(true)}>
-						<Plus className="h-4 w-4 mr-2" />
-						New Project
-					</Button>
-				</div>
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
+				<PageHeader
+					title="Projects"
+					description="Manage and track your projects"
+					icon={FolderKanban}
+					actions={
+						<Button onClick={() => setShowCreateDialog(true)} size="sm">
+							<Plus className="h-4 w-4 sm:mr-2" />
+							<span className="hidden sm:inline">New Project</span>
+						</Button>
+					}
+				/>
 
 				{/* Filters and View Toggle */}
 				<div className="flex items-center justify-between gap-4 flex-wrap">
@@ -303,11 +316,12 @@ export default function ProjectsPage() {
 						) : (
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 								{filteredProjects.map((project) => (
-									<ProjectCard
-										key={project.id}
-										project={project}
-										workEntriesCount={getWorkEntriesCount(project.id)}
-									/>
+								<ProjectCard
+									key={project.id}
+									project={project}
+									workEntriesCount={getWorkEntriesCount(project.id)}
+									latestWorkEntry={getLatestWorkEntry(project.id)}
+								/>
 								))}
 							</div>
 						)}
