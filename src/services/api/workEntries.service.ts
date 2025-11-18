@@ -53,7 +53,7 @@ class WorkEntriesService {
 				entries = entries.filter(e => e.department === filters.department)
 			}
 			if (filters.userId) {
-				entries = entries.filter(e => e.submittedById === filters.userId)
+				entries = entries.filter(e => e.submittedBy === filters.userId)
 			}
 			if (filters.startDate) {
 				entries = entries.filter(e => new Date(e.date) >= filters.startDate!)

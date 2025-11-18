@@ -7,8 +7,6 @@
 
 import { handleError } from './errorHandler'
 
-type LogLevel = 'error' | 'warn' | 'info' | 'debug'
-
 interface LogContext {
 	component?: string
 	action?: string

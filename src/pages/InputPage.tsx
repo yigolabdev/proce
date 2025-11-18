@@ -186,7 +186,13 @@ export default function InputPage() {
 	// Review Request State
 	const [selectedReviewer, setSelectedReviewer] = useState('')
 	const [requestReview, setRequestReview] = useState(false)
-	const [reviewers, setReviewers] = useState<Array<{ id: string; name: string; role: string; department: string }>>([])
+	
+	// Mock reviewers data
+	const reviewers = [
+		{ id: 'user-1', name: '홍길동', role: '시니어 개발자', department: '개발팀' },
+		{ id: 'user-2', name: '김철수', role: '팀 리더', department: '개발팀' },
+		{ id: 'user-3', name: '박영희', role: '프로젝트 매니저', department: '기획팀' },
+	]
 	
 	// NoMeet (Async Discussion) State
 	const [asyncAgenda, setAsyncAgenda] = useState('')

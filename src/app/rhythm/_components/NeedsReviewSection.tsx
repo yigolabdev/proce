@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Button } from '../../../components/ui/Button'
 import { EmptyState } from '../../../components/common/EmptyState'
 import { 
-	AlertTriangle, 
 	Calendar,
 	User,
 	MessageSquare,

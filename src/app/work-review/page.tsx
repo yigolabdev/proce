@@ -7,16 +7,12 @@ import { PageHeader } from '../../components/common/PageHeader'
 import { EmptyState } from '../../components/common/EmptyState'
 import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
-import { useAuth } from '../../context/AuthContext'
-import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
 import {
 	MessageSquare,
 	Clock,
 	Calendar,
 	User,
 	FileText,
-	Tag,
-	Eye,
 	Filter,
 	ChevronDown,
 	ChevronUp,
@@ -27,7 +23,6 @@ import {
 	Mail,
 	ThumbsUp,
 	ThumbsDown,
-	RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
@@ -50,12 +45,10 @@ interface ReceivedReview {
 
 export default function WorkReviewPage() {
 	const navigate = useNavigate()
-	const { updateAfterReviewRead } = useRhythmUpdate()
 	
 	// State
 	const [reviews, setReviews] = useState<ReceivedReview[]>([])
 	const [filteredReviews, setFilteredReviews] = useState<ReceivedReview[]>([])
-	const [selectedReview, setSelectedReview] = useState<ReceivedReview | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [filterType, setFilterType] = useState<string>('all')
 	const [filterProject, setFilterProject] = useState<string>('all')

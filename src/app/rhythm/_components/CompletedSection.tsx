@@ -10,14 +10,12 @@ import { Select } from '../../../components/ui/Select'
 import { EmptyState } from '../../../components/common/EmptyState'
 import { 
 	CheckCircle2, 
-	Calendar,
 	User,
 	FolderKanban,
 	Clock,
 	TrendingUp,
 	Award,
 } from 'lucide-react'
-import type { LoopItem } from '../../../services/rhythm/types'
 
 export function CompletedSection() {
 	const navigate = useNavigate()

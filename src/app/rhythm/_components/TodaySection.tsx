@@ -7,7 +7,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRhythm } from '../../../context/RhythmContext'
-import { useAuth } from '../../../context/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import { EmptyState } from '../../../components/common/EmptyState'
@@ -27,7 +26,6 @@ import type { LoopItem } from '../../../services/rhythm/types'
 
 export function TodaySection() {
 	const navigate = useNavigate()
-	const { user } = useAuth()
 	const { todayStatus, requestNextActions } = useRhythm()
 	const [showingNext, setShowingNext] = useState(false)
 	const [nextActions, setNextActions] = useState<any>(null)
@@ -67,7 +65,7 @@ export function TodaySection() {
 		)
 	}
 
-	const { urgent, scheduled, needsReview, completed, isLoopComplete, summary } = todayStatus
+	const { urgent, scheduled, needsReview, isLoopComplete, summary } = todayStatus
 
 	return (
 		<div className="space-y-8">

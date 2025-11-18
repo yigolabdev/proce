@@ -191,11 +191,18 @@ export interface TaskRecommendation {
 	projectId?: string // 프로젝트 ID
 	projectName?: string // 프로젝트 이름
 	source?: 'ai' | 'manual' // AI 생성 또는 수동 생성
+	isManual?: boolean // 수동 생성 여부
 	createdAt?: string // 생성 시간
 	createdBy?: string // 생성자 ID
 	createdByName?: string // 생성자 이름
 	assignedTo?: string // 할당받은 사람 ID
 	assignedToName?: string // 할당받은 사람 이름
+	acceptedAt?: string // 수락 시간
+	completedAt?: string // 완료 시간
+	estimatedDuration?: number // 예상 소요 시간 (분)
+	estimatedTime?: number // 예상 소요 시간 (분) - 별칭
+	aiReason?: string // AI 추천 이유
+	suggestedBy?: string // 제안자
 	tags?: string[]
 	relatedMembers?: Array<{
 		id: string

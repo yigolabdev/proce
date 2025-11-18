@@ -42,7 +42,6 @@ class RhythmService {
 				deadline: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4시간 후
 				estimatedDuration: 180,
 				source: 'ai',
-				confidence: 0.95,
 				status: 'pending',
 				isManual: false,
 				aiReason: '최근 사용자 피드백 분석 결과 높은 우선순위로 분류됨',
@@ -62,7 +61,6 @@ class RhythmService {
 				deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // 2일 후
 				estimatedDuration: 240,
 				source: 'ai',
-				confidence: 0.85,
 				status: 'accepted',
 				isManual: false,
 				aiReason: 'UX 개선 제안',
@@ -83,7 +81,6 @@ class RhythmService {
 				deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1주일 후
 				estimatedDuration: 120,
 				source: 'ai',
-				confidence: 0.75,
 				status: 'pending',
 				isManual: false,
 				aiReason: '최근 API 변경 사항 감지',
@@ -103,7 +100,6 @@ class RhythmService {
 				deadline: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2시간 전 (완료)
 				estimatedDuration: 300,
 				source: 'ai',
-				confidence: 0.9,
 				status: 'completed',
 				isManual: false,
 				aiReason: '스키마 변경 감지',
@@ -125,7 +121,6 @@ class RhythmService {
 				deadline: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
 				estimatedDuration: 120,
 				source: 'ai',
-				confidence: 0.88,
 				status: 'completed',
 				isManual: false,
 				aiReason: '보안 스캔 결과',
@@ -151,7 +146,6 @@ class RhythmService {
 				deadline: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), // 8시간 후
 				estimatedDuration: 120,
 				source: 'manual',
-				confidence: 1,
 				status: 'pending',
 				isManual: true,
 				projectId: 'project-3',
@@ -170,7 +164,6 @@ class RhythmService {
 				deadline: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(), // 20시간 후
 				estimatedDuration: 60,
 				source: 'manual',
-				confidence: 1,
 				status: 'accepted',
 				isManual: true,
 				projectId: 'project-1',
@@ -241,7 +234,7 @@ class RhythmService {
 				date: new Date(Date.now() - 3 * 60 * 60 * 1000),
 				category: 'Development',
 				tags: ['Frontend', 'Security', 'Authentication'],
-				duration: 240,
+				duration: '240',
 				projectId: 'project-1',
 				submittedBy: '김철수',
 				status: 'approved',
@@ -253,7 +246,7 @@ class RhythmService {
 				date: new Date(Date.now() - 6 * 60 * 60 * 1000),
 				category: 'Development',
 				tags: ['Frontend', 'Performance', 'React'],
-				duration: 180,
+				duration: '180',
 				projectId: 'project-1',
 				submittedBy: '김철수',
 				status: 'rejected',
@@ -265,7 +258,7 @@ class RhythmService {
 				date: new Date(Date.now() - 25 * 60 * 60 * 1000),
 				category: 'Development',
 				tags: ['Backend', 'API', 'Error Handling'],
-				duration: 150,
+				duration: '150',
 				projectId: 'project-2',
 				submittedBy: '김철수',
 				status: 'approved',
@@ -371,43 +364,6 @@ class RhythmService {
 		}
 	}
 	
-	/**
-	 * 기존 WorkEntry를 LoopItem으로 변환
-	 * (현재는 사용하지 않지만 향후 확장 가능)
-	 */
-	private workEntryToLoopItem(work: WorkEntry): LoopItem {
-		const status = work.status === 'approved' ? 'completed' :
-		               work.status === 'rejected' ? 'needs-review' :
-		               work.status === 'submitted' ? 'needs-review' : 'pending'
-		
-		const loopStage: LoopStage = 
-			work.status === 'approved' ? 'completed' :
-			work.status === 'submitted' ? 'needs-review' :
-			'today'
-		
-		// WorkEntry.date는 Date | string 타입이므로 Date로 변환
-		const completedAt = work.status === 'approved' && work.date 
-			? (typeof work.date === 'string' ? new Date(work.date) : work.date)
-			: undefined
-		
-		return {
-			id: work.id,
-			type: 'work',
-			title: work.title,
-			description: work.description,
-			status,
-			priority: 'medium', // WorkEntry는 기본 medium
-			loopStage,
-			completedAt,
-			assignedTo: work.submittedBy, // submittedBy가 이름
-			assignedToName: work.submittedBy,
-			projectId: work.projectId,
-			projectName: undefined, // WorkEntry에 projectName 필드 없음
-			sourceType: 'work_entry',
-			sourceId: work.id,
-			originalData: work,
-		}
-	}
 	
 	/**
 	 * Today 상태 계산
@@ -524,8 +480,9 @@ class RhythmService {
 	/**
 	 * Needs Review 항목 가져오기
 	 */
-	async getNeedsReview(userId: string): Promise<LoopItem[]> {
+	async getNeedsReview(_userId: string): Promise<LoopItem[]> {
 		const reviews = storage.get<any[]>('received_reviews') || []
+		// TODO: userId로 필터링 필요 시 추가
 		const myReviews = reviews.filter(r => !r.isRead)
 		
 		return myReviews.map(review => ({
@@ -546,7 +503,7 @@ class RhythmService {
 	/**
 	 * Completed 항목 가져오기 (오늘 완료한 것)
 	 */
-	async getCompleted(userId: string, date?: Date): Promise<LoopItem[]> {
+	async getCompleted(userId: string, _date?: Date): Promise<LoopItem[]> {
 		const manualTasks = storage.get<TaskRecommendation[]>('manual_tasks') || []
 		const aiTasks = storage.get<TaskRecommendation[]>('ai_recommendations') || []
 		const allTasks = [...manualTasks, ...aiTasks]

@@ -13,11 +13,8 @@ import {
 	Star,
 	Clock,
 	CheckCircle2,
-	XCircle,
 	X,
 	Sparkles,
-	FileText,
-	ArrowRight,
 	AlertCircle,
 	Users,
 	FolderKanban,
@@ -103,7 +100,7 @@ export default function MessagesPage() {
 					quickActions: [
 						{ label: 'Accept Task', action: 'accept', variant: 'primary' },
 						{ label: 'View Details', action: 'view', variant: 'outline' },
-						{ label: 'Ask Question', action: 'reply', variant: 'ghost' },
+						{ label: 'Ask Question', action: 'reply', variant: 'secondary' },
 					],
 					aiInsight: {
 						summary: 'Urgent bug fix required for payment gateway affecting international customers',
@@ -128,7 +125,7 @@ export default function MessagesPage() {
 					relatedPage: '/app/work-review',
 					quickActions: [
 						{ label: 'View Review', action: 'view', variant: 'outline' },
-						{ label: 'Say Thanks', action: 'reply', variant: 'ghost' },
+						{ label: 'Say Thanks', action: 'reply', variant: 'secondary' },
 					],
 					aiInsight: {
 						summary: 'Work approved with positive feedback. High quality implementation recognized.',
@@ -221,7 +218,7 @@ export default function MessagesPage() {
 					priority: 'normal',
 					quickActions: [
 						{ label: 'Reply', action: 'reply', variant: 'outline' },
-						{ label: 'Volunteer', action: 'accept', variant: 'ghost' },
+						{ label: 'Volunteer', action: 'accept', variant: 'secondary' },
 					],
 					aiInsight: {
 						summary: 'Marketing 팀이 기술 지원 요청 - 랜딩 페이지 최적화 및 분석',
@@ -244,7 +241,7 @@ export default function MessagesPage() {
 					quickActions: [
 						{ label: 'Approve', action: 'approve', variant: 'primary' },
 						{ label: 'Decline', action: 'decline', variant: 'outline' },
-						{ label: 'Request Info', action: 'reply', variant: 'ghost' },
+						{ label: 'Request Info', action: 'reply', variant: 'secondary' },
 					],
 					aiInsight: {
 						summary: '3일 휴가 신청 - 남은 휴가 8일, 업무 인수인계 완료',

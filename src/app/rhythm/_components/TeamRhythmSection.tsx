@@ -9,12 +9,10 @@ import { EmptyState } from '../../../components/common/EmptyState'
 import { 
 	Users, 
 	User,
-	TrendingUp,
 	Building2,
 	CheckCircle2,
 	Clock,
 	AlertCircle,
-	Calendar,
 } from 'lucide-react'
 
 export function TeamRhythmSection() {

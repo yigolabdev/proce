@@ -131,7 +131,7 @@ class TasksService {
 			id: `task-${taskData.source}-${Date.now()}`,
 			...taskData,
 			status: 'pending',
-			estimatedTime: '2-3 hours',
+			estimatedDuration: 150, // 예상 소요 시간 (분)
 			relatedMembers: [],
 		}
 		

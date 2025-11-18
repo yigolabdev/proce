@@ -38,13 +38,18 @@ export const getAuthHeaders = (): HeadersInit => {
  * API Error class for better error handling
  */
 export class ApiError extends Error {
+	status: number
+	data?: any
+	
 	constructor(
-		public status: number,
-		public message: string,
-		public data?: any
+		status: number,
+		message: string,
+		data?: any
 	) {
 		super(message)
 		this.name = 'ApiError'
+		this.status = status
+		this.data = data
 	}
 }
 
