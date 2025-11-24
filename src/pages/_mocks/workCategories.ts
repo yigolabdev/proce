@@ -11,42 +11,41 @@ export interface WorkCategory {
 }
 
 export const mockWorkCategories: WorkCategory[] = [
-	// Completion & Progress
 	{
-		id: 'completed-work',
-		name: 'Completed Work',
-		color: '#10B981', // green
-		description: 'Report completed tasks, achievements, and finished projects',
-	},
-	{
-		id: 'progress-update',
-		name: 'Progress Update',
+		id: 'in-progress',
+		name: 'In Progress',
 		color: '#3B82F6', // blue
-		description: 'Share current work status, progress, and intermediate results',
+		description: 'Work that is currently being worked on',
 	},
-
-	// Requests (Consolidated)
 	{
-		id: 'request',
-		name: 'Request',
+		id: 'done',
+		name: 'Done',
+		color: '#10B981', // green
+		description: 'Completed work',
+	},
+	{
+		id: 'review',
+		name: 'Review',
 		color: '#F59E0B', // amber
-		description: 'Request approval, feedback, review, or help from team members',
+		description: 'Work pending review',
 	},
-
-	// Issues
 	{
-		id: 'issue-report',
-		name: 'Issue Report',
+		id: 'hold',
+		name: 'Hold',
 		color: '#DC2626', // red
-		description: 'Report errors, issues, or problems that need resolution',
+		description: 'Work that is on hold',
 	},
-
-	// Other (with custom input)
+	{
+		id: 'qa',
+		name: 'QA',
+		color: '#8B5CF6', // purple
+		description: 'Work in quality assurance',
+	},
 	{
 		id: 'other',
 		name: 'Other',
 		color: '#9CA3AF', // gray
-		description: 'Custom category for content that does not fit above categories',
+		description: 'Custom status for content that does not fit above categories',
 	},
 ]
 
@@ -210,7 +209,7 @@ export const mockWorkTemplates: WorkTemplate[] = [
  * Initialize mock data to localStorage
  * Automatic update on category structure changes through version control
  */
-const WORK_STATUSES_VERSION = '6.0' // Renamed to Status and synced with System Settings
+const WORK_STATUSES_VERSION = '6.2' // Updated Status options: In Progress, Done, Review, Hold, QA, Other
 
 export const initializeMockWorkCategories = (): void => {
 	try {
