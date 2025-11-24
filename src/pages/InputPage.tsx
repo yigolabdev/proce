@@ -185,7 +185,6 @@ export default function InputPage() {
 	
 	// Review Request State
 	const [selectedReviewer, setSelectedReviewer] = useState('')
-	const [requestReview, setRequestReview] = useState(false)
 	
 	// Mock reviewers data
 	const reviewers = [
@@ -768,11 +767,6 @@ export default function InputPage() {
 			return
 		}
 		
-		// Validate reviewer selection if review is requested
-		if (requestReview && !selectedReviewer) {
-			toast.error('Please select a reviewer')
-			return
-		}
 		if (!description.trim()) {
 			toast.error('Please enter a description')
 			return
@@ -903,8 +897,8 @@ export default function InputPage() {
 					toast.success('Work entry submitted!')
 				}
 				
-			// Send review request notification if requested
-			if (requestReview && selectedReviewer && selectedProject && projectName) {
+			// Send review request notification if reviewer is selected
+			if (selectedReviewer && selectedProject && projectName) {
 				const reviewer = reviewers.find(r => r.id === selectedReviewer)
 				if (reviewer) {
 					// Create pending review entry
@@ -955,7 +949,7 @@ export default function InputPage() {
 						description: 'They will be notified to review your work',
 					})
 				}
-			} else if (selectedProject && projectName && !requestReview) {
+			} else if (selectedProject && projectName && !selectedReviewer) {
 				// Generic notification if no specific reviewer selected
 				toast.info('Work linked to project', {
 					description: 'Project team can view your work in Work History',
@@ -1605,56 +1599,26 @@ export default function InputPage() {
 										This work will be linked to the selected project
 									</p>
 									
-									{/* Request Review Checkbox */}
+									{/* Reviewer Selection */}
 									<div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-										<label className="flex items-start gap-2 cursor-pointer">
-											<input
-												type="checkbox"
-												checked={requestReview}
-												onChange={(e) => {
-													setRequestReview(e.target.checked)
-													if (!e.target.checked) {
-														setSelectedReviewer('')
-													}
-												}}
-												className="mt-0.5"
-											/>
-											<div className="flex-1">
-												<span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-													Request Review
-												</span>
-												<p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
-													Ask a team member to review your work before marking it complete
-												</p>
-											</div>
+										<label className="block text-xs font-semibold mb-2 text-blue-900 dark:text-blue-100">
+											Select Reviewer
 										</label>
-										
-										{/* Reviewer Selection */}
-										{requestReview && (
-											<div className="mt-3">
-												<label className="block text-xs font-semibold mb-2 text-blue-900 dark:text-blue-100">
-													Select Reviewer *
-												</label>
-												<select
-													value={selectedReviewer}
-													onChange={(e) => setSelectedReviewer(e.target.value)}
-													className="w-full px-3 py-2 text-sm border border-blue-300 dark:border-blue-700 rounded-xl bg-white dark:bg-neutral-900"
-													required={requestReview}
-												>
-													<option value="">Choose a reviewer...</option>
-													{reviewers.map((reviewer) => (
-														<option key={reviewer.id} value={reviewer.id}>
-															{reviewer.name} - {reviewer.role} ({reviewer.department})
-														</option>
-													))}
-												</select>
-												{!selectedReviewer && (
-													<p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-														Please select a reviewer to continue
-													</p>
-												)}
-											</div>
-										)}
+										<select
+											value={selectedReviewer}
+											onChange={(e) => setSelectedReviewer(e.target.value)}
+											className="w-full px-3 py-2 text-sm border border-blue-300 dark:border-blue-700 rounded-xl bg-white dark:bg-neutral-900"
+										>
+											<option value="">Choose a reviewer...</option>
+											{reviewers.map((reviewer) => (
+												<option key={reviewer.id} value={reviewer.id}>
+													{reviewer.name} - {reviewer.role} ({reviewer.department})
+												</option>
+											))}
+										</select>
+										<p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+											Select a team member to review your work (optional)
+										</p>
 									</div>
 								</>
 							)}
