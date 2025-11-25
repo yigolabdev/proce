@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
+import { PageHeader } from '../../components/common/PageHeader'
 import { BarChart3, Calendar, RefreshCw, TrendingUp, LineChart, FileText } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import DevMemo from '../../components/dev/DevMemo'
@@ -215,19 +216,32 @@ export default function ExecutivePage() {
 
 	if (!analyticsData) {
 		return (
-			<div className="space-y-6">
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 				<DevMemo content={DEV_MEMOS.EXECUTIVE} pagePath="/app/executive/page.tsx" />
-				<div className="flex items-center justify-center h-96">
-					<div className="text-center">
-						<BarChart3 className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
-						<h2 className="text-xl font-semibold mb-2">Analytics Error</h2>
-						<p className="text-neutral-600 dark:text-neutral-400">
-							Failed to load analytics data. Please try again.
-						</p>
-						<Button onClick={handleRefresh} className="mt-4">
-							<RefreshCw className="h-4 w-4 mr-2" />
-							Retry
+				<PageHeader
+					title="Analytics & Insights"
+					description="Comprehensive analytics and performance tracking"
+					icon={BarChart3}
+					actions={
+						<Button onClick={handleRefresh} variant="outline" size="sm">
+							<RefreshCw className="h-4 w-4 sm:mr-2" />
+							<span className="hidden sm:inline">Refresh</span>
 						</Button>
+					}
+				/>
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+					<div className="flex items-center justify-center h-96">
+						<div className="text-center">
+							<BarChart3 className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
+							<h2 className="text-xl font-semibold mb-2">Analytics Error</h2>
+							<p className="text-neutral-600 dark:text-neutral-400">
+								Failed to load analytics data. Please try again.
+							</p>
+							<Button onClick={handleRefresh} className="mt-4">
+								<RefreshCw className="h-4 w-4 mr-2" />
+								Retry
+							</Button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -237,31 +251,28 @@ export default function ExecutivePage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.EXECUTIVE} pagePath="/app/executive/page.tsx" />
-			<div className="space-y-6">
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+				<Toaster />
+				
 				{/* Header */}
-				<div className="flex items-center justify-between flex-wrap gap-4">
-					<div>
-						<h1 className="text-3xl font-bold flex items-center gap-3">
-							<BarChart3 className="h-8 w-8 text-primary" />
-							Analytics & Insights
-						</h1>
-						<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-							Comprehensive analytics and performance tracking
-						</p>
-					</div>
-					<div className="flex items-center gap-2">
+				<PageHeader
+					title="Analytics & Insights"
+					description="Comprehensive analytics and performance tracking"
+					icon={BarChart3}
+					actions={
 						<Button
 							onClick={handleRefresh}
 							variant="outline"
-							className="flex items-center gap-2"
+							size="sm"
 							disabled={refreshing}
 						>
-							<RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-							Refresh
+							<RefreshCw className={`h-4 w-4 sm:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+							<span className="hidden sm:inline">Refresh</span>
 						</Button>
-					</div>
-				</div>
-
+					}
+				/>
+				
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Date Range Filter */}
 				<Card>
 					<CardContent className="p-4">
@@ -347,8 +358,7 @@ export default function ExecutivePage() {
 						/>
 					)}
 				</div>
-
-				<Toaster />
+			</div>
 			</div>
 		</>
 	)

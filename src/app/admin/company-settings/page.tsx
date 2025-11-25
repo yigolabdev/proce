@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent } from '../../../components/ui/Card'
+import { PageHeader } from '../../../components/common/PageHeader'
 import {
 	Building2,
 	DollarSign,
@@ -812,68 +813,57 @@ export default function CompanySettingsPage() {
 	}
 
 	return (
-		<div className="space-y-6">
-
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold">Company Settings</h1>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-						Manage company information, leadership, goals, and financial data
-					</p>
-				</div>
-			</div>
-
-			{/* Progress Bar */}
-			<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
-				<CardContent className="p-6">
-					<div className="flex items-center justify-between mb-4">
-						<div className="flex items-center gap-3">
-							<CheckCircle2 className="h-5 w-5 text-primary" />
-							<h3 className="font-bold text-lg">Profile Completion</h3>
+			<PageHeader
+				title="Company Settings"
+				description="Manage company information, leadership, goals, and financial data"
+				icon={Building2}
+				tabs={{
+					items: [
+						{ id: 'company', label: 'Company Info', icon: Building2 },
+						{ id: 'business', label: 'Business', icon: Briefcase },
+						{ id: 'leadership', label: 'Leadership', icon: Users },
+						{ id: 'goals', label: 'Company Goals', icon: Target },
+						{ id: 'financial', label: 'Financial', icon: DollarSign },
+						{ id: 'workplace', label: 'Workplace', icon: Clock },
+						{ id: 'documents', label: 'Documents', icon: FileText },
+					],
+					activeTab,
+					onTabChange: (id) => setActiveTab(id as any),
+					mobileLabels: {
+						'company': 'Info',
+						'leadership': 'Leaders',
+						'goals': 'Goals',
+						'financial': 'Finance',
+						'workplace': 'Work',
+						'documents': 'Docs',
+					}
+				}}
+			>
+				{/* Progress Bar */}
+				<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
+					<CardContent className="p-6">
+						<div className="flex items-center justify-between mb-4">
+							<div className="flex items-center gap-3">
+								<CheckCircle2 className="h-5 w-5 text-primary" />
+								<h3 className="font-bold text-lg">Profile Completion</h3>
+							</div>
+							<div className="text-3xl font-bold text-primary">{completionStats.percentage}%</div>
 						</div>
-						<div className="text-3xl font-bold text-primary">{completionStats.percentage}%</div>
-					</div>
-					<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-						<div
-							className="absolute top-0 left-0 h-full bg-linear-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
-							style={{ width: `${completionStats.percentage}%` }}
-						/>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* Tabs */}
-			<div className="flex items-center gap-2 overflow-x-auto border-b border-neutral-200 dark:border-neutral-800 pb-px">
-				{[
-					{ id: 'company', label: 'Company Info', icon: Building2 },
-					{ id: 'business', label: 'Business', icon: Briefcase },
-					{ id: 'leadership', label: 'Leadership', icon: Users },
-					{ id: 'goals', label: 'Company Goals', icon: Target },
-					{ id: 'financial', label: 'Financial', icon: DollarSign },
-					{ id: 'workplace', label: 'Workplace', icon: Clock },
-					{ id: 'documents', label: 'Documents', icon: FileText },
-				].map((tab) => {
-					const Icon = tab.icon
-					return (
-						<button
-							key={tab.id}
-							onClick={() => setActiveTab(tab.id as any)}
-							className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-								activeTab === tab.id
-									? 'border-primary text-primary'
-									: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-							}`}
-						>
-							<Icon className="h-4 w-4" />
-							{tab.label}
-						</button>
-					)
-				})}
-			</div>
-
-			{/* Tab Content */}
-			<div className="space-y-6">
+						<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+							<div
+								className="absolute top-0 left-0 h-full bg-linear-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
+								style={{ width: `${completionStats.percentage}%` }}
+							/>
+						</div>
+					</CardContent>
+				</Card>
+			</PageHeader>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Company Info Tab (Basic + Contact merged) */}
 				{activeTab === 'company' && (
 					<CompanyInfoTab
@@ -969,8 +959,6 @@ export default function CompanySettingsPage() {
 					/>
 				)}
 			</div>
-
-			<Toaster />
 		</div>
 	)
 }

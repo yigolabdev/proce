@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
+import { PageHeader } from '../../components/common/PageHeader'
 import {
 	BarChart3,
 	TrendingUp,
@@ -185,22 +186,19 @@ export default function AnalyticsPage() {
 	const totalOverdue = employees.reduce((sum, e) => sum + e.tasks.overdue, 0)
 
 	return (
-		<div className="space-y-6">
+		<>
 			{/* Developer Memo */}
 			<DevMemo content={DEV_MEMOS.ANALYTICS} />
-
+			
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<BarChart3 className="h-8 w-8 text-primary" />
-						성과 분석
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						전사 성과와 개인 생산성을 통합 분석하고 인사이트를 확인하세요
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="성과 분석"
+				description="전사 성과와 개인 생산성을 통합 분석하고 인사이트를 확인하세요"
+				icon={BarChart3}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 			{/* View Mode Tabs */}
 			<Card>
@@ -725,5 +723,7 @@ export default function AnalyticsPage() {
 				</>
 			)}
 		</div>
+		</div>
+		</>
 	)
 }

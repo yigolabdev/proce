@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
+import { PageHeader } from '../components/common/PageHeader'
 import { 
 	TrendingUp, 
 	TrendingDown, 
@@ -323,39 +324,36 @@ export default function ExecutiveDashboardPage() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			{/* Developer Memo */}
 			<DevMemo content={DEV_MEMOS.EXECUTIVE_DASHBOARD} />
 
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Brain className="h-8 w-8 text-primary" />
-						Executive Dashboard
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Real-time insights and strategic overview for leadership
-					</p>
-				</div>
-				<div className="flex items-center gap-2">
-					<select
-						value={timeRange}
-						onChange={(e) => setTimeRange(e.target.value as any)}
-						className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 text-sm"
-					>
-						<option value="week">This Week</option>
-						<option value="month">This Month</option>
-						<option value="quarter">This Quarter</option>
-						<option value="year">This Year</option>
-					</select>
-					<Button variant="outline" className="flex items-center gap-2">
-						<FileText className="h-4 w-4" />
-						Export Report
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title="Executive Dashboard"
+				description="Real-time insights and strategic overview for leadership"
+				icon={Brain}
+				actions={
+					<>
+						<select
+							value={timeRange}
+							onChange={(e) => setTimeRange(e.target.value as any)}
+							className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 text-sm"
+						>
+							<option value="week">This Week</option>
+							<option value="month">This Month</option>
+							<option value="quarter">This Quarter</option>
+							<option value="year">This Year</option>
+						</select>
+						<Button variant="outline" className="flex items-center gap-2">
+							<FileText className="h-4 w-4" />
+							Export Report
+						</Button>
+					</>
+				}
+			/>
 
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
 			{/* Executive KPIs */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				{kpis.map((kpi) => {
@@ -605,6 +603,7 @@ export default function ExecutiveDashboardPage() {
 					</div>
 				</CardContent>
 			</Card>
+			</div>
 		</div>
 	)
 }

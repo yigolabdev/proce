@@ -5,12 +5,14 @@ import { integrationsI18n } from './_i18n/integrations.i18n';
 import { useMemo } from 'react';
 import IntegrationGrid from './_components/IntegrationGrid';
 import ConnectorDetails from './_components/ConnectorDetails';
+import { PageHeader } from '../../components/common/PageHeader';
 import Toaster from '../../components/ui/Toaster';
 import { Dialog, DialogContent } from '../../components/ui/Dialog';
 import Button from '../../components/ui/Button';
 import { disconnect } from './_mocks/integrationsApi';
 import { useIntegrations } from '../_providers/IntegrationsContext';
 import { toast } from 'sonner';
+import { Plug } from 'lucide-react';
 
 export default function IntegrationsPage() {
 	const { locale } = useI18n();
@@ -37,12 +39,17 @@ export default function IntegrationsPage() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-7xl px-4 py-8">
-			<header className="mb-8">
-				<h1 className="text-3xl font-bold">{tt.title}</h1>
-				<p className="mt-2 text-neutral-600 dark:text-neutral-300">{tt.subtitle}</p>
-			</header>
-
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
+			{/* Header */}
+			<PageHeader
+				title={tt.title}
+				description={tt.subtitle}
+				icon={Plug}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 			<IntegrationGrid onConfigure={setSelectedConnector} onDisconnect={handleDisconnect} />
 
 			<ConnectorDetails connector={selectedConnector} onClose={() => setSelectedConnector(null)} />
@@ -62,8 +69,7 @@ export default function IntegrationsPage() {
 					</div>
 				</DialogContent>
 			</Dialog>
-
-			<Toaster />
+			</div>
 		</div>
 	);
 }

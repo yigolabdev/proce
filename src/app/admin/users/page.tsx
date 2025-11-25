@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
+import { PageHeader } from '../../../components/common/PageHeader'
 import Input from '../../../components/ui/Input'
 import { Users, UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -592,26 +593,26 @@ export default function UsersManagementPage() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Users className="h-8 w-8 text-primary" />
-						User Management
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Invite team members and manage permissions
-					</p>
-				</div>
-				<Button
-					onClick={() => setIsInviting(true)}
-					className="flex items-center gap-2"
-				>
-					<UserPlus className="h-5 w-5" />
-					<span>Invite User</span>
-				</Button>
-			</div>
+			<PageHeader
+				title="User Management"
+				description="Invite team members and manage permissions"
+				icon={Users}
+				actions={
+					<Button
+						onClick={() => setIsInviting(true)}
+						size="sm"
+					>
+						<UserPlus className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">Invite User</span>
+					</Button>
+				}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 			{/* Stats */}
 			<div className="grid gap-4 md:grid-cols-5">
@@ -1107,12 +1108,11 @@ export default function UsersManagementPage() {
 									<ChevronRight className="h-4 w-4" />
 								</Button>
 							</div>
-						</div>
-					)}
-				</CardContent>
-			</Card>
-
-			<Toaster />
+					</div>
+				)}
+			</CardContent>
+		</Card>
+		</div>
 		</div>
 	)
 }

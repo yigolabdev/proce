@@ -58,26 +58,26 @@ export function PageHeader({
 }: PageHeaderProps) {
 	return (
 		<div 
-			className={`bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 ${
-				sticky ? 'sticky top-0 z-10' : ''
+			className={`${
+				sticky ? 'sticky top-0 z-10 bg-neutral-50 dark:bg-neutral-950' : ''
 			} ${className}`}
 		>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 				{/* Title & Actions */}
-				<div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 ${tabs ? 'mb-3 sm:mb-4' : ''}`}>
+				<div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${tabs || children ? 'mb-6' : ''}`}>
 					<div className="flex-1 min-w-0">
-						<h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
-							{Icon && <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${iconColor} shrink-0`} />}
-							<span className="truncate">{title}</span>
-						</h1>
+						<div className="flex items-center gap-2 sm:gap-3 mb-2">
+							{Icon && <Icon className={`h-7 w-7 sm:h-8 sm:w-8 ${iconColor} shrink-0`} />}
+							<h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-50">{title}</h1>
+						</div>
 						{description && (
-							<p className="mt-1 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
+							<p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400">
 								{description}
 							</p>
 						)}
 					</div>
 					{actions && (
-						<div className="flex items-center gap-2 shrink-0">
+						<div className="flex items-center gap-2 flex-wrap shrink-0">
 							{actions}
 						</div>
 					)}
@@ -85,7 +85,7 @@ export function PageHeader({
 
 				{/* Tabs */}
 				{tabs && (
-					<div className="flex items-center gap-0.5 sm:gap-1 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto -mb-3 sm:-mb-4 pb-px">
+					<div className="flex items-center gap-1 sm:gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto pb-px">
 						{tabs.items.map((tab) => {
 							const TabIcon = tab.icon
 							const isActive = tabs.activeTab === tab.id
@@ -101,18 +101,18 @@ export function PageHeader({
 											tabs.onTabChange(tab.id)
 										}
 									}}
-									className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-colors relative whitespace-nowrap ${
+									className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium transition-colors relative whitespace-nowrap ${
 										isActive
 											? 'text-primary'
 											: 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
 									}`}
 								>
-									{TabIcon && <TabIcon className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />}
+									{TabIcon && <TabIcon className="h-4 w-4 shrink-0" />}
 									<span className="hidden sm:inline">{tab.label}</span>
 									{mobileLabel && <span className="sm:hidden">{mobileLabel}</span>}
 									{!mobileLabel && <span className="sm:hidden">{tab.label}</span>}
 									{tab.count !== null && tab.count !== undefined && tab.count > 0 && (
-										<span className="ml-1 px-1.5 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-medium">
+										<span className="ml-1 px-1.5 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
 											{tab.count}
 										</span>
 									)}
@@ -127,7 +127,7 @@ export function PageHeader({
 
 				{/* Additional Content */}
 				{children && (
-					<div className="mt-4">
+					<div className="mt-6">
 						{children}
 					</div>
 				)}

@@ -540,21 +540,21 @@ export default function WorkHistoryPage() {
 		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			<Toaster />
 			
+			{/* Header */}
+			<PageHeader
+				title="Team Work History"
+				description="View and track work history across the entire team"
+				icon={FileText}
+				actions={
+					<Button onClick={() => navigate('/app/input')} size="sm">
+						<Plus className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">New Entry</span>
+					</Button>
+				}
+			/>
+			
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Header */}
-				<PageHeader
-					title="Team Work History"
-					description="View and track work history across the entire team"
-					icon={FileText}
-					actions={
-						<Button onClick={() => navigate('/app/input')} size="sm">
-							<Plus className="h-4 w-4 sm:mr-2" />
-							<span className="hidden sm:inline">New Entry</span>
-						</Button>
-					}
-				/>
-
-					{/* Statistics Cards */}
+				{/* Statistics Cards */}
 					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
 							<CardContent className="p-4">

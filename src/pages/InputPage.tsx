@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Textarea from '../components/ui/Textarea'
 import { useAuth } from '../context/AuthContext'
+import { PageHeader } from '../components/common/PageHeader'
 import { 
 	FileText, 
 	Upload, 
@@ -1039,23 +1040,58 @@ export default function InputPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.INPUT} pagePath="/pages/InputPage.tsx" />
-			<div className="space-y-4 sm:space-y-6">
-				{/* Header */}
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-				<div className="flex-1 min-w-0">
-					<div className="flex items-center gap-2 sm:gap-3 mb-2">
-						<FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
-						<h1 className="text-2xl sm:text-3xl font-bold">Work Input</h1>
-						{editingEntryId && (
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+				<PageHeader
+					title={editingEntryId ? "Work Input" : "Work Input"}
+					description={
+						<>
+							<span className="hidden sm:inline">Document your work, link to projects/OKRs, and track your progress</span>
+							<span className="sm:hidden">Document your work & progress</span>
+						</>
+					}
+					icon={FileText}
+					actions={
+						<>
+							<Button 
+								variant="outline" 
+								onClick={saveDraft}
+								className="flex items-center gap-2"
+							>
+								<Save className="h-4 w-4" />
+								<span className="hidden sm:inline">Save Draft</span>
+							</Button>
+							<Button 
+								variant="outline" 
+								onClick={() => setShowDraftsDialog(true)}
+								className="flex items-center gap-2"
+							>
+								<FolderOpen className="h-4 w-4" />
+								<span className="hidden sm:inline">Drafts {drafts.length > 0 && `(${drafts.length})`}</span>
+								<span className="sm:hidden">{drafts.length > 0 ? drafts.length : ''}</span>
+							</Button>
+							<Button 
+								variant="outline" 
+								onClick={() => setShowDecisionDialog(true)}
+								className="flex items-center gap-2 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+							>
+								<AlertCircle className="h-4 w-4" />
+								<span className="hidden sm:inline">Decision Issue</span>
+							</Button>
+							<Button onClick={handleSubmit} className="flex items-center gap-2">
+								<Send className="h-4 w-4" />
+								<span className="hidden sm:inline">Submit</span>
+							</Button>
+						</>
+					}
+				>
+					{/* Edit Badge */}
+					{editingEntryId && (
+						<div className="mb-4">
 							<span className="text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
-								Edit
+								Edit Mode
 							</span>
-						)}
-					</div>
-					<p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
-						<span className="hidden sm:inline">Document your work, link to projects/OKRs, and track your progress</span>
-						<span className="sm:hidden">Document your work & progress</span>
-					</p>
+						</div>
+					)}
 					
 					{/* Progress Indicator */}
 					{!editingEntryId && (
@@ -1104,41 +1140,9 @@ export default function InputPage() {
 							Shortcuts: Ctrl+S (Save) | Ctrl+Enter (Submit)
 						</span>
 					</div>
-				</div>
-				
-				{/* Action Buttons */}
-				<div className="flex items-center gap-2 flex-wrap">
-					<Button 
-						variant="outline" 
-						onClick={saveDraft}
-						className="flex items-center gap-2"
-					>
-						<Save className="h-4 w-4" />
-						Save Draft
-					</Button>
-					<Button 
-						variant="outline" 
-						onClick={() => setShowDraftsDialog(true)}
-						className="flex items-center gap-2"
-					>
-						<FolderOpen className="h-4 w-4" />
-						Drafts {drafts.length > 0 && `(${drafts.length})`}
-					</Button>
-					<Button 
-						variant="outline" 
-						onClick={() => setShowDecisionDialog(true)}
-						className="flex items-center gap-2 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-					>
-						<AlertCircle className="h-4 w-4" />
-						Decision Issue
-					</Button>
-					<Button onClick={handleSubmit} className="flex items-center gap-2">
-						<Send className="h-4 w-4" />
-						Submit
-					</Button>
-				</div>
-			</div>
+				</PageHeader>
 
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
 			<div className="grid gap-6 lg:grid-cols-3">
 				{/* Main Input Area - 2 columns */}
 				<div className="lg:col-span-2 space-y-6">
@@ -2238,6 +2242,7 @@ export default function InputPage() {
 				</div>
 			)}
 			</div>
+		</div>
 		</>
 	)
 }

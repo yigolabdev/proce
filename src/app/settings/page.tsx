@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
+import { PageHeader } from '../../components/common/PageHeader'
 import {
 	Settings as SettingsIcon,
 	User,
@@ -373,39 +374,26 @@ export default function SettingsPage() {
 	const isProfileChanged = JSON.stringify(profile) !== JSON.stringify(originalProfile)
 
 	return (
-		<div className="space-y-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
 			{/* Header */}
-			<div>
-				<h1 className="text-3xl font-bold flex items-center gap-3">
-					<SettingsIcon className="h-8 w-8 text-primary" />
-					Settings
-				</h1>
-				<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-					Manage your account, preferences, and privacy settings
-				</p>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto">
-				{[
-					{ id: 'profile', label: 'Profile', icon: User },
-					{ id: 'account', label: 'Account & Security', icon: Lock },
-					{ id: 'notifications', label: 'Notifications', icon: Bell },
-				].map((tab) => (
-					<button
-						key={tab.id}
-						onClick={() => setActiveTab(tab.id as any)}
-						className={`px-4 py-2 font-medium text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
-							activeTab === tab.id
-								? 'border-primary text-primary'
-								: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-						}`}
-					>
-						<tab.icon className="h-4 w-4" />
-						{tab.label}
-					</button>
-				))}
-			</div>
+			<PageHeader
+				title="Settings"
+				description="Manage your account, preferences, and privacy settings"
+				icon={SettingsIcon}
+				tabs={{
+					items: [
+						{ id: 'profile', label: 'Profile', icon: User },
+						{ id: 'account', label: 'Account & Security', icon: Lock },
+						{ id: 'notifications', label: 'Notifications', icon: Bell },
+					],
+					activeTab,
+					onTabChange: (id) => setActiveTab(id as any),
+				}}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 			{/* Profile Tab */}
 			{activeTab === 'profile' && (
@@ -1111,8 +1099,7 @@ export default function SettingsPage() {
 					</div>
 				</div>
 			)}
-
-			<Toaster />
+		</div>
 		</div>
 	)
 }

@@ -421,19 +421,20 @@ export default function MessagesPage() {
 		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			<Toaster />
 			
+			{/* Header */}
+			<PageHeader
+				title="Messages"
+				description="모든 업무 알림과 커뮤니케이션을 한곳에서 관리하세요"
+				icon={Mail}
+				actions={
+					<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2">
+						<RefreshCw className="h-4 w-4" />
+						<span className="hidden sm:inline">Refresh</span>
+					</Button>
+				}
+			/>
+			
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Header */}
-				<PageHeader
-					title="Messages"
-					description="모든 업무 알림과 커뮤니케이션을 한곳에서 관리하세요"
-					icon={Mail}
-					actions={
-						<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2">
-							<RefreshCw className="h-4 w-4" />
-							<span className="hidden sm:inline">Refresh</span>
-						</Button>
-					}
-				/>
 				{/* Quick Stats */}
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">

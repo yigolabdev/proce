@@ -36,6 +36,7 @@ const OnboardingPage = lazy(() => import('../app/auth/onboarding/page'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const InputPage = lazy(() => import('../pages/InputPage'))
 const ProjectsPage = lazy(() => import('../app/projects/page'))
+const ProjectDetailPage = lazy(() => import('../app/projects/detail/page'))
 const WorkHistoryPage = lazy(() => import('../app/work-history/page'))
 const WorkReviewPage = lazy(() => import('../app/work-review/page'))
 const MessagesPage = lazy(() => import('../app/messages/page'))
@@ -106,6 +107,7 @@ const appRoutes = [
 	// 작업자 메뉴
 	{ path: '/app/dashboard', element: withSuspense(DashboardPage) },
 	{ path: '/app/input', element: withSuspense(InputPage) },
+	{ path: '/app/projects/:id', element: withSuspense(ProjectDetailPage) },
 	{ path: '/app/projects', element: withSuspense(ProjectsPage) },
 	{ path: '/app/work-history', element: withSuspense(WorkHistoryPage) },
 	{ path: '/app/work-review', element: withSuspense(WorkReviewPage) },

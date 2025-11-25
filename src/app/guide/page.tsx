@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
+import { PageHeader } from '../../components/common/PageHeader'
 import { 
 	LayoutDashboard, 
 	FileText, 
@@ -625,29 +626,25 @@ export default function GuidePage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			{/* Header */}
-			<div className="max-w-7xl mx-auto mb-8">
-				<div className="flex items-center justify-between mb-2">
-					<div className="flex items-center gap-3">
-						<BookOpen className="h-8 w-8 text-primary" />
-						<h1 className="text-3xl font-bold">{t.title}</h1>
-					</div>
+			<PageHeader
+				title={t.title}
+				description={t.subtitle}
+				icon={BookOpen}
+				actions={
 					<Button
 						onClick={toggleLanguage}
 						variant="outline"
-						className="flex items-center gap-2"
+						size="sm"
 					>
-						<Languages className="h-4 w-4" />
-						{language === 'ko' ? 'English' : '한국어'}
+						<Languages className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">{language === 'ko' ? 'English' : '한국어'}</span>
 					</Button>
-				</div>
-				<p className="text-neutral-600 dark:text-neutral-400">
-					{t.subtitle}
-				</p>
-			</div>
+				}
+			/>
 
-			<div className="max-w-7xl mx-auto space-y-8">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Quick Stats */}
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">

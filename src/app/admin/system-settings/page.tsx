@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { Settings, Activity, Briefcase, Building } from 'lucide-react'
+import { PageHeader } from '../../../components/common/PageHeader'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { storage } from '../../../utils/storage'
@@ -289,56 +290,29 @@ export default function SystemSettingsPage() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Settings className="h-8 w-8 text-primary" />
-						System Settings
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Configure departments, positions, roles, and work status
-					</p>
-				</div>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800">
-				<button
-					onClick={() => setActiveTab('departments')}
-					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'departments'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<Building className="inline h-4 w-4 mr-2" />
-					Departments
-				</button>
-				<button
-					onClick={() => setActiveTab('positions')}
-					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'positions'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<Briefcase className="inline h-4 w-4 mr-2" />
-					Positions & Roles
-				</button>
-				<button
-					onClick={() => setActiveTab('status')}
-					className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'status'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<Activity className="inline h-4 w-4 mr-2" />
-					Status
-				</button>
-			</div>
+			<PageHeader
+				title="System Settings"
+				description="Configure departments, positions, roles, and work status"
+				icon={Settings}
+				tabs={{
+					items: [
+						{ id: 'departments', label: 'Departments', icon: Building },
+						{ id: 'positions', label: 'Positions & Roles', icon: Briefcase },
+						{ id: 'status', label: 'Status', icon: Activity },
+					],
+					activeTab,
+					onTabChange: (id) => setActiveTab(id as any),
+					mobileLabels: {
+						'positions': 'Positions',
+					}
+				}}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 			{/* Departments Tab */}
 			{activeTab === 'departments' && (
@@ -393,12 +367,11 @@ export default function SystemSettingsPage() {
 					onSetShowAddCategory={setShowAddStatus}
 					onSetNewCategory={setNewStatus}
 					onAdd={handleAddStatus}
-					onUpdate={handleUpdateStatus}
-					onDelete={handleDeleteStatus}
-				/>
-			)}
-
-			<Toaster />
+				onUpdate={handleUpdateStatus}
+				onDelete={handleDeleteStatus}
+			/>
+		)}
+		</div>
 		</div>
 	)
 }

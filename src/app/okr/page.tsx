@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
+import { PageHeader } from '../../components/common/PageHeader'
 import {
 	Target,
 	Plus,
@@ -1623,25 +1624,23 @@ export default function OKRPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.OKR} pagePath="/app/okr/page.tsx" />
-			<div className="space-y-6">
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 				<Toaster />
 			
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Target className="h-8 w-8 text-primary" />
-						My Goals (OKR)
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Set objectives and track key results to achieve your goals
-					</p>
-				</div>
-				<Button onClick={handleOpenAddObjective} className="flex items-center gap-2">
-					<Plus className="h-4 w-4" />
-					Add Objective
-				</Button>
-			</div>
+			<PageHeader
+				title="My Goals (OKR)"
+				description="Set objectives and track key results to achieve your goals"
+				icon={Target}
+				actions={
+					<Button onClick={handleOpenAddObjective} size="sm">
+						<Plus className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">Add Objective</span>
+					</Button>
+				}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 		{/* Period Filter & Stats */}
 		<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -2491,6 +2490,7 @@ export default function OKRPage() {
 				</div>
 			)}
 
+			</div>
 			</div>
 		</>
 	)

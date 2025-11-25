@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
+import { PageHeader } from '../../components/common/PageHeader'
 import DevMemo from '../../components/dev/DevMemo'
 import { DEV_MEMOS } from '../../constants/devMemos'
 import { EmptyState } from '../../components/common/EmptyState'
@@ -445,68 +446,45 @@ export default function InboxPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.INBOX} pagePath="/app/inbox/page.tsx" />
-			<div className="space-y-6">
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+				<Toaster />
+				
 				{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Inbox className="h-8 w-8 text-primary" />
-						Notifications & AI Assistant
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						Stay updated with messages, tasks, and AI-powered recommendations
-					</p>
-				</div>
-				<div className="flex items-center gap-4">
-					{activeTab === 'messages' && (
-						<span className="text-sm text-neutral-600 dark:text-neutral-400">
-							Unread: <span className="font-bold text-primary">{unreadCount}</span>
-						</span>
-					)}
-					{activeTab === 'recommendations' && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={handleRefreshRecommendations}
-							disabled={isLoading}
-							className="flex items-center gap-2"
-						>
-							<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-							Refresh
-						</Button>
-					)}
-				</div>
-			</div>
-
-			{/* Tabs */}
-			<div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800">
-				<button
-					onClick={() => setActiveTab('messages')}
-					className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'messages'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<div className="flex items-center gap-2">
-						<Mail className="h-4 w-4" />
-						Messages ({messages.length})
-					</div>
-				</button>
-				<button
-					onClick={() => setActiveTab('recommendations')}
-					className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-						activeTab === 'recommendations'
-							? 'border-primary text-primary'
-							: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
-					}`}
-				>
-					<div className="flex items-center gap-2">
-						<Sparkles className="h-4 w-4" />
-						AI Recommendations ({pendingRecommendations.length})
-					</div>
-				</button>
-			</div>
+			<PageHeader
+				title="Notifications & AI Assistant"
+				description="Stay updated with messages, tasks, and AI-powered recommendations"
+				icon={Inbox}
+				actions={
+					<>
+						{activeTab === 'messages' && (
+							<span className="text-sm text-neutral-600 dark:text-neutral-400">
+								Unread: <span className="font-bold text-primary">{unreadCount}</span>
+							</span>
+						)}
+						{activeTab === 'recommendations' && (
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleRefreshRecommendations}
+								disabled={isLoading}
+							>
+								<RefreshCw className={`h-4 w-4 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+								<span className="hidden sm:inline">Refresh</span>
+							</Button>
+						)}
+					</>
+				}
+				tabs={{
+					items: [
+						{ id: 'messages', label: `Messages (${messages.length})`, icon: Mail },
+						{ id: 'recommendations', label: `AI Recommendations (${pendingRecommendations.length})`, icon: Sparkles },
+					],
+					activeTab,
+					onTabChange: (id) => setActiveTab(id as 'messages' | 'recommendations'),
+				}}
+			/>
+			
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
 			{/* Messages Tab */}
 			{activeTab === 'messages' && (
@@ -1015,8 +993,7 @@ export default function InboxPage() {
 					</div>
 				</div>
 			)}
-
-			<Toaster />
+			</div>
 			</div>
 		</>
 	)

@@ -865,7 +865,7 @@ export default function AIRecommendationsPage() {
 	return (
 		<>
 			<DevMemo content={DEV_MEMOS.INBOX} pagePath="/app/ai-recommendations/page.tsx" />
-			<div className="space-y-4 sm:space-y-6">
+			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 				{/* Header */}
 				<PageHeader
 					title="AI Recommendations"
@@ -896,10 +896,11 @@ export default function AIRecommendationsPage() {
 					}
 				/>
 				
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Statistics Cards */}
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 					{/* Total Tasks */}
-					<Card className="bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 border-neutral-200 dark:border-neutral-700">
+					<Card className="bg-linear-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 border-neutral-200 dark:border-neutral-700">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
 								<div>
@@ -914,7 +915,7 @@ export default function AIRecommendationsPage() {
 					</Card>
 					
 					{/* AI Generated Tasks */}
-					<Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+					<Card className="bg-linear-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 border-emerald-200 dark:border-emerald-800">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
 								<div>
@@ -929,7 +930,7 @@ export default function AIRecommendationsPage() {
 					</Card>
 					
 					{/* Manual Tasks */}
-					<Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800">
+					<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
 								<div>
@@ -944,7 +945,7 @@ export default function AIRecommendationsPage() {
 					</Card>
 					
 					{/* Accepted Tasks */}
-					<Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800">
+					<Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800">
 						<CardContent className="p-4">
 							<div className="flex items-center justify-between">
 								<div>
@@ -1577,7 +1578,7 @@ export default function AIRecommendationsPage() {
 														className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-200 dark:border-green-800"
 													>
 														<div className="flex items-center gap-3">
-															<div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-green-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+															<div className="w-10 h-10 rounded-full bg-linear-to-br from-green-600 to-green-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
 																{member.name[0]}
 															</div>
 															<div className="flex-1 min-w-0">
@@ -1614,7 +1615,7 @@ export default function AIRecommendationsPage() {
 														className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
 													>
 														<div className="flex items-center gap-3">
-															<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+															<div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
 																{member.name[0]}
 															</div>
 															<div className="flex-1 min-w-0">
@@ -1747,6 +1748,7 @@ export default function AIRecommendationsPage() {
 				)}
 
 				<Toaster />
+				</div>
 			</div>
 		</>
 	)

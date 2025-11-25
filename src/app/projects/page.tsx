@@ -224,23 +224,23 @@ export default function ProjectsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			<Toaster />
 			
 			{/* Header */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
-				<PageHeader
-					title="Projects"
-					description="Manage and track your projects"
-					icon={FolderKanban}
-					actions={
-						<Button onClick={() => setShowCreateDialog(true)} size="sm">
-							<Plus className="h-4 w-4 sm:mr-2" />
-							<span className="hidden sm:inline">New Project</span>
-						</Button>
-					}
-				/>
+			<PageHeader
+				title="Projects"
+				description="Manage and track your projects"
+				icon={FolderKanban}
+				actions={
+					<Button onClick={() => setShowCreateDialog(true)} size="sm">
+						<Plus className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">New Project</span>
+					</Button>
+				}
+			/>
 
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Filters and View Toggle */}
 				<div className="flex items-center justify-between gap-4 flex-wrap">
 					{/* Status Filter */}
@@ -337,14 +337,13 @@ export default function ProjectsPage() {
 			)}
 			</div>
 
-			{/* Create Project Dialog */}
-			<ProjectFormDialog
-				show={showCreateDialog}
-				onClose={() => setShowCreateDialog(false)}
-				onSubmit={handleCreateProject}
-				availableDepartments={availableDepartments}
-			/>
-
-		</div>
-	)
+		{/* Create Project Dialog */}
+		<ProjectFormDialog
+			show={showCreateDialog}
+			onClose={() => setShowCreateDialog(false)}
+			onSubmit={handleCreateProject}
+			availableDepartments={availableDepartments}
+		/>
+	</div>
+)
 }

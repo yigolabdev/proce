@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
+import { PageHeader } from '../../../components/common/PageHeader'
 import {
 	Rocket,
 	CheckCircle2,
@@ -92,28 +93,27 @@ export default function DevelopmentRoadmapPage() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold flex items-center gap-3">
-						<Rocket className="h-8 w-8 text-primary" />
-						Development Roadmap
-					</h1>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-						AI-Powered Performance Management System - Full Feature Implementation Plan
-					</p>
-					<div className="mt-2 flex items-center gap-2 text-sm">
-						<span className="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-full font-medium">
-							⚠️ DEVELOPMENT ONLY
-						</span>
-						<span className="text-neutral-500">This page is not visible in production</span>
-					</div>
-				</div>
-			</div>
+			<PageHeader
+				title="Development Roadmap"
+				description={
+					<>
+						<span className="block">AI-Powered Performance Management System - Full Feature Implementation Plan</span>
+						<div className="mt-2 flex items-center gap-2 text-sm">
+							<span className="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-full font-medium">
+								⚠️ DEVELOPMENT ONLY
+							</span>
+							<span className="text-neutral-500">This page is not visible in production</span>
+						</div>
+					</>
+				}
+				icon={Rocket}
+			/>
 
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
 			{/* Overall Progress */}
-			<Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+			<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
 				<CardContent className="p-6">
 					<div className="flex items-center justify-between mb-4">
 						<div>
@@ -131,7 +131,7 @@ export default function DevelopmentRoadmapPage() {
 					</div>
 					<div className="relative w-full h-4 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
 						<div
-							className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500"
+							className="absolute top-0 left-0 h-full bg-linear-to-r from-primary to-primary/80 rounded-full transition-all duration-500"
 							style={{ width: `${overallStats.completionRate}%` }}
 						/>
 					</div>
@@ -382,7 +382,7 @@ export default function DevelopmentRoadmapPage() {
 			)}
 
 			{/* Quick Actions */}
-			<Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+			<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
 				<CardContent className="p-6">
 					<h3 className="font-bold mb-4">Quick Actions</h3>
 					<div className="flex flex-wrap gap-3">
@@ -424,6 +424,7 @@ export default function DevelopmentRoadmapPage() {
 					</div>
 				</CardContent>
 			</Card>
+			</div>
 		</div>
 	)
 }
