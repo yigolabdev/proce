@@ -18,10 +18,8 @@ import {
 	Trash2,
 	Clock,
 	TrendingUp,
-	AlertTriangle,
 	CheckCircle2,
 	User,
-	Mail,
 	Briefcase,
 	ChevronRight,
 } from 'lucide-react'
