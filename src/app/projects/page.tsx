@@ -19,28 +19,14 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
-import type { Project } from './_types/projects.types'
+import type { Project, WorkEntry, Department } from '../../types/common.types'
 import { initializeMockProjects } from './_mocks/projectsApi'
 import ProjectFormDialog, { type ProjectFormData } from './_components/ProjectFormDialog'
 import ProjectCard from './_components/ProjectCard'
 import TimelineView from './_components/TimelineView'
 import { storage } from '../../utils/storage'
 import { createAITasksForProject } from '../ai-recommendations/_utils/aiTaskGenerator'
-
-interface WorkEntry {
-	id: string
-	title: string
-	category: string
-	projectId?: string
-	date: Date
-	duration?: string
-}
-
-interface Department {
-	id: string
-	name: string
-	description?: string
-}
+import { parseProjectsFromStorage, parseWorkEntriesFromStorage } from '../../utils/mappers'
 
 export default function ProjectsPage() {
 	const navigate = useNavigate()
@@ -88,20 +74,9 @@ export default function ProjectsPage() {
 
 	const loadProjects = async () => {
 		try {
-			const saved = storage.get<Project[]>('projects')
+			const saved = storage.get<any[]>('projects')
 			if (saved) {
-				const parsed = saved.map((proj: any) => ({
-					...proj,
-					// Migrate old 'department' to 'departments' array
-					departments: proj.departments || (proj.department ? [proj.department] : ['General']),
-					startDate: new Date(proj.startDate),
-					endDate: new Date(proj.endDate),
-					createdAt: new Date(proj.createdAt),
-					members: proj.members?.map((m: any) => ({
-						...m,
-						joinedAt: m.joinedAt ? new Date(m.joinedAt) : new Date(),
-					})) || [],
-				}))
+				const parsed = parseProjectsFromStorage(saved)
 				setProjects(parsed)
 			}
 		} catch (error) {
@@ -113,11 +88,8 @@ export default function ProjectsPage() {
 		try {
 			const saved = storage.get<any[]>('workEntries')
 			if (saved) {
-				const entriesWithDates = saved.map((entry) => ({
-					...entry,
-					date: new Date(entry.date),
-				}))
-				setWorkEntries(entriesWithDates)
+				const parsed = parseWorkEntriesFromStorage(saved)
+				setWorkEntries(parsed)
 			}
 		} catch (error) {
 			console.error('Failed to load work entries:', error)
@@ -200,17 +172,17 @@ export default function ProjectsPage() {
 	}
 
 	// Get latest work entry for each project
-	const getLatestWorkEntry = (projectId: string) => {
+	const getLatestWorkEntry = (projectId: string): { title: string; submittedBy?: string; date: Date | string } | undefined => {
 		const projectEntries = workEntries
 			.filter((entry) => entry.projectId === projectId)
-			.sort((a, b) => b.date.getTime() - a.date.getTime())
+			.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 		
 		if (projectEntries.length === 0) return undefined
 		
 		const latest = projectEntries[0]
 		return {
 			title: latest.title,
-			submittedBy: (latest as any).submittedBy,
+			submittedBy: latest.submittedByName || latest.submittedBy,
 			date: latest.date,
 		}
 	}

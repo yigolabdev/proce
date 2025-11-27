@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import { Calendar, ChevronLeft, ChevronRight, Users, Clock } from 'lucide-react'
-import type { Project } from '../_types/projects.types'
+import type { Project } from '../../../types/common.types'
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, isWithinInterval, differenceInDays } from 'date-fns'
 
 interface TimelineViewProps {

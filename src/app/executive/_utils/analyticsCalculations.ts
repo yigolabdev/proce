@@ -175,12 +175,12 @@ export const analyzeDepartmentPerformance = (startDate: Date, endDate: Date): De
 
 	// From projects
 	projects.forEach((project) => {
-		const dept = project.department || 'Unassigned'
+		const dept = project.departments?.[0] || 'Unassigned'
 		if (!departments.has(dept)) departments.set(dept, [])
 	})
 
 	const results: DepartmentPerformance[] = Array.from(departments.entries()).map(([dept, entries]) => {
-		const deptProjects = projects.filter((p) => p.department === dept)
+		const deptProjects = projects.filter((p) => p.departments?.includes(dept))
 		const deptObjectives = objectives.filter((o) => o.team === dept)
 
 		const totalHours = entries.reduce((sum, e) => {
@@ -280,7 +280,7 @@ export const analyzeProjects = (startDate: Date, endDate: Date): ProjectAnalytic
 		return {
 			projectId: project.id,
 			projectName: project.name,
-			department: project.department || 'Unassigned',
+			department: project.departments?.[0] || 'Unassigned',
 			status: project.status,
 			progress: project.progress,
 			daysRemaining,

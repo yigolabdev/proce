@@ -7,6 +7,8 @@
 
 import { STORAGE_KEYS } from '../types/common.types'
 import type { WorkEntry, WorkDraft, Project } from '../types/common.types'
+import { parseWorkEntriesFromStorage, serializeWorkEntryForStorage } from './mappers/workEntry.mapper'
+import { parseProjectsFromStorage, serializeProjectForStorage } from './mappers/project.mapper'
 
 // STORAGE_KEYS를 재export
 export { STORAGE_KEYS }
@@ -270,22 +272,65 @@ class StorageManager {
 // 싱글톤 인스턴스 export
 export const storage = new StorageManager()
 
-// 편의 함수들 - 타입 안전한 버전
-export const saveWorkEntry = (entry: WorkEntry): boolean => 
-	storage.pushToArray<WorkEntry>(STORAGE_KEYS.WORK_ENTRIES, entry)
+// 편의 함수들 - 타입 안전한 버전 (매퍼 통합)
 
-export const getWorkEntries = (): WorkEntry[] => 
-	storage.get<WorkEntry[]>(STORAGE_KEYS.WORK_ENTRIES, []) || []
+/**
+ * WorkEntry 저장 (자동 직렬화)
+ */
+export const saveWorkEntry = (entry: WorkEntry): boolean => {
+	const serialized = serializeWorkEntryForStorage(entry)
+	return storage.pushToArray<any>(STORAGE_KEYS.WORK_ENTRIES, serialized)
+}
 
+/**
+ * WorkEntry 목록 조회 (자동 파싱)
+ */
+export const getWorkEntries = (): WorkEntry[] => {
+	const raw = storage.get<any[]>(STORAGE_KEYS.WORK_ENTRIES, []) || []
+	return parseWorkEntriesFromStorage(raw)
+}
+
+/**
+ * 단일 WorkEntry 조회 (자동 파싱)
+ */
+export const getWorkEntry = (id: string): WorkEntry | null => {
+	const entries = getWorkEntries()
+	return entries.find(e => e.id === id) || null
+}
+
+/**
+ * Draft 저장
+ */
 export const saveDraft = (draft: WorkDraft): boolean => 
 	storage.set<WorkDraft>(STORAGE_KEYS.WORK_DRAFTS, draft)
 
+/**
+ * Draft 목록 조회
+ */
 export const getDrafts = (): WorkDraft[] => 
 	storage.get<WorkDraft[]>(STORAGE_KEYS.WORK_DRAFTS, []) || []
 
-export const saveProject = (project: Project): boolean => 
-	storage.pushToArray<Project>(STORAGE_KEYS.PROJECTS, project)
+/**
+ * Project 저장 (자동 직렬화)
+ */
+export const saveProject = (project: Project): boolean => {
+	const serialized = serializeProjectForStorage(project)
+	return storage.pushToArray<any>(STORAGE_KEYS.PROJECTS, serialized)
+}
 
-export const getProjects = (): Project[] => 
-	storage.get<Project[]>(STORAGE_KEYS.PROJECTS, []) || []
+/**
+ * Project 목록 조회 (자동 파싱)
+ */
+export const getProjects = (): Project[] => {
+	const raw = storage.get<any[]>(STORAGE_KEYS.PROJECTS, []) || []
+	return parseProjectsFromStorage(raw)
+}
+
+/**
+ * 단일 Project 조회 (자동 파싱)
+ */
+export const getProject = (id: string): Project | null => {
+	const projects = getProjects()
+	return projects.find(p => p.id === id) || null
+}
 

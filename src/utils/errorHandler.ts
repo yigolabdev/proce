@@ -57,6 +57,33 @@ class ErrorHandler {
 			console.error('[ErrorHandler]', error)
 		}
 	}
+	
+	/**
+	 * Handle success with toast notification
+	 */
+	handleSuccess(message: string, options?: { duration?: number }): void {
+		toast.success(message, {
+			duration: options?.duration || 3000,
+		})
+	}
+	
+	/**
+	 * Handle warning with toast notification
+	 */
+	handleWarning(message: string, options?: { duration?: number }): void {
+		toast.warning(message, {
+			duration: options?.duration || 4000,
+		})
+	}
+	
+	/**
+	 * Handle info with toast notification
+	 */
+	handleInfo(message: string, options?: { duration?: number }): void {
+		toast.info(message, {
+			duration: options?.duration || 3000,
+		})
+	}
 }
 
 /**
@@ -114,5 +141,17 @@ export const errorHandler = new ErrorHandler()
 // Export convenience functions for backward compatibility
 export const handleError = (error: unknown, customMessage?: string) => {
 	errorHandler.handleError(error, customMessage)
+}
+
+export const handleSuccess = (message: string, options?: { duration?: number }) => {
+	errorHandler.handleSuccess(message, options)
+}
+
+export const handleWarning = (message: string, options?: { duration?: number }) => {
+	errorHandler.handleWarning(message, options)
+}
+
+export const handleInfo = (message: string, options?: { duration?: number }) => {
+	errorHandler.handleInfo(message, options)
 }
 

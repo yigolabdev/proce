@@ -24,7 +24,7 @@ class RhythmService {
 		const manualTasks = storage.get<TaskRecommendation[]>('manual_tasks') || []
 		const aiTasks = storage.get<TaskRecommendation[]>('ai_recommendations') || []
 		const reviews = storage.get<any[]>('received_reviews') || []
-		const workEntries = storage.get<WorkEntry[]>('work_entries') || []
+		const workEntries = storage.get<WorkEntry[]>('workEntries') || []
 		
 		// 데이터가 하나라도 있으면 초기화하지 않음
 		if (manualTasks.length > 0 || aiTasks.length > 0 || reviews.length > 0 || workEntries.length > 0) {
@@ -317,7 +317,7 @@ class RhythmService {
 		storage.set('ai_recommendations', mockAITasks)
 		storage.set('manual_tasks', mockManualTasks)
 		storage.set('received_reviews', mockReviews)
-		storage.set('work_entries', mockWorkEntries)
+		storage.set('workEntries', mockWorkEntries)
 		
 		if (import.meta.env.DEV) {
 			console.log('[RhythmService] Mock data initialized')

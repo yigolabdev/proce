@@ -5,15 +5,17 @@
  */
 
 import { storage } from '../../utils/storage'
-import type { Project } from '../../types/common.types'
+import type { Project, ProjectStatus } from '../../types/common.types'
 import type { ApiResponse } from './config'
+import { parseProjectsFromStorage, serializeProjectForStorage } from '../../utils/mappers'
 
 /**
  * Project Filters
  */
 export interface ProjectFilters {
-	status?: 'planning' | 'active' | 'on-hold' | 'completed'
+	status?: ProjectStatus
 	department?: string
+	departments?: string[]
 	startDate?: Date
 	endDate?: Date
 }
@@ -31,7 +33,8 @@ class ProjectsService {
 		// TODO: Replace with API call
 		// return apiClient.get<Project[]>('/projects', { params: filters })
 		
-		let projects = storage.get<Project[]>(this.STORAGE_KEY) || []
+		const rawProjects = storage.get<any[]>(this.STORAGE_KEY) || []
+		let projects = parseProjectsFromStorage(rawProjects)
 		
 		// Apply filters
 		if (filters) {
@@ -39,7 +42,16 @@ class ProjectsService {
 				projects = projects.filter(p => p.status === filters.status)
 			}
 			if (filters.department) {
-				projects = projects.filter(p => p.department === filters.department)
+				// Support both legacy single department and new departments array
+				projects = projects.filter(p => 
+					p.departments?.includes(filters.department!)
+				)
+			}
+			if (filters.departments) {
+				// Filter by multiple departments (match any)
+				projects = projects.filter(p => 
+					p.departments?.some(d => filters.departments!.includes(d))
+				)
 			}
 			if (filters.startDate) {
 				projects = projects.filter(p => new Date(p.startDate) >= filters.startDate!)
@@ -62,7 +74,8 @@ class ProjectsService {
 		// TODO: Replace with API call
 		// return apiClient.get<Project>(`/projects/${id}`)
 		
-		const projects = storage.get<Project[]>(this.STORAGE_KEY) || []
+		const rawProjects = storage.get<any[]>(this.STORAGE_KEY) || []
+		const projects = parseProjectsFromStorage(rawProjects)
 		const project = projects.find(p => p.id === id)
 		
 		return {
@@ -78,7 +91,7 @@ class ProjectsService {
 		// TODO: Replace with API call
 		// return apiClient.post<Project>('/projects', project)
 		
-		const projects = storage.get<Project[]>(this.STORAGE_KEY) || []
+		const rawProjects = storage.get<any[]>(this.STORAGE_KEY) || []
 		
 		const newProject: Project = {
 			...project,
@@ -86,8 +99,9 @@ class ProjectsService {
 			createdAt: new Date(),
 		}
 		
-		projects.unshift(newProject)
-		storage.set(this.STORAGE_KEY, projects)
+		const serialized = serializeProjectForStorage(newProject)
+		rawProjects.unshift(serialized)
+		storage.set(this.STORAGE_KEY, rawProjects)
 		
 		return {
 			data: newProject,
@@ -103,18 +117,21 @@ class ProjectsService {
 		// TODO: Replace with API call
 		// return apiClient.put<Project>(`/projects/${id}`, updates)
 		
-		const projects = storage.get<Project[]>(this.STORAGE_KEY) || []
+		const rawProjects = storage.get<any[]>(this.STORAGE_KEY) || []
+		const projects = parseProjectsFromStorage(rawProjects)
 		const index = projects.findIndex(p => p.id === id)
 		
 		if (index === -1) {
 			throw new Error('Project not found')
 		}
 		
-		projects[index] = { ...projects[index], ...updates }
-		storage.set(this.STORAGE_KEY, projects)
+		const updatedProject = { ...projects[index], ...updates }
+		const serialized = serializeProjectForStorage(updatedProject)
+		rawProjects[index] = serialized
+		storage.set(this.STORAGE_KEY, rawProjects)
 		
 		return {
-			data: projects[index],
+			data: updatedProject,
 			message: 'Project updated successfully',
 			success: true,
 		}
@@ -127,8 +144,8 @@ class ProjectsService {
 		// TODO: Replace with API call
 		// return apiClient.delete<void>(`/projects/${id}`)
 		
-		const projects = storage.get<Project[]>(this.STORAGE_KEY) || []
-		const filtered = projects.filter(p => p.id !== id)
+		const rawProjects = storage.get<any[]>(this.STORAGE_KEY) || []
+		const filtered = rawProjects.filter((p: any) => p.id !== id)
 		storage.set(this.STORAGE_KEY, filtered)
 		
 		return {

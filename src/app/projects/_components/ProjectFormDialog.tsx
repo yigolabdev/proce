@@ -22,7 +22,7 @@ import {
 	Building2,
 	Trash2,
 } from 'lucide-react'
-import type { UploadedFile, LinkedResource } from '../_types/projects.types'
+import type { FileAttachment, LinkResource } from '../../../types/common.types'
 
 interface ProjectFormDialogProps {
 	show: boolean
@@ -38,8 +38,8 @@ export interface ProjectFormData {
 	objectives: string[]
 	startDate: string
 	endDate: string
-	files: UploadedFile[]
-	links: LinkedResource[]
+	files: FileAttachment[]
+	links: LinkResource[]
 }
 
 export default function ProjectFormDialog({
@@ -59,8 +59,8 @@ export default function ProjectFormDialog({
 	const [selectedDept, setSelectedDept] = useState('')
 
 	// Files and Links states
-	const [files, setFiles] = useState<UploadedFile[]>([])
-	const [links, setLinks] = useState<LinkedResource[]>([])
+	const [files, setFiles] = useState<FileAttachment[]>([])
+	const [links, setLinks] = useState<LinkResource[]>([])
 	const [linkInput, setLinkInput] = useState('')
 	const [isDragging, setIsDragging] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
@@ -127,7 +127,7 @@ export default function ProjectFormDialog({
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFiles = e.target.files
 		if (selectedFiles) {
-			const newFiles: UploadedFile[] = Array.from(selectedFiles).map((file) => ({
+			const newFiles: FileAttachment[] = Array.from(selectedFiles).map((file): FileAttachment => ({
 				id: `${Date.now()}-${file.name}`,
 				name: file.name,
 				size: file.size,
@@ -153,12 +153,13 @@ export default function ProjectFormDialog({
 
 		const droppedFiles = e.dataTransfer.files
 		if (droppedFiles) {
-			const newFiles: UploadedFile[] = Array.from(droppedFiles).map((file) => ({
+			const newFiles: FileAttachment[] = Array.from(droppedFiles).map((file) => ({
 				id: `${Date.now()}-${file.name}`,
 				name: file.name,
 				size: file.size,
 				type: file.type,
-				uploadedAt: new Date().toISOString(),
+				url: '',
+				uploadedAt: new Date(),
 			}))
 			setFiles([...files, ...newFiles])
 		}
@@ -171,7 +172,7 @@ export default function ProjectFormDialog({
 	const handleAddLink = () => {
 		if (linkInput.trim()) {
 			try {
-				const newLink: LinkedResource = {
+				const newLink: LinkResource = {
 					id: Date.now().toString(),
 					url: linkInput.trim(),
 					title: new URL(linkInput.trim()).hostname,
@@ -181,7 +182,7 @@ export default function ProjectFormDialog({
 				setLinkInput('')
 			} catch (error) {
 				// Invalid URL, but still add it
-				const newLink: LinkedResource = {
+				const newLink: LinkResource = {
 					id: Date.now().toString(),
 					url: linkInput.trim(),
 					title: linkInput.trim(),

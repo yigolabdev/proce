@@ -1209,40 +1209,16 @@ export default function AIRecommendationsPage() {
 
 									{/* Actions */}
 									<div className="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
-										<div className="flex items-center gap-2">
-											<Button
-												onClick={(e) => {
-													e.stopPropagation()
-													handleAcceptTask(task.id, true)
-												}}
-												className="flex-1 flex items-center justify-center gap-2"
-											>
-												<Zap className="h-4 w-4" />
-												Accept & Start
-											</Button>
-											<Button
-												variant="outline"
-												onClick={(e) => {
-													e.stopPropagation()
-													handleAcceptTask(task.id, false)
-												}}
-												className="flex-1 flex items-center justify-center gap-2"
-											>
-												<CheckCircle2 className="h-4 w-4" />
-												Accept
-											</Button>
-										</div>
-									<Button
-										variant="outline"
-										onClick={(e) => {
-											e.stopPropagation()
-											handleRejectTask(task.id)
-										}}
-										className="w-full flex items-center justify-center gap-2 text-neutral-600 hover:text-neutral-900"
-									>
-										<XCircle className="h-4 w-4" />
-										Not Now
-									</Button>
+										<Button
+											onClick={(e) => {
+												e.stopPropagation()
+												handleAcceptTask(task.id, true)
+											}}
+											className="w-full flex items-center justify-center gap-2"
+										>
+											<Zap className="h-4 w-4" />
+											Accept & Start
+										</Button>
 									</div>
 									</div>
 								</CardContent>

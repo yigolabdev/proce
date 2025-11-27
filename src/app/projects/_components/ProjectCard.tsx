@@ -20,12 +20,13 @@ import {
 	FileText,
 	User as UserIcon,
 } from 'lucide-react'
-import type { Project } from '../_types/projects.types'
+import type { Project } from '../../../types/common.types'
+import { toDate } from '../../../utils/dateUtils'
 
 interface LatestWorkEntry {
 	title: string
 	submittedBy?: string
-	date: Date
+	date: Date | string
 }
 
 interface ProjectCardProps {
@@ -37,14 +38,16 @@ interface ProjectCardProps {
 export default function ProjectCard({ project, workEntriesCount = 0, latestWorkEntry }: ProjectCardProps) {
 	const navigate = useNavigate()
 
-	const formatTimeAgo = (date: Date) => {
-		const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+	const formatTimeAgo = (date: Date | string) => {
+		const d = toDate(date)
+		if (!d) return 'Unknown'
+		const seconds = Math.floor((new Date().getTime() - d.getTime()) / 1000)
 		
 		if (seconds < 60) return 'Just now'
 		if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
 		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
 		if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
-		return date.toLocaleDateString()
+		return d.toLocaleDateString()
 	}
 
 	const getStatusBadge = (status: string) => {

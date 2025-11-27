@@ -25,7 +25,7 @@ export const workApi = {
 	async getWorkEntries(params?: PaginationParams & WorkEntryFilters): Promise<PaginatedResponse<WorkEntry>> {
 		// 개발 환경: localStorage 사용
 		if (import.meta.env.DEV) {
-			const entries = storage.get<WorkEntry[]>('work_entries') || []
+			const entries = storage.get<WorkEntry[]>('workEntries') || []
 			const { page = 1, limit = 20 } = params || {}
 			
 			// 필터링
@@ -76,7 +76,7 @@ export const workApi = {
 	 */
 	async getWorkEntry(id: string): Promise<WorkEntry> {
 		if (import.meta.env.DEV) {
-			const entries = storage.get<WorkEntry[]>('work_entries') || []
+			const entries = storage.get<WorkEntry[]>('workEntries') || []
 			const entry = entries.find(e => e.id === id)
 			if (!entry) throw new Error('Work entry not found')
 			return entry
@@ -90,7 +90,7 @@ export const workApi = {
 	 */
 	async createWorkEntry(data: CreateWorkEntryDto): Promise<WorkEntry> {
 		if (import.meta.env.DEV) {
-			const entries = storage.get<WorkEntry[]>('work_entries') || []
+			const entries = storage.get<WorkEntry[]>('workEntries') || []
 			const newEntry: WorkEntry = {
 				id: `work-${Date.now()}`,
 				title: data.title,
@@ -106,7 +106,7 @@ export const workApi = {
 				updatedAt: new Date(),
 			}
 			entries.push(newEntry)
-			storage.set('work_entries', entries)
+			storage.set('workEntries', entries)
 			return newEntry
 		}
 
@@ -118,7 +118,7 @@ export const workApi = {
 	 */
 	async updateWorkEntry(id: string, data: UpdateWorkEntryDto): Promise<WorkEntry> {
 		if (import.meta.env.DEV) {
-			const entries = storage.get<WorkEntry[]>('work_entries') || []
+			const entries = storage.get<WorkEntry[]>('workEntries') || []
 			const index = entries.findIndex(e => e.id === id)
 			if (index === -1) throw new Error('Work entry not found')
 			
@@ -135,7 +135,7 @@ export const workApi = {
 				updatedAt: new Date(),
 			}
 			entries[index] = updated
-			storage.set('work_entries', entries)
+			storage.set('workEntries', entries)
 			return updated
 		}
 
@@ -147,9 +147,9 @@ export const workApi = {
 	 */
 	async deleteWorkEntry(id: string): Promise<void> {
 		if (import.meta.env.DEV) {
-			const entries = storage.get<WorkEntry[]>('work_entries') || []
+			const entries = storage.get<WorkEntry[]>('workEntries') || []
 			const filtered = entries.filter(e => e.id !== id)
-			storage.set('work_entries', filtered)
+			storage.set('workEntries', filtered)
 			return
 		}
 

@@ -31,40 +31,9 @@ import {
 import Input from '../../components/ui/Input'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
-
-interface UploadedFile {
-	id: string
-	name: string
-	size: number
-	type: string
-	url: string
-}
-
-interface LinkedResource {
-	id: string
-	url: string
-	title: string
-	addedAt: Date
-}
-
-interface WorkEntry {
-	id: string
-	title: string
-	description: string
-	category: string
-	projectId?: string
-	projectName?: string
-	objectiveId?: string
-	tags: string[]
-	date: Date
-	duration: string
-	files: UploadedFile[]
-	links: LinkedResource[]
-	status: 'draft' | 'submitted' | 'approved' | 'rejected'
-	submittedBy?: string // User name
-	submittedById?: string // User ID
-	department?: string // User's department
-}
+import type { WorkEntry } from '../../types/common.types'
+import { parseWorkEntriesFromStorage } from '../../utils/mappers'
+import { toDate } from '../../utils/dateUtils'
 
 export default function WorkHistoryPage() {
 	const navigate = useNavigate()
@@ -126,14 +95,7 @@ export default function WorkHistoryPage() {
 				// Load work entries
 				const saved = storage.get<any[]>('workEntries')
 				if (saved && saved.length > 0) {
-					const entriesWithDates = saved.map((entry: any) => ({
-						...entry,
-						date: new Date(entry.date),
-						links: entry.links?.map((link: any) => ({
-							...link,
-							addedAt: new Date(link.addedAt),
-						})) || [],
-					}))
+					const entriesWithDates = parseWorkEntriesFromStorage(saved)
 					setEntries(entriesWithDates)
 					
 					// Extract departments and users
@@ -450,7 +412,7 @@ export default function WorkHistoryPage() {
 				(entry) =>
 					entry.title.toLowerCase().includes(query) ||
 					entry.description.toLowerCase().includes(query) ||
-					entry.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+					entry.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
 					entry.submittedBy?.toLowerCase().includes(query)
 			)
 		}
@@ -480,7 +442,7 @@ export default function WorkHistoryPage() {
 		// Sort
 		filtered.sort((a, b) => {
 			if (sortBy === 'date') {
-				return b.date.getTime() - a.date.getTime()
+				return new Date(b.date).getTime() - new Date(a.date).getTime()
 			}
 			return a.title.localeCompare(b.title)
 		})
@@ -838,11 +800,11 @@ export default function WorkHistoryPage() {
 															</div>
 														)}
 
-														{/* Date */}
-														<div className="flex items-center gap-1.5">
-															<Calendar className="h-4 w-4" />
-															<span>{entry.date.toLocaleDateString()}</span>
-														</div>
+													{/* Date */}
+													<div className="flex items-center gap-1.5">
+														<Calendar className="h-4 w-4" />
+														<span>{toDate(entry.date)?.toLocaleDateString() || 'N/A'}</span>
+													</div>
 
 														{/* Duration */}
 														<div className="flex items-center gap-1.5">
@@ -851,8 +813,22 @@ export default function WorkHistoryPage() {
 														</div>
 													</div>
 
+													{/* Progress Bar */}
+													<div className="w-full mt-3 max-w-xs">
+														<div className="flex justify-between text-xs mb-1">
+															<span className="text-neutral-500">Progress</span>
+															<span className="font-medium text-neutral-900 dark:text-neutral-100">{entry.status === 'approved' ? '100%' : '65%'}</span>
+														</div>
+														<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5">
+															<div 
+																className={`h-1.5 rounded-full ${entry.status === 'approved' ? 'bg-green-500' : 'bg-blue-500'}`} 
+																style={{ width: entry.status === 'approved' ? '100%' : '65%' }}
+															></div>
+														</div>
+													</div>
+
 													{/* Tags */}
-													{entry.tags.length > 0 && (
+													{entry.tags && entry.tags.length > 0 && (
 														<div className="flex items-center gap-2 mt-2 flex-wrap">
 															<Tag className="h-3 w-3 text-neutral-400" />
 															{entry.tags.map((tag, idx) => (
@@ -890,15 +866,15 @@ export default function WorkHistoryPage() {
 														</p>
 													</div>
 
-													{/* Files */}
-													{entry.files.length > 0 && (
-														<div>
-															<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-																<Upload className="h-4 w-4" />
-																Attachments ({entry.files.length})
-															</h4>
-															<div className="space-y-2">
-																{entry.files.map((file) => (
+												{/* Files */}
+												{entry.files && entry.files.length > 0 && (
+													<div>
+														<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+															<Upload className="h-4 w-4" />
+															Attachments ({entry.files.length})
+														</h4>
+														<div className="space-y-2">
+															{entry.files.map((file) => (
 																	<div
 																		key={file.id}
 																		className="flex items-center gap-3 p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg"
@@ -917,15 +893,15 @@ export default function WorkHistoryPage() {
 														</div>
 													)}
 
-													{/* Links */}
-													{entry.links.length > 0 && (
-														<div>
-															<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-																<Link2 className="h-4 w-4" />
-																Links ({entry.links.length})
-															</h4>
-															<div className="space-y-2">
-																{entry.links.map((link) => (
+												{/* Links */}
+												{entry.links && entry.links.length > 0 && (
+													<div>
+														<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+															<Link2 className="h-4 w-4" />
+															Links ({entry.links.length})
+														</h4>
+														<div className="space-y-2">
+															{entry.links.map((link) => (
 																	<a
 																		key={link.id}
 																		href={link.url}

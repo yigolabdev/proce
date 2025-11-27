@@ -35,22 +35,9 @@ import {
 	RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
-
-interface WorkEntry {
-	id: string
-	title: string
-	description: string
-	category: string
-	projectId?: string
-	projectName?: string
-	tags: string[]
-	date: Date
-	duration?: string
-	status: string
-	submittedBy?: string
-	submittedById?: string
-	department?: string
-}
+import type { WorkEntry, Project } from '../types/common.types'
+import { parseWorkEntriesFromStorage, parseProjectsFromStorage } from '../utils/mappers'
+import { toDate } from '../utils/dateUtils'
 
 interface ReceivedReview {
 	id: string
@@ -70,13 +57,6 @@ interface TaskRecommendation {
 	projectName?: string
 	deadline?: string
 	description?: string
-}
-
-interface Project {
-	id: string
-	name: string
-	status?: string
-	endDate?: string
 }
 
 interface TeamMember {
@@ -155,11 +135,8 @@ export default function DashboardPage() {
 			// Load work entries (all team)
 			const savedEntries = storage.get<any[]>('workEntries')
 			if (savedEntries && savedEntries.length > 0) {
-				const entriesWithDates = savedEntries.map((entry: any) => ({
-					...entry,
-					date: new Date(entry.date),
-				}))
-				setWorkEntries(entriesWithDates)
+				const parsed = parseWorkEntriesFromStorage(savedEntries)
+				setWorkEntries(parsed)
 			}
 
 			// Load received reviews - filter by current user
@@ -185,7 +162,8 @@ export default function DashboardPage() {
 			// Load projects
 			const savedProjects = storage.get<any[]>('projects')
 			if (savedProjects && savedProjects.length > 0) {
-				setProjects(savedProjects)
+				const parsed = parseProjectsFromStorage(savedProjects)
+				setProjects(parsed)
 			}
 
 			// Load users for team view
@@ -386,7 +364,7 @@ export default function DashboardPage() {
 	const recentActivities = useMemo(() => {
 		return workEntries
 			.filter(e => e.status === 'approved')
-			.sort((a, b) => b.date.getTime() - a.date.getTime())
+			.sort((a, b) => (toDate(b.date)?.getTime() || 0) - (toDate(a.date)?.getTime() || 0))
 			.slice(0, 5)
 	}, [workEntries])
 
@@ -394,7 +372,7 @@ export default function DashboardPage() {
 	const myRecentWork = useMemo(() => {
 		return workEntries
 			.filter(e => e.submittedById === currentUserId)
-			.sort((a, b) => b.date.getTime() - a.date.getTime())
+			.sort((a, b) => (toDate(b.date)?.getTime() || 0) - (toDate(a.date)?.getTime() || 0))
 			.slice(0, 3)
 	}, [workEntries, currentUserId])
 
@@ -697,10 +675,10 @@ export default function DashboardPage() {
 																	{entry.projectName}
 																</span>
 															)}
-															<span className="flex items-center gap-1">
-																<Calendar className="h-3 w-3" />
-																{entry.date.toLocaleDateString()}
-															</span>
+														<span className="flex items-center gap-1">
+															<Calendar className="h-3 w-3" />
+															{toDate(entry.date)?.toLocaleDateString() || 'N/A'}
+														</span>
 															{entry.duration && (
 																<span className="flex items-center gap-1">
 																	<Clock className="h-3 w-3" />
@@ -897,10 +875,10 @@ export default function DashboardPage() {
 																{entry.projectName}
 															</span>
 														)}
-														<span className="flex items-center gap-1">
-															<Clock className="h-3 w-3" />
-															{Math.floor((Date.now() - entry.date.getTime()) / (1000 * 60 * 60))}h ago
-														</span>
+													<span className="flex items-center gap-1">
+														<Clock className="h-3 w-3" />
+														{Math.floor((Date.now() - (toDate(entry.date)?.getTime() || 0)) / (1000 * 60 * 60))}h ago
+													</span>
 													</div>
 												</div>
 											</div>

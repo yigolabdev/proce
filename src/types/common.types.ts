@@ -3,6 +3,25 @@
 
 // ==================== Work Entry Types ====================
 
+export interface FileAttachment {
+	id: string
+	name: string
+	size: number
+	type: string
+	url?: string
+	uploadedAt?: Date | string
+}
+
+export interface LinkResource {
+	id: string
+	title: string
+	url: string
+	description?: string
+	addedAt?: Date | string
+}
+
+export type WorkEntryStatus = 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected'
+
 export interface WorkEntry {
 	id: string
 	title: string
@@ -10,36 +29,75 @@ export interface WorkEntry {
 	description: string
 	date: Date | string
 	duration: string
+	
+	// Relations
 	projectId?: string
+	projectName?: string // Denormalized for display
 	objectiveId?: string
+	keyResultId?: string
+	taskId?: string
+	
+	// Metadata
 	tags?: string[]
 	files?: FileAttachment[]
 	links?: LinkResource[]
+	isConfidential?: boolean
+	
+	// User & Department
+	submittedBy?: string // User ID (legacy) or User name
+	submittedById?: string // User ID (preferred)
+	submittedByName?: string // User name (denormalized)
 	department?: string
-	status?: 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected'
-	createdAt?: Date | string
-	updatedAt?: Date | string
-	submittedBy?: string
-	submittedAt?: Date | string
+	
+	// Status & Review
+	status?: WorkEntryStatus
 	reviewedBy?: string
+	reviewedByName?: string
 	reviewedAt?: Date | string
 	reviewComments?: string
+	
+	// Timestamps
+	createdAt?: Date | string
+	updatedAt?: Date | string
+	submittedAt?: Date | string
+	
+	// AI Analysis (optional)
+	complexity?: 'low' | 'medium' | 'high'
+	estimatedDuration?: string
+	actualDuration?: string
+	requiredSkills?: string[]
+	collaborators?: string[]
+	blockers?: string[]
 }
 
-export interface FileAttachment {
-	id: string
-	name: string
-	size: number
-	type: string
-	url?: string
-	uploadedAt: Date | string
-}
-
-export interface LinkResource {
-	id: string
-	url: string
-	title?: string
-	description?: string
+/**
+ * DTO for creating a new WorkEntry
+ * Excludes auto-generated fields like id, timestamps
+ */
+export interface CreateWorkEntryDto {
+	title: string
+	category: string
+	description: string
+	date?: Date | string
+	duration: string
+	
+	// Relations
+	projectId?: string
+	projectName?: string
+	objectiveId?: string
+	keyResultId?: string
+	taskId?: string
+	
+	// Metadata
+	tags?: string[]
+	files?: FileAttachment[]
+	links?: LinkResource[]
+	isConfidential?: boolean
+	
+	// User & Department
+	submittedBy?: string
+	submittedById?: string
+	department?: string
 }
 
 // ==================== Project Types ====================
@@ -50,7 +108,9 @@ export interface ProjectMember {
 	id: string
 	name: string
 	email: string
-	role: string
+	role: 'leader' | 'member'
+	department: string
+	joinedAt?: Date | string
 }
 
 export interface Milestone {
@@ -58,8 +118,8 @@ export interface Milestone {
 	name: string
 	plannedDate: string
 	actualDate?: string
-	status: 'pending' | 'in-progress' | 'completed' | 'delayed'
 	completionDate?: string
+	status: 'pending' | 'in-progress' | 'completed' | 'delayed'
 }
 
 export interface ProjectSchedule {
@@ -71,6 +131,36 @@ export interface ProjectSchedule {
 	milestones?: Milestone[]
 }
 
+export interface ProjectResources {
+	budget?: number
+	actualCost?: number
+	teamSize: number
+	requiredTeamSize?: number
+	currentVelocity?: number
+	requiredVelocity?: number
+}
+
+export interface ProjectRisk {
+	id: string
+	type: 'schedule' | 'resource' | 'technical' | 'external'
+	severity: 'low' | 'medium' | 'high' | 'critical'
+	description: string
+	probability: number // 0-1
+	impact: number // 0-1
+	mitigation?: string
+	aiDetected?: boolean
+}
+
+export interface ProjectAIAnalysis {
+	healthScore: number // 0-1
+	completionProbability: number // 0-1
+	riskScore: number // 0-1
+	teamWorkload: number // 0-1
+	recommendedActions: string[]
+	predictedIssues: string[]
+	scheduleVariance?: number // days
+}
+
 export interface Project {
 	id: string
 	name: string
@@ -79,19 +169,49 @@ export interface Project {
 	progress: number
 	startDate: Date | string
 	endDate: Date | string
-	department?: string // Legacy: single department (deprecated)
-	departments?: string[] // New: multiple departments
-	objectives?: string[] // Project objectives/goals
-	members?: ProjectMember[]
+	departments: string[] // Multiple departments (required)
+	objectives: string[] // Project objectives/goals (required)
+	members: ProjectMember[] // Team members (required)
 	tags?: string[]
 	priority?: 'low' | 'medium' | 'high'
-	budget?: number
 	createdAt: Date | string
 	createdBy: string
+	
+	// Optional advanced features
 	schedule?: ProjectSchedule
+	resources?: ProjectResources
+	risks?: ProjectRisk[]
+	aiAnalysis?: ProjectAIAnalysis
 	files?: FileAttachment[] // Attached files
 	links?: LinkResource[] // Related links
 }
+
+/**
+ * 프로젝트 생성 요청 데이터
+ */
+export type CreateProjectData = Omit<Project, 'id' | 'createdAt' | 'progress'>
+
+/**
+ * 프로젝트 수정 요청 데이터
+ */
+export type UpdateProjectData = Partial<Omit<Project, 'id' | 'createdAt'>>
+
+/**
+ * 프로젝트 통계
+ */
+export interface ProjectStats {
+	total: number
+	active: number
+	planning: number
+	completed: number
+	onHold: number
+	cancelled?: number
+}
+
+/**
+ * 프로젝트 필터
+ */
+export type ProjectFilter = 'all' | ProjectStatus
 
 // ==================== OKR Types ====================
 
@@ -104,21 +224,31 @@ export interface KeyResult {
 	current: number
 	unit: string
 	progress: number
+	owner?: string
+	ownerId?: string
+	createdAt?: Date | string
+	updatedAt?: Date | string
 }
 
 export interface Objective {
 	id: string
 	title: string
 	description?: string
-	period: string
+	period: string // e.g., "Q4 2024" or "2024"
+	quarter?: string // e.g., "Q4 2024"
+	year?: number
 	team?: string
 	owner?: string
+	ownerId?: string
+	department?: string
 	status: OKRStatus
 	progress: number
 	keyResults: KeyResult[]
 	startDate?: Date | string
 	endDate?: Date | string
 	createdAt?: Date | string
+	updatedAt?: Date | string
+	createdBy?: string
 }
 
 // ==================== Category & Tag Types ====================
@@ -152,7 +282,7 @@ export interface WorkTemplate {
 export interface Department {
 	id: string
 	name: string
-	code: string
+	code?: string
 	parentId?: string
 	managerId?: string
 	managerName?: string
@@ -231,8 +361,14 @@ export interface WorkDraft {
 	title: string
 	category: string
 	description: string
+	duration?: string
+	projectId?: string
+	objectiveId?: string
+	keyResultId?: string
+	tags?: string[]
+	isConfidential?: boolean
 	savedAt: Date | string
-	[key: string]: any // Allow additional fields
+	[key: string]: any // Allow additional fields for flexibility
 }
 
 export interface WorkspaceSettings {

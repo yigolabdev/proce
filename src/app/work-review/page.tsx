@@ -43,10 +43,28 @@ interface ReceivedReview {
 	isRead: boolean
 }
 
+// Review pending for the current user (as a reviewer)
+interface PendingReview {
+	id: string
+	workEntryId: string
+	workTitle: string
+	workDescription: string
+	projectId: string
+	projectName: string
+	submittedBy: string
+	submittedById?: string
+	submittedByDepartment?: string
+	reviewerId: string
+	status: 'pending'
+	submittedAt: Date | string
+}
+
 export default function WorkReviewPage() {
 	const navigate = useNavigate()
 	
 	// State
+	const [activeTab, setActiveTab] = useState<'pending' | 'received'>('pending')
+	const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([])
 	const [reviews, setReviews] = useState<ReceivedReview[]>([])
 	const [filteredReviews, setFilteredReviews] = useState<ReceivedReview[]>([])
 	const [loading, setLoading] = useState(true)
@@ -86,6 +104,30 @@ export default function WorkReviewPage() {
 					{ id: 'proj-8', name: 'AI/ML Pipeline' },
 				]
 				setProjects(mockProjects)
+			}
+
+			// Load pending reviews (To Review)
+			const savedPending = storage.get<any[]>('pending_reviews')
+			if (savedPending && savedPending.length > 0) {
+				setPendingReviews(savedPending)
+			} else {
+				// Mock pending reviews
+				setPendingReviews([
+					{
+						id: 'pending-1',
+						workEntryId: 'work-new-1',
+						workTitle: 'New Feature Implementation',
+						workDescription: 'Implemented the new dashboard widget system.',
+						projectId: 'proj-1',
+						projectName: 'Website Redesign',
+						submittedBy: 'John Doe',
+						submittedById: 'user-1',
+						submittedByDepartment: 'Engineering',
+						reviewerId: 'current-user',
+						status: 'pending',
+						submittedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+					}
+				])
 			}
 
 			// Load received reviews
@@ -474,6 +516,64 @@ export default function WorkReviewPage() {
 		}
 	}
 
+	// Handle review action
+	const handleReviewAction = (review: PendingReview, action: 'approve' | 'reject', comment: string) => {
+		// 1. Remove from pending reviews
+		const updatedPending = pendingReviews.filter(r => r.id !== review.id)
+		setPendingReviews(updatedPending)
+		storage.set('pending_reviews', updatedPending)
+
+		// 2. Update WorkEntry status
+		const workEntries = storage.get<any[]>('workEntries') || []
+		const updatedEntries = workEntries.map(entry => 
+			entry.id === review.workEntryId 
+				? { ...entry, status: action === 'approve' ? 'approved' : 'rejected' }
+				: entry
+		)
+		storage.set('workEntries', updatedEntries)
+
+		// 3. Add to received reviews (Notify submitter)
+		const receivedReviews = storage.get<any[]>('received_reviews') || []
+		const newReceivedReview = {
+			id: `review-${Date.now()}`,
+			workEntryId: review.workEntryId,
+			workTitle: review.workTitle,
+			workDescription: review.workDescription,
+			projectId: review.projectId,
+			projectName: review.projectName,
+			reviewType: action === 'approve' ? 'approved' : 'rejected',
+			reviewedBy: 'Current User', // In real app, get from auth context
+			reviewedByDepartment: 'Management',
+			reviewedAt: new Date().toISOString(),
+			reviewComments: comment || (action === 'approve' ? 'Approved.' : 'Rejected.'),
+			isRead: false
+		}
+		storage.set('received_reviews', [newReceivedReview, ...receivedReviews])
+
+		// 4. Send Message
+		const messages = storage.get<any[]>('messages') || []
+		messages.unshift({
+			id: `msg-review-${Date.now()}`,
+			type: 'notification',
+			priority: 'normal',
+			subject: `Work Review: ${action === 'approve' ? 'Approved' : 'Rejected'} - ${review.workTitle}`,
+			from: 'Current User',
+			fromDepartment: 'Management',
+			preview: `Your work "${review.workTitle}" was ${action === 'approve' ? 'approved' : 'rejected'}`,
+			content: `Your work submission "${review.workTitle}" has been ${action === 'approve' ? 'approved' : 'rejected'}.\n\n**Comments:**\n${comment}`,
+			timestamp: new Date(),
+			isRead: false,
+			recipientId: review.submittedById,
+			relatedType: 'work',
+			relatedId: review.workEntryId
+		})
+		storage.set('messages', messages)
+
+		toast.success(`Work ${action === 'approve' ? 'Approved' : 'Rejected'}`, {
+			description: `Notification sent to ${review.submittedBy}`
+		})
+	}
+
 	// Filter reviews
 	useEffect(() => {
 		let filtered = reviews
@@ -581,8 +681,93 @@ export default function WorkReviewPage() {
 				icon={MessageSquare}
 			/>
 			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Statistics */}
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+				{/* Tabs */}
+				<div className="flex border-b border-neutral-200 dark:border-neutral-800 mb-6">
+					<button
+						onClick={() => setActiveTab('pending')}
+						className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+							activeTab === 'pending'
+								? 'border-primary text-primary'
+								: 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+						}`}
+					>
+						To Review ({pendingReviews.length})
+					</button>
+					<button
+						onClick={() => setActiveTab('received')}
+						className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+							activeTab === 'received'
+								? 'border-primary text-primary'
+								: 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+						}`}
+					>
+						My Reviews ({reviews.length})
+					</button>
+				</div>
+
+				{/* Pending Reviews (To Review) */}
+				{activeTab === 'pending' && (
+					<div className="space-y-4">
+						{pendingReviews.length === 0 ? (
+							<EmptyState
+								icon={<CheckCircle2 className="h-12 w-12" />}
+								title="All Caught Up!"
+								description="You have no pending reviews."
+							/>
+						) : (
+							pendingReviews.map((review) => (
+								<Card key={review.id}>
+									<CardContent className="p-6">
+										<div className="flex items-start justify-between gap-4">
+											<div className="flex-1">
+												<div className="flex items-center gap-2 mb-2">
+													<span className="text-xs font-medium px-2 py-1 rounded bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 flex items-center gap-1">
+														<FolderKanban className="h-3 w-3" />
+														{review.projectName}
+													</span>
+													<span className="text-xs text-neutral-500">
+														{new Date(review.submittedAt).toLocaleString()}
+													</span>
+												</div>
+												<h3 className="text-lg font-bold mb-1">{review.workTitle}</h3>
+												<div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+													<User className="h-4 w-4" />
+													<span>{review.submittedBy}</span>
+													{review.submittedByDepartment && (
+														<span className="text-neutral-500">• {review.submittedByDepartment}</span>
+													)}
+												</div>
+												<div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg text-sm">
+													{review.workDescription}
+												</div>
+											</div>
+										</div>
+										<div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex gap-3">
+											<Button 
+												onClick={() => handleReviewAction(review, 'approve', '')}
+												className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+											>
+												<CheckCircle2 className="mr-2 h-4 w-4" /> Approve
+											</Button>
+											<Button 
+												onClick={() => handleReviewAction(review, 'reject', '')}
+												className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+											>
+												<XCircle className="mr-2 h-4 w-4" /> Reject
+											</Button>
+										</div>
+									</CardContent>
+								</Card>
+							))
+						)}
+					</div>
+				)}
+
+				{/* Received Reviews (My Reviews) */}
+				{activeTab === 'received' && (
+					<div className="space-y-4 sm:space-y-6">
+						{/* Statistics */}
 				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 					<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
 						<CardContent className="p-4">
@@ -879,6 +1064,8 @@ export default function WorkReviewPage() {
 								</Card>
 							)
 						})}
+					</div>
+				)}
 					</div>
 				)}
 			</div>

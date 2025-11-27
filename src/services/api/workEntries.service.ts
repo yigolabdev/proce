@@ -8,6 +8,7 @@
 import { storage } from '../../utils/storage'
 import type { WorkEntry } from '../../types/common.types'
 import type { ApiResponse, PaginatedResponse } from './config'
+import { parseWorkEntriesFromStorage, serializeWorkEntryForStorage } from '../../utils/mappers'
 
 /**
  * Work Entry Filters
@@ -39,7 +40,8 @@ class WorkEntriesService {
 		// TODO: Replace with API call
 		// return apiClient.get<WorkEntry[]>('/work-entries', { params: filters })
 		
-		let entries = storage.get<WorkEntry[]>(this.STORAGE_KEY) || []
+		const rawEntries = storage.get<any[]>(this.STORAGE_KEY) || []
+		let entries = parseWorkEntriesFromStorage(rawEntries)
 		
 		// Apply filters
 		if (filters) {
@@ -119,15 +121,18 @@ class WorkEntriesService {
 		// TODO: Replace with API call
 		// return apiClient.post<WorkEntry>('/work-entries', entry)
 		
-		const entries = storage.get<WorkEntry[]>(this.STORAGE_KEY) || []
+		const rawEntries = storage.get<any[]>(this.STORAGE_KEY) || []
 		const newEntry: WorkEntry = {
 			...entry,
 			id: `work-${Date.now()}`,
 			date: new Date(),
+			createdAt: new Date(),
+			updatedAt: new Date(),
 		}
 		
-		entries.unshift(newEntry)
-		storage.set(this.STORAGE_KEY, entries)
+		const serialized = serializeWorkEntryForStorage(newEntry)
+		rawEntries.unshift(serialized)
+		storage.set(this.STORAGE_KEY, rawEntries)
 		
 		return {
 			data: newEntry,

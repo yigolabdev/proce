@@ -4,18 +4,8 @@
  */
 
 import { storage } from '../../../utils/storage'
-
-interface Project {
-	id: string
-	name: string
-	description: string
-	departments: string[]
-	objectives: string[]
-	startDate: Date
-	endDate: Date
-	status: string
-	members?: any[]
-}
+import type { Project } from '../../../types/common.types'
+import { toDate } from '../../../utils/dateUtils'
 
 interface TaskRecommendation {
 	id: string
@@ -69,15 +59,17 @@ function calculateMilestoneDate(startDate: Date, endDate: Date, percentage: numb
  */
 export function generateAITasksForNewProject(project: Project): TaskRecommendation[] {
 	const tasks: TaskRecommendation[] = []
-	const projectDuration = calculateProjectDuration(project.startDate, project.endDate)
+	const startDate = toDate(project.startDate)!
+	const endDate = toDate(project.endDate)!
+	const projectDuration = calculateProjectDuration(startDate, endDate)
 	const now = new Date()
 	
 	// 프로젝트 시작까지 남은 일수
-	const daysUntilStart = Math.ceil((project.startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+	const daysUntilStart = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 	
 	// 1. 프로젝트 킥오프 미팅 (프로젝트 시작 3일 전 또는 즉시)
 	const kickoffDeadline = daysUntilStart > 3 
-		? new Date(project.startDate.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString()
+		? new Date(startDate.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString()
 		: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString()
 	
 	tasks.push({
@@ -134,7 +126,7 @@ export function generateAITasksForNewProject(project: Project): TaskRecommendati
 		description: `Develop comprehensive project plan including scope, timeline, resource allocation, and risk management strategy for ${project.name}.`,
 		priority: 'high',
 		category: 'Documentation',
-		deadline: calculateMilestoneDate(project.startDate, project.endDate, 0.1),
+		deadline: calculateMilestoneDate(startDate, endDate, 0.1),
 		dataSource: 'AI Project Analysis',
 		status: 'pending',
 		projectId: project.id,
@@ -183,7 +175,7 @@ export function generateAITasksForNewProject(project: Project): TaskRecommendati
 			description: `Identify and assign appropriate team members with required skills for ${project.name}. Ensure balanced workload distribution.`,
 			priority: 'high',
 			category: 'Resource Management',
-			deadline: calculateMilestoneDate(project.startDate, project.endDate, 0.15),
+			deadline: calculateMilestoneDate(startDate, endDate, 0.15),
 			dataSource: 'AI Project Analysis',
 			status: 'pending',
 			projectId: project.id,
@@ -233,7 +225,7 @@ export function generateAITasksForNewProject(project: Project): TaskRecommendati
 			description: `Identify potential risks, assess their impact and probability, and develop mitigation strategies for ${project.name}.`,
 			priority: 'medium',
 			category: 'Risk Management',
-			deadline: calculateMilestoneDate(project.startDate, project.endDate, 0.2),
+			deadline: calculateMilestoneDate(startDate, endDate, 0.2),
 			dataSource: 'AI Project Analysis',
 			status: 'pending',
 			projectId: project.id,
@@ -283,7 +275,7 @@ export function generateAITasksForNewProject(project: Project): TaskRecommendati
 			description: `Schedule comprehensive mid-project review to assess progress, adjust plans, and address any issues for ${project.name}.`,
 			priority: 'medium',
 			category: 'Project Review',
-			deadline: calculateMilestoneDate(project.startDate, project.endDate, 0.5),
+			deadline: calculateMilestoneDate(startDate, endDate, 0.5),
 			dataSource: 'AI Project Analysis',
 			status: 'pending',
 			projectId: project.id,
@@ -332,7 +324,7 @@ export function generateAITasksForNewProject(project: Project): TaskRecommendati
 		description: `Ensure all deliverables are complete, conduct final review, and prepare for project handoff and closure activities.`,
 		priority: 'medium',
 		category: 'Project Closure',
-		deadline: calculateMilestoneDate(project.startDate, project.endDate, 0.9),
+		deadline: calculateMilestoneDate(startDate, endDate, 0.9),
 		dataSource: 'AI Project Analysis',
 		status: 'pending',
 		projectId: project.id,

@@ -25,16 +25,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
-import type { Project } from '../_types/projects.types'
-
-interface WorkEntry {
-	id: string
-	title: string
-	date: Date
-	projectId?: string
-	content?: string
-	hours?: number
-}
+import type { Project, WorkEntry } from '../../../types/common.types'
+import { parseProjectsFromStorage, parseWorkEntriesFromStorage } from '../../../utils/mappers'
 
 export default function ProjectDetailPage() {
 	const { id } = useParams<{ id: string }>()
@@ -51,7 +43,8 @@ export default function ProjectDetailPage() {
 		setLoading(true)
 		try {
 			// Load project
-			const projects = storage.get<Project[]>('projects') || []
+			const projectsData = storage.get<any[]>('projects') || []
+			const projects = parseProjectsFromStorage(projectsData)
 			const foundProject = projects.find(p => p.id === id)
 			
 			if (!foundProject) {
@@ -63,7 +56,8 @@ export default function ProjectDetailPage() {
 			setProject(foundProject)
 
 			// Load related work entries
-			const allWorkEntries = storage.get<WorkEntry[]>('work_entries') || []
+			const workEntriesData = storage.get<any[]>('workEntries') || []
+			const allWorkEntries = parseWorkEntriesFromStorage(workEntriesData)
 			const projectWorkEntries = allWorkEntries
 				.filter(entry => entry.projectId === id)
 				.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -218,7 +212,11 @@ export default function ProjectDetailPage() {
 								<div>
 									<p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Total Hours</p>
 									<p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-										{workEntries.reduce((sum, entry) => sum + (entry.hours || 0), 0)}h
+										{workEntries.reduce((sum, entry) => {
+											if (!entry.duration) return sum
+											const match = entry.duration.match(/(\d+\.?\d*)/)
+											return sum + (match ? parseFloat(match[1]) : 0)
+										}, 0).toFixed(1)}h
 									</p>
 								</div>
 							</div>
@@ -370,9 +368,9 @@ export default function ProjectDetailPage() {
 														<h4 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
 															{entry.title}
 														</h4>
-														{entry.content && (
+														{entry.description && (
 															<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-																{entry.content}
+																{entry.description}
 															</p>
 														)}
 														<div className="flex items-center gap-4 mt-2 text-xs text-neutral-500">
@@ -380,10 +378,10 @@ export default function ProjectDetailPage() {
 																<Calendar className="h-3 w-3" />
 																{new Date(entry.date).toLocaleDateString()}
 															</div>
-															{entry.hours && (
+															{entry.duration && (
 																<div className="flex items-center gap-1">
 																	<Clock className="h-3 w-3" />
-																	{entry.hours}h
+																	{entry.duration}
 																</div>
 															)}
 														</div>

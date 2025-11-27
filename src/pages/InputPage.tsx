@@ -36,83 +36,12 @@ import { toast } from 'sonner'
 import { initializeMockDrafts } from './_mocks/workInputDrafts'
 import { initializeMockWorkCategories } from './_mocks/workCategories'
 import { initializeMockTeamMembers } from './_mocks/teamMembers'
-
-// Local interfaces
-interface UploadedFile {
-	id: string
-	name: string
-	size: number
-	type: string
-	url?: string
-	uploadedAt?: string
-	createdAt?: string
-}
-
-interface LinkedResource {
-	id: string
-	title: string
-	url: string
-	addedAt: string
-}
-
-// OKR Interfaces (from OKR page)
-interface KeyResult {
-	id: string
-	description: string
-	target: number
-	current: number
-	unit: string
-	owner: string
-}
-
-interface Objective {
-	id: string
-	title: string
-	description: string
-	quarter: string
-	owner: string
-	team: string
-	status: 'on-track' | 'at-risk' | 'behind' | 'completed'
-	keyResults: KeyResult[]
-	startDate: string
-	endDate: string
-}
-
-// Local WorkEntry interface
-export interface WorkEntry {
-	id: string
-	title: string
-	description: string
-	category: string
-	projectId?: string
-	projectName?: string
-	objectiveId?: string
-	keyResultId?: string
-	keyResultProgress?: number
-	tags: string[]
-	date: Date
-	duration: string
-	files: UploadedFile[]
-	links: LinkedResource[]
-	status: 'draft' | 'submitted'
-	isConfidential: boolean
-	
-	// User information
-	submittedBy?: string
-	submittedById?: string
-	department?: string
-	
-	// Task relation
-	taskId?: string
-	
-	// AI Analysis (optional)
-	complexity?: 'low' | 'medium' | 'high'
-	estimatedDuration?: string
-	actualDuration?: string
-	requiredSkills?: string[]
-	collaborators?: string[]
-	blockers?: string[]
-}
+import type { 
+	WorkEntry,
+	FileAttachment,
+	LinkResource,
+	Objective 
+} from '../types/common.types'
 
 export interface DraftData {
 	id: string
@@ -124,10 +53,11 @@ export interface DraftData {
 	keyResultId?: string
 	keyResultProgress?: number
 	tags: string[]
-	files: UploadedFile[]
-	links: LinkedResource[]
+	files: FileAttachment[]
+	links: LinkResource[]
 	isConfidential: boolean
 	savedAt: Date
+	comment?: string
 }
 
 interface Project {
@@ -176,11 +106,9 @@ export default function InputPage() {
 	const [keyResultProgress, setKeyResultProgress] = useState<string>('')
 	const [tags, setTags] = useState<string[]>([])
 	const [tagInput, setTagInput] = useState('')
-	const [duration, setDuration] = useState('')
-	const [showCustomDuration, setShowCustomDuration] = useState(false)
-	const [customDuration, setCustomDuration] = useState('')
-	const [files, setFiles] = useState<UploadedFile[]>([])
-	const [links, setLinks] = useState<LinkedResource[]>([])
+	const [comment, setComment] = useState('')
+	const [files, setFiles] = useState<FileAttachment[]>([])
+	const [links, setLinks] = useState<LinkResource[]>([])
 	const [linkInput, setLinkInput] = useState('')
 	const [isConfidential, setIsConfidential] = useState(false)
 	
@@ -403,7 +331,7 @@ export default function InputPage() {
 					setDescription(data.description)
 					setCategory(data.category || '')
 					setSelectedProject(data.projectId || '')
-					setDuration(data.duration || '')
+					setComment(data.comment || '')
 					setTags(data.tags || [])
 					setFiles(data.files || [])
 					setLinks(data.links || [])
@@ -533,13 +461,13 @@ export default function InputPage() {
 	// File handling
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFiles = Array.from(e.target.files || [])
-		const newFiles: UploadedFile[] = selectedFiles.map((file) => ({
+		const newFiles: FileAttachment[] = selectedFiles.map((file) => ({
 			id: `file-${Date.now()}-${Math.random()}`,
 			name: file.name,
 			size: file.size,
 			type: file.type,
 			url: URL.createObjectURL(file),
-			createdAt: new Date().toISOString(),
+			uploadedAt: new Date(),
 		}))
 		setFiles([...files, ...newFiles])
 		toast.success(`${selectedFiles.length} file(s) uploaded`)
@@ -568,13 +496,13 @@ export default function InputPage() {
 		setIsDragging(false)
 
 		const droppedFiles = Array.from(e.dataTransfer.files)
-		const newFiles: UploadedFile[] = droppedFiles.map((file) => ({
+		const newFiles: FileAttachment[] = droppedFiles.map((file) => ({
 			id: `file-${Date.now()}-${Math.random()}`,
 			name: file.name,
 			size: file.size,
 			type: file.type,
 			url: URL.createObjectURL(file),
-			createdAt: new Date().toISOString(),
+			uploadedAt: new Date(),
 		}))
 		setFiles([...files, ...newFiles])
 		toast.success(`${droppedFiles.length} file(s) uploaded`)
@@ -584,11 +512,11 @@ export default function InputPage() {
 	const addLink = () => {
 		if (!linkInput.trim()) return
 		
-		const newLink: LinkedResource = {
+		const newLink: LinkResource = {
 			id: `link-${Date.now()}`,
 			title: linkInput.trim(),
 			url: linkInput.trim(),
-			addedAt: new Date().toISOString(),
+			addedAt: new Date(),
 		}
 		setLinks([...links, newLink])
 		setLinkInput('')
@@ -598,18 +526,6 @@ export default function InputPage() {
 	const removeLink = (id: string) => {
 		setLinks(links.filter((l) => l.id !== id))
 		toast.info('Link removed')
-	}
-
-	// Duration handling
-	const handleDurationChange = (value: string) => {
-		if (value === 'custom') {
-			setShowCustomDuration(true)
-			setDuration('')
-		} else {
-			setShowCustomDuration(false)
-			setCustomDuration('')
-			setDuration(value)
-		}
 	}
 
 	// Tag handling
@@ -660,6 +576,7 @@ export default function InputPage() {
 			links,
 			isConfidential,
 			savedAt: new Date(),
+			comment,
 		}
 
 		try {
@@ -712,6 +629,8 @@ export default function InputPage() {
 		setLinks(draft.links || [])
 		setIsConfidential(draft.isConfidential || false)
 		
+		setComment(draft.comment || '')
+		
 		setShowDraftsDialog(false)
 		toast.success('Draft loaded')
 	}
@@ -745,9 +664,7 @@ export default function InputPage() {
 		setSelectedKeyResult('')
 		setKeyResultProgress('')
 		setTags([])
-		setDuration('')
-		setShowCustomDuration(false)
-		setCustomDuration('')
+		setComment('')
 		setFiles([])
 		setLinks([])
 		setIsConfidential(false)
@@ -785,9 +702,6 @@ export default function InputPage() {
 			return
 		}
 
-		// Use custom duration if provided
-		const finalDuration = showCustomDuration ? customDuration : duration
-		
 		// Use custom category if "Other" is selected
 		const finalCategory = showCustomCategory ? customCategory.trim() : category
 		
@@ -795,6 +709,11 @@ export default function InputPage() {
 		let finalDescription = description.trim()
 		if (inputMode === 'task' && selectedTask && progressComment) {
 			finalDescription = `${description}\n\n📊 Progress Update (${taskProgress}%):\n${progressComment}`
+		}
+
+		// Append comment
+		if (comment) {
+			finalDescription = `💬 Comment: ${comment}\n\n${finalDescription}`
 		}
 
 	// Find project name if project is selected
@@ -816,10 +735,9 @@ export default function InputPage() {
 		projectName: projectName,
 		objectiveId: selectedObjective || undefined,
 		keyResultId: selectedKeyResult || undefined,
-		keyResultProgress: keyResultProgress ? parseFloat(keyResultProgress) : undefined,
 		tags,
 		date: new Date(),
-		duration: finalDuration || '1h',
+		duration: '1h',
 		files,
 		links,
 		status: 'submitted',
@@ -935,7 +853,7 @@ export default function InputPage() {
 						from: user?.name || 'Unknown User',
 						fromDepartment: user?.department,
 						preview: `${user?.name} requests your review on "${title}"`,
-						content: `Hi ${reviewer.name},\n\n${user?.name || 'Unknown User'} has requested your review on their work submission.\n\n**Project:** ${projectName}\n**Title:** ${title}\n**Description:**\n${description}\n\n${category ? `**Category:** ${category}\n` : ''}${duration ? `**Duration:** ${finalDuration}\n` : ''}${tags.length > 0 ? `**Tags:** ${tags.join(', ')}\n` : ''}\n\nPlease review and provide feedback at your earliest convenience.\n\n---\nThis is a review request from the Work Input system.`,
+						content: `Hi ${reviewer.name},\n\n${user?.name || 'Unknown User'} has requested your review on their work submission.\n\n**Project:** ${projectName}\n**Title:** ${title}\n**Description:**\n${description}\n\n${category ? `**Category:** ${category}\n` : ''}${tags.length > 0 ? `**Tags:** ${tags.join(', ')}\n` : ''}\n\nPlease review and provide feedback at your earliest convenience.\n\n---\nThis is a review request from the Work Input system.`,
 						timestamp: new Date(),
 						isRead: false,
 						isStarred: false,
@@ -1030,7 +948,7 @@ export default function InputPage() {
 	// Calculate progress
 	const requiredFields = [title, description]
 	const finalCategoryValue = showCustomCategory ? customCategory : category
-	const optionalFields = [finalCategoryValue, selectedProject, selectedObjective, duration, tags.length > 0]
+	const optionalFields = [finalCategoryValue, selectedProject, selectedObjective, comment, tags.length > 0]
 	const requiredFieldsFilled = requiredFields.filter(Boolean).length
 	const optionalFieldsFilled = optionalFields.filter(Boolean).length
 	const totalRequiredFields = requiredFields.length
@@ -1503,34 +1421,16 @@ export default function InputPage() {
 
 								<div>
 									<label className="block text-sm font-semibold mb-2">
-										<Clock className="inline h-4 w-4 mr-1" />
-										Duration
+										<Info className="inline h-4 w-4 mr-1" />
+										One-line Comment
 									</label>
-									<select
-										value={showCustomDuration ? 'custom' : duration}
-										onChange={(e) => handleDurationChange(e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="">Select duration</option>
-										<option value="15m">15 minutes</option>
-										<option value="30m">30 minutes</option>
-										<option value="1h">1 hour</option>
-										<option value="2h">2 hours</option>
-										<option value="4h">4 hours</option>
-										<option value="1d">1 day</option>
-										<option value="2d">2 days</option>
-										<option value="1w">1 week</option>
-										<option value="custom">Custom (Enter manually)</option>
-									</select>
-									{showCustomDuration && (
-										<Input
-											type="text"
-											placeholder="e.g., 3h 30m, 2.5 hours, 90 minutes"
-											value={customDuration}
-											onChange={(e) => setCustomDuration(e.target.value)}
-											className="mt-2"
-										/>
-									)}
+									<Input
+										type="text"
+										placeholder="Add a quick note (optional)..."
+										value={comment}
+										onChange={(e) => setComment(e.target.value)}
+										className="w-full"
+									/>
 								</div>
 							</div>
 						</CardContent>
