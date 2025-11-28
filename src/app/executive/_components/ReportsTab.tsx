@@ -4,7 +4,7 @@ import { Button } from '../../../components/ui/Button'
 import { Download, FileText, Table, Printer, FileJson, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { exportToCSV, exportToJSON, generatePrintableReport, formatNumber, formatPercentage } from '../_utils/exportUtils'
-import type { DepartmentPerformance, CategoryBreakdown, ProjectAnalytics, OKRAnalytics, ComparisonPeriod } from '../_types/analytics.types'
+import type { DepartmentPerformance, CategoryBreakdown, ProjectAnalytics, ComparisonPeriod } from '../_types/analytics.types'
 import { toast } from 'sonner'
 
 interface ReportsTabProps {
@@ -12,7 +12,6 @@ interface ReportsTabProps {
 	departments: DepartmentPerformance[]
 	categoryBreakdown: CategoryBreakdown[]
 	projects: ProjectAnalytics[]
-	okrs: OKRAnalytics[]
 	comparison: { current: ComparisonPeriod; previous: ComparisonPeriod; changes: Record<string, number> } | null
 }
 
@@ -21,7 +20,6 @@ export default function ReportsTab({
 	departments,
 	categoryBreakdown,
 	projects,
-	okrs,
 	comparison,
 }: ReportsTabProps) {
 	const [exporting, setExporting] = useState(false)
@@ -68,20 +66,20 @@ export default function ReportsTab({
 		toast.success('Project analytics exported successfully')
 	}
 
-	const handleExportOKRs = () => {
-		const data = okrs.map(okr => ({
-			Objective: okr.title,
-			Owner: okr.owner,
-			Team: okr.team,
-			'Progress (%)': okr.progress,
-			Status: okr.status,
-			'Total KRs': okr.keyResultsTotal,
-			'Completed KRs': okr.keyResultsCompleted,
-			'Days Remaining': okr.daysRemaining,
-		}))
-		exportToCSV(data, 'okr-performance')
-		toast.success('OKR performance exported successfully')
-	}
+	// const handleExportOKRs = () => {
+	// 	const data = okrs.map(okr => ({
+	// 		Objective: okr.title,
+	// 		Owner: okr.owner,
+	// 		Team: okr.team,
+	// 		'Progress (%)': okr.progress,
+	// 		Status: okr.status,
+	// 		'Total KRs': okr.keyResultsTotal,
+	// 		'Completed KRs': okr.keyResultsCompleted,
+	// 		'Days Remaining': okr.daysRemaining,
+	// 	}))
+	// 	exportToCSV(data, 'okr-performance')
+	// 	toast.success('OKR performance exported successfully')
+	// }
 
 	const handleExportComparison = () => {
 		if (!comparison) {
@@ -107,12 +105,12 @@ export default function ReportsTab({
 				Previous: comparison.previous.metrics.projectsActive,
 				'Change (%)': formatPercentage(comparison.changes.projectsActive),
 			},
-			{
-				Metric: 'OKR Progress',
-				Current: formatPercentage(comparison.current.metrics.okrProgress),
-				Previous: formatPercentage(comparison.previous.metrics.okrProgress),
-				'Change (pp)': formatNumber(comparison.changes.okrProgress),
-			},
+			// {
+			// 	Metric: 'OKR Progress',
+			// 	Current: formatPercentage(comparison.current.metrics.okrProgress),
+			// 	Previous: formatPercentage(comparison.previous.metrics.okrProgress),
+			// 	'Change (pp)': formatNumber(comparison.changes.okrProgress),
+			// },
 		]
 		exportToCSV(data, 'period-comparison')
 		toast.success('Period comparison exported successfully')
@@ -131,7 +129,6 @@ export default function ReportsTab({
 			departments,
 			categoryBreakdown,
 			projects,
-			okrs,
 			comparison,
 		}
 		exportToJSON(allData, 'full-analytics-report')
@@ -235,8 +232,8 @@ export default function ReportsTab({
 			title: 'Department Performance',
 			description: 'Detailed department metrics and rankings',
 			icon: Table,
-			color: 'text-blue-600',
-			bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+			color: 'text-blue-400',
+			bgColor: 'bg-blue-500/10 border border-blue-500/20',
 			action: handleExportDepartments,
 			dataCount: departments.length,
 		},
@@ -244,8 +241,8 @@ export default function ReportsTab({
 			title: 'Category Breakdown',
 			description: 'Work distribution by category',
 			icon: FileText,
-			color: 'text-green-600',
-			bgColor: 'bg-green-50 dark:bg-green-900/20',
+			color: 'text-green-400',
+			bgColor: 'bg-green-500/10 border border-green-500/20',
 			action: handleExportCategories,
 			dataCount: categoryBreakdown.length,
 		},
@@ -253,26 +250,26 @@ export default function ReportsTab({
 			title: 'Project Analytics',
 			description: 'Project status and risk assessment',
 			icon: FileText,
-			color: 'text-purple-600',
-			bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+			color: 'text-purple-400',
+			bgColor: 'bg-purple-500/10 border border-purple-500/20',
 			action: handleExportProjects,
 			dataCount: projects.length,
 		},
-		{
-			title: 'OKR Performance',
-			description: 'Objectives and key results tracking',
-			icon: FileText,
-			color: 'text-orange-600',
-			bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-			action: handleExportOKRs,
-			dataCount: okrs.length,
-		},
+		// {
+		// 	title: 'OKR Performance',
+		// 	description: 'Objectives and key results tracking',
+		// 	icon: FileText,
+		// 	color: 'text-orange-400',
+		// 	bgColor: 'bg-orange-500/10 border border-orange-500/20',
+		// 	action: handleExportOKRs,
+		// 	dataCount: okrs.length,
+		// },
 		{
 			title: 'Period Comparison',
 			description: 'Current vs previous period analysis',
 			icon: FileText,
-			color: 'text-pink-600',
-			bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+			color: 'text-pink-400',
+			bgColor: 'bg-pink-500/10 border border-pink-500/20',
 			action: handleExportComparison,
 			dataCount: comparison ? 4 : 0,
 		},
@@ -281,13 +278,13 @@ export default function ReportsTab({
 	return (
 		<div className="space-y-6">
 			{/* Export Options */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<Download className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<Download className="h-5 w-5 text-orange-500" />
 						Export Reports
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Download analytics data in various formats
 					</p>
 				</CardHeader>
@@ -296,15 +293,15 @@ export default function ReportsTab({
 						{reports.map((report, index) => (
 							<div
 								key={index}
-								className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+								className="p-4 rounded-lg border border-border-dark hover:bg-neutral-800/50 transition-colors"
 							>
 								<div className="flex items-start gap-4">
 									<div className={`p-3 rounded-lg ${report.bgColor}`}>
 										<report.icon className={`h-6 w-6 ${report.color}`} />
 									</div>
 									<div className="flex-1">
-										<h4 className="font-semibold mb-1">{report.title}</h4>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+										<h4 className="font-semibold mb-1 text-white">{report.title}</h4>
+										<p className="text-sm text-neutral-400 mb-3">
 											{report.description}
 										</p>
 										<div className="flex items-center justify-between">
@@ -315,7 +312,7 @@ export default function ReportsTab({
 												onClick={report.action}
 												size="sm"
 												variant="outline"
-												className="flex items-center gap-2"
+												className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-neutral-300 hover:text-white"
 											>
 												<Download className="h-4 w-4" />
 												Export CSV
@@ -330,27 +327,27 @@ export default function ReportsTab({
 			</Card>
 
 			{/* Full Report Export */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<FileJson className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<FileJson className="h-5 w-5 text-orange-500" />
 						Full Report Export
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Export complete analytics data for external processing
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
-					<div className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
+					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-[#1a1a1a]">
 						<div>
-							<h4 className="font-semibold mb-1">Complete Analytics Report</h4>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400">
+							<h4 className="font-semibold mb-1 text-white">Complete Analytics Report</h4>
+							<p className="text-sm text-neutral-400">
 								Includes all departments, categories, projects, OKRs, and comparisons in JSON format
 							</p>
 						</div>
 						<Button
 							onClick={handleExportFullReport}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none"
 						>
 							<FileJson className="h-4 w-4" />
 							Export JSON
@@ -360,28 +357,28 @@ export default function ReportsTab({
 			</Card>
 
 			{/* PDF Report */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<Printer className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<Printer className="h-5 w-5 text-orange-500" />
 						Printable Report
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Generate a formatted report for printing or PDF export
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
-					<div className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
+					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-[#1a1a1a]">
 						<div>
-							<h4 className="font-semibold mb-1">Executive Report</h4>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400">
+							<h4 className="font-semibold mb-1 text-white">Executive Report</h4>
+							<p className="text-sm text-neutral-400">
 								Professional formatted report with summary, tables, and insights
 							</p>
 						</div>
 						<Button
 							onClick={handleGeneratePDF}
 							disabled={exporting}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none"
 						>
 							<Printer className="h-4 w-4" />
 							{exporting ? 'Generating...' : 'Generate PDF'}
@@ -391,29 +388,29 @@ export default function ReportsTab({
 			</Card>
 
 			{/* Export History/Tips */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<CheckCircle2 className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<CheckCircle2 className="h-5 w-5 text-orange-500" />
 						Export Tips
 					</h3>
 				</CardHeader>
 				<CardContent className="p-6">
-					<div className="space-y-2 text-sm">
+					<div className="space-y-2 text-sm text-neutral-400">
 						<p className="flex items-start gap-2">
-							<span className="text-blue-600">💡</span>
+							<span className="text-blue-400">💡</span>
 							<span>CSV files can be opened in Excel or Google Sheets for further analysis</span>
 						</p>
 						<p className="flex items-start gap-2">
-							<span className="text-blue-600">💡</span>
+							<span className="text-blue-400">💡</span>
 							<span>JSON format preserves all data structure and is ideal for integration with other systems</span>
 						</p>
 						<p className="flex items-start gap-2">
-							<span className="text-blue-600">💡</span>
+							<span className="text-blue-400">💡</span>
 							<span>Use &quot;Print &gt; Save as PDF&quot; in the browser to create PDF reports from the printable version</span>
 						</p>
 						<p className="flex items-start gap-2">
-							<span className="text-blue-600">💡</span>
+							<span className="text-blue-400">💡</span>
 							<span>All exports include the current date range filter applied in the dashboard</span>
 						</p>
 					</div>

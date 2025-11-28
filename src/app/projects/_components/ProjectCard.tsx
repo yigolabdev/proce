@@ -54,27 +54,27 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 		const statusConfig = {
 			completed: {
 				icon: CheckCircle2,
-				className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+				className: 'bg-green-500/10 text-green-400 border border-green-500/20',
 				label: 'Completed',
 			},
 			active: {
 				icon: Clock,
-				className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+				className: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
 				label: 'Active',
 			},
 			planning: {
 				icon: AlertCircle,
-				className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+				className: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
 				label: 'Planning',
 			},
 			'on-hold': {
 				icon: AlertCircle,
-				className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+				className: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
 				label: 'On Hold',
 			},
 			cancelled: {
 				icon: AlertCircle,
-				className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+				className: 'bg-red-500/10 text-red-400 border border-red-500/20',
 				label: 'Cancelled',
 			},
 		}
@@ -83,7 +83,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 		const Icon = config.icon
 
 		return (
-			<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
+			<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${config.className}`}>
 				<Icon className="h-3 w-3" />
 				{config.label}
 			</div>
@@ -103,7 +103,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 				{project.departments.map((dept: string, idx: number) => (
 					<div
 						key={idx}
-						className="inline-flex items-center gap-1.5 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-lg text-xs"
+						className="inline-flex items-center gap-1.5 px-2 py-1 bg-surface-dark border border-border-dark text-neutral-400 rounded-lg text-xs"
 					>
 						<Building2 className="h-3 w-3" />
 						{dept}
@@ -114,15 +114,15 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 	}
 
 	return (
-		<Card className="hover:shadow-lg transition-shadow cursor-pointer group">
+		<Card className="hover:shadow-lg transition-all cursor-pointer group bg-surface-dark border-border-dark hover:border-neutral-700">
 			<CardHeader>
 				<div className="flex items-start justify-between gap-3">
 					<div className="flex-1 min-w-0">
-						<h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors truncate">
+						<h3 className="text-lg font-bold mb-2 text-white group-hover:text-orange-500 transition-colors truncate">
 							{project.name}
 						</h3>
 						{project.description && (
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+							<p className="text-sm text-neutral-400 line-clamp-2">
 								{project.description}
 							</p>
 						)}
@@ -135,12 +135,12 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 					{/* Progress Bar */}
 					<div>
 						<div className="flex items-center justify-between text-sm mb-2">
-							<span className="text-neutral-600 dark:text-neutral-400">Progress</span>
-							<span className="font-semibold">{project.progress}%</span>
+							<span className="text-neutral-400">Progress</span>
+							<span className="font-semibold text-white">{project.progress}%</span>
 						</div>
-						<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-2">
+						<div className="w-full bg-neutral-800 rounded-full h-2">
 							<div
-								className="bg-primary h-2 rounded-full transition-all duration-300"
+								className="bg-orange-500 h-2 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(249,115,22,0.3)]"
 								style={{ width: `${project.progress}%` }}
 							/>
 						</div>
@@ -149,22 +149,22 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 					{/* Info Grid */}
 					<div className="grid grid-cols-2 gap-3 text-sm">
 						{/* Start Date */}
-						<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+						<div className="flex items-center gap-2 text-neutral-400">
 							<Calendar className="h-4 w-4 shrink-0" />
 							<div>
-								<p className="text-xs text-neutral-500 dark:text-neutral-500">Start</p>
-								<p className="font-medium text-neutral-900 dark:text-neutral-100">
+								<p className="text-xs text-neutral-500">Start</p>
+								<p className="font-medium text-neutral-200">
 									{formatDate(project.startDate)}
 								</p>
 							</div>
 						</div>
 
 						{/* End Date */}
-						<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+						<div className="flex items-center gap-2 text-neutral-400">
 							<Calendar className="h-4 w-4 shrink-0" />
 							<div>
-								<p className="text-xs text-neutral-500 dark:text-neutral-500">End</p>
-								<p className="font-medium text-neutral-900 dark:text-neutral-100">
+								<p className="text-xs text-neutral-500">End</p>
+								<p className="font-medium text-neutral-200">
 									{formatDate(project.endDate)}
 								</p>
 							</div>
@@ -180,15 +180,15 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 
 					{/* Latest Work Entry */}
 					{latestWorkEntry && (
-						<div className="p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+						<div className="p-3 bg-neutral-900/50 border border-border-dark rounded-lg">
 							<div className="flex items-start gap-2">
-								<FileText className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+								<FileText className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
 								<div className="flex-1 min-w-0">
-									<p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-0.5">Latest Update</p>
-									<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+									<p className="text-xs text-neutral-500 font-medium mb-0.5">Latest Update</p>
+									<p className="text-sm font-medium text-neutral-200 truncate">
 										{latestWorkEntry.title}
 									</p>
-									<div className="flex items-center gap-2 mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+									<div className="flex items-center gap-2 mt-1 text-xs text-neutral-400">
 										{latestWorkEntry.submittedBy && (
 											<span className="flex items-center gap-1">
 												<UserIcon className="h-3 w-3" />
@@ -206,8 +206,8 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 					)}
 
 					{/* Bottom Info */}
-					<div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-800">
-						<div className="flex items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
+					<div className="flex items-center justify-between pt-3 border-t border-border-dark">
+						<div className="flex items-center gap-4 text-xs text-neutral-400">
 					{project.members.length > 0 && (
 						<div className="flex items-center gap-1.5">
 							<Users className="h-4 w-4" />
@@ -232,7 +232,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 						variant="outline"
 						size="sm"
 						onClick={() => navigate(`/app/projects/${project.id}`)}
-						className="group-hover:bg-primary group-hover:text-white transition-colors"
+						className="border-border-dark hover:bg-border-dark text-neutral-300 hover:text-white transition-colors"
 					>
 						<span>View Details</span>
 						<ArrowRight className="h-4 w-4 ml-1" />

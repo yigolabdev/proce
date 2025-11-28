@@ -15,8 +15,6 @@ import {
 	Building2,
 	UserCircle2,
 } from 'lucide-react'
-import DevMemo from '../../components/dev/DevMemo'
-import { DEV_MEMOS } from '../../constants/devMemos'
 
 type ViewMode = 'overview' | 'departments' | 'individuals'
 
@@ -186,11 +184,7 @@ export default function AnalyticsPage() {
 	const totalOverdue = employees.reduce((sum, e) => sum + e.tasks.overdue, 0)
 
 	return (
-		<>
-			{/* Developer Memo */}
-			<DevMemo content={DEV_MEMOS.ANALYTICS} />
-			
-			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
 			{/* Header */}
 			<PageHeader
 				title="성과 분석"
@@ -724,6 +718,5 @@ export default function AnalyticsPage() {
 			)}
 		</div>
 		</div>
-		</>
 	)
 }

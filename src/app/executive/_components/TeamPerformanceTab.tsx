@@ -1,53 +1,38 @@
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Building2, TrendingUp, TrendingDown, Minus, Award, Target, Users, FolderKanban } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import type { DepartmentPerformance, ProjectAnalytics, OKRAnalytics } from '../_types/analytics.types'
+import type { DepartmentPerformance, ProjectAnalytics } from '../_types/analytics.types'
 
 interface TeamPerformanceTabProps {
 	departments: DepartmentPerformance[]
 	projects: ProjectAnalytics[]
-	okrs: OKRAnalytics[]
 }
 
-export default function TeamPerformanceTab({ departments, projects, okrs }: TeamPerformanceTabProps) {
+export default function TeamPerformanceTab({ departments, projects }: TeamPerformanceTabProps) {
 	const getTrendIcon = (trend: string) => {
 		switch (trend) {
-			case 'up': return <TrendingUp className="h-4 w-4 text-green-600" />
-			case 'down': return <TrendingDown className="h-4 w-4 text-red-600" />
-			default: return <Minus className="h-4 w-4 text-gray-600" />
+			case 'up': return <TrendingUp className="h-4 w-4 text-green-400" />
+			case 'down': return <TrendingDown className="h-4 w-4 text-red-400" />
+			default: return <Minus className="h-4 w-4 text-neutral-400" />
 		}
 	}
 
 	const getRankBadge = (rank: number) => {
-		if (rank === 1) return <span className="text-yellow-600">🥇</span>
-		if (rank === 2) return <span className="text-gray-400">🥈</span>
-		if (rank === 3) return <span className="text-orange-600">🥉</span>
-		return <span className="text-neutral-600">#{rank}</span>
+		if (rank === 1) return <span className="text-yellow-500">🥇</span>
+		if (rank === 2) return <span className="text-neutral-400">🥈</span>
+		if (rank === 3) return <span className="text-orange-500">🥉</span>
+		return <span className="text-neutral-500">#{rank}</span>
 	}
 
 	const getRiskBadge = (risk: string) => {
 		switch (risk) {
 			case 'high':
-				return <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High Risk</span>
+				return <span className="px-2 py-1 text-xs rounded-full bg-red-500/10 text-red-400 border border-red-500/20">High Risk</span>
 			case 'medium':
-				return <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">Medium Risk</span>
+				return <span className="px-2 py-1 text-xs rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Medium Risk</span>
 			default:
-				return <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low Risk</span>
+				return <span className="px-2 py-1 text-xs rounded-full bg-green-500/10 text-green-400 border border-green-500/20">Low Risk</span>
 		}
-	}
-
-	const getOKRStatusBadge = (status: string) => {
-		const styles = {
-			'on-track': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-			'at-risk': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-			'behind': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-			'completed': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-		}
-		return (
-			<span className={`px-2 py-1 text-xs rounded-full ${styles[status as keyof typeof styles] || styles['on-track']}`}>
-				{status.replace('-', ' ').toUpperCase()}
-			</span>
-		)
 	}
 
 	// Department chart data
@@ -60,36 +45,38 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 	return (
 		<div className="space-y-6">
 			{/* Department Overview */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<Building2 className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<Building2 className="h-5 w-5 text-orange-500" />
 						Department Performance
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Comparative analysis across departments
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart data={deptChartData}>
-							<CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+							<CartesianGrid strokeDasharray="3 3" opacity={0.1} stroke="#525252" />
 							<XAxis
 								dataKey="name"
-								tick={{ fontSize: 11 }}
+								tick={{ fontSize: 11, fill: '#a3a3a3' }}
 								angle={-45}
 								textAnchor="end"
 								height={80}
+								stroke="#525252"
 							/>
-							<YAxis tick={{ fontSize: 11 }} />
+							<YAxis tick={{ fontSize: 11, fill: '#a3a3a3' }} stroke="#525252" />
 							<Tooltip
 								contentStyle={{
-									backgroundColor: 'rgba(255, 255, 255, 0.95)',
-									border: '1px solid #e5e7eb',
+									backgroundColor: '#1a1a1a',
+									border: '1px solid #262626',
 									borderRadius: '8px',
+									color: '#fff',
 								}}
 							/>
-							<Bar dataKey="entries" fill="#3b82f6" name="Work Entries" radius={[4, 4, 0, 0]} />
+							<Bar dataKey="entries" fill="#f97316" name="Work Entries" radius={[4, 4, 0, 0]} />
 							<Bar dataKey="hours" fill="#8b5cf6" name="Total Hours" radius={[4, 4, 0, 0]} />
 						</BarChart>
 					</ResponsiveContainer>
@@ -97,36 +84,36 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 			</Card>
 
 			{/* Department Ranking Table */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<Award className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<Award className="h-5 w-5 text-orange-500" />
 						Department Rankings
 					</h3>
 				</CardHeader>
 				<CardContent className="p-6">
 					<div className="overflow-x-auto">
-						<table className="w-full">
+						<table className="w-full text-neutral-200">
 							<thead>
-								<tr className="border-b border-neutral-200 dark:border-neutral-800">
-									<th className="text-left py-3 px-4 text-sm font-semibold">Rank</th>
-									<th className="text-left py-3 px-4 text-sm font-semibold">Department</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Entries</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Hours</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Projects</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">OKR Rate</th>
-									<th className="text-center py-3 px-4 text-sm font-semibold">Trend</th>
+								<tr className="border-b border-border-dark">
+									<th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Rank</th>
+									<th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Department</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Entries</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Hours</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Projects</th>
+									{/* <th className="text-right py-3 px-4 text-sm font-semibold">OKR Rate</th> */}
+									<th className="text-center py-3 px-4 text-sm font-semibold text-neutral-400">Trend</th>
 								</tr>
 							</thead>
 							<tbody>
 								{departments.map((dept) => (
-									<tr key={dept.department} className="border-b border-neutral-100 dark:border-neutral-800">
+									<tr key={dept.department} className="border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
 										<td className="py-3 px-4 text-lg">{getRankBadge(dept.rank)}</td>
 										<td className="py-3 px-4 font-medium">{dept.department}</td>
 										<td className="text-right py-3 px-4">{dept.metrics.totalWorkEntries}</td>
 										<td className="text-right py-3 px-4">{dept.metrics.totalHours.toFixed(1)}h</td>
 										<td className="text-right py-3 px-4">{dept.metrics.projectsCount}</td>
-										<td className="text-right py-3 px-4">{dept.metrics.okrCompletionRate.toFixed(0)}%</td>
+										{/* <td className="text-right py-3 px-4">{dept.metrics.okrCompletionRate.toFixed(0)}%</td> */}
 										<td className="text-center py-3 px-4">{getTrendIcon(dept.trend)}</td>
 									</tr>
 								))}
@@ -137,13 +124,13 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 			</Card>
 
 			{/* Project Status */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<FolderKanban className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<FolderKanban className="h-5 w-5 text-orange-500" />
 						Project Analytics
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Current project status and risk assessment
 					</p>
 				</CardHeader>
@@ -152,34 +139,34 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 						{projects.slice(0, 10).map((project) => (
 							<div
 								key={project.projectId}
-								className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+								className="p-4 rounded-lg border border-border-dark hover:bg-neutral-800/50 transition-colors"
 							>
 								<div className="flex items-start justify-between mb-2">
 									<div className="flex-1">
-										<h4 className="font-semibold">{project.projectName}</h4>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										<h4 className="font-semibold text-white">{project.projectName}</h4>
+										<p className="text-sm text-neutral-400">
 											{project.department} • {project.teamSize} members
 										</p>
 									</div>
 									{getRiskBadge(project.risk)}
 								</div>
 								<div className="flex items-center gap-4 text-sm">
-									<div className="flex items-center gap-1">
+									<div className="flex items-center gap-1 text-neutral-400">
 										<Target className="h-4 w-4 text-neutral-500" />
 										<span>{project.progress}% complete</span>
 									</div>
-									<div className="flex items-center gap-1">
+									<div className="flex items-center gap-1 text-neutral-400">
 										<Users className="h-4 w-4 text-neutral-500" />
 										<span>{project.workEntriesCount} entries</span>
 									</div>
-									<div className="text-neutral-600 dark:text-neutral-400">
+									<div className="text-neutral-400">
 										{project.daysRemaining} days remaining
 									</div>
 								</div>
 								<div className="mt-2">
-									<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-2">
+									<div className="w-full bg-neutral-800 rounded-full h-2">
 										<div
-											className="h-2 rounded-full bg-blue-600"
+											className="h-2 rounded-full bg-orange-500"
 											style={{ width: `${project.progress}%` }}
 										/>
 									</div>
@@ -191,7 +178,7 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 			</Card>
 
 			{/* OKR Status */}
-			<Card>
+			{/* <Card>
 				<CardHeader>
 					<h3 className="font-bold flex items-center gap-2">
 						<Target className="h-5 w-5 text-primary" />
@@ -241,7 +228,7 @@ export default function TeamPerformanceTab({ departments, projects, okrs }: Team
 						))}
 					</div>
 				</CardContent>
-			</Card>
+			</Card> */}
 		</div>
 	)
 }

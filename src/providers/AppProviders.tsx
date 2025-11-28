@@ -21,6 +21,24 @@ function PageLoader() {
 	)
 }
 
+// Error Boundary Component
+function RouteError() {
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+			<div className="text-center p-6">
+				<h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Something went wrong</h2>
+				<p className="text-neutral-600 dark:text-neutral-400 mb-6">Failed to load this page. Please try refreshing.</p>
+				<button
+					onClick={() => window.location.reload()}
+					className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+				>
+					Refresh Page
+				</button>
+			</div>
+		</div>
+	)
+}
+
 // Lazy load pages for better performance (Code Splitting)
 const LandingPage = lazy(() => import('../pages/LandingPage'))
 
@@ -41,7 +59,7 @@ const WorkHistoryPage = lazy(() => import('../app/work-history/page'))
 const WorkReviewPage = lazy(() => import('../app/work-review/page'))
 const MessagesPage = lazy(() => import('../app/messages/page'))
 const AIRecommendationsPage = lazy(() => import('../app/ai-recommendations/page'))
-const OKRPage = lazy(() => import('../app/okr/page'))
+// const OKRPage = lazy(() => import('../app/okr/page'))
 
 // Admin Pages
 const UsersManagementPage = lazy(() => import('../app/admin/users/page'))
@@ -56,14 +74,9 @@ const PerformancePage = lazy(() => import('../app/performance/page'))
 // Other Pages
 const IntegrationsPage = lazy(() => import('../app/integrations/page'))
 const SettingsPage = lazy(() => import('../app/settings/page'))
-const GuidePage = lazy(() => import('../app/guide/page'))
-const WorkflowPage = lazy(() => import('../app/workflow/page'))
 
 // Rhythm Pages
 const WorkRhythmPage = lazy(() => import('../app/rhythm/page'))
-
-// Development Pages (only in dev mode)
-const DevelopmentRoadmapPage = lazy(() => import('../app/dev/roadmap/page'))
 
 // 404 Not Found Page Component
 function NotFoundPage() {
@@ -114,11 +127,11 @@ const appRoutes = [
 	{ path: '/app/messages', element: withSuspense(MessagesPage) },
 	{ path: '/app/ai-recommendations', element: withSuspense(AIRecommendationsPage) },
 	{ path: '/app/inbox', element: <Navigate to="/app/messages" replace /> },
-	{ path: '/app/okr', element: withSuspense(OKRPage) },
+	// { path: '/app/okr', element: withSuspense(OKRPage) },
 	// 관리자 메뉴
 	{ path: '/app/admin/users', element: withSuspense(UsersManagementPage) },
 	{ path: '/app/admin/system-settings', element: withSuspense(SystemSettingsPage) },
-	{ path: '/app/admin/company-settings', element: withSuspense(CompanySettingsPage) },
+	{ path: '/app/admin/company-settings', element: withSuspense(CompanySettingsPage), errorElement: <RouteError /> },
 	// 임원 메뉴
 	{ path: '/app/executive', element: withSuspense(ExecutiveDashboardPage) },
 	{ path: '/app/executive/goals', element: withSuspense(ExecutiveGoalsPage) },
@@ -127,14 +140,12 @@ const appRoutes = [
 	// 기타
 	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 	{ path: '/app/integrations', element: withSuspense(IntegrationsPage) },
-		{ path: '/app/guide', element: withSuspense(GuidePage) },
-		{ path: '/app/workflow', element: withSuspense(WorkflowPage) },
+		{ path: '/app/guide', element: <Navigate to="/app/dashboard" replace /> },
+		{ path: '/app/workflow', element: <Navigate to="/app/dashboard" replace /> },
 		{ path: '/app/settings', element: withSuspense(SettingsPage) },
 		
 	// Work Rhythm Page
 	{ path: '/app/rhythm', element: withSuspense(WorkRhythmPage) },
-// Development routes (only in dev mode)
-	...(import.meta.env.DEV ? [{ path: '/app/dev/roadmap', element: withSuspense(DevelopmentRoadmapPage) }] : []),
 ]
 
 // 라우터 설정
@@ -158,7 +169,7 @@ const router = createBrowserRouter([
 	{ path: '/work-history', element: <Navigate to="/app/work-history" replace /> },
 	{ path: '/inbox', element: <Navigate to="/app/messages" replace /> },
 	{ path: '/messages', element: <Navigate to="/app/messages" replace /> },
-	{ path: '/okr', element: <Navigate to="/app/okr" replace /> },
+	// { path: '/okr', element: <Navigate to="/app/okr" replace /> },
 	{ path: '/ai-recommendations', element: <Navigate to="/app/ai-recommendations" replace /> },
 	{ path: '/admin/users', element: <Navigate to="/app/admin/users" replace /> },
 	{ path: '/admin/system-settings', element: <Navigate to="/app/admin/system-settings" replace /> },

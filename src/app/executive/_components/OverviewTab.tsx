@@ -22,7 +22,6 @@ export default function OverviewTab({
 	const totalWorkEntries = comparison?.current.metrics.workEntries || 0
 	const totalHours = comparison?.current.metrics.totalHours || 0
 	const activeProjects = comparison?.current.metrics.projectsActive || 0
-	const avgOkrProgress = comparison?.current.metrics.okrProgress || 0
 
 	const kpis = [
 		{
@@ -30,62 +29,62 @@ export default function OverviewTab({
 			value: totalWorkEntries,
 			change: comparison?.changes.workEntries || 0,
 			icon: Clock,
-			color: 'text-blue-600',
-			bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+			color: 'text-blue-400',
+			bgColor: 'bg-blue-500/10 border border-blue-500/20',
 		},
 		{
 			label: 'Total Hours',
 			value: totalHours.toFixed(1),
 			change: comparison?.changes.totalHours || 0,
 			icon: Clock,
-			color: 'text-green-600',
-			bgColor: 'bg-green-50 dark:bg-green-900/20',
+			color: 'text-green-400',
+			bgColor: 'bg-green-500/10 border border-green-500/20',
 		},
 		{
 			label: 'Active Projects',
 			value: activeProjects,
 			change: comparison?.changes.projectsActive || 0,
 			icon: FolderKanban,
-			color: 'text-purple-600',
-			bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+			color: 'text-purple-400',
+			bgColor: 'bg-purple-500/10 border border-purple-500/20',
 		},
-		{
-			label: 'Avg OKR Progress',
-			value: `${avgOkrProgress.toFixed(0)}%`,
-			change: comparison?.changes.okrProgress || 0,
-			icon: Target,
-			color: 'text-orange-600',
-			bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-		},
+		// {
+		// 	label: 'Avg OKR Progress',
+		// 	value: `${avgOkrProgress.toFixed(0)}%`,
+		// 	change: comparison?.changes.okrProgress || 0,
+		// 	icon: Target,
+		// 	color: 'text-orange-400',
+		// 	bgColor: 'bg-orange-500/10 border border-orange-500/20',
+		// },
 	]
 
 	const getTrendIcon = (change: number) => {
-		if (change > 0) return <TrendingUp className="h-4 w-4 text-green-600" />
-		if (change < 0) return <TrendingDown className="h-4 w-4 text-red-600" />
-		return <Minus className="h-4 w-4 text-gray-600" />
+		if (change > 0) return <TrendingUp className="h-4 w-4 text-green-400" />
+		if (change < 0) return <TrendingDown className="h-4 w-4 text-red-400" />
+		return <Minus className="h-4 w-4 text-neutral-400" />
 	}
 
 	const getChangeColor = (change: number) => {
-		if (change > 0) return 'text-green-600'
-		if (change < 0) return 'text-red-600'
-		return 'text-gray-600'
+		if (change > 0) return 'text-green-400'
+		if (change < 0) return 'text-red-400'
+		return 'text-neutral-400'
 	}
 
 	const getInsightIcon = (type: string) => {
 		switch (type) {
-			case 'success': return <CheckCircle2 className="h-5 w-5 text-green-600" />
-			case 'warning': return <AlertCircle className="h-5 w-5 text-yellow-600" />
-			case 'danger': return <AlertCircle className="h-5 w-5 text-red-600" />
-			default: return <AlertCircle className="h-5 w-5 text-blue-600" />
+			case 'success': return <CheckCircle2 className="h-5 w-5 text-green-400" />
+			case 'warning': return <AlertCircle className="h-5 w-5 text-yellow-400" />
+			case 'danger': return <AlertCircle className="h-5 w-5 text-red-400" />
+			default: return <AlertCircle className="h-5 w-5 text-blue-400" />
 		}
 	}
 
 	const getInsightBorderColor = (type: string) => {
 		switch (type) {
-			case 'success': return 'border-green-200 dark:border-green-800'
-			case 'warning': return 'border-yellow-200 dark:border-yellow-800'
-			case 'danger': return 'border-red-200 dark:border-red-800'
-			default: return 'border-blue-200 dark:border-blue-800'
+			case 'success': return 'border-green-500/20'
+			case 'warning': return 'border-yellow-500/20'
+			case 'danger': return 'border-red-500/20'
+			default: return 'border-blue-500/20'
 		}
 	}
 
@@ -94,7 +93,7 @@ export default function OverviewTab({
 			{/* KPI Cards */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 				{kpis.map((kpi, index) => (
-					<Card key={index}>
+					<Card key={index} className="bg-surface-dark border-border-dark">
 						<CardContent className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<div className={`p-3 rounded-lg ${kpi.bgColor}`}>
@@ -107,8 +106,8 @@ export default function OverviewTab({
 									</span>
 								</div>
 							</div>
-							<div className="text-2xl font-bold mb-1">{kpi.value}</div>
-							<div className="text-sm text-neutral-600 dark:text-neutral-400">{kpi.label}</div>
+							<div className="text-2xl font-bold mb-1 text-white">{kpi.value}</div>
+							<div className="text-sm text-neutral-400">{kpi.label}</div>
 						</CardContent>
 					</Card>
 				))}
@@ -117,53 +116,55 @@ export default function OverviewTab({
 			{/* Charts Row */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				{/* Work Entries Trend */}
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardHeader>
-						<h3 className="font-bold flex items-center gap-2">
-							<TrendingUp className="h-5 w-5 text-primary" />
+						<h3 className="font-bold flex items-center gap-2 text-white">
+							<TrendingUp className="h-5 w-5 text-orange-500" />
 							Work Entries Trend
 						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-400">
 							Daily work entry activity over selected period
 						</p>
 					</CardHeader>
 					<CardContent className="p-6">
 						<ResponsiveContainer width="100%" height={250}>
 							<LineChart data={workEntriesTrend.data}>
-								<CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+								<CartesianGrid strokeDasharray="3 3" opacity={0.1} stroke="#525252" />
 								<XAxis
 									dataKey="label"
-									tick={{ fontSize: 11 }}
+									tick={{ fontSize: 11, fill: '#a3a3a3' }}
 									angle={-45}
 									textAnchor="end"
 									height={60}
+									stroke="#525252"
 								/>
-								<YAxis tick={{ fontSize: 11 }} />
+								<YAxis tick={{ fontSize: 11, fill: '#a3a3a3' }} stroke="#525252" />
 								<Tooltip
 									contentStyle={{
-										backgroundColor: 'rgba(255, 255, 255, 0.95)',
-										border: '1px solid #e5e7eb',
+										backgroundColor: '#1a1a1a',
+										border: '1px solid #262626',
 										borderRadius: '8px',
+										color: '#fff',
 									}}
 								/>
 								<Line
 									type="monotone"
 									dataKey="value"
-									stroke="#3b82f6"
+									stroke="#f97316"
 									strokeWidth={2}
-									dot={{ r: 4 }}
-									activeDot={{ r: 6 }}
+									dot={{ r: 4, fill: '#f97316' }}
+									activeDot={{ r: 6, fill: '#f97316' }}
 								/>
 							</LineChart>
 						</ResponsiveContainer>
 						<div className="flex items-center justify-center gap-4 mt-4">
 							<div className="flex items-center gap-2">
-								{workEntriesTrend.trend === 'increasing' && <ArrowUp className="h-4 w-4 text-green-600" />}
-								{workEntriesTrend.trend === 'decreasing' && <ArrowDown className="h-4 w-4 text-red-600" />}
-								{workEntriesTrend.trend === 'stable' && <Minus className="h-4 w-4 text-gray-600" />}
-								<span className="text-sm font-medium capitalize">{workEntriesTrend.trend}</span>
+								{workEntriesTrend.trend === 'increasing' && <ArrowUp className="h-4 w-4 text-green-400" />}
+								{workEntriesTrend.trend === 'decreasing' && <ArrowDown className="h-4 w-4 text-red-400" />}
+								{workEntriesTrend.trend === 'stable' && <Minus className="h-4 w-4 text-neutral-400" />}
+								<span className="text-sm font-medium capitalize text-neutral-200">{workEntriesTrend.trend}</span>
 							</div>
-							<span className="text-sm text-neutral-600 dark:text-neutral-400">
+							<span className="text-sm text-neutral-400">
 								{Math.abs(workEntriesTrend.changePercent).toFixed(1)}% change
 							</span>
 						</div>
@@ -171,13 +172,13 @@ export default function OverviewTab({
 				</Card>
 
 				{/* Category Breakdown */}
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardHeader>
-						<h3 className="font-bold flex items-center gap-2">
-							<Target className="h-5 w-5 text-primary" />
+						<h3 className="font-bold flex items-center gap-2 text-white">
+							<Target className="h-5 w-5 text-orange-500" />
 							Category Distribution
 						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-400">
 							Work breakdown by category
 						</p>
 					</CardHeader>
@@ -192,6 +193,7 @@ export default function OverviewTab({
 									outerRadius={90}
 									paddingAngle={2}
 									dataKey="count"
+									stroke="none"
 								>
 									{categoryBreakdown.map((entry, index) => (
 										<Cell key={`cell-${index}`} fill={entry.color} />
@@ -199,9 +201,10 @@ export default function OverviewTab({
 								</Pie>
 							<Tooltip
 								contentStyle={{
-									backgroundColor: 'rgba(255, 255, 255, 0.95)',
-									border: '1px solid #e5e7eb',
+									backgroundColor: '#1a1a1a',
+									border: '1px solid #262626',
 									borderRadius: '8px',
+									color: '#fff',
 								}}
 								formatter={(value: number, _name: string, props: any) => [
 									`${value} entries (${props.payload.percentage.toFixed(1)}%)`,
@@ -214,7 +217,7 @@ export default function OverviewTab({
 								iconType="circle"
 								formatter={(_value: any, entry: any) => {
 									const item = categoryBreakdown.find((c: CategoryBreakdown) => c.category === entry.payload?.category)
-									return `${entry.payload?.category || ''} (${item?.count || 0})`
+									return <span className="text-neutral-400">{`${entry.payload?.category || ''} (${item?.count || 0})`}</span>
 								}}
 							/>
 							</PieChart>
@@ -225,13 +228,13 @@ export default function OverviewTab({
 
 			{/* Insights */}
 			{insights.length > 0 && (
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardHeader>
-						<h3 className="font-bold flex items-center gap-2">
-							<AlertCircle className="h-5 w-5 text-primary" />
+						<h3 className="font-bold flex items-center gap-2 text-white">
+							<AlertCircle className="h-5 w-5 text-orange-500" />
 							AI-Powered Insights
 						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-400">
 							Automated analysis and recommendations
 						</p>
 					</CardHeader>
@@ -240,13 +243,13 @@ export default function OverviewTab({
 							{insights.map((insight) => (
 								<div
 									key={insight.id}
-									className={`p-4 rounded-lg border-l-4 ${getInsightBorderColor(insight.type)} bg-neutral-50 dark:bg-neutral-900`}
+									className={`p-4 rounded-lg border-l-4 ${getInsightBorderColor(insight.type)} bg-neutral-900/50`}
 								>
 									<div className="flex items-start gap-3">
 										{getInsightIcon(insight.type)}
 										<div className="flex-1">
-											<h4 className="font-semibold mb-1">{insight.title}</h4>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+											<h4 className="font-semibold mb-1 text-white">{insight.title}</h4>
+											<p className="text-sm text-neutral-400 mb-2">
 												{insight.description}
 											</p>
 											{insight.metric && (
@@ -255,15 +258,15 @@ export default function OverviewTab({
 												</div>
 											)}
 											{insight.recommendation && (
-												<div className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+												<div className="mt-2 text-sm text-blue-400">
 													💡 {insight.recommendation}
 												</div>
 											)}
 										</div>
-										<span className={`text-xs px-2 py-1 rounded-full ${
-											insight.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-											insight.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-											'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+										<span className={`text-xs px-2 py-1 rounded-full border ${
+											insight.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+											insight.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+											'bg-neutral-500/10 text-neutral-400 border-neutral-500/20'
 										}`}>
 											{insight.priority}
 										</span>
@@ -276,28 +279,28 @@ export default function OverviewTab({
 			)}
 
 			{/* Category Details Table */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<Users className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<Users className="h-5 w-5 text-orange-500" />
 						Category Details
 					</h3>
 				</CardHeader>
 				<CardContent className="p-6">
 					<div className="overflow-x-auto">
-						<table className="w-full">
+						<table className="w-full text-neutral-200">
 							<thead>
-								<tr className="border-b border-neutral-200 dark:border-neutral-800">
-									<th className="text-left py-3 px-4 text-sm font-semibold">Category</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Entries</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Hours</th>
-									<th className="text-right py-3 px-4 text-sm font-semibold">Percentage</th>
-									<th className="text-left py-3 px-4 text-sm font-semibold">Indicator</th>
+								<tr className="border-b border-border-dark">
+									<th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Category</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Entries</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Hours</th>
+									<th className="text-right py-3 px-4 text-sm font-semibold text-neutral-400">Percentage</th>
+									<th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Indicator</th>
 								</tr>
 							</thead>
 							<tbody>
 								{categoryBreakdown.map((cat, index) => (
-									<tr key={index} className="border-b border-neutral-100 dark:border-neutral-800">
+									<tr key={index} className="border-b border-neutral-800 last:border-0 hover:bg-neutral-800/50 transition-colors">
 										<td className="py-3 px-4">
 											<div className="flex items-center gap-2">
 												<div
@@ -311,7 +314,7 @@ export default function OverviewTab({
 										<td className="text-right py-3 px-4">{cat.hours.toFixed(1)}h</td>
 										<td className="text-right py-3 px-4">{cat.percentage.toFixed(1)}%</td>
 										<td className="py-3 px-4">
-											<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-2">
+											<div className="w-full bg-neutral-800 rounded-full h-2">
 												<div
 													className="h-2 rounded-full"
 													style={{

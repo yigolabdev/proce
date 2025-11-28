@@ -365,9 +365,13 @@ export interface WorkDraft {
 	projectId?: string
 	objectiveId?: string
 	keyResultId?: string
+	taskId?: string
 	tags?: string[]
+	files?: FileAttachment[]
+	links?: LinkResource[]
 	isConfidential?: boolean
 	savedAt: Date | string
+	comment?: string
 	[key: string]: any // Allow additional fields for flexibility
 }
 

@@ -59,7 +59,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 			case 'completed': return 'bg-green-500'
 			case 'active': return 'bg-blue-500'
 			case 'planning': return 'bg-yellow-500'
-			case 'on-hold': return 'bg-gray-500'
+			case 'on-hold': return 'bg-orange-500'
 			default: return 'bg-neutral-500'
 		}
 	}
@@ -81,12 +81,12 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 	return (
 		<div className="space-y-4">
 			{/* Controls */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-4">
-							<h3 className="text-lg font-bold flex items-center gap-2">
-								<Calendar className="h-5 w-5 text-primary" />
+							<h3 className="text-lg font-bold flex items-center gap-2 text-white">
+								<Calendar className="h-5 w-5 text-orange-500" />
 								Project Timeline
 							</h3>
 							<div className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									onClick={handlePreviousPeriod}
 									variant="outline"
 									size="sm"
-									className="h-8 w-8 p-0"
+									className="h-8 w-8 p-0 border-border-dark hover:bg-border-dark text-white"
 								>
 									<ChevronLeft className="h-4 w-4" />
 								</Button>
@@ -102,6 +102,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									onClick={handleToday}
 									variant="outline"
 									size="sm"
+									className="border-border-dark hover:bg-border-dark text-white"
 								>
 									Today
 								</Button>
@@ -109,34 +110,37 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									onClick={handleNextPeriod}
 									variant="outline"
 									size="sm"
-									className="h-8 w-8 p-0"
+									className="h-8 w-8 p-0 border-border-dark hover:bg-border-dark text-white"
 								>
 									<ChevronRight className="h-4 w-4" />
 								</Button>
-								<span className="text-sm font-medium ml-2">
+								<span className="text-sm font-medium ml-2 text-neutral-300">
 									{format(dateRange.start, 'MMM yyyy')} - {format(dateRange.end, 'MMM yyyy')}
 								</span>
 							</div>
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-2 bg-surface-dark border border-border-dark p-1 rounded-lg">
 						<Button
 							onClick={() => setViewMode('month')}
-							variant={viewMode === 'month' ? 'primary' : 'outline'}
+							variant={viewMode === 'month' ? 'primary' : 'ghost'}
 							size="sm"
+							className={viewMode === 'month' ? 'bg-orange-500 text-white' : 'text-neutral-400 hover:text-white'}
 						>
 							Month
 						</Button>
 						<Button
 							onClick={() => setViewMode('quarter')}
-							variant={viewMode === 'quarter' ? 'primary' : 'outline'}
+							variant={viewMode === 'quarter' ? 'primary' : 'ghost'}
 							size="sm"
+							className={viewMode === 'quarter' ? 'bg-orange-500 text-white' : 'text-neutral-400 hover:text-white'}
 						>
 							Quarter
 						</Button>
 						<Button
 							onClick={() => setViewMode('year')}
-							variant={viewMode === 'year' ? 'primary' : 'outline'}
+							variant={viewMode === 'year' ? 'primary' : 'ghost'}
 							size="sm"
+							className={viewMode === 'year' ? 'bg-orange-500 text-white' : 'text-neutral-400 hover:text-white'}
 						>
 							Year
 						</Button>
@@ -146,7 +150,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 			</Card>
 
 			{/* Timeline */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardContent className="p-6">
 					{visibleProjects.length === 0 ? (
 						<div className="text-center py-12 text-neutral-500">
@@ -155,14 +159,14 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 					) : (
 						<div className="space-y-6">
 							{/* Header - Month labels */}
-							<div className="relative h-8 border-b border-neutral-200 dark:border-neutral-800">
+							<div className="relative h-8 border-b border-neutral-800">
 								<div className="absolute inset-0 flex">
 									{Array.from({ length: viewMode === 'month' ? 1 : viewMode === 'quarter' ? 3 : 12 }).map((_, idx) => {
 										const monthDate = addMonths(startOfMonth(viewMode === 'month' ? currentMonth : subMonths(currentMonth, viewMode === 'quarter' ? 1 : 5)), idx)
 										return (
 											<div
 												key={idx}
-												className="flex-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 text-center border-r border-neutral-200 dark:border-neutral-800 last:border-r-0"
+												className="flex-1 text-xs font-medium text-neutral-400 text-center border-r border-neutral-800 last:border-r-0"
 											>
 												{format(monthDate, 'MMM yyyy')}
 											</div>
@@ -193,7 +197,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 										<div key={project.id} className="relative">
 											<div className="flex items-start gap-3">
 												{/* Project info */}
-												<div className="w-48 flex-shrink-0">
+												<div className="w-48 shrink-0">
 													<div className="space-y-1">
 														<h4 className="font-medium text-sm truncate" title={project.name}>
 															{project.name}
@@ -268,7 +272,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 												</div>
 
 												{/* Team size */}
-												<div className="w-20 flex-shrink-0 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+												<div className="w-20 shrink-0 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
 													<Users className="h-3 w-3" />
 													{project.members.length}
 												</div>
@@ -283,9 +287,9 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 			</Card>
 
 			{/* Legend */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardContent className="p-4">
-					<div className="flex items-center gap-6 text-xs">
+					<div className="flex items-center gap-6 text-xs text-neutral-400">
 						<div className="flex items-center gap-2">
 							<div className="w-4 h-4 rounded bg-blue-500" />
 							<span>Active</span>
@@ -299,7 +303,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 							<span>Planning</span>
 						</div>
 						<div className="flex items-center gap-2">
-							<div className="w-4 h-4 rounded bg-gray-500" />
+							<div className="w-4 h-4 rounded bg-orange-500" />
 							<span>On Hold</span>
 						</div>
 						<div className="flex items-center gap-2">

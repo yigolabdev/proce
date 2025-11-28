@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
-import DevMemo from '../../components/dev/DevMemo'
-import { DEV_MEMOS } from '../../constants/devMemos'
 import { EmptyState } from '../../components/common/EmptyState'
 import {
 	Inbox,
@@ -444,12 +442,10 @@ export default function InboxPage() {
 	const acceptedCount = recommendations.filter((r) => r.status === 'accepted').length
 
 	return (
-		<>
-			<DevMemo content={DEV_MEMOS.INBOX} pagePath="/app/inbox/page.tsx" />
-			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-				<Toaster />
-				
-				{/* Header */}
+		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<Toaster />
+			
+			{/* Header */}
 			<PageHeader
 				title="Notifications & AI Assistant"
 				description="Stay updated with messages, tasks, and AI-powered recommendations"
@@ -994,7 +990,6 @@ export default function InboxPage() {
 				</div>
 			)}
 			</div>
-			</div>
-		</>
+		</div>
 	)
 }

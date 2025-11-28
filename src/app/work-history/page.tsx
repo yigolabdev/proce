@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
-import { EmptyState } from '../../components/common/EmptyState'
 import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import { useAuth } from '../../context/AuthContext'
@@ -12,8 +11,6 @@ import {
 	FileText,
 	Calendar,
 	Clock,
-	Tag,
-	Upload,
 	Link2,
 	Search,
 	ChevronDown,
@@ -25,7 +22,6 @@ import {
 	BarChart3,
 	User,
 	Users,
-	Building2,
 	Plus,
 } from 'lucide-react'
 import Input from '../../components/ui/Input'
@@ -477,12 +473,6 @@ export default function WorkHistoryPage() {
 		)
 	}
 
-	// Get category color
-	const getCategoryColor = (categoryId: string) => {
-		const category = categories.find((c) => c.id === categoryId)
-		return category?.color || categories[categories.length - 1].color
-	}
-
 	// Format file size
 	const formatFileSize = (bytes: number) => {
 		if (bytes < 1024) return bytes + ' B'
@@ -492,102 +482,108 @@ export default function WorkHistoryPage() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
+			<div className="min-h-screen flex items-center justify-center bg-background-dark">
 				<LoadingState type="page" />
 			</div>
 		)
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
 				title="Team Work History"
 				description="View and track work history across the entire team"
-				icon={FileText}
 				actions={
-					<Button onClick={() => navigate('/app/input')} size="sm">
+						<Button onClick={() => navigate('/app/input')} size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 border-none">
 						<Plus className="h-4 w-4 sm:mr-2" />
 						<span className="hidden sm:inline">New Entry</span>
 					</Button>
 				}
 			/>
 			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+				<div className="space-y-6">
 				{/* Statistics Cards */}
 					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-						<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
-							<CardContent className="p-4">
-								<div className="flex items-center gap-3">
-									<BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+						<Card className="bg-surface-dark border-border-dark">
+							<CardContent className="p-5">
+								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Total Entries</p>
-										<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{statistics.total}</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">Total Entries</p>
+										<p className="text-2xl font-bold text-white">{statistics.total}</p>
+									</div>
+									<div className="p-2 bg-surface-dark rounded-lg text-blue-500">
+										<BarChart3 className="h-5 w-5" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
 
-						<Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
-							<CardContent className="p-4">
-								<div className="flex items-center gap-3">
-									<TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
+						<Card className="bg-surface-dark border-border-dark">
+							<CardContent className="p-5">
+								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-green-600 dark:text-green-400 font-medium">This Week</p>
-										<p className="text-2xl font-bold text-green-900 dark:text-green-100">{statistics.thisWeek}</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">This Week</p>
+										<p className="text-2xl font-bold text-white">{statistics.thisWeek}</p>
+									</div>
+									<div className="p-2 bg-surface-dark rounded-lg text-green-500">
+										<TrendingUp className="h-5 w-5" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
 
-						<Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
-							<CardContent className="p-4">
-								<div className="flex items-center gap-3">
-									<Clock className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+						<Card className="bg-surface-dark border-border-dark">
+							<CardContent className="p-5">
+								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Total Hours</p>
-										<p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{statistics.totalHours.toFixed(1)}h</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">Total Hours</p>
+										<p className="text-2xl font-bold text-white">{statistics.totalHours.toFixed(1)}h</p>
+									</div>
+									<div className="p-2 bg-surface-dark rounded-lg text-purple-500">
+										<Clock className="h-5 w-5" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
 
-						<Card className="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800">
-							<CardContent className="p-4">
-								<div className="flex items-center gap-3">
-									<Users className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+						<Card className="bg-surface-dark border-border-dark">
+							<CardContent className="p-5">
+								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Team Members</p>
-										<p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{users.length}</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">Team Members</p>
+										<p className="text-2xl font-bold text-white">{users.length}</p>
+									</div>
+									<div className="p-2 bg-surface-dark rounded-lg text-orange-500">
+										<Users className="h-5 w-5" />
 									</div>
 								</div>
 							</CardContent>
 						</Card>
-					</div>
 				</div>
 
-				<div className="space-y-4">
 				{/* Search and Filters */}
-				<Card>
+					<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4 space-y-4">
 						{/* Search */}
 						<div className="relative">
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
 							<Input
 								type="text"
 								placeholder="Search by title, description, tags, or person..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								className="pl-10"
+									className="pl-10 bg-surface-dark border-border-dark text-white placeholder-neutral-600 focus:ring-orange-500 focus:border-orange-500"
 							/>
 						</div>
 
 						{/* Filter Toggle */}
 						<button
 							onClick={() => setShowFilters(!showFilters)}
-							className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors"
+								className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors"
 						>
 							<Filter className="h-4 w-4" />
 							{showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -596,14 +592,14 @@ export default function WorkHistoryPage() {
 
 						{/* Filters */}
 						{showFilters && (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border-dark">
 								{/* Category Filter */}
 								<div>
-									<label className="block text-sm font-medium mb-2">Category</label>
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Category</label>
 									<select
 										value={selectedCategory}
 										onChange={(e) => setSelectedCategory(e.target.value)}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
 										{categories.map((cat) => (
 											<option key={cat.id} value={cat.id}>
@@ -615,14 +611,13 @@ export default function WorkHistoryPage() {
 
 								{/* Project Filter */}
 								<div>
-									<label className="flex items-center gap-2 text-sm font-medium mb-2">
-										<FolderKanban className="h-4 w-4" />
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
 										Project
 									</label>
 									<select
 										value={selectedProject}
 										onChange={(e) => setSelectedProject(e.target.value)}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
 										<option value="all">All Projects</option>
 										{projects.map((proj) => (
@@ -635,14 +630,13 @@ export default function WorkHistoryPage() {
 
 								{/* Department Filter */}
 								<div>
-									<label className="flex items-center gap-2 text-sm font-medium mb-2">
-										<Building2 className="h-4 w-4" />
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
 										Department
 									</label>
 									<select
 										value={selectedDepartment}
 										onChange={(e) => setSelectedDepartment(e.target.value)}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
 										<option value="all">All Departments</option>
 										{departments.map((dept) => (
@@ -655,14 +649,13 @@ export default function WorkHistoryPage() {
 
 								{/* User Filter */}
 								<div>
-									<label className="flex items-center gap-2 text-sm font-medium mb-2">
-										<User className="h-4 w-4" />
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
 										Team Member
 									</label>
 									<select
 										value={selectedUser}
 										onChange={(e) => setSelectedUser(e.target.value)}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
 										<option value="all">All Team Members</option>
 										<option value="me">My History Only</option>
@@ -678,11 +671,11 @@ export default function WorkHistoryPage() {
 
 								{/* Sort */}
 								<div>
-									<label className="block text-sm font-medium mb-2">Sort By</label>
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Sort By</label>
 									<select
 										value={sortBy}
 										onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
 										<option value="date">Date (Newest First)</option>
 										<option value="title">Title (A-Z)</option>
@@ -694,10 +687,10 @@ export default function WorkHistoryPage() {
 				</Card>
 
 				{/* Results Summary */}
-				<div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
+					<div className="flex items-center justify-between text-sm text-neutral-500">
 					<p>
-						Showing <span className="font-semibold text-neutral-900 dark:text-neutral-100">{filteredEntries.length}</span>{' '}
-						of <span className="font-semibold text-neutral-900 dark:text-neutral-100">{entries.length}</span> entries
+							Showing <span className="font-semibold text-white">{filteredEntries.length}</span>{' '}
+							of <span className="font-semibold text-white">{entries.length}</span> entries
 					</p>
 					{(selectedCategory !== 'all' || selectedProject !== 'all' || selectedDepartment !== 'all' || selectedUser !== 'all') && (
 						<button
@@ -708,7 +701,7 @@ export default function WorkHistoryPage() {
 								setSelectedUser('all')
 								setSearchQuery('')
 							}}
-							className="text-primary hover:underline"
+								className="text-orange-500 hover:text-orange-400 text-xs font-medium"
 						>
 							Clear all filters
 						</button>
@@ -717,18 +710,19 @@ export default function WorkHistoryPage() {
 
 				{/* Entries List */}
 				{filteredEntries.length === 0 ? (
-					<EmptyState
-						icon={<FileText className="h-12 w-12" />}
-						title="No work entries found"
-						description={
-							searchQuery || selectedCategory !== 'all' || selectedProject !== 'all'
+						<div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border-dark rounded-xl bg-surface-dark/50">
+							<div className="p-4 rounded-full bg-surface-dark mb-4">
+								<FileText className="h-8 w-8 text-neutral-500" />
+							</div>
+							<h3 className="text-lg font-medium text-white mb-2">No work entries found</h3>
+							<p className="text-neutral-500 mb-6 max-w-md">
+								{searchQuery || selectedCategory !== 'all' || selectedProject !== 'all'
 								? 'Try adjusting your filters or search query'
-								: 'No work has been logged yet'
-						}
-						action={
-							searchQuery || selectedCategory !== 'all' || selectedProject !== 'all'
-								? (
+									: 'No work has been logged yet'}
+							</p>
+							{searchQuery || selectedCategory !== 'all' || selectedProject !== 'all' ? (
 									<Button
+									variant="outline"
 										onClick={() => {
 											setSearchQuery('')
 											setSelectedCategory('all')
@@ -736,107 +730,87 @@ export default function WorkHistoryPage() {
 											setSelectedDepartment('all')
 											setSelectedUser('all')
 										}}
+									className="border-border-dark hover:bg-border-dark text-white"
 									>
 										Clear Filters
 									</Button>
-								)
-								: (
-									<Button onClick={() => navigate('/app/input')}>
+							) : (
+								<Button onClick={() => navigate('/app/input')} className="rounded-full bg-white text-black hover:bg-neutral-200">
 										Log Work
 									</Button>
-								)
-						}
-					/>
+							)}
+						</div>
 				) : (
 					<div className="space-y-4">
 						{filteredEntries.map((entry) => {
 							const isExpanded = expandedEntries.includes(entry.id)
 							
 							return (
-								<Card key={entry.id} className="hover:shadow-md transition-shadow">
-									<CardContent className="p-6">
+									<div key={entry.id} className="group bg-surface-dark border border-border-dark rounded-xl hover:border-neutral-700 transition-colors overflow-hidden">
+										<div className="p-5">
 										<div className="space-y-4">
 											{/* Header */}
 											<div className="flex items-start justify-between gap-4">
 												<div className="flex-1 min-w-0">
-													<div className="flex items-center gap-2 mb-2 flex-wrap">
+														<div className="flex items-center gap-2 mb-3 flex-wrap">
 														{/* Category Badge */}
-														<span className={`text-xs font-medium px-2 py-1 rounded ${getCategoryColor(entry.category)}`}>
+															<span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+																entry.category === 'development' ? 'bg-blue-900/30 text-blue-400' :
+																entry.category === 'meeting' ? 'bg-purple-900/30 text-purple-400' :
+																'bg-neutral-800 text-neutral-400'
+															}`}>
 															{categories.find((c) => c.id === entry.category)?.label || entry.category}
 														</span>
 
 														{/* Status Badge */}
 														{entry.status === 'approved' && (
-															<span className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+																<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-green-900/30 text-green-400">
 																Approved
 															</span>
 														)}
 
 														{/* Project Badge */}
 														{entry.projectName && (
-															<span className="text-xs text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded flex items-center gap-1">
+																<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-neutral-800 text-neutral-300 flex items-center gap-1">
 																<FolderKanban className="h-3 w-3" />
 																{entry.projectName}
 															</span>
 														)}
-
-														{/* Department Badge */}
-														{entry.department && (
-															<span className="text-xs text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded flex items-center gap-1">
-																<Building2 className="h-3 w-3" />
-																{entry.department}
-															</span>
-														)}
 													</div>
 
-													<h3 className="text-lg font-bold mb-1">{entry.title}</h3>
+														<h3 className="text-lg font-semibold text-white mb-2 group-hover:text-orange-500 transition-colors">{entry.title}</h3>
 
-													<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400 flex-wrap">
+														<div className="flex items-center gap-4 text-xs text-neutral-500 flex-wrap">
 														{/* Submitted By */}
 														{entry.submittedBy && (
 															<div className="flex items-center gap-1.5">
-																<User className="h-4 w-4" />
-																<span>{entry.submittedBy}</span>
+																	<User className="h-3.5 w-3.5" />
+																	<span className="text-neutral-400">{entry.submittedBy}</span>
 															</div>
 														)}
 
 													{/* Date */}
 													<div className="flex items-center gap-1.5">
-														<Calendar className="h-4 w-4" />
+															<Calendar className="h-3.5 w-3.5" />
 														<span>{toDate(entry.date)?.toLocaleDateString() || 'N/A'}</span>
 													</div>
 
 														{/* Duration */}
 														<div className="flex items-center gap-1.5">
-															<Clock className="h-4 w-4" />
+																<Clock className="h-3.5 w-3.5" />
 															<span>{entry.duration}</span>
-														</div>
-													</div>
-
-													{/* Progress Bar */}
-													<div className="w-full mt-3 max-w-xs">
-														<div className="flex justify-between text-xs mb-1">
-															<span className="text-neutral-500">Progress</span>
-															<span className="font-medium text-neutral-900 dark:text-neutral-100">{entry.status === 'approved' ? '100%' : '65%'}</span>
-														</div>
-														<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5">
-															<div 
-																className={`h-1.5 rounded-full ${entry.status === 'approved' ? 'bg-green-500' : 'bg-blue-500'}`} 
-																style={{ width: entry.status === 'approved' ? '100%' : '65%' }}
-															></div>
 														</div>
 													</div>
 
 													{/* Tags */}
 													{entry.tags && entry.tags.length > 0 && (
-														<div className="flex items-center gap-2 mt-2 flex-wrap">
-															<Tag className="h-3 w-3 text-neutral-400" />
+															<div className="flex items-center gap-2 mt-3 flex-wrap">
 															{entry.tags.map((tag, idx) => (
 																<span
 																	key={idx}
-																	className="text-xs px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded"
+																		className="text-[10px] px-1.5 py-0.5 bg-surface-dark text-neutral-400 rounded border border-border-dark"
 																>
-																	{tag}
+																		#{tag}
 																</span>
 															))}
 														</div>
@@ -845,7 +819,7 @@ export default function WorkHistoryPage() {
 
 												<button
 													onClick={() => toggleExpand(entry.id)}
-													className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors shrink-0"
+														className="p-1 rounded-full hover:bg-surface-dark text-neutral-500 hover:text-white transition-colors"
 												>
 													{isExpanded ? (
 														<ChevronUp className="h-5 w-5" />
@@ -857,11 +831,11 @@ export default function WorkHistoryPage() {
 
 											{/* Expanded Content */}
 											{isExpanded && (
-												<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+													<div className="space-y-4 pt-4 border-t border-border-dark mt-4">
 													{/* Description */}
 													<div>
-														<h4 className="text-sm font-semibold mb-2">Description</h4>
-														<p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap">
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Description</h4>
+															<p className="text-sm text-neutral-300 whitespace-pre-wrap leading-relaxed bg-surface-dark p-3 rounded-lg border border-border-dark">
 															{entry.description}
 														</p>
 													</div>
@@ -869,22 +843,23 @@ export default function WorkHistoryPage() {
 												{/* Files */}
 												{entry.files && entry.files.length > 0 && (
 													<div>
-														<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-															<Upload className="h-4 w-4" />
-															Attachments ({entry.files.length})
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+																Attachments
 														</h4>
 														<div className="space-y-2">
 															{entry.files.map((file) => (
 																	<div
 																		key={file.id}
-																		className="flex items-center gap-3 p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg"
+																			className="flex items-center gap-3 p-2 bg-surface-dark border border-border-dark rounded-lg hover:border-neutral-600 transition-colors group/file"
 																	>
-																		<FileText className="h-4 w-4 text-neutral-500" />
+																			<div className="p-1.5 bg-border-dark rounded">
+																				<FileText className="h-4 w-4 text-neutral-400" />
+																			</div>
 																		<div className="flex-1 min-w-0">
-																			<p className="text-sm font-medium truncate">{file.name}</p>
-																			<p className="text-xs text-neutral-500">{formatFileSize(file.size)}</p>
+																				<p className="text-sm font-medium text-neutral-200 truncate group-hover/file:text-white">{file.name}</p>
+																				<p className="text-[10px] text-neutral-500">{formatFileSize(file.size)}</p>
 																		</div>
-																		<Button variant="outline" size="sm">
+																			<Button variant="outline" size="sm" className="h-7 px-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-white">
 																			<Eye className="h-3 w-3" />
 																		</Button>
 																	</div>
@@ -896,21 +871,18 @@ export default function WorkHistoryPage() {
 												{/* Links */}
 												{entry.links && entry.links.length > 0 && (
 													<div>
-														<h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-															<Link2 className="h-4 w-4" />
-															Links ({entry.links.length})
-														</h4>
-														<div className="space-y-2">
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Links</h4>
+															<div className="flex flex-wrap gap-2">
 															{entry.links.map((link) => (
 																	<a
 																		key={link.id}
 																		href={link.url}
 																		target="_blank"
 																		rel="noopener noreferrer"
-																		className="flex items-center gap-2 p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group"
+																			className="flex items-center gap-2 px-3 py-1.5 bg-surface-dark border border-border-dark rounded-full hover:border-orange-500/50 transition-colors group/link"
 																	>
-																		<Link2 className="h-4 w-4 text-neutral-500" />
-																		<span className="text-sm text-primary group-hover:underline truncate">
+																			<Link2 className="h-3 w-3 text-neutral-500 group-hover/link:text-orange-500" />
+																			<span className="text-xs text-neutral-300 group-hover/link:text-white truncate max-w-[200px]">
 																			{link.title}
 																		</span>
 																	</a>
@@ -921,12 +893,13 @@ export default function WorkHistoryPage() {
 												</div>
 											)}
 										</div>
-									</CardContent>
-								</Card>
+										</div>
+									</div>
 							)
 						})}
 					</div>
 				)}
+				</div>
 			</div>
 		</div>
 	)

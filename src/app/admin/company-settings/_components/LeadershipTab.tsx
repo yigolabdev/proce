@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from '../../../../components/ui/Card'
 import { Button } from '../../../../components/ui/Button'
 import Input from '../../../../components/ui/Input'
+import { Select } from '../../../../components/ui/Select'
 import {
 	Users,
 	Plus,
@@ -46,21 +47,21 @@ export default function LeadershipTab({
 }: LeadershipTabProps) {
 	return (
 		<div className="space-y-6">
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
 					<div className="flex items-center justify-between">
 						<div>
-							<h2 className="text-xl font-bold flex items-center gap-2">
-								<Users className="h-5 w-5 text-primary" />
+							<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+								<Users className="h-5 w-5 text-orange-500" />
 								Leadership Team
 							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							<p className="text-sm text-neutral-400 mt-1 mb-2">
 								Manage key leaders and executives in your organization
 							</p>
 						</div>
 						<Button
 							onClick={() => onSetIsAddingLeader(true)}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200"
 						>
 							<Plus className="h-4 w-4" />
 							Add Leader
@@ -71,11 +72,11 @@ export default function LeadershipTab({
 
 			{/* Add Leader Form */}
 			{isAddingLeader && (
-				<Card className="border-primary/30">
+				<Card className="bg-surface-dark border-border-dark">
 					<CardHeader>
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold">New Leader</h3>
-							<Button variant="outline" size="sm" onClick={() => onSetIsAddingLeader(false)}>
+							<h3 className="font-semibold text-white">New Leader</h3>
+							<Button variant="outline" size="sm" onClick={() => onSetIsAddingLeader(false)} className="border-border-dark hover:bg-border-dark text-white">
 								<X className="h-4 w-4" />
 							</Button>
 						</div>
@@ -85,7 +86,7 @@ export default function LeadershipTab({
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								{/* Name */}
 								<div>
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										Name <span className="text-red-500">*</span>
 									</label>
 									<Input
@@ -99,15 +100,14 @@ export default function LeadershipTab({
 								
 								{/* Position */}
 								<div>
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										Position <span className="text-red-500">*</span>
 									</label>
-									<select
+									<Select
 										value={newLeader.position || ''}
 										onChange={(e) =>
 											onSetNewLeader({ ...newLeader, position: e.target.value })
 										}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
 										<option value="">Select position</option>
 										{POSITION_OPTIONS.map((pos) => (
@@ -115,18 +115,17 @@ export default function LeadershipTab({
 												{pos}
 											</option>
 										))}
-									</select>
+									</Select>
 								</div>
 								
 								{/* Department */}
 								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">Department</label>
-									<select
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Department</label>
+									<Select
 										value={newLeader.department || ''}
 										onChange={(e) =>
 											onSetNewLeader({ ...newLeader, department: e.target.value })
 										}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 									>
 										<option value="">Select department</option>
 										{availableDepartments.map((dept) => (
@@ -134,12 +133,12 @@ export default function LeadershipTab({
 												{dept.name}
 											</option>
 										))}
-									</select>
+									</Select>
 								</div>
 								
 								{/* Email */}
 								<div>
-									<label className="block text-sm font-medium mb-2">Email</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Email</label>
 									<Input
 										type="email"
 										value={newLeader.email || ''}
@@ -152,7 +151,7 @@ export default function LeadershipTab({
 								
 								{/* Phone */}
 								<div>
-									<label className="block text-sm font-medium mb-2">Phone</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Phone</label>
 									<Input
 										value={newLeader.phone || ''}
 										onChange={(e) =>
@@ -164,10 +163,10 @@ export default function LeadershipTab({
 							</div>
 
 							<div className="flex justify-end gap-3">
-								<Button variant="outline" onClick={() => onSetIsAddingLeader(false)}>
+								<Button variant="outline" onClick={() => onSetIsAddingLeader(false)} className="border-border-dark hover:bg-border-dark text-white">
 									Cancel
 								</Button>
-								<Button onClick={onAddLeader}>
+								<Button onClick={onAddLeader} className="bg-white text-black hover:bg-neutral-200">
 									<Plus className="h-4 w-4 mr-2" />
 									Add Leader
 								</Button>
@@ -180,12 +179,12 @@ export default function LeadershipTab({
 			{/* Leadership List */}
 			<div className="grid grid-cols-1 gap-4">
 				{leadership.map((leader) => (
-					<Card key={leader.id} className="hover:border-primary/30 transition-colors">
+					<Card key={leader.id} className="bg-surface-dark border-border-dark hover:border-orange-500/50 transition-colors">
 						<CardContent className="p-6">
 							<div className="flex items-start justify-between">
 								<div className="flex items-start gap-4 flex-1">
-									<div className="p-3 rounded-xl bg-primary/10">
-										<UserCircle className="h-8 w-8 text-primary" />
+									<div className="p-3 rounded-xl bg-orange-500/10">
+										<UserCircle className="h-8 w-8 text-orange-500" />
 									</div>
 									<div className="flex-1 space-y-3">
 										{editingLeader === leader.id ? (
@@ -201,35 +200,35 @@ export default function LeadershipTab({
 													/>
 													
 													{/* Position */}
-													<select
+													<Select
 														value={leader.position}
 														onChange={(e) =>
 															onUpdateLeader(leader.id, 'position', e.target.value)
 														}
-														className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 													>
 														{POSITION_OPTIONS.map((pos) => (
 															<option key={pos} value={pos}>
 																{pos}
 															</option>
 														))}
-													</select>
+													</Select>
 													
 													{/* Department */}
-													<select
-														value={leader.department || ''}
-														onChange={(e) =>
-															onUpdateLeader(leader.id, 'department', e.target.value)
-														}
-														className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900 md:col-span-2"
-													>
-														<option value="">Select department</option>
-														{availableDepartments.map((dept) => (
-															<option key={dept.id} value={dept.name}>
-																{dept.name}
-															</option>
-														))}
-													</select>
+													<div className="md:col-span-2">
+														<Select
+															value={leader.department || ''}
+															onChange={(e) =>
+																onUpdateLeader(leader.id, 'department', e.target.value)
+															}
+														>
+															<option value="">Select department</option>
+															{availableDepartments.map((dept) => (
+																<option key={dept.id} value={dept.name}>
+																	{dept.name}
+																</option>
+															))}
+														</Select>
+													</div>
 													
 													{/* Email */}
 													<Input
@@ -250,7 +249,7 @@ export default function LeadershipTab({
 														placeholder="Phone"
 													/>
 												</div>
-												<Button variant="outline" size="sm" onClick={onSaveEdit}>
+												<Button variant="outline" size="sm" onClick={onSaveEdit} className="border-border-dark hover:bg-border-dark text-white">
 													<Save className="h-4 w-4 mr-2" />
 													Save Changes
 												</Button>
@@ -258,23 +257,23 @@ export default function LeadershipTab({
 										) : (
 											<>
 												<div>
-													<h3 className="font-bold text-lg">{leader.name}</h3>
-													<p className="text-primary font-medium">{leader.position}</p>
+													<h3 className="font-bold text-lg text-white">{leader.name}</h3>
+													<p className="text-orange-500 font-medium">{leader.position}</p>
 													{leader.department && (
-														<p className="text-sm text-neutral-600 dark:text-neutral-400">
+														<p className="text-sm text-neutral-400">
 															{leader.department}
 														</p>
 													)}
 												</div>
 												<div className="space-y-1 text-sm">
 													{leader.email && (
-														<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+														<div className="flex items-center gap-2 text-neutral-400">
 															<Mail className="h-4 w-4" />
 															{leader.email}
 														</div>
 													)}
 													{leader.phone && (
-														<div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+														<div className="flex items-center gap-2 text-neutral-400">
 															<Phone className="h-4 w-4" />
 															{leader.phone}
 														</div>
@@ -291,6 +290,7 @@ export default function LeadershipTab({
 										onClick={() =>
 											onSetEditingLeader(editingLeader === leader.id ? null : leader.id)
 										}
+										className="border-border-dark hover:bg-border-dark text-neutral-400 hover:text-white"
 									>
 										<Edit2 className="h-4 w-4" />
 									</Button>
@@ -298,6 +298,7 @@ export default function LeadershipTab({
 										variant="outline"
 										size="sm"
 										onClick={() => onDeleteLeader(leader.id)}
+										className="border-border-dark hover:bg-border-dark text-neutral-400 hover:text-red-400"
 									>
 										<Trash2 className="h-4 w-4" />
 									</Button>
@@ -310,14 +311,14 @@ export default function LeadershipTab({
 
 			{/* Empty State */}
 			{leadership.length === 0 && !isAddingLeader && (
-				<Card className="border-dashed">
+				<Card className="bg-surface-dark border-dashed border-border-dark">
 					<CardContent className="p-12 text-center">
-						<Users className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
-						<h3 className="font-semibold text-lg mb-2">No Leaders Added Yet</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+						<Users className="h-12 w-12 mx-auto text-neutral-600 mb-4" />
+						<h3 className="font-semibold text-lg mb-2 text-white">No Leaders Added Yet</h3>
+						<p className="text-sm text-neutral-400 mb-4">
 							Start by adding your first leadership team member
 						</p>
-						<Button onClick={() => onSetIsAddingLeader(true)}>
+						<Button onClick={() => onSetIsAddingLeader(true)} className="bg-white text-black hover:bg-neutral-200">
 							<Plus className="h-4 w-4 mr-2" />
 							Add First Leader
 						</Button>
@@ -327,4 +328,3 @@ export default function LeadershipTab({
 		</div>
 	)
 }
-

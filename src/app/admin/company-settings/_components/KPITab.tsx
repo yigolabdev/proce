@@ -146,21 +146,21 @@ export default function KPITab({
 
 	return (
 		<div className="space-y-6">
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
 					<div className="flex items-center justify-between">
 						<div>
-							<h2 className="text-xl font-bold flex items-center gap-2">
-								<Target className="h-5 w-5 text-primary" />
+							<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+								<Target className="h-5 w-5 text-orange-500" />
 								Company KPIs & Metrics
 							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							<p className="text-sm text-neutral-400 mt-1">
 								Track key performance indicators across all business areas
 							</p>
 						</div>
 						<Button
 							onClick={() => setIsAdding(true)}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200"
 						>
 							<Plus className="h-4 w-4" />
 							Add KPI
@@ -171,14 +171,15 @@ export default function KPITab({
 
 			{/* Add KPI Form */}
 			{isAdding && (
-				<Card className="border-primary/30 shadow-lg">
+				<Card className="bg-surface-dark border-border-dark shadow-lg">
 					<CardHeader>
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold text-lg">New KPI</h3>
+							<h3 className="font-semibold text-lg text-white">New KPI</h3>
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={() => setIsAdding(false)}
+								className="border-border-dark hover:bg-border-dark text-white"
 							>
 								<X className="h-4 w-4" />
 							</Button>
@@ -188,7 +189,7 @@ export default function KPITab({
 						<div className="space-y-6">
 							{/* Industry Selection */}
 							<div>
-								<label className="flex items-center gap-2 text-sm font-medium mb-2">
+								<label className="flex items-center gap-2 text-sm font-medium mb-2 text-neutral-300">
 									<Building2 className="h-4 w-4" />
 									Industry (Optional)
 								</label>
@@ -208,15 +209,15 @@ export default function KPITab({
 										</option>
 									))}
 								</Select>
-								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+								<p className="text-xs text-neutral-500 mt-1">
 									💡 Select your industry to see relevant KPI suggestions
 								</p>
 							</div>
 
 							{/* Industry-specific KPI Presets */}
 							{selectedIndustry && industryKPIPresets[selectedIndustry] && (
-								<div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-									<p className="text-sm font-medium text-purple-900 dark:text-purple-200 mb-3">
+								<div className="p-4 rounded-xl bg-purple-900/10 border border-purple-800">
+									<p className="text-sm font-medium text-purple-400 mb-3">
 										💡 Common KPIs for {industries.find(i => i.value === selectedIndustry)?.label}:
 									</p>
 									<div className="flex flex-wrap gap-2">
@@ -224,7 +225,7 @@ export default function KPITab({
 											<button
 												key={preset}
 												onClick={() => setNewKPI({ ...newKPI, name: preset })}
-												className="px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-neutral-900 border border-purple-300 dark:border-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors font-medium"
+												className="px-3 py-1.5 text-xs rounded-lg bg-neutral-900 border border-purple-800 hover:bg-purple-900/40 text-purple-300 transition-colors font-medium"
 											>
 												{preset}
 											</button>
@@ -235,7 +236,7 @@ export default function KPITab({
 
 							{/* Category Selection */}
 							<div>
-								<label className="block text-sm font-medium mb-3">
+								<label className="block text-sm font-medium mb-3 text-neutral-300">
 									KPI Category (Optional)
 								</label>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -245,13 +246,15 @@ export default function KPITab({
 											onClick={() => setNewKPI({ ...newKPI, category: cat.value as any })}
 											className={`p-4 rounded-xl border-2 transition-all text-left ${
 												newKPI.category === cat.value
-													? 'border-primary bg-primary/5'
-													: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+													? 'border-orange-500 bg-orange-500/10 text-white'
+													: 'border-border-dark text-neutral-400 hover:border-orange-500/50 hover:text-neutral-200'
 											}`}
 										>
 											<div className="text-2xl mb-2">{cat.icon}</div>
 											<div className="font-semibold text-sm">{cat.label}</div>
-											<div className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+											<div className={`text-xs mt-1 ${
+												newKPI.category === cat.value ? 'text-orange-200' : 'text-neutral-500'
+											}`}>
 												{cat.description}
 											</div>
 										</button>
@@ -261,8 +264,8 @@ export default function KPITab({
 
 							{/* Category-specific KPI Examples */}
 							{newKPI.category && kpiExamples[newKPI.category] && (
-								<div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-									<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
+								<div className="p-4 rounded-xl bg-blue-900/10 border border-blue-800">
+									<p className="text-sm font-medium text-blue-400 mb-2">
 										💡 Common {newKPI.category} KPIs:
 									</p>
 									<div className="flex flex-wrap gap-2">
@@ -270,7 +273,7 @@ export default function KPITab({
 											<button
 												key={example}
 												onClick={() => setNewKPI({ ...newKPI, name: example })}
-												className="px-3 py-1 text-xs rounded-lg bg-white dark:bg-neutral-900 border border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+												className="px-3 py-1 text-xs rounded-lg bg-neutral-900 border border-blue-800 hover:bg-blue-900/40 text-blue-300 transition-colors"
 											>
 												{example}
 											</button>
@@ -282,7 +285,7 @@ export default function KPITab({
 							{/* Basic Information */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										KPI Name <span className="text-red-500">*</span>
 									</label>
 									<Input
@@ -290,12 +293,12 @@ export default function KPITab({
 										onChange={(e) => setNewKPI({ ...newKPI, name: e.target.value })}
 										placeholder="e.g., Annual Revenue Growth, Customer Satisfaction Score..."
 									/>
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+									<p className="text-xs text-neutral-500 mt-1">
 										💡 Only required field - everything else is optional
 									</p>
 								</div>
 								<div className="md:col-span-2">
-									<label className="block text-sm font-medium mb-2">Description (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Description (Optional)</label>
 									<Textarea
 										value={newKPI.description || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, description: e.target.value })}
@@ -308,7 +311,7 @@ export default function KPITab({
 							{/* Target & Current Values */}
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										Target Value
 									</label>
 									<Input
@@ -322,7 +325,7 @@ export default function KPITab({
 									</p>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Current Value</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Current Value</label>
 									<Input
 										type="number"
 										value={newKPI.currentValue}
@@ -331,11 +334,11 @@ export default function KPITab({
 									/>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Unit</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Unit</label>
 									<select
 										value={newKPI.unit}
 										onChange={(e) => setNewKPI({ ...newKPI, unit: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+										className="w-full px-4 py-2 border border-border-dark rounded-xl bg-[#1a1a1a] text-white focus:outline-none focus:border-orange-500"
 									>
 										{kpiUnits.map(unit => (
 											<option key={unit.value} value={unit.value}>{unit.label}</option>
@@ -347,7 +350,7 @@ export default function KPITab({
 							{/* Period - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">Period (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Period (Optional)</label>
 									<Select
 										value={newKPI.period || 'quarterly'}
 										onChange={(e) => setNewKPI({ ...newKPI, period: e.target.value as any })}
@@ -358,7 +361,7 @@ export default function KPITab({
 									</Select>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Start Date (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Start Date (Optional)</label>
 									<Input
 										type="date"
 										value={newKPI.startDate || ''}
@@ -366,7 +369,7 @@ export default function KPITab({
 									/>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">End Date (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">End Date (Optional)</label>
 									<Input
 										type="date"
 										value={newKPI.endDate || ''}
@@ -378,7 +381,7 @@ export default function KPITab({
 							{/* Responsibility - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										Owner/Responsible Person (Optional)
 									</label>
 									<Select
@@ -393,13 +396,13 @@ export default function KPITab({
 										))}
 									</Select>
 									{leadership.length === 0 && (
-										<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+										<p className="text-xs text-neutral-500 mt-1">
 											💡 Add leaders in the Leadership tab to assign owners
 										</p>
 									)}
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Department (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Department (Optional)</label>
 									<Select
 										value={newKPI.department || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, department: e.target.value })}
@@ -417,7 +420,7 @@ export default function KPITab({
 							{/* Measurement - Optional */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">Measurement Frequency (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Measurement Frequency (Optional)</label>
 									<Select
 										value={newKPI.measurementFrequency || 'monthly'}
 										onChange={(e) => setNewKPI({ ...newKPI, measurementFrequency: e.target.value as any })}
@@ -429,7 +432,7 @@ export default function KPITab({
 									</Select>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Data Source (Optional)</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Data Source (Optional)</label>
 									<Input
 										value={newKPI.dataSource || ''}
 										onChange={(e) => setNewKPI({ ...newKPI, dataSource: e.target.value })}
@@ -440,16 +443,16 @@ export default function KPITab({
 
 							{/* Priority - Optional */}
 							<div>
-								<label className="block text-sm font-medium mb-2">Priority (Optional)</label>
+								<label className="block text-sm font-medium mb-2 text-neutral-300">Priority (Optional)</label>
 								<div className="flex gap-3">
 									{['high', 'medium', 'low'].map((p) => (
 										<button
 											key={p}
 											onClick={() => setNewKPI({ ...newKPI, priority: p as any })}
-											className={`flex-1 px-4 py-2 rounded-xl border-2 transition-all ${
+											className={`flex-1 px-4 py-2 rounded-xl border-2 transition-all text-white ${
 												(newKPI.priority || 'medium') === p
-													? 'border-primary bg-primary/10'
-													: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+													? 'border-orange-500 bg-orange-500/10'
+													: 'border-border-dark hover:border-orange-500/50'
 											}`}
 										>
 											<span className="font-medium capitalize">{p}</span>
@@ -459,14 +462,15 @@ export default function KPITab({
 							</div>
 
 							{/* Actions */}
-							<div className="flex justify-end gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+							<div className="flex justify-end gap-3 pt-4 border-t border-border-dark">
 								<Button
 									variant="outline"
 									onClick={() => setIsAdding(false)}
+									className="border-border-dark hover:bg-border-dark text-white"
 								>
 									Cancel
 								</Button>
-								<Button onClick={onAdd}>
+								<Button onClick={onAdd} className="bg-white text-black hover:bg-neutral-200">
 									<Plus className="h-4 w-4 mr-2" />
 									Add KPI
 								</Button>
@@ -480,13 +484,13 @@ export default function KPITab({
 			{groupedKPIs.length > 0 ? (
 				<div className="space-y-6">
 					{groupedKPIs.map((group) => (
-						<Card key={group.value}>
+						<Card key={group.value} className="bg-surface-dark border-border-dark">
 							<CardHeader>
 								<div className="flex items-center gap-3">
 									<span className="text-2xl">{group.icon}</span>
 									<div>
-										<h3 className="font-bold text-lg">{group.label} KPIs</h3>
-										<p className="text-xs text-neutral-600 dark:text-neutral-400">
+										<h3 className="font-bold text-lg text-white">{group.label} KPIs</h3>
+										<p className="text-xs text-neutral-400">
 											{group.description} • {group.kpis.length} KPI(s)
 										</p>
 									</div>
@@ -501,7 +505,7 @@ export default function KPITab({
 										return (
 											<div
 												key={kpi.id}
-												className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-primary/30 transition-all"
+												className="p-4 rounded-xl border border-border-dark hover:border-orange-500/50 transition-all bg-[#1a1a1a]"
 											>
 												{isEditing ? (
 													// Edit Mode
@@ -534,6 +538,7 @@ export default function KPITab({
 															variant="outline"
 															size="sm"
 															onClick={() => setEditingId(null)}
+															className="border-border-dark hover:bg-border-dark text-white"
 														>
 															Save Changes
 														</Button>
@@ -543,14 +548,14 @@ export default function KPITab({
 													<>
 														<div className="flex items-start justify-between mb-3">
 															<div className="flex-1">
-																<h4 className="font-bold text-lg mb-1">{kpi.name}</h4>
+																<h4 className="font-bold text-lg mb-1 text-white">{kpi.name}</h4>
 																{kpi.description && (
-																	<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+																	<p className="text-sm text-neutral-400 mb-2">
 																		{kpi.description}
 																	</p>
 																)}
-																<div className="flex flex-wrap items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-																	<span className="flex items-center gap-1">
+																<div className="flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+																	<span className="flex items-center gap-1 text-neutral-400">
 																		👤 {kpi.owner}
 																	</span>
 																	{kpi.department && (
@@ -565,7 +570,7 @@ export default function KPITab({
 																	variant="outline"
 																	size="sm"
 																	onClick={() => setEditingId(kpi.id)}
-																	className="px-2"
+																	className="px-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-white"
 																>
 																	<Edit2 className="h-4 w-4" />
 																</Button>
@@ -573,7 +578,7 @@ export default function KPITab({
 																	variant="outline"
 																	size="sm"
 																	onClick={() => onDelete(kpi.id)}
-																	className="px-2"
+																	className="px-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-red-400"
 																>
 																	<Trash2 className="h-4 w-4" />
 																</Button>
@@ -583,12 +588,12 @@ export default function KPITab({
 														{/* Progress Bar */}
 														<div className="mb-3">
 															<div className="flex items-center justify-between text-sm mb-2">
-																<span className="font-medium">Progress: {progress}%</span>
-																<span className="text-neutral-600 dark:text-neutral-400">
+																<span className="font-medium text-white">Progress: {progress}%</span>
+																<span className="text-neutral-500">
 																	{kpi.currentValue} / {kpi.targetValue} {kpi.unit}
 																</span>
 															</div>
-															<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+															<div className="relative w-full h-3 bg-neutral-800 rounded-full overflow-hidden">
 																<div
 																	className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${
 																		progress >= 100 ? 'bg-green-500' :
@@ -608,14 +613,14 @@ export default function KPITab({
 																{kpi.status.replace('-', ' ').toUpperCase()}
 															</div>
 															<div className={`px-3 py-1 rounded-lg text-xs font-medium ${
-																kpi.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-																kpi.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-																'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+																kpi.priority === 'high' ? 'bg-red-900/20 text-red-400 border border-red-900/30' :
+																kpi.priority === 'medium' ? 'bg-yellow-900/20 text-yellow-400 border border-yellow-900/30' :
+																'bg-green-900/20 text-green-400 border border-green-900/30'
 															}`}>
 																{kpi.priority.toUpperCase()} PRIORITY
 															</div>
 															{kpi.dataSource && (
-																<div className="px-3 py-1 rounded-lg text-xs bg-neutral-100 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300">
+																<div className="px-3 py-1 rounded-lg text-xs bg-neutral-800 text-neutral-400 border border-neutral-700">
 																	📊 {kpi.dataSource}
 																</div>
 															)}
@@ -631,14 +636,14 @@ export default function KPITab({
 					))}
 				</div>
 			) : !isAdding && (
-				<Card className="border-dashed border-2">
+				<Card className="bg-surface-dark border-dashed border-2 border-border-dark">
 					<CardContent className="p-12 text-center">
-						<Target className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
-						<h3 className="font-semibold text-lg mb-2">No KPIs Yet</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+						<Target className="h-12 w-12 mx-auto text-neutral-600 mb-4" />
+						<h3 className="font-semibold text-lg mb-2 text-white">No KPIs Yet</h3>
+						<p className="text-sm text-neutral-400 mb-4">
 							Start by adding your first company KPI to track performance
 						</p>
-						<Button onClick={() => setIsAdding(true)}>
+						<Button onClick={() => setIsAdding(true)} className="bg-white text-black hover:bg-neutral-200">
 							<Plus className="h-4 w-4 mr-2" />
 							Add First KPI
 						</Button>

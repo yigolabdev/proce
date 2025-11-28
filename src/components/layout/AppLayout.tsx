@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, Target, History, FolderKanban, Building2, Rocket, CheckCircle2, BookOpen, Workflow, Menu, X } from 'lucide-react'
+import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 import { useState, useEffect, Fragment } from 'react'
@@ -52,15 +52,28 @@ export default function AppLayout() {
 			to={to}
 			end
 			className={({ isActive }) =>
-				`flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900 ${isActive ? 'bg-neutral-100 dark:bg-neutral-900 font-medium text-primary' : 'text-neutral-700 dark:text-neutral-300'}`
+				`relative flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm transition-all duration-300 group overflow-hidden ${
+					isActive 
+						? 'text-white bg-white/5 font-medium shadow-[0_0_20px_-10px_rgba(255,255,255,0.1)] border border-white/5' 
+						: 'text-neutral-500 hover:text-neutral-200 hover:bg-white/5'
+				}`
 			}
 		>
-			<Icon size={20} />
-			<span className="flex-1">{label}</span>
-			{badge !== undefined && badge > 0 && (
-				<span className="shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-primary text-white text-xs font-bold animate-pulse">
-					{badge > 99 ? '99+' : badge}
-				</span>
+			{({ isActive }) => (
+				<>
+					{isActive && (
+						<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-500/80 rounded-r-full blur-[2px]" />
+					)}
+					<Icon size={20} className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-orange-500' : 'group-hover:text-neutral-300'}`} />
+					<span className="flex-1 truncate tracking-wide">{label}</span>
+					{badge !== undefined && badge > 0 && (
+						<span className={`shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-sm transition-colors ${
+							isActive ? 'bg-orange-500 text-white' : 'bg-neutral-800 text-neutral-400 group-hover:bg-neutral-700 group-hover:text-white'
+						}`}>
+							{badge > 99 ? '99+' : badge}
+						</span>
+					)}
+				</>
 			)}
 		</NavLink>
 	)
@@ -72,13 +85,13 @@ export default function AppLayout() {
 		roles: ['user', 'admin', 'executive'] as UserRole[],
 		items: [
 			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/rhythm', label: 'Work Rhythm', icon: Clock, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/messages', label: 'Messages', icon: Mail, roles: ['user', 'admin', 'executive'], badge: unreadMessages },
-			{ to: '/app/ai-recommendations', label: 'AI Recommendations', icon: Sparkles, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/ai-recommendations', label: 'AI Suggestions', icon: Sparkles, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-review', label: 'Work Review', icon: CheckCircle2, roles: ['user', 'admin', 'executive'], badge: unreadReviews },
 			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/okr', label: 'My Goals (OKR)', icon: Target, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
 	},
 		{
@@ -110,104 +123,105 @@ const visibleMenuGroups = menuGroups
 
 	// Sidebar Component
 	const SidebarContent = () => (
-		<>
-			{/* 사이드바 헤더 */}
-			<div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
-				<div className="size-8 rounded-2xl bg-primary" />
-				<div className="flex-1 min-w-0">
-					<div className="text-lg font-semibold">Proce</div>
-					{user && (
-						<div className="text-xs text-neutral-600 dark:text-neutral-400 truncate">
-							{user.name} • {user.role === 'user' ? 'User' : user.role === 'admin' ? 'Admin' : 'Executive'}
-						</div>
-					)}
+		<div className="flex flex-col h-full bg-[#050505] border-r border-[#1a1a1a]/50 backdrop-blur-xl">
+			{/* Sidebar Header with Logo - More Spacious */}
+			<div className="px-6 py-8 flex items-center gap-4 shrink-0">
+				<div className="relative group cursor-pointer">
+                    <div className="absolute -inset-2 bg-orange-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative size-10 rounded-2xl bg-linear-to-br from-white to-neutral-300 text-black flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </div>
+				</div>
+				<div className="flex flex-col">
+					<div className="text-base font-bold text-white tracking-tight leading-none mb-1">Proce</div>
+					<div className="text-[10px] text-neutral-500 font-medium tracking-widest uppercase">Workspace</div>
 				</div>
 				{/* Mobile close button */}
 				<button
 					onClick={() => setIsMobileSidebarOpen(false)}
-					className="lg:hidden p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-					aria-label="Close menu"
+					className="lg:hidden ml-auto p-1 text-neutral-500 hover:text-white transition-colors"
 				>
-					<X size={20} />
+					<X size={24} />
 				</button>
 			</div>
-
-			{/* 메인 네비게이션 */}
-			<nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-				{/* Work Rhythm 메뉴 */}
-				<div className="mb-6">
-					<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-						Work Rhythm
-					</div>
-					{link('/app/rhythm', 'Work Rhythm', Clock)}
-				</div>
 				
-				{/* 구분선 */}
-				<div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />
-				
-				{/* 기존 메뉴 */}
-				{visibleMenuGroups.map((group, groupIndex) => (
-					<div key={group.title}>
-						{groupIndex > 0 && <div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />}
-						<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+			{/* Main Navigation - Increased Spacing & Breathability */}
+			<nav className="flex-1 px-4 pb-6 space-y-8 overflow-y-auto overflow-x-hidden scrollbar-hide">
+				{/* Visible Menu Groups */}
+				{visibleMenuGroups.map((group) => (
+					<div key={group.title} className="animate-in slide-in-from-left-4 duration-500 fade-in">
+						<div className="px-4 mb-3 text-[11px] font-bold uppercase tracking-widest text-neutral-600">
 							{group.title}
 						</div>
+						<div className="space-y-1.5">
 						{group.items.map((item) => (
 							<Fragment key={item.to}>
 								{link(item.to, item.label, item.icon, item.badge)}
 							</Fragment>
 						))}
+						</div>
 					</div>
 				))}
 				
-				<div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />
-				
-				<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-					Other
+				{/* System Group */}
+				<div>
+					<div className="px-4 mb-3 text-[11px] font-bold uppercase tracking-widest text-neutral-600">
+						System
+					</div>
+					<div className="space-y-1.5">
+						{link('/app/settings', 'Settings', Settings)}
+					</div>
 				</div>
-				{link('/app/settings', 'Settings', Settings)}
-				
-				{/* Development menu (only visible in dev mode) */}
-				{import.meta.env.DEV && (
-					<>
-						<div className="my-4 border-t border-neutral-200 dark:border-neutral-800" />
-						<div className="mb-2 px-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-							Development
-						</div>
-						{link('/app/guide', 'Service Guide', BookOpen)}
-						{link('/app/workflow', 'Workflow Visualization', Workflow)}
-						{link('/app/dev/roadmap', '🚀 Product Roadmap', Rocket)}
-					</>
-				)}
 			</nav>
 
-			{/* Sidebar Footer - Logout */}
-			<div className="px-3 py-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2 shrink-0">
-				<Link
-					to="/"
-					className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-				>
-					<LogOut size={20} />
-					Logout
-				</Link>
+			{/* Sidebar Footer - Floating User Card */}
+			<div className="p-4 mt-auto bg-linear-to-t from-[#050505] via-[#050505] to-transparent">
+				{user && (
+                    <div className="relative group rounded-2xl bg-[#0f0f0f] border border-[#1f1f1f] hover:border-[#2f2f2f] transition-all duration-300 p-4 shadow-lg cursor-default">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="relative shrink-0">
+                                <div className="size-10 rounded-full bg-linear-to-br from-orange-500 to-amber-500 p-[1px]">
+                                    <div className="size-full rounded-full bg-[#1a1a1a] flex items-center justify-center text-white font-medium text-sm">
+                                        {user.name.charAt(0)}
+                                    </div>
+                                </div>
+                                <div className="absolute bottom-0 right-0 size-2.5 bg-green-500 rounded-full border-2 border-[#0f0f0f]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-white truncate">{user.name}</div>
+                                <div className="text-xs text-neutral-500 truncate">{user.role}</div>
+                            </div>
+                        </div>
+                        <Link
+                            to="/"
+                            className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 text-xs font-medium bg-[#1a1a1a] text-neutral-400 hover:text-white hover:bg-[#252525] transition-all border border-transparent hover:border-[#333]"
+                        >
+                            <LogOut size={14} />
+                            <span>Sign out</span>
+                        </Link>
+                    </div>
+				)}
 			</div>
-		</>
+		</div>
 	)
 
 	return (
-		<div className="min-h-screen flex bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen flex bg-[#050505]">
 			{/* Mobile Overlay */}
 			{isMobileSidebarOpen && (
 				<div 
-					className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+					className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
 					onClick={() => setIsMobileSidebarOpen(false)}
 				/>
 			)}
 
-			{/* 좌측 사이드바 - Desktop: 고정형, Mobile: Overlay */}
+			{/* Sidebar - Fixed width, dark theme */}
 			<aside className={`
-				w-64 flex flex-col border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900
-				fixed left-0 top-0 bottom-0 z-50
+				w-[280px] fixed left-0 top-0 bottom-0 z-50
 				transition-transform duration-300 ease-in-out
 				lg:translate-x-0
 				${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -215,27 +229,23 @@ const visibleMenuGroups = menuGroups
 				<SidebarContent />
 			</aside>
 
-			{/* 메인 컨텐츠 영역 */}
-			<main className="flex-1 lg:ml-64 overflow-y-auto">
-				{/* Mobile Header with Hamburger Menu */}
-				<div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 py-3 flex items-center gap-3">
+			{/* Main Content Area - Adjusted margin for wider sidebar */}
+			<main className="flex-1 lg:ml-[280px] min-h-screen bg-[#050505] text-neutral-200">
+				{/* Mobile Header */}
+				<div className="lg:hidden sticky top-0 z-30 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-[#1a1a1a] px-4 py-3 flex items-center justify-between">
+					<div className="flex items-center gap-3">
 					<button
 						onClick={() => setIsMobileSidebarOpen(true)}
-						className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-						aria-label="Open menu"
+							className="p-2 text-neutral-400 hover:text-white rounded-lg"
 					>
 						<Menu size={24} />
 					</button>
-					<div className="size-6 rounded-lg bg-primary" />
-					<span className="text-lg font-semibold">Proce</span>
+						<span className="text-lg font-bold text-white">Proce</span>
+					</div>
 				</div>
 
 				{/* Page Content */}
-				<div className="p-4 sm:p-6">
-					<div className="mx-auto max-w-6xl">
-						<Outlet />
-					</div>
-				</div>
+				<Outlet />
 			</main>
 
 			<Toaster />

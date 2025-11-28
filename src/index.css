@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-	--color-primary: #3d3eff;
+	/* Professional Orange/Amber Theme */
+	--color-primary: #f97316; /* Orange-500 */
 	--color-primary-foreground: #ffffff;
+	--color-primary-hover: #ea580c; /* Orange-600 */
+	
+	/* Dark Mode Backgrounds - Deep & Sleek */
+	--color-background-dark: #050505; /* Almost Black */
+	--color-surface-dark: #0f0f0f; /* Slightly lighter for cards */
+	--color-border-dark: #262626; /* Neutral-800 */
+	
 	--font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", "Pretendard Variable", Pretendard, "Noto Sans", "Noto Sans CJK KR", "Malgun Gothic", "맑은 고딕", sans-serif;
 }
 
@@ -11,9 +19,36 @@
 html, body, #root { height: 100%; }
 
 body {
-	@apply bg-white text-neutral-900 antialiased;
+	@apply bg-neutral-50 text-neutral-900 antialiased;
 }
 
 @media (prefers-color-scheme: dark) {
-	body { @apply bg-neutral-950 text-neutral-50; }
+	body { 
+		background-color: var(--color-background-dark);
+		@apply text-neutral-100; 
+	}
+}
+
+/* Scrollbar Styles for professional look */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+::-webkit-scrollbar-track {
+	@apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+	@apply bg-neutral-300 dark:bg-neutral-800 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+	@apply bg-neutral-400 dark:bg-neutral-700;
+}
+
+/* Utility Classes for the Image Look */
+.card-gradient {
+	@apply bg-linear-to-br from-neutral-900 to-neutral-950;
+}
+
+.glass-panel {
+	@apply bg-white/5 backdrop-blur-lg border-white/10;
 }

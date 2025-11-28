@@ -1,21 +1,20 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
-import { BarChart3, Calendar, RefreshCw, TrendingUp, LineChart, FileText } from 'lucide-react'
+import { BarChart3, RefreshCw, TrendingUp, LineChart, FileText, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import DevMemo from '../../components/dev/DevMemo'
-import { DEV_MEMOS } from '../../constants/devMemos'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import { LoadingState } from '../../components/common/LoadingState'
 import { subDays, startOfDay, endOfDay } from 'date-fns'
 
-// Import tab components
+// Import components
 import OverviewTab from './_components/OverviewTab'
 import ComparisonTab from './_components/ComparisonTab'
 import TeamPerformanceTab from './_components/TeamPerformanceTab'
 import ReportsTab from './_components/ReportsTab'
+import ExecutiveChat from './_components/ExecutiveChat'
+import StrategicOverview from './_components/StrategicOverview'
 
 // Import utils
 import {
@@ -24,7 +23,6 @@ import {
 	analyzeDepartmentPerformance,
 	analyzeCategoryBreakdown,
 	analyzeProjects,
-	analyzeOKRs,
 	generateInsights,
 } from './_utils/analyticsCalculations'
 
@@ -41,7 +39,6 @@ export default function ExecutivePage() {
 		start: subDays(new Date(), 30),
 		end: new Date(),
 	})
-	// Note: setCustomDateRange will be used for custom date picker feature
 	const [loading, setLoading] = useState(true)
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -108,7 +105,6 @@ export default function ExecutivePage() {
 			const departments = analyzeDepartmentPerformance(dateRange.start, dateRange.end)
 			const categoryBreakdown = analyzeCategoryBreakdown(dateRange.start, dateRange.end)
 			const projects = analyzeProjects(dateRange.start, dateRange.end)
-			const okrs = analyzeOKRs()
 			const insights = generateInsights(dateRange.start, dateRange.end)
 
 			return {
@@ -117,7 +113,6 @@ export default function ExecutivePage() {
 				departments,
 				categoryBreakdown,
 				projects,
-				okrs,
 				insights,
 			}
 		} catch (error) {
@@ -131,7 +126,6 @@ export default function ExecutivePage() {
 	useEffect(() => {
 		const loadData = async () => {
 			setLoading(true)
-			// Simulate loading delay for better UX
 			await new Promise(resolve => setTimeout(resolve, 500))
 			setLoading(false)
 		}
@@ -141,7 +135,6 @@ export default function ExecutivePage() {
 	// Handle refresh
 	const handleRefresh = async () => {
 		setRefreshing(true)
-		// Recalculate analytics
 		await new Promise(resolve => setTimeout(resolve, 800))
 		setRefreshing(false)
 		toast.success('Analytics refreshed successfully')
@@ -157,14 +150,14 @@ export default function ExecutivePage() {
 	const tabs = [
 		{ 
 			id: 'overview' as TabType, 
-			label: 'Overview', 
-			icon: BarChart3,
+			label: 'Executive Dashboard', 
+			icon: LayoutDashboard,
 			visible: canViewOverview,
-			description: 'Executive summary and key insights'
+			description: 'High-level executive summary'
 		},
 		{ 
 			id: 'comparison' as TabType, 
-			label: 'Comparison', 
+			label: 'Trend Analysis', 
 			icon: LineChart,
 			visible: true,
 			description: 'Period-over-period analysis'
@@ -178,7 +171,7 @@ export default function ExecutivePage() {
 		},
 		{ 
 			id: 'reports' as TabType, 
-			label: 'Reports', 
+			label: 'Reports & Export', 
 			icon: FileText,
 			visible: true,
 			description: 'Export and download analytics'
@@ -187,12 +180,10 @@ export default function ExecutivePage() {
 
 	// Date range presets
 	const datePresets = [
-		{ id: 'last7days' as DateRangePreset, label: 'Last 7 Days' },
-		{ id: 'last30days' as DateRangePreset, label: 'Last 30 Days' },
-		{ id: 'last90days' as DateRangePreset, label: 'Last 90 Days' },
+		{ id: 'last7days' as DateRangePreset, label: '7 Days' },
+		{ id: 'last30days' as DateRangePreset, label: '30 Days' },
 		{ id: 'thisMonth' as DateRangePreset, label: 'This Month' },
-		{ id: 'lastMonth' as DateRangePreset, label: 'Last Month' },
-		{ id: 'thisYear' as DateRangePreset, label: 'This Year' },
+		{ id: 'thisYear' as DateRangePreset, label: 'YTD' },
 	]
 
 	if (loading) {
@@ -202,11 +193,8 @@ export default function ExecutivePage() {
 					<div>
 						<h1 className="text-3xl font-bold flex items-center gap-3">
 							<BarChart3 className="h-8 w-8 text-primary" />
-							Analytics & Insights
+							Executive Insights
 						</h1>
-						<p className="mt-2 text-neutral-600 dark:text-neutral-400">
-							Advanced analytics and performance metrics
-						</p>
 					</div>
 				</div>
 				<LoadingState type="card" count={4} />
@@ -217,10 +205,9 @@ export default function ExecutivePage() {
 	if (!analyticsData) {
 		return (
 			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-				<DevMemo content={DEV_MEMOS.EXECUTIVE} pagePath="/app/executive/page.tsx" />
 				<PageHeader
-					title="Analytics & Insights"
-					description="Comprehensive analytics and performance tracking"
+					title="Executive Insights"
+					description="Strategic overview and performance analytics"
 					icon={BarChart3}
 					actions={
 						<Button onClick={handleRefresh} variant="outline" size="sm">
@@ -237,7 +224,7 @@ export default function ExecutivePage() {
 							<p className="text-neutral-600 dark:text-neutral-400">
 								Failed to load analytics data. Please try again.
 							</p>
-							<Button onClick={handleRefresh} className="mt-4">
+							<Button onClick={handleRefresh} variant="primary" className="mt-4">
 								<RefreshCw className="h-4 w-4 mr-2" />
 								Retry
 							</Button>
@@ -249,67 +236,63 @@ export default function ExecutivePage() {
 	}
 
 	return (
-		<>
-			<DevMemo content={DEV_MEMOS.EXECUTIVE} pagePath="/app/executive/page.tsx" />
-			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-				<Toaster />
-				
-				{/* Header */}
-				<PageHeader
-					title="Analytics & Insights"
-					description="Comprehensive analytics and performance tracking"
-					icon={BarChart3}
-					actions={
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100 pb-20">
+			<Toaster />
+			<ExecutiveChat />
+			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+			{/* Header */}
+			<PageHeader
+				title="Executive Insights"
+				description="Strategic overview, risks, and performance pulse"
+				actions={
+					<div className="flex items-center gap-2">
+						<div className="hidden md:flex items-center bg-surface-dark rounded-lg border border-border-dark p-1">
+							{datePresets.map((preset) => (
+								<button
+									key={preset.id}
+									onClick={() => handleDateRangeChange(preset.id)}
+									className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+										dateRangePreset === preset.id
+											? 'bg-border-dark text-white'
+											: 'text-neutral-500 hover:text-neutral-300'
+									}`}
+								>
+									{preset.label}
+								</button>
+							))}
+						</div>
 						<Button
 							onClick={handleRefresh}
 							variant="outline"
 							size="sm"
 							disabled={refreshing}
+							className="text-neutral-300 hover:text-white"
 						>
 							<RefreshCw className={`h-4 w-4 sm:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
 							<span className="hidden sm:inline">Refresh</span>
 						</Button>
-					}
-				/>
+					</div>
+				}
+			/>
+			
+			<div className="space-y-6">
 				
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Date Range Filter */}
-				<Card>
-					<CardContent className="p-4">
-						<div className="flex items-center justify-between flex-wrap gap-4">
-							<div className="flex items-center gap-2">
-								<Calendar className="h-5 w-5 text-neutral-500" />
-								<span className="text-sm font-medium">Date Range:</span>
-							</div>
-							<div className="flex items-center gap-2 flex-wrap">
-								{datePresets.map((preset) => (
-									<button
-										key={preset.id}
-										onClick={() => handleDateRangeChange(preset.id)}
-										className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-											dateRangePreset === preset.id
-												? 'bg-primary text-white'
-												: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-										}`}
-									>
-										{preset.label}
-									</button>
-								))}
-							</div>
-						</div>
-					</CardContent>
-				</Card>
+				{/* Strategic Overview Section - Always visible on Overview tab */}
+				{activeTab === 'overview' && (
+					<StrategicOverview />
+				)}
 
 				{/* Tabs */}
-				<div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto">
+				<div className="flex items-center gap-2 border-b border-border-dark overflow-x-auto">
 					{tabs.map((tab) => (
 						<button
 							key={tab.id}
 							onClick={() => setActiveTab(tab.id)}
 							className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
 								activeTab === tab.id
-									? 'border-primary text-primary'
-									: 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+									? 'border-orange-500 text-orange-500'
+									: 'border-transparent text-neutral-500 hover:text-neutral-300'
 							}`}
 							title={tab.description}
 						>
@@ -320,7 +303,7 @@ export default function ExecutivePage() {
 				</div>
 
 				{/* Tab Content */}
-				<div className="min-h-[600px]">
+				<div className="min-h-[500px]">
 					{activeTab === 'overview' && canViewOverview && (
 						<OverviewTab
 							dateRange={dateRange}
@@ -343,7 +326,6 @@ export default function ExecutivePage() {
 						<TeamPerformanceTab
 							departments={analyticsData.departments}
 							projects={analyticsData.projects}
-							okrs={analyticsData.okrs}
 						/>
 					)}
 
@@ -353,13 +335,12 @@ export default function ExecutivePage() {
 							departments={analyticsData.departments}
 							categoryBreakdown={analyticsData.categoryBreakdown}
 							projects={analyticsData.projects}
-							okrs={analyticsData.okrs}
 							comparison={analyticsData.comparison}
 						/>
 					)}
 				</div>
 			</div>
-			</div>
-		</>
+		</div>
+	</div>
 	)
 }

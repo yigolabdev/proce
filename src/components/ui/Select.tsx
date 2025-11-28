@@ -17,7 +17,7 @@ export function Select({ children, className = '', ...props }: SelectProps) {
 			className={`
 				w-full px-3 py-2 
 				bg-white dark:bg-neutral-900 
-				border border-neutral-300 dark:border-neutral-700 
+				border border-neutral-300 dark:border-border-dark 
 				rounded-lg 
 				text-sm 
 				text-neutral-900 dark:text-neutral-100

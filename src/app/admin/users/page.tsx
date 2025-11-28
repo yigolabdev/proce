@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import { PageHeader } from '../../../components/common/PageHeader'
 import Input from '../../../components/ui/Input'
-import { Users, UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { UserPlus, Mail, Trash2, Edit, Search, X, ChevronLeft, ChevronRight, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import type { UserRole } from '../../../types/auth.types'
@@ -537,9 +537,9 @@ export default function UsersManagementPage() {
 
 	const getRoleBadge = (role: UserRole) => {
 		const styles = {
-			user: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-			admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-			executive: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+			user: 'bg-blue-900/30 text-blue-400 border border-blue-900/30',
+			admin: 'bg-purple-900/30 text-purple-400 border border-purple-900/30',
+			executive: 'bg-orange-900/30 text-orange-400 border border-orange-900/30',
 		}
 		const labels = {
 			user: 'User',
@@ -555,9 +555,9 @@ export default function UsersManagementPage() {
 
 	const getStatusBadge = (status: TeamMember['status']) => {
 		const styles = {
-			active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-			inactive: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400',
-			pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+			active: 'bg-green-900/30 text-green-400 border border-green-900/30',
+			inactive: 'bg-neutral-800 text-neutral-400 border border-neutral-700',
+			pending: 'bg-yellow-900/30 text-yellow-400 border border-yellow-900/30',
 		}
 		const labels = {
 			active: 'Active',
@@ -593,18 +593,20 @@ export default function UsersManagementPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
 				title="User Management"
 				description="Invite team members and manage permissions"
-				icon={Users}
 				actions={
 					<Button
 						onClick={() => setIsInviting(true)}
+						variant="outline"
 						size="sm"
+						className="rounded-full"
 					>
 						<UserPlus className="h-4 w-4 sm:mr-2" />
 						<span className="hidden sm:inline">Invite User</span>
@@ -612,49 +614,49 @@ export default function UsersManagementPage() {
 				}
 			/>
 			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+			<div className="space-y-6">
 
 			{/* Stats */}
 			<div className="grid gap-4 md:grid-cols-5">
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Total</div>
-						<div className="text-2xl font-bold">{stats.total}</div>
+						<div className="text-sm text-neutral-400 mb-1">Total</div>
+						<div className="text-2xl font-bold text-white">{stats.total}</div>
 					</CardContent>
 				</Card>
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Active</div>
-						<div className="text-2xl font-bold text-green-600">{stats.active}</div>
+						<div className="text-sm text-neutral-400 mb-1">Active</div>
+						<div className="text-2xl font-bold text-green-400">{stats.active}</div>
 					</CardContent>
 				</Card>
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Users</div>
-						<div className="text-2xl font-bold text-blue-600">{stats.users}</div>
+						<div className="text-sm text-neutral-400 mb-1">Users</div>
+						<div className="text-2xl font-bold text-blue-400">{stats.users}</div>
 					</CardContent>
 				</Card>
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Admins</div>
-						<div className="text-2xl font-bold text-purple-600">{stats.admins}</div>
+						<div className="text-sm text-neutral-400 mb-1">Admins</div>
+						<div className="text-2xl font-bold text-purple-400">{stats.admins}</div>
 					</CardContent>
 				</Card>
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
-						<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Executives</div>
-						<div className="text-2xl font-bold text-orange-600">{stats.executives}</div>
+						<div className="text-sm text-neutral-400 mb-1">Executives</div>
+						<div className="text-2xl font-bold text-orange-500">{stats.executives}</div>
 					</CardContent>
 				</Card>
 			</div>
 
 			{/* Invite Modal - Gmail Style */}
 			{isInviting && (
-				<Card className="border-primary/50 bg-primary/5">
+				<Card className="bg-surface-dark border-border-dark shadow-lg">
 					<CardContent className="p-6">
 						<div className="flex items-center justify-between mb-4">
-							<h3 className="font-bold text-lg flex items-center gap-2">
-								<Mail className="h-5 w-5 text-primary" />
+							<h3 className="font-bold text-lg flex items-center gap-2 text-white">
+								<Mail className="h-5 w-5 text-orange-500" />
 								Invite Users
 							</h3>
 							<button
@@ -663,7 +665,7 @@ export default function UsersManagementPage() {
 									setInviteEmails([])
 									setInviteEmail('')
 								}}
-								className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+								className="text-neutral-400 hover:text-white"
 							>
 								<X className="h-5 w-5" />
 							</button>
@@ -671,17 +673,17 @@ export default function UsersManagementPage() {
 
 						{/* Gmail-style Email Input */}
 						<div className="space-y-4">
-							<div className="border border-neutral-300 dark:border-neutral-700 rounded-2xl p-3 bg-white dark:bg-neutral-900 min-h-[100px]">
+							<div className="border border-border-dark rounded-2xl p-3 bg-[#1a1a1a] min-h-[100px]">
 								<div className="flex flex-wrap gap-2 mb-2">
 									{inviteEmails.map((email) => (
 										<div
 											key={email}
-											className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+											className="flex items-center gap-1 px-3 py-1 bg-orange-500/10 text-orange-500 rounded-full text-sm border border-orange-500/20"
 										>
 											<span>{email}</span>
 											<button
 												onClick={() => removeEmail(email)}
-												className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+												className="hover:bg-orange-500/20 rounded-full p-0.5 transition-colors"
 											>
 												<X className="h-3 w-3" />
 											</button>
@@ -694,28 +696,28 @@ export default function UsersManagementPage() {
 										onKeyDown={handleEmailKeyDown}
 										onBlur={addEmail}
 										placeholder={inviteEmails.length === 0 ? 'Enter email addresses (separate with comma, space, or Enter)' : ''}
-										className="flex-1 min-w-[200px] outline-none bg-transparent text-sm"
+										className="flex-1 min-w-[200px] outline-none bg-transparent text-sm text-white placeholder-neutral-500"
 									/>
 								</div>
 								{inviteEmails.length > 0 && (
-									<div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+									<div className="text-xs text-neutral-400 mt-1">
 										{inviteEmails.length} email{inviteEmails.length > 1 ? 's' : ''} added
 									</div>
 								)}
 							</div>
 
 							{/* Bulk Upload Option */}
-							<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+							<div className="border-t border-border-dark pt-4">
 								<div className="flex items-center justify-between mb-3">
-									<h4 className="font-medium text-sm flex items-center gap-2">
-										<FileSpreadsheet className="h-4 w-4 text-primary" />
+									<h4 className="font-medium text-sm flex items-center gap-2 text-neutral-300">
+										<FileSpreadsheet className="h-4 w-4 text-orange-500" />
 										Bulk Upload from CSV
 									</h4>
 									<Button
 										variant="outline"
 										size="sm"
 										onClick={downloadTemplate}
-										className="flex items-center gap-1 text-xs"
+										className="flex items-center gap-1 text-xs text-neutral-400 hover:text-white"
 									>
 										<Download className="h-3 w-3" />
 										Download Template
@@ -738,14 +740,14 @@ export default function UsersManagementPage() {
 										Upload CSV File
 									</Button>
 								</div>
-								<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+								<p className="text-xs text-neutral-500 mt-2">
 									CSV format: email,name (optional)
 								</p>
 							</div>
 
 							{/* Action Buttons */}
 							<div className="flex items-center gap-3">
-								<Button onClick={handleSendInvites} className="flex-1">
+								<Button onClick={handleSendInvites} variant="primary" className="flex-1">
 									<Mail className="h-4 w-4 mr-2" />
 									Send {inviteEmails.length > 0 ? `${inviteEmails.length} ` : ''}Invite{inviteEmails.length !== 1 ? 's' : ''}
 								</Button>
@@ -768,12 +770,12 @@ export default function UsersManagementPage() {
 
 			{/* Bulk Upload Preview Modal */}
 			{showBulkUpload && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<Card className="w-full max-w-4xl max-h-[80vh] flex flex-col">
-						<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+					<Card className="w-full max-w-4xl max-h-[80vh] flex flex-col bg-surface-dark border-border-dark">
+						<CardHeader className="border-b border-border-dark">
 							<div className="flex items-center justify-between">
-								<h3 className="font-bold text-xl flex items-center gap-2">
-									<FileSpreadsheet className="h-6 w-6 text-primary" />
+								<h3 className="font-bold text-xl flex items-center gap-2 text-white">
+									<FileSpreadsheet className="h-6 w-6 text-orange-500" />
 									Bulk Invite Preview
 								</h3>
 								<button
@@ -781,7 +783,7 @@ export default function UsersManagementPage() {
 										setShowBulkUpload(false)
 										setUploadedEmails([])
 									}}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-400 hover:text-white"
 								>
 									<X className="h-5 w-5" />
 								</button>
@@ -791,21 +793,21 @@ export default function UsersManagementPage() {
 							<div className="space-y-4">
 								{/* Summary */}
 								<div className="grid grid-cols-2 gap-4">
-									<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+									<div className="p-4 bg-green-900/10 border border-green-800 rounded-xl">
 										<div className="flex items-center gap-2 mb-2">
-											<CheckCircle2 className="h-5 w-5 text-green-600" />
-											<span className="font-medium text-green-900 dark:text-green-100">Valid Emails</span>
+											<CheckCircle2 className="h-5 w-5 text-green-400" />
+											<span className="font-medium text-green-100">Valid Emails</span>
 										</div>
-										<div className="text-3xl font-bold text-green-600">
+										<div className="text-3xl font-bold text-green-400">
 											{uploadedEmails.filter((e) => e.valid).length}
 										</div>
 									</div>
-									<div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+									<div className="p-4 bg-red-900/10 border border-red-800 rounded-xl">
 										<div className="flex items-center gap-2 mb-2">
-											<AlertCircle className="h-5 w-5 text-red-600" />
-											<span className="font-medium text-red-900 dark:text-red-100">Invalid/Duplicate</span>
+											<AlertCircle className="h-5 w-5 text-red-400" />
+											<span className="font-medium text-red-100">Invalid/Duplicate</span>
 										</div>
-										<div className="text-3xl font-bold text-red-600">
+										<div className="text-3xl font-bold text-red-400">
 											{uploadedEmails.filter((e) => !e.valid).length}
 										</div>
 									</div>
@@ -813,30 +815,30 @@ export default function UsersManagementPage() {
 
 								{/* Email List */}
 								<div className="space-y-2">
-									<h4 className="font-medium text-sm text-neutral-600 dark:text-neutral-400">Email List</h4>
+									<h4 className="font-medium text-sm text-neutral-400">Email List</h4>
 									<div className="max-h-[400px] overflow-y-auto space-y-2">
 										{uploadedEmails.map((item, index) => (
 											<div
 												key={index}
 												className={`p-3 border rounded-xl flex items-center justify-between ${
 													item.valid
-														? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
-														: 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
+														? 'border-green-800 bg-green-900/10'
+														: 'border-red-800 bg-red-900/10'
 												}`}
 											>
 												<div className="flex items-center gap-3 flex-1 min-w-0">
 													{item.valid ? (
-														<CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+														<CheckCircle2 className="h-4 w-4 text-green-400 shrink-0" />
 													) : (
-														<AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+														<AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
 													)}
 													<div className="flex-1 min-w-0">
-														<div className="font-medium text-sm truncate">{item.email}</div>
-														{item.name && <div className="text-xs text-neutral-600 dark:text-neutral-400">{item.name}</div>}
+														<div className="font-medium text-sm truncate text-white">{item.email}</div>
+														{item.name && <div className="text-xs text-neutral-400">{item.name}</div>}
 													</div>
 												</div>
 												{!item.valid && item.error && (
-													<span className="text-xs text-red-600 dark:text-red-400 ml-2">
+													<span className="text-xs text-red-400 ml-2">
 														{item.error}
 													</span>
 												)}
@@ -846,9 +848,10 @@ export default function UsersManagementPage() {
 								</div>
 
 								{/* Action Buttons */}
-								<div className="flex items-center gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								<div className="flex items-center gap-3 pt-4 border-t border-border-dark">
 									<Button
 										onClick={handleBulkInvite}
+										variant="primary"
 										disabled={uploadedEmails.filter((e) => e.valid).length === 0}
 										className="flex-1"
 									>
@@ -874,17 +877,17 @@ export default function UsersManagementPage() {
 
 			{/* Edit Modal */}
 			{editingMember && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-					<Card className="w-full max-w-2xl mx-4">
-						<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+					<Card className="w-full max-w-2xl mx-4 bg-surface-dark border-border-dark">
+						<CardHeader className="border-b border-border-dark">
 							<div className="flex items-center justify-between">
-								<h3 className="font-bold text-xl flex items-center gap-2">
-									<Edit className="h-5 w-5 text-primary" />
+								<h3 className="font-bold text-xl flex items-center gap-2 text-white">
+									<Edit className="h-5 w-5 text-orange-500" />
 									Edit User
 								</h3>
 								<button
 									onClick={handleEditCancel}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-400 hover:text-white"
 								>
 									<X className="h-5 w-5" />
 								</button>
@@ -894,7 +897,7 @@ export default function UsersManagementPage() {
 							<div className="space-y-4">
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium mb-2">Name</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Name</label>
 										<Input
 											value={editForm.name || ''}
 											onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
@@ -902,7 +905,7 @@ export default function UsersManagementPage() {
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">Email</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Email</label>
 										<Input
 											type="email"
 											value={editForm.email || ''}
@@ -914,7 +917,7 @@ export default function UsersManagementPage() {
 
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium mb-2">Department</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Department</label>
 										<Input
 											value={editForm.department || ''}
 											onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
@@ -922,7 +925,7 @@ export default function UsersManagementPage() {
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">Position</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Position</label>
 										<Input
 											value={editForm.position || ''}
 											onChange={(e) => setEditForm({ ...editForm, position: e.target.value })}
@@ -933,11 +936,11 @@ export default function UsersManagementPage() {
 
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-									<label className="block text-sm font-medium mb-2">Role</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Role</label>
 									<select
 										value={editForm.role || 'user'}
 										onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
 									>
 										<option value="user">User</option>
 										<option value="admin">Admin</option>
@@ -945,11 +948,11 @@ export default function UsersManagementPage() {
 									</select>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">Status</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Status</label>
 										<select
 											value={editForm.status || 'active'}
 											onChange={(e) => setEditForm({ ...editForm, status: e.target.value as TeamMember['status'] })}
-											className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
 										>
 											<option value="active">Active</option>
 											<option value="inactive">Inactive</option>
@@ -959,7 +962,7 @@ export default function UsersManagementPage() {
 								</div>
 
 								<div className="flex items-center gap-3 pt-4">
-									<Button onClick={handleEditSave} className="flex-1">
+									<Button onClick={handleEditSave} variant="primary" className="flex-1">
 										Save Changes
 									</Button>
 									<Button variant="outline" onClick={handleEditCancel} className="flex-1">
@@ -973,10 +976,10 @@ export default function UsersManagementPage() {
 			)}
 
 			{/* Search */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardContent className="p-4">
 					<div className="relative">
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500" />
 						<Input
 							type="text"
 							placeholder="Search by name, email, or department..."
@@ -985,18 +988,18 @@ export default function UsersManagementPage() {
 								setSearchQuery(e.target.value)
 								setCurrentPage(1) // Reset to first page on search
 							}}
-							className="pl-10"
+							className="pl-10 bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
 						/>
 					</div>
 				</CardContent>
 			</Card>
 
 			{/* Members List */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
 					<div className="flex items-center justify-between">
-						<h2 className="text-xl font-bold">Team Members</h2>
-						<div className="text-sm text-neutral-600 dark:text-neutral-400">
+						<h2 className="text-xl font-bold text-white">Team Members</h2>
+						<div className="text-sm text-neutral-400">
 							Showing {startIndex + 1}-{Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length}
 						</div>
 					</div>
@@ -1006,17 +1009,17 @@ export default function UsersManagementPage() {
 						{currentMembers.map((member) => (
 							<div
 								key={member.id}
-								className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:shadow-md transition-shadow"
+								className="flex items-center justify-between p-3 border border-border-dark rounded-xl hover:bg-neutral-800/50 transition-colors bg-[#1a1a1a]"
 							>
 							<div className="flex items-center flex-1">
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center gap-2 mb-0.5">
-										<h3 className="font-bold text-sm">{member.name}</h3>
+										<h3 className="font-bold text-sm text-white">{member.name}</h3>
 										{getRoleBadge(member.role)}
 										{getStatusBadge(member.status)}
 									</div>
-									<div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-										<span className="truncate">{member.email}</span>
+									<div className="flex items-center gap-3 text-xs text-neutral-500">
+										<span className="truncate text-neutral-400">{member.email}</span>
 										<span>•</span>
 										<span>{member.department}</span>
 										<span>•</span>
@@ -1026,26 +1029,30 @@ export default function UsersManagementPage() {
 							</div>
 
 							<div className="flex items-center gap-2">
-								<button
-									className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 rounded-lg"
 									onClick={() => handleEditClick(member)}
 									title="Edit user"
 								>
 									<Edit className="h-4 w-4" />
-								</button>
-								<button
-									className="p-2 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-900/20"
 									onClick={() => handleDelete(member.id, member.name)}
 									title="Delete user"
 								>
 									<Trash2 className="h-4 w-4" />
-								</button>
+								</Button>
 							</div>
 							</div>
 						))}
 
 						{currentMembers.length === 0 && (
-							<div className="text-center py-12 text-neutral-600 dark:text-neutral-400">
+							<div className="text-center py-12 text-neutral-400">
 								No users found
 							</div>
 						)}
@@ -1053,9 +1060,9 @@ export default function UsersManagementPage() {
 
 					{/* Pagination */}
 					{totalPages > 1 && (
-						<div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-							<div className="text-sm text-neutral-600 dark:text-neutral-400">
-								Showing <span className="font-medium text-neutral-900 dark:text-neutral-100">{startIndex + 1}-{Math.min(endIndex, filteredMembers.length)}</span> of <span className="font-medium text-neutral-900 dark:text-neutral-100">{filteredMembers.length}</span> users
+						<div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-border-dark">
+							<div className="text-sm text-neutral-400">
+								Showing <span className="font-medium text-white">{startIndex + 1}-{Math.min(endIndex, filteredMembers.length)}</span> of <span className="font-medium text-white">{filteredMembers.length}</span> users
 							</div>
 							<div className="flex items-center gap-2">
 								<Button
@@ -1063,7 +1070,7 @@ export default function UsersManagementPage() {
 									size="sm"
 									onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
 									disabled={currentPage === 1}
-									className="flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+									className="flex items-center gap-1"
 								>
 									<ChevronLeft className="h-4 w-4" />
 									Previous
@@ -1088,8 +1095,8 @@ export default function UsersManagementPage() {
 												onClick={() => setCurrentPage(pageNumber)}
 												className={`min-w-[32px] h-8 px-2 rounded-lg text-sm font-medium transition-all ${
 													pageNumber === currentPage
-														? 'bg-primary text-white shadow-md'
-														: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
+														? 'bg-white text-black shadow-md'
+														: 'hover:bg-neutral-800 text-neutral-400 hover:text-white'
 												}`}
 											>
 												{pageNumber}
@@ -1097,22 +1104,23 @@ export default function UsersManagementPage() {
 										)
 									})}
 								</div>
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-									disabled={currentPage === totalPages}
-									className="flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
-								>
-									Next
-									<ChevronRight className="h-4 w-4" />
-								</Button>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+										disabled={currentPage === totalPages}
+										className="flex items-center gap-1"
+									>
+										Next
+										<ChevronRight className="h-4 w-4" />
+									</Button>
+								</div>
 							</div>
-					</div>
-				)}
-			</CardContent>
-		</Card>
-		</div>
+						)}
+					</CardContent>
+				</Card>
+			</div>
+			</div>
 		</div>
 	)
 }

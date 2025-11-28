@@ -5,11 +5,10 @@ import type {
 	DepartmentPerformance,
 	CategoryBreakdown,
 	ProjectAnalytics,
-	OKRAnalytics,
 	InsightCard,
 	TimeSeriesDataPoint,
 } from '../_types/analytics.types'
-import type { WorkEntry, Project, Objective } from '../../../types/common.types'
+import type { WorkEntry, Project } from '../../../types/common.types'
 import { STORAGE_KEYS } from '../../../types/common.types'
 import { safeGetArray } from '../../../utils/safeStorage'
 
@@ -95,8 +94,6 @@ export const comparePeriods = (
 		endDate: parseDate(proj.endDate),
 	}))
 	
-	const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
-
 	const getCurrentMetrics = (start: Date, end: Date) => {
 		const entries = workEntries.filter((e) => isWithinInterval(e.date, { start, end }))
 		const activeProjects = projects.filter((p) =>
@@ -106,9 +103,9 @@ export const comparePeriods = (
 				(p.startDate <= start && p.endDate >= end)
 			)
 		)
-		const avgOkrProgress = objectives.length > 0
-			? objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) / objectives.length
-			: 0
+		// const avgOkrProgress = objectives.length > 0
+		// 	? objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) / objectives.length
+		// 	: 0
 
 		return {
 			workEntries: entries.length,
@@ -117,7 +114,7 @@ export const comparePeriods = (
 				return sum + hours
 			}, 0),
 			projectsActive: activeProjects.length,
-			okrProgress: avgOkrProgress,
+			okrProgress: 0, // avgOkrProgress,
 		}
 	}
 
@@ -161,7 +158,7 @@ export const analyzeDepartmentPerformance = (startDate: Date, endDate: Date): De
 		.filter((e) => isWithinInterval(e.date, { start: startDate, end: endDate }))
 
 	const projects = safeGetArray<Project>(STORAGE_KEYS.PROJECTS)
-	const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
+	// const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
 
 	// Group by department
 	const departments = new Map<string, WorkEntry[]>()
@@ -181,7 +178,7 @@ export const analyzeDepartmentPerformance = (startDate: Date, endDate: Date): De
 
 	const results: DepartmentPerformance[] = Array.from(departments.entries()).map(([dept, entries]) => {
 		const deptProjects = projects.filter((p) => p.departments?.includes(dept))
-		const deptObjectives = objectives.filter((o) => o.team === dept)
+		// const deptObjectives = objectives.filter((o) => o.team === dept)
 
 		const totalHours = entries.reduce((sum, e) => {
 			const hours = e.duration ? parseFloat(e.duration.replace('h', '')) || 0 : 0
@@ -192,9 +189,9 @@ export const analyzeDepartmentPerformance = (startDate: Date, endDate: Date): De
 			? deptProjects.reduce((sum, p) => sum + p.progress, 0) / deptProjects.length
 			: 0
 
-		const okrCompletionRate = deptObjectives.length > 0
-			? deptObjectives.filter((o) => o.status === 'completed').length / deptObjectives.length * 100
-			: 0
+		// const okrCompletionRate = deptObjectives.length > 0
+		// 	? deptObjectives.filter((o) => o.status === 'completed').length / deptObjectives.length * 100
+		// 	: 0
 
 		return {
 			department: dept,
@@ -203,7 +200,7 @@ export const analyzeDepartmentPerformance = (startDate: Date, endDate: Date): De
 				totalHours,
 				averageProgress: avgProgress,
 				projectsCount: deptProjects.length,
-				okrCompletionRate,
+				okrCompletionRate: 0, // okrCompletionRate,
 			},
 			trend: 'stable', // TODO: Calculate based on historical data
 			rank: 0, // Will be set after sorting
@@ -295,36 +292,10 @@ export const analyzeProjects = (startDate: Date, endDate: Date): ProjectAnalytic
 	)
 }
 
-// 6. OKR Analytics
-export const analyzeOKRs = (): OKRAnalytics[] => {
-	const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
-
-	return objectives.map((obj) => {
-		const totalKRs = obj.keyResults?.length || 0
-		const completedKRs = obj.keyResults?.filter((kr) => kr.current >= kr.target).length || 0
-		const endDate = obj.endDate ? new Date(obj.endDate) : new Date()
-		const daysRemaining = Math.max(0, differenceInDays(endDate, new Date()))
-		
-		// Map status to allowed OKRAnalytics statuses
-		let mappedStatus: 'on-track' | 'at-risk' | 'behind' | 'completed' = 'on-track'
-		if (obj.status === 'completed') mappedStatus = 'completed'
-		else if (obj.status === 'behind') mappedStatus = 'behind'
-		else if (obj.status === 'at-risk') mappedStatus = 'at-risk'
-		else mappedStatus = 'on-track' // 'not-started' or undefined -> 'on-track'
-
-		return {
-			objectiveId: obj.id,
-			title: obj.title,
-			owner: obj.owner || 'Unassigned',
-			team: obj.team || 'Unassigned',
-			progress: obj.progress || 0,
-			status: mappedStatus,
-			keyResultsTotal: totalKRs,
-			keyResultsCompleted: completedKRs,
-			daysRemaining,
-		}
-	})
-}
+// 6. OKR Analytics (Deprecated)
+// export const analyzeOKRs = (): OKRAnalytics[] => {
+// 	return []
+// }
 
 // 7. Generate AI Insights
 export const generateInsights = (startDate: Date, endDate: Date): InsightCard[] => {
@@ -337,7 +308,7 @@ export const generateInsights = (startDate: Date, endDate: Date): InsightCard[] 
 		.filter((e) => isWithinInterval(e.date, { start: startDate, end: endDate }))
 
 	const projects = safeGetArray<Project>(STORAGE_KEYS.PROJECTS)
-	const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
+	// const objectives = safeGetArray<Objective>(STORAGE_KEYS.OBJECTIVES)
 
 	const insights: InsightCard[] = []
 
@@ -370,29 +341,7 @@ export const generateInsights = (startDate: Date, endDate: Date): InsightCard[] 
 		})
 	}
 
-	// Insight 3: OKR Progress
-	const avgOkrProgress = objectives.length > 0
-		? objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) / objectives.length
-		: 0
-	if (avgOkrProgress > 70) {
-		insights.push({
-			id: 'okr-on-track',
-			type: 'success',
-			title: 'OKRs On Track',
-			description: `Average progress is ${avgOkrProgress.toFixed(0)}%`,
-			metric: `${objectives.filter((o) => o.status === 'completed').length}/${objectives.length} completed`,
-			priority: 'medium',
-		})
-	} else if (avgOkrProgress < 30) {
-		insights.push({
-			id: 'okr-behind',
-			type: 'danger',
-			title: 'OKRs Need Attention',
-			description: `Average progress is only ${avgOkrProgress.toFixed(0)}%`,
-			recommendation: 'Review objectives and adjust key results',
-			priority: 'high',
-		})
-	}
+	// Insight 3: OKR Progress (Removed)
 
 	// Insight 4: Category Distribution
 	const categories = new Map<string, number>()

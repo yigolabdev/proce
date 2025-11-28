@@ -1,9 +1,9 @@
-import type { DraftData } from '../InputPage'
+import type { WorkDraft } from '../../types/common.types'
 
 /**
  * Work Input 임시 저장 목업 데이터
  */
-export const mockDrafts: Omit<DraftData, 'savedAt'>[] = [
+export const mockDrafts: Omit<WorkDraft, 'savedAt'>[] = [
 	{
 		id: '1',
 		title: '신규 프로젝트 기획안 작성',

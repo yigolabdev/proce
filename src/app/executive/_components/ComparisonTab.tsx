@@ -36,21 +36,21 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 	]
 
 	const getChangeIcon = (change: number) => {
-		if (change > 0) return <ArrowUp className="h-5 w-5 text-green-600" />
-		if (change < 0) return <ArrowDown className="h-5 w-5 text-red-600" />
-		return <Minus className="h-5 w-5 text-gray-600" />
+		if (change > 0) return <ArrowUp className="h-5 w-5 text-green-400" />
+		if (change < 0) return <ArrowDown className="h-5 w-5 text-red-400" />
+		return <Minus className="h-5 w-5 text-neutral-400" />
 	}
 
 	const getChangeColor = (change: number) => {
-		if (change > 0) return 'text-green-600'
-		if (change < 0) return 'text-red-600'
-		return 'text-gray-600'
+		if (change > 0) return 'text-green-400'
+		if (change < 0) return 'text-red-400'
+		return 'text-neutral-400'
 	}
 
 	const getChangeBackground = (change: number) => {
-		if (change > 0) return 'bg-green-50 dark:bg-green-900/20'
-		if (change < 0) return 'bg-red-50 dark:bg-red-900/20'
-		return 'bg-gray-50 dark:bg-gray-900/20'
+		if (change > 0) return 'bg-green-500/10 border-green-500/20'
+		if (change < 0) return 'bg-red-500/10 border-red-500/20'
+		return 'bg-neutral-500/10 border-neutral-500/20'
 	}
 
 	const metrics = [
@@ -88,31 +88,31 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 		<div className="space-y-6">
 			{/* Period Info */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-6">
 						<div className="flex items-center gap-3 mb-2">
-							<Calendar className="h-5 w-5 text-blue-600" />
-							<h3 className="font-bold text-lg">Current Period</h3>
+							<Calendar className="h-5 w-5 text-orange-500" />
+							<h3 className="font-bold text-lg text-white">Current Period</h3>
 						</div>
-						<div className="text-sm text-neutral-600 dark:text-neutral-400">
+						<div className="text-sm text-neutral-400">
 							{format(current.startDate, 'MMM d, yyyy')} - {format(current.endDate, 'MMM d, yyyy')}
 						</div>
-						<div className="mt-4 text-3xl font-bold text-blue-600">
+						<div className="mt-4 text-3xl font-bold text-orange-500">
 							{current.metrics.workEntries} entries
 						</div>
 					</CardContent>
 				</Card>
 
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-6">
 						<div className="flex items-center gap-3 mb-2">
-							<Calendar className="h-5 w-5 text-gray-600" />
-							<h3 className="font-bold text-lg">Previous Period</h3>
+							<Calendar className="h-5 w-5 text-neutral-500" />
+							<h3 className="font-bold text-lg text-white">Previous Period</h3>
 						</div>
-						<div className="text-sm text-neutral-600 dark:text-neutral-400">
+						<div className="text-sm text-neutral-400">
 							{format(previous.startDate, 'MMM d, yyyy')} - {format(previous.endDate, 'MMM d, yyyy')}
 						</div>
-						<div className="mt-4 text-3xl font-bold text-gray-600">
+						<div className="mt-4 text-3xl font-bold text-neutral-500">
 							{previous.metrics.workEntries} entries
 						</div>
 					</CardContent>
@@ -120,42 +120,43 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 			</div>
 
 			{/* Comparison Chart */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<TrendingUp className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<TrendingUp className="h-5 w-5 text-orange-500" />
 						Period Comparison
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Side-by-side comparison of key metrics
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
 					<ResponsiveContainer width="100%" height={350}>
 						<BarChart data={comparisonData}>
-							<CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-							<XAxis dataKey="metric" tick={{ fontSize: 12 }} />
-							<YAxis tick={{ fontSize: 12 }} />
+							<CartesianGrid strokeDasharray="3 3" opacity={0.1} stroke="#525252" />
+							<XAxis dataKey="metric" tick={{ fontSize: 12, fill: '#a3a3a3' }} stroke="#525252" />
+							<YAxis tick={{ fontSize: 12, fill: '#a3a3a3' }} stroke="#525252" />
 							<Tooltip
 								contentStyle={{
-									backgroundColor: 'rgba(255, 255, 255, 0.95)',
-									border: '1px solid #e5e7eb',
+									backgroundColor: '#1a1a1a',
+									border: '1px solid #262626',
 									borderRadius: '8px',
+									color: '#fff',
 								}}
 							/>
 							<Legend />
-							<Bar dataKey="previous" fill="#9ca3af" name="Previous Period" radius={[4, 4, 0, 0]} />
-							<Bar dataKey="current" fill="#3b82f6" name="Current Period" radius={[4, 4, 0, 0]} />
+							<Bar dataKey="previous" fill="#525252" name="Previous Period" radius={[4, 4, 0, 0]} />
+							<Bar dataKey="current" fill="#f97316" name="Current Period" radius={[4, 4, 0, 0]} />
 						</BarChart>
 					</ResponsiveContainer>
 				</CardContent>
 			</Card>
 
 			{/* Detailed Metrics */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold flex items-center gap-2">
-						<TrendingDown className="h-5 w-5 text-primary" />
+					<h3 className="font-bold flex items-center gap-2 text-white">
+						<TrendingDown className="h-5 w-5 text-orange-500" />
 						Detailed Changes
 					</h3>
 				</CardHeader>
@@ -168,7 +169,7 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 							>
 								<div className="flex items-start justify-between mb-3">
 									<div>
-										<h4 className="font-semibold text-lg">{metric.label}</h4>
+										<h4 className="font-semibold text-lg text-white">{metric.label}</h4>
 									</div>
 									<div className="flex items-center gap-2">
 										{getChangeIcon(metric.change)}
@@ -179,19 +180,19 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 								</div>
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<div className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Current</div>
-										<div className="text-2xl font-bold">
+										<div className="text-xs text-neutral-400 mb-1">Current</div>
+										<div className="text-2xl font-bold text-white">
 											{metric.current}{metric.unit}
 										</div>
 									</div>
 									<div>
-										<div className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Previous</div>
-										<div className="text-xl font-semibold text-neutral-600">
+										<div className="text-xs text-neutral-400 mb-1">Previous</div>
+										<div className="text-xl font-semibold text-neutral-500">
 											{metric.previous}{metric.unit}
 										</div>
 									</div>
 								</div>
-							<div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
+							<div className="mt-3 text-xs text-neutral-400">
 								{metric.change > 0 ? 'Increased' : metric.change < 0 ? 'Decreased' : 'No change'} by{' '}
 								{Math.abs(parseFloat(String(metric.current)) - parseFloat(String(metric.previous))).toFixed(1)}{metric.unit}
 							</div>
@@ -202,29 +203,29 @@ export default function ComparisonTab({ current, previous, changes }: Comparison
 			</Card>
 
 			{/* Summary */}
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
-					<h3 className="font-bold">Period Summary</h3>
+					<h3 className="font-bold text-white">Period Summary</h3>
 				</CardHeader>
 				<CardContent className="p-6">
 					<div className="space-y-3">
-						<p className="text-sm">
+						<p className="text-sm text-neutral-300">
 							{changes.workEntries > 0 ? (
-								<span className="text-green-600 font-semibold">✓ Positive growth</span>
+								<span className="text-green-400 font-semibold">✓ Positive growth</span>
 							) : changes.workEntries < 0 ? (
-								<span className="text-red-600 font-semibold">⚠ Decline</span>
+								<span className="text-red-400 font-semibold">⚠ Decline</span>
 							) : (
-								<span className="text-gray-600 font-semibold">− Stable</span>
+								<span className="text-neutral-400 font-semibold">− Stable</span>
 							)}{' '}
 							in work activity compared to previous period
 						</p>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-300">
 							Team productivity {changes.totalHours > 0 ? 'increased' : 'decreased'} by{' '}
-							<span className="font-semibold">{Math.abs(changes.totalHours).toFixed(1)}%</span> in total hours worked
+							<span className="font-semibold text-white">{Math.abs(changes.totalHours).toFixed(1)}%</span> in total hours worked
 						</p>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-300">
 							OKR progress {changes.okrProgress > 0 ? 'improved' : 'declined'} by{' '}
-							<span className="font-semibold">{Math.abs(changes.okrProgress).toFixed(1)} percentage points</span>
+							<span className="font-semibold text-white">{Math.abs(changes.okrProgress).toFixed(1)} percentage points</span>
 						</p>
 					</div>
 				</CardContent>

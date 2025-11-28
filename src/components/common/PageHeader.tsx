@@ -2,7 +2,7 @@
  * PageHeader Component - Enhanced
  * 
  * 모든 페이지에서 사용하는 통일된 헤더 디자인 시스템
- * 탭, 특수 컨텐츠 등을 지원하는 확장 가능한 헤더
+ * Dashboard 페이지와 동일한 스타일 가이드 적용
  */
 
 import { type ReactNode } from 'react'
@@ -49,7 +49,7 @@ export function PageHeader({
 	title,
 	description,
 	icon: Icon,
-	iconColor = 'text-primary',
+	iconColor = 'text-neutral-900 dark:text-white',
 	actions,
 	tabs,
 	children,
@@ -57,27 +57,30 @@ export function PageHeader({
 	className = '',
 }: PageHeaderProps) {
 	return (
-		<div 
-			className={`${
-				sticky ? 'sticky top-0 z-10 bg-neutral-50 dark:bg-neutral-950' : ''
-			} ${className}`}
-		>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+		<div className={`${sticky ? 'sticky top-0 z-10 bg-neutral-50 dark:bg-background-dark pt-4 pb-4 border-b border-neutral-200 dark:border-border-dark' : ''} ${className}`}>
 				{/* Title & Actions */}
-				<div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${tabs || children ? 'mb-6' : ''}`}>
-					<div className="flex-1 min-w-0">
-						<div className="flex items-center gap-2 sm:gap-3 mb-2">
-							{Icon && <Icon className={`h-7 w-7 sm:h-8 sm:w-8 ${iconColor} shrink-0`} />}
-							<h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-50">{title}</h1>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+				<div className="flex items-center gap-3 min-w-0">
+					{/* Icon is optional */}
+					{Icon && (
+						<div className="p-2 rounded-xl bg-neutral-100 dark:bg-surface-dark border border-neutral-200 dark:border-border-dark shrink-0">
+							<Icon className={`h-6 w-6 ${iconColor}`} />
 						</div>
+					)}
+					<div className="min-w-0">
+						<h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 truncate">
+							{title}
+						</h1>
 						{description && (
-							<p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400">
+							<div className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 truncate">
 								{description}
-							</p>
+							</div>
 						)}
 					</div>
+				</div>
+				
 					{actions && (
-						<div className="flex items-center gap-2 flex-wrap shrink-0">
+					<div className="flex items-center gap-3 shrink-0">
 							{actions}
 						</div>
 					)}
@@ -85,7 +88,8 @@ export function PageHeader({
 
 				{/* Tabs */}
 				{tabs && (
-					<div className="flex items-center gap-1 sm:gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto pb-px">
+				<div className="mt-8 border-b border-neutral-200 dark:border-border-dark overflow-x-auto pb-px no-scrollbar">
+					<div className="flex items-center gap-6">
 						{tabs.items.map((tab) => {
 							const TabIcon = tab.icon
 							const isActive = tabs.activeTab === tab.id
@@ -101,27 +105,32 @@ export function PageHeader({
 											tabs.onTabChange(tab.id)
 										}
 									}}
-									className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium transition-colors relative whitespace-nowrap ${
+									className={`flex items-center gap-2 pb-3 text-sm font-medium transition-all relative whitespace-nowrap ${
 										isActive
-											? 'text-primary'
-											: 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+											? 'text-neutral-900 dark:text-white'
+											: 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
 									}`}
 								>
-									{TabIcon && <TabIcon className="h-4 w-4 shrink-0" />}
+									{TabIcon && <TabIcon className={`h-4 w-4 ${isActive ? 'text-orange-500' : 'text-neutral-500'}`} />}
 									<span className="hidden sm:inline">{tab.label}</span>
 									{mobileLabel && <span className="sm:hidden">{mobileLabel}</span>}
 									{!mobileLabel && <span className="sm:hidden">{tab.label}</span>}
 									{tab.count !== null && tab.count !== undefined && tab.count > 0 && (
-										<span className="ml-1 px-1.5 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
+										<span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+											isActive 
+												? 'bg-orange-500/10 text-orange-500' 
+												: 'bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-500'
+										}`}>
 											{tab.count}
 										</span>
 									)}
 									{isActive && (
-										<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+										<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />
 									)}
 								</button>
 							)
 						})}
+					</div>
 					</div>
 				)}
 
@@ -131,7 +140,6 @@ export function PageHeader({
 						{children}
 					</div>
 				)}
-			</div>
 		</div>
 	)
 }

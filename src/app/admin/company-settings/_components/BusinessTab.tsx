@@ -12,19 +12,19 @@ interface BusinessTabProps {
 
 export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessTabProps) {
 	return (
-		<Card>
+		<Card className="bg-surface-dark border-border-dark">
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 className="text-xl font-bold flex items-center gap-2">
-							<Briefcase className="h-5 w-5 text-primary" />
+						<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+							<Briefcase className="h-5 w-5 text-orange-500" />
 							Business Information
 						</h2>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-sm text-neutral-400 mt-1">
 							Company description, vision, mission, market, and customers
 						</p>
 					</div>
-					<Button onClick={onSave} className="flex items-center gap-2">
+					<Button onClick={onSave} className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200">
 						<Save className="h-4 w-4" />
 						Save
 					</Button>
@@ -34,7 +34,7 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 				<div className="space-y-6">
 					{/* Description */}
 					<div>
-						<label className="block text-sm font-medium mb-2">Company Description</label>
+						<label className="block text-sm font-medium mb-2 text-neutral-300">Company Description</label>
 						<Textarea
 							value={companyInfo.description}
 							onChange={(e) => onChange('description', e.target.value)}
@@ -46,7 +46,7 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 					{/* Vision & Mission */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
-							<label className="block text-sm font-medium mb-2">Vision</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Vision</label>
 							<Textarea
 								value={companyInfo.vision}
 								onChange={(e) => onChange('vision', e.target.value)}
@@ -55,7 +55,7 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium mb-2">Mission</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Mission</label>
 							<Textarea
 								value={companyInfo.mission}
 								onChange={(e) => onChange('mission', e.target.value)}
@@ -68,7 +68,7 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 					{/* Products & Services */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
-							<label className="block text-sm font-medium mb-2">Main Products</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Main Products</label>
 							<Textarea
 								value={companyInfo.mainProducts}
 								onChange={(e) => onChange('mainProducts', e.target.value)}
@@ -77,7 +77,7 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium mb-2">Main Services</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Main Services</label>
 							<Textarea
 								value={companyInfo.mainServices}
 								onChange={(e) => onChange('mainServices', e.target.value)}
@@ -90,26 +90,26 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 					{/* Market & Customers */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
-							<label className="block text-sm font-medium mb-2">Target Market</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Target Market</label>
 							<Textarea
 								value={companyInfo.targetMarket}
 								onChange={(e) => onChange('targetMarket', e.target.value)}
 								placeholder="Describe your target market (geography, industry, market size)..."
 								rows={4}
 							/>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+							<p className="text-xs text-neutral-500 mt-1">
 								💡 e.g., "Global SaaS market, focusing on mid-size enterprises in North America and Europe"
 							</p>
 						</div>
 						<div>
-							<label className="block text-sm font-medium mb-2">Target Customers</label>
+							<label className="block text-sm font-medium mb-2 text-neutral-300">Target Customers</label>
 							<Textarea
 								value={companyInfo.targetCustomers}
 								onChange={(e) => onChange('targetCustomers', e.target.value)}
 								placeholder="Describe your ideal customers (demographics, behavior, needs)..."
 								rows={4}
 							/>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+							<p className="text-xs text-neutral-500 mt-1">
 								💡 e.g., "HR managers and team leaders in tech companies with 50-500 employees"
 							</p>
 						</div>
@@ -117,14 +117,14 @@ export default function BusinessTab({ companyInfo, onChange, onSave }: BusinessT
 
 					{/* Competitive Advantage */}
 					<div>
-						<label className="block text-sm font-medium mb-2">Competitive Advantage</label>
+						<label className="block text-sm font-medium mb-2 text-neutral-300">Competitive Advantage</label>
 						<Textarea
 							value={companyInfo.competitiveAdvantage}
 							onChange={(e) => onChange('competitiveAdvantage', e.target.value)}
 							placeholder="What makes your company unique and competitive..."
 							rows={4}
 						/>
-						<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-500 mt-1">
 							💡 Describe your unique value proposition, technology, expertise, or market position
 						</p>
 					</div>

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from '../../../../components/ui/Card'
 import { Button } from '../../../../components/ui/Button'
 import Input from '../../../../components/ui/Input'
+import { Select } from '../../../../components/ui/Select'
 import {
 	Building2,
 	Save,
@@ -53,19 +54,19 @@ export default function CompanyInfoTab({
 	onSocialLinkChange,
 }: CompanyInfoTabProps) {
 	return (
-		<Card>
+		<Card className="bg-surface-dark border-border-dark">
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<h2 className="text-xl font-bold flex items-center gap-2">
-							<Building2 className="h-5 w-5 text-primary" />
+						<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+							<Building2 className="h-5 w-5 text-orange-500" />
 							Company Information
 						</h2>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-sm text-neutral-400 mt-1">
 							Basic information, location, and contact details
 						</p>
 					</div>
-					<Button onClick={onSave} className="flex items-center gap-2">
+					<Button onClick={onSave} variant="primary">
 						<Save className="h-4 w-4" />
 						Save
 					</Button>
@@ -75,7 +76,7 @@ export default function CompanyInfoTab({
 				<div className="space-y-8">
 					{/* Company Identity */}
 					<div>
-						<h3 className="font-semibold text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex items-center gap-2">
+						<h3 className="font-semibold text-sm text-neutral-400 mb-4 flex items-center gap-2">
 							<Building2 className="h-4 w-4" />
 							Company Identity
 						</h3>
@@ -107,43 +108,41 @@ export default function CompanyInfoTab({
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-2">
+								<label className="block text-sm font-medium mb-2 text-neutral-300">
 									Industry <span className="text-red-500">*</span>
 								</label>
-								<select
+								<Select
 									value={companyInfo.industry}
 									onChange={(e) => onChange('industry', e.target.value)}
-									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 								>
 									{INDUSTRIES.map((ind) => (
 										<option key={ind} value={ind}>
 											{ind}
 										</option>
 									))}
-								</select>
+								</Select>
 							</div>
 						</div>
 					</div>
 
 					{/* Size & Foundation */}
 					<div>
-						<h3 className="font-semibold text-sm text-neutral-700 dark:text-neutral-300 mb-4">
+						<h3 className="font-semibold text-sm text-neutral-400 mb-4">
 							Size & Foundation
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-2">Company Size</label>
-								<select
+								<label className="block text-sm font-medium mb-2 text-neutral-300">Company Size</label>
+								<Select
 									value={companyInfo.companySize}
 									onChange={(e) => onChange('companySize', e.target.value)}
-									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
 								>
 									{COMPANY_SIZES.map((size) => (
 										<option key={size} value={size}>
 											{size}
 										</option>
 									))}
-								</select>
+								</Select>
 							</div>
 							<div>
 								<label className="block text-sm font-medium mb-2">Founded Year</label>
@@ -167,13 +166,13 @@ export default function CompanyInfoTab({
 
 					{/* Workforce */}
 					<div>
-						<h3 className="font-semibold text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex items-center gap-2">
+						<h3 className="font-semibold text-sm text-neutral-400 mb-4 flex items-center gap-2">
 							<Users className="h-4 w-4" />
 							Workforce Information
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-2">Total Employees</label>
+								<label className="block text-sm font-medium mb-2 text-neutral-300">Total Employees</label>
 								<Input
 									type="number"
 									value={companyInfo.employeeCount}
@@ -254,7 +253,7 @@ export default function CompanyInfoTab({
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-2 flex items-center gap-2">
+								<label className="text-sm font-medium mb-2 flex items-center gap-2">
 									<Phone className="h-4 w-4" />
 									Phone
 								</label>
@@ -265,7 +264,7 @@ export default function CompanyInfoTab({
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-2 flex items-center gap-2">
+								<label className="text-sm font-medium mb-2 flex items-center gap-2">
 									<Mail className="h-4 w-4" />
 									Email
 								</label>
@@ -277,7 +276,7 @@ export default function CompanyInfoTab({
 								/>
 							</div>
 							<div className="md:col-span-2">
-								<label className="block text-sm font-medium mb-2 flex items-center gap-2">
+								<label className="text-sm font-medium mb-2 flex items-center gap-2">
 									<Globe className="h-4 w-4" />
 									Website
 								</label>
@@ -294,7 +293,7 @@ export default function CompanyInfoTab({
 					{/* Social Media */}
 					<div>
 						<div className="flex items-center justify-between mb-3">
-							<label className="block text-sm font-medium flex items-center gap-2">
+							<label className="text-sm font-medium flex items-center gap-2">
 								<Globe className="h-4 w-4" />
 								Social Media
 							</label>

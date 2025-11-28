@@ -189,39 +189,40 @@ export default function ProjectsPage() {
 
 	if (loading) {
 		return (
-			<div className="flex items-center justify-center min-h-screen">
+			<div className="flex items-center justify-center min-h-screen bg-background-dark">
 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
 			</div>
 		)
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
 				title="Projects"
 				description="Manage and track your projects"
-				icon={FolderKanban}
 				actions={
-					<Button onClick={() => setShowCreateDialog(true)} size="sm">
+						<Button onClick={() => setShowCreateDialog(true)} size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 border-none">
 						<Plus className="h-4 w-4 sm:mr-2" />
 						<span className="hidden sm:inline">New Project</span>
 					</Button>
 				}
 			/>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+				<div className="space-y-6">
 				{/* Filters and View Toggle */}
 				<div className="flex items-center justify-between gap-4 flex-wrap">
 					{/* Status Filter */}
 					<div className="flex items-center gap-2">
-						<Filter className="h-4 w-4 text-neutral-500" />
+							<div className="relative">
+								<Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
 						<select
 							value={filterStatus}
 							onChange={(e) => setFilterStatus(e.target.value)}
-							className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									className="pl-10 pr-8 py-2 bg-surface-dark border border-border-dark rounded-lg text-sm focus:outline-none focus:border-neutral-600 text-neutral-300 appearance-none"
 						>
 							<option value="all">All Projects</option>
 							<option value="planning">Planning</option>
@@ -230,52 +231,54 @@ export default function ProjectsPage() {
 							<option value="completed">Completed</option>
 							<option value="cancelled">Cancelled</option>
 						</select>
+							</div>
 					</div>
 
 					{/* View Mode Toggle */}
-					<div className="flex items-center gap-2 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-300 dark:border-neutral-700 p-1">
+						<div className="flex bg-surface-dark rounded-lg p-1 border border-border-dark">
 						<button
 							onClick={() => setViewMode('list')}
-							className={`px-4 py-2 rounded-lg transition-colors ${
+								className={`flex items-center px-3 py-1.5 rounded-md text-sm transition-colors ${
 								viewMode === 'list'
-									? 'bg-primary text-white'
-									: 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+										? 'bg-border-dark text-white'
+										: 'text-neutral-500 hover:text-neutral-300'
 							}`}
 						>
-							<LayoutList className="h-4 w-4 inline mr-2" />
+								<LayoutList className="h-4 w-4 mr-2" />
 							List
 						</button>
 						<button
 							onClick={() => setViewMode('timeline')}
-							className={`px-4 py-2 rounded-lg transition-colors ${
+								className={`flex items-center px-3 py-1.5 rounded-md text-sm transition-colors ${
 								viewMode === 'timeline'
-									? 'bg-primary text-white'
-									: 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+										? 'bg-border-dark text-white'
+										: 'text-neutral-500 hover:text-neutral-300'
 							}`}
 						>
-							<CalendarIcon className="h-4 w-4 inline mr-2" />
+								<CalendarIcon className="h-4 w-4 mr-2" />
 							Timeline
 						</button>
-					</div>
 				</div>
 			</div>
 
 			{/* Content */}
-			<div className="max-w-7xl mx-auto">
+					<div>
 				{/* List View */}
 				{viewMode === 'list' && (
 					<>
 						{filteredProjects.length === 0 ? (
-							<div className="text-center py-12">
-								<FolderKanban className="h-16 w-16 mx-auto text-neutral-400 mb-4" />
-								<h3 className="text-lg font-semibold mb-2">No projects found</h3>
-								<p className="text-neutral-600 dark:text-neutral-400 mb-6">
+									<div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border-dark rounded-xl bg-surface-dark/50">
+										<div className="p-4 rounded-full bg-surface-dark mb-4">
+											<FolderKanban className="h-8 w-8 text-neutral-500" />
+										</div>
+										<h3 className="text-lg font-medium text-white mb-2">No projects found</h3>
+										<p className="text-neutral-500 mb-6 max-w-md">
 									{filterStatus === 'all'
-										? 'Create your first project to get started'
-										: `No projects with status: ${filterStatus}`}
+												? 'Get started by creating your first project to track tasks and progress.'
+												: `No projects found with status "${filterStatus}". Try changing the filter.`}
 								</p>
 								{filterStatus === 'all' ? (
-									<Button onClick={() => setShowCreateDialog(true)}>
+											<Button onClick={() => setShowCreateDialog(true)} className="rounded-full">
 										<Plus className="h-4 w-4 mr-2" />
 										Create Project
 									</Button>
@@ -307,6 +310,8 @@ export default function ProjectsPage() {
 					onProjectClick={(project) => navigate(`/app/projects/${project.id}`)}
 				/>
 			)}
+					</div>
+				</div>
 			</div>
 
 		{/* Create Project Dialog */}

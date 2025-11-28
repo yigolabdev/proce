@@ -6,21 +6,20 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Settings, Activity, Briefcase, Building } from 'lucide-react'
+import { Briefcase, Building } from 'lucide-react'
 import { PageHeader } from '../../../components/common/PageHeader'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { storage } from '../../../utils/storage'
 
 // Import types and components
-import type { WorkCategory, Department, Position, Job } from './_types/types'
-import { DEFAULT_CATEGORIES, DEFAULT_DEPARTMENTS, DEFAULT_POSITIONS, DEFAULT_JOBS } from './_types/types'
-import CategoriesTab from './_components/CategoriesTab'
+import type { Department, Position, Job } from './_types/types'
+import { DEFAULT_DEPARTMENTS, DEFAULT_POSITIONS, DEFAULT_JOBS } from './_types/types'
 import DepartmentsTab from './_components/DepartmentsTab'
 import PositionsJobsTab from './_components/PositionsJobsTab'
 
 export default function SystemSettingsPage() {
-	const [activeTab, setActiveTab] = useState<'departments' | 'positions' | 'status'>('departments')
+	const [activeTab, setActiveTab] = useState<'departments' | 'positions'>('departments')
 
 	// Departments
 	const [departments, setDepartments] = useState<Department[]>([])
@@ -48,16 +47,6 @@ export default function SystemSettingsPage() {
 		title: '',
 		description: '',
 		responsibilities: '',
-	})
-
-	// Status (formerly Categories)
-	const [statuses, setStatuses] = useState<WorkCategory[]>([])
-	const [showAddStatus, setShowAddStatus] = useState(false)
-	const [editingStatus, setEditingStatus] = useState<WorkCategory | null>(null)
-	const [newStatus, setNewStatus] = useState<Omit<WorkCategory, 'id'>>({
-		name: '',
-		color: '#3B82F6',
-		description: '',
 	})
 
 	// Load data from storage
@@ -92,15 +81,6 @@ export default function SystemSettingsPage() {
 			} else {
 				setJobs(DEFAULT_JOBS)
 				storage.set('jobs', DEFAULT_JOBS)
-			}
-
-			// Load statuses
-			const savedStatuses = storage.get<WorkCategory[]>('workStatuses')
-			if (savedStatuses) {
-				setStatuses(savedStatuses)
-			} else {
-				setStatuses(DEFAULT_CATEGORIES)
-				storage.set('workStatuses', DEFAULT_CATEGORIES)
 			}
 		} catch (error) {
 			console.error('Failed to load settings:', error)
@@ -261,48 +241,19 @@ export default function SystemSettingsPage() {
 		deleteItem(jobs, id, 'jobs', setJobs, 'Are you sure you want to delete this job?', 'Job deleted')
 	}
 
-	// Status handlers
-	const handleAddStatus = () => {
-		if (!newStatus.name) {
-			toast.error('Please enter a status name')
-			return
-		}
-		createItem(
-			statuses,
-			newStatus,
-			'workStatuses',
-			setStatuses,
-			() => {
-				setNewStatus({ name: '', color: '#3B82F6', description: '' })
-				setShowAddStatus(false)
-			},
-			'Status added successfully'
-		)
-	}
-
-	const handleUpdateStatus = () => {
-		if (!editingStatus) return
-		updateItem(statuses, editingStatus, 'workStatuses', setStatuses, setEditingStatus, 'Status updated successfully')
-	}
-
-	const handleDeleteStatus = (id: string) => {
-		deleteItem(statuses, id, 'workStatuses', setStatuses, 'Are you sure you want to delete this status?', 'Status deleted')
-	}
-
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
 				title="System Settings"
 				description="Configure departments, positions, roles, and work status"
-				icon={Settings}
 				tabs={{
 					items: [
 						{ id: 'departments', label: 'Departments', icon: Building },
 						{ id: 'positions', label: 'Positions & Roles', icon: Briefcase },
-						{ id: 'status', label: 'Status', icon: Activity },
 					],
 					activeTab,
 					onTabChange: (id) => setActiveTab(id as any),
@@ -312,8 +263,7 @@ export default function SystemSettingsPage() {
 				}}
 			/>
 			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-
+				<div>
 			{/* Departments Tab */}
 			{activeTab === 'departments' && (
 				<DepartmentsTab
@@ -355,22 +305,7 @@ export default function SystemSettingsPage() {
 					onDeleteJob={handleDeleteJob}
 				/>
 			)}
-
-			{/* Status Tab */}
-			{activeTab === 'status' && (
-				<CategoriesTab
-					categories={statuses}
-					editingCategory={editingStatus}
-					showAddCategory={showAddStatus}
-					newCategory={newStatus}
-					onSetEditingCategory={setEditingStatus}
-					onSetShowAddCategory={setShowAddStatus}
-					onSetNewCategory={setNewStatus}
-					onAdd={handleAddStatus}
-				onUpdate={handleUpdateStatus}
-				onDelete={handleDeleteStatus}
-			/>
-		)}
+				</div>
 		</div>
 		</div>
 	)

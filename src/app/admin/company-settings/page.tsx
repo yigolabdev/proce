@@ -30,6 +30,7 @@ import type {
 	WorkplaceSettings,
 } from './_types/types'
 
+// Company Settings Page
 export default function CompanySettingsPage() {
 	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'goals' | 'financial' | 'documents' | 'workplace'>('company')
 	
@@ -763,6 +764,7 @@ export default function CompanySettingsPage() {
 			type: file.type,
 			category: category || 'General',
 			uploadedAt: new Date().toISOString(),
+			uploadedBy: 'User', // Fallback if auth user not available
 		}))
 
 		const updatedDocuments = [...documents, ...newDocuments]
@@ -813,152 +815,155 @@ export default function CompanySettingsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-			<Toaster />
-			
-			{/* Header */}
-			<PageHeader
-				title="Company Settings"
-				description="Manage company information, leadership, goals, and financial data"
-				icon={Building2}
-				tabs={{
-					items: [
-						{ id: 'company', label: 'Company Info', icon: Building2 },
-						{ id: 'business', label: 'Business', icon: Briefcase },
-						{ id: 'leadership', label: 'Leadership', icon: Users },
-						{ id: 'goals', label: 'Company Goals', icon: Target },
-						{ id: 'financial', label: 'Financial', icon: DollarSign },
-						{ id: 'workplace', label: 'Workplace', icon: Clock },
-						{ id: 'documents', label: 'Documents', icon: FileText },
-					],
-					activeTab,
-					onTabChange: (id) => setActiveTab(id as any),
-					mobileLabels: {
-						'company': 'Info',
-						'leadership': 'Leaders',
-						'goals': 'Goals',
-						'financial': 'Finance',
-						'workplace': 'Work',
-						'documents': 'Docs',
-					}
-				}}
-			>
-				{/* Progress Bar */}
-				<Card className="border-primary/20 bg-linear-to-r from-primary/5 to-transparent">
-					<CardContent className="p-6">
-						<div className="flex items-center justify-between mb-4">
-							<div className="flex items-center gap-3">
-								<CheckCircle2 className="h-5 w-5 text-primary" />
-								<h3 className="font-bold text-lg">Profile Completion</h3>
-							</div>
-							<div className="text-3xl font-bold text-primary">{completionStats.percentage}%</div>
-						</div>
-						<div className="relative w-full h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-							<div
-								className="absolute top-0 left-0 h-full bg-linear-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
-								style={{ width: `${completionStats.percentage}%` }}
+		<>
+			<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+				<Toaster />
+				
+				<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+					{/* Header */}
+					<PageHeader
+						title="Company Settings"
+						description="Manage company information, leadership, goals, and financial data"
+						tabs={{
+							items: [
+								{ id: 'company', label: 'Company Info', icon: Building2 },
+								{ id: 'business', label: 'Business', icon: Briefcase },
+								{ id: 'leadership', label: 'Leadership', icon: Users },
+								{ id: 'goals', label: 'Company Goals', icon: Target },
+								{ id: 'financial', label: 'Financial', icon: DollarSign },
+								{ id: 'workplace', label: 'Workplace', icon: Clock },
+								{ id: 'documents', label: 'Documents', icon: FileText },
+							],
+							activeTab,
+							onTabChange: (id) => setActiveTab(id as any),
+							mobileLabels: {
+								'company': 'Info',
+								'leadership': 'Leaders',
+								'goals': 'Goals',
+								'financial': 'Finance',
+								'workplace': 'Work',
+								'documents': 'Docs',
+							}
+						}}
+					>
+						{/* Progress Bar */}
+						<Card className="border-border-dark bg-surface-dark mt-6">
+							<CardContent className="p-6">
+								<div className="flex items-center justify-between mb-4">
+									<div className="flex items-center gap-3">
+										<CheckCircle2 className="h-5 w-5 text-orange-500" />
+										<h3 className="font-bold text-lg text-white">Profile Completion</h3>
+									</div>
+									<div className="text-3xl font-bold text-orange-500">{completionStats.percentage}%</div>
+								</div>
+								<div className="relative w-full h-3 bg-neutral-800 rounded-full overflow-hidden">
+									<div
+										className="absolute top-0 left-0 h-full bg-orange-500 rounded-full transition-all duration-500 ease-out"
+										style={{ width: `${completionStats.percentage}%` }}
+									/>
+								</div>
+							</CardContent>
+						</Card>
+					</PageHeader>
+					
+					<div className="space-y-6">
+						{/* Company Info Tab (Basic + Contact merged) */}
+						{activeTab === 'company' && (
+							<CompanyInfoTab
+								companyInfo={companyInfo}
+								onChange={handleCompanyInfoChange}
+								onSave={handleSaveCompanyInfo}
+								onAddSocialLink={handleAddSocialLink}
+								onRemoveSocialLink={handleRemoveSocialLink}
+								onSocialLinkChange={handleSocialLinkChange}
 							/>
-						</div>
-					</CardContent>
-				</Card>
-			</PageHeader>
-			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Company Info Tab (Basic + Contact merged) */}
-				{activeTab === 'company' && (
-					<CompanyInfoTab
-						companyInfo={companyInfo}
-						onChange={handleCompanyInfoChange}
-						onSave={handleSaveCompanyInfo}
-						onAddSocialLink={handleAddSocialLink}
-						onRemoveSocialLink={handleRemoveSocialLink}
-						onSocialLinkChange={handleSocialLinkChange}
-					/>
-				)}
+						)}
 
-				{/* Leadership Tab */}
-				{activeTab === 'leadership' && (
-					<LeadershipTab
-						leadership={leadership}
-						isAddingLeader={isAddingLeader}
-						editingLeader={editingLeader}
-						newLeader={newLeader}
-						availableDepartments={availableDepartments}
-						onSetIsAddingLeader={setIsAddingLeader}
-						onSetEditingLeader={setEditingLeader}
-						onSetNewLeader={setNewLeader}
-						onAddLeader={handleAddLeader}
-						onUpdateLeader={handleUpdateLeader}
-						onDeleteLeader={handleDeleteLeader}
-						onSaveEdit={handleSaveLeaderEdit}
-					/>
-				)}
+						{/* Leadership Tab */}
+						{activeTab === 'leadership' && (
+							<LeadershipTab
+								leadership={leadership}
+								isAddingLeader={isAddingLeader}
+								editingLeader={editingLeader}
+								newLeader={newLeader}
+								availableDepartments={availableDepartments}
+								onSetIsAddingLeader={setIsAddingLeader}
+								onSetEditingLeader={setEditingLeader}
+								onSetNewLeader={setNewLeader}
+								onAddLeader={handleAddLeader}
+								onUpdateLeader={handleUpdateLeader}
+								onDeleteLeader={handleDeleteLeader}
+								onSaveEdit={handleSaveLeaderEdit}
+							/>
+						)}
 
-				{/* Business Tab */}
-				{activeTab === 'business' && (
-					<BusinessTab
-						companyInfo={companyInfo}
-						onChange={handleCompanyInfoChange}
-						onSave={handleSaveCompanyInfo}
-					/>
-				)}
+						{/* Business Tab */}
+						{activeTab === 'business' && (
+							<BusinessTab
+								companyInfo={companyInfo}
+								onChange={handleCompanyInfoChange}
+								onSave={handleSaveCompanyInfo}
+							/>
+						)}
 
-				{/* Workplace Tab */}
-				{activeTab === 'workplace' && (
-					<WorkplaceTab
-						settings={workplaceSettings}
-						onChange={setWorkplaceSettings}
-						onSave={handleSaveWorkplace}
-					/>
-				)}
+						{/* Workplace Tab */}
+						{activeTab === 'workplace' && (
+							<WorkplaceTab
+								settings={workplaceSettings}
+								onChange={setWorkplaceSettings}
+								onSave={handleSaveWorkplace}
+							/>
+						)}
 
-				{/* Company KPIs Tab */}
-				{activeTab === 'goals' && (
-					<KPITab
-						kpis={companyKPIs}
-						isAdding={isAddingKPI}
-						editingId={editingKPI}
-						newKPI={newKPI}
-						availableDepartments={availableDepartments}
-						leadership={leadership}
-						companyIndustry={companyInfo.industry}
-						setNewKPI={setNewKPI}
-						setIsAdding={setIsAddingKPI}
-						setEditingId={setEditingKPI}
-						onAdd={handleAddKPI}
-						onUpdate={handleUpdateKPI}
-						onDelete={handleDeleteKPI}
-						calculateProgress={calculateProgress}
-					/>
-				)}
+						{/* Company KPIs Tab */}
+						{activeTab === 'goals' && (
+							<KPITab
+								kpis={companyKPIs}
+								isAdding={isAddingKPI}
+								editingId={editingKPI}
+								newKPI={newKPI}
+								availableDepartments={availableDepartments}
+								leadership={leadership}
+								companyIndustry={companyInfo.industry}
+								setNewKPI={setNewKPI}
+								setIsAdding={setIsAddingKPI}
+								setEditingId={setEditingKPI}
+								onAdd={handleAddKPI}
+								onUpdate={handleUpdateKPI}
+								onDelete={handleDeleteKPI}
+								calculateProgress={calculateProgress}
+							/>
+						)}
 
-				{/* Financial Tab */}
-				{activeTab === 'financial' && (
-					<FinancialTab
-						financialData={financialData}
-						isAddingFinancial={isAddingFinancial}
-						newFinancialYear={newFinancialYear}
-						onSetIsAddingFinancial={setIsAddingFinancial}
-						onSetNewFinancialYear={setNewFinancialYear}
-						onAddFinancialData={handleAddFinancialData}
-						onDeleteFinancialData={handleDeleteFinancialData}
-						onFileUpload={handleFileUpload}
-						onDeleteFinancialDocument={handleDeleteFinancialDocument}
-						formatCurrency={formatCurrency}
-						formatFileSize={formatFileSize}
-					/>
-				)}
+						{/* Financial Tab */}
+						{activeTab === 'financial' && (
+							<FinancialTab
+								financialData={financialData}
+								isAddingFinancial={isAddingFinancial}
+								newFinancialYear={newFinancialYear}
+								onSetIsAddingFinancial={setIsAddingFinancial}
+								onSetNewFinancialYear={setNewFinancialYear}
+								onAddFinancialData={handleAddFinancialData}
+								onDeleteFinancialData={handleDeleteFinancialData}
+								onFileUpload={handleFileUpload}
+								onDeleteFinancialDocument={handleDeleteFinancialDocument}
+								formatCurrency={formatCurrency}
+								formatFileSize={formatFileSize}
+							/>
+						)}
 
-				{/* Documents Tab */}
-				{activeTab === 'documents' && (
-					<DocumentsTab
-						documents={documents}
-						onUpload={handleGeneralFileUpload}
-						onDelete={handleDeleteGeneralDocument}
-						formatFileSize={formatFileSize}
-					/>
-				)}
+						{/* Documents Tab */}
+						{activeTab === 'documents' && (
+							<DocumentsTab
+								documents={documents}
+								onUpload={handleGeneralFileUpload}
+								onDelete={handleDeleteGeneralDocument}
+								formatFileSize={formatFileSize}
+							/>
+						)}
+					</div>
+				</div>
 			</div>
-		</div>
+		</>
 	)
 }

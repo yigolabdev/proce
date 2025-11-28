@@ -20,7 +20,7 @@ export const Input = function Input({ className, label, error, id, ...props }: P
 				className={clsx(
 					'w-full rounded-2xl border bg-white dark:bg-neutral-900 px-4 py-2.5 outline-none ring-primary/30 transition focus:ring-4',
 					{
-						'border-neutral-300 dark:border-neutral-700': !error,
+						'border-neutral-300 dark:border-border-dark': !error,
 						'border-red-500': Boolean(error),
 					},
 				)}

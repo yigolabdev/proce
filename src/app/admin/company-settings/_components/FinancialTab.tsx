@@ -41,21 +41,21 @@ export default function FinancialTab({
 }: FinancialTabProps) {
 	return (
 		<div className="space-y-6">
-			<Card>
+			<Card className="bg-surface-dark border-border-dark">
 				<CardHeader>
 					<div className="flex items-center justify-between">
 						<div>
-							<h2 className="text-xl font-bold flex items-center gap-2">
-								<DollarSign className="h-5 w-5 text-primary" />
+							<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+								<DollarSign className="h-5 w-5 text-orange-500" />
 								Financial Data
 							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							<p className="text-sm text-neutral-400 mt-1">
 								Year-by-year financial information and statements
 							</p>
 						</div>
 						<Button
 							onClick={() => onSetIsAddingFinancial(true)}
-							className="flex items-center gap-2"
+							className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200"
 						>
 							<Plus className="h-4 w-4" />
 							Add Year
@@ -66,11 +66,11 @@ export default function FinancialTab({
 
 			{/* Add Financial Data Form */}
 			{isAddingFinancial && (
-				<Card className="border-primary/30">
+				<Card className="bg-surface-dark border-border-dark shadow-lg">
 					<CardHeader>
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold">New Financial Year</h3>
-							<Button variant="outline" size="sm" onClick={() => onSetIsAddingFinancial(false)}>
+							<h3 className="font-semibold text-white">New Financial Year</h3>
+							<Button variant="outline" size="sm" onClick={() => onSetIsAddingFinancial(false)} className="border-border-dark hover:bg-border-dark text-white">
 								<X className="h-4 w-4" />
 							</Button>
 						</div>
@@ -78,7 +78,7 @@ export default function FinancialTab({
 					<CardContent>
 						<div className="space-y-4">
 							<div>
-								<label className="block text-sm font-medium mb-2">
+								<label className="block text-sm font-medium mb-2 text-neutral-300">
 									Fiscal Year <span className="text-red-500">*</span>
 								</label>
 								<Input
@@ -93,7 +93,7 @@ export default function FinancialTab({
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">
+									<label className="block text-sm font-medium mb-2 text-neutral-300">
 										Total Revenue <span className="text-red-500">*</span>
 									</label>
 									<Input
@@ -113,7 +113,7 @@ export default function FinancialTab({
 									</p>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Net Income</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Net Income</label>
 									<Input
 										type="number"
 										value={newFinancialYear.netIncome}
@@ -127,7 +127,7 @@ export default function FinancialTab({
 									</p>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Total Assets</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Total Assets</label>
 									<Input
 										type="number"
 										value={newFinancialYear.totalAssets}
@@ -145,7 +145,7 @@ export default function FinancialTab({
 									</p>
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-2">Total Liabilities</label>
+									<label className="block text-sm font-medium mb-2 text-neutral-300">Total Liabilities</label>
 									<Input
 										type="number"
 										value={newFinancialYear.totalLiabilities}
@@ -165,8 +165,8 @@ export default function FinancialTab({
 							</div>
 
 							{/* File Upload Section */}
-							<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
-								<label className="block text-sm font-medium mb-3">
+							<div className="border-t border-border-dark pt-4">
+								<label className="block text-sm font-medium mb-3 text-neutral-300">
 									<FileText className="inline h-4 w-4 mr-1" />
 									Financial Documents (Optional)
 								</label>
@@ -194,9 +194,9 @@ export default function FinancialTab({
 											className="hidden"
 											accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
 										/>
-										<div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-xl hover:border-primary hover:bg-primary/5 transition-colors">
+										<div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border-dark rounded-xl hover:border-orange-500 hover:bg-orange-500/10 transition-colors">
 											<Upload className="h-5 w-5 text-neutral-500" />
-											<span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+											<span className="text-sm font-medium text-neutral-400">
 												Click to upload documents
 											</span>
 										</div>
@@ -208,12 +208,12 @@ export default function FinancialTab({
 											{newFinancialYear.documents.map((doc: any) => (
 												<div
 													key={doc.id}
-													className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+													className="flex items-center justify-between p-3 rounded-xl bg-[#1a1a1a] border border-border-dark"
 												>
 													<div className="flex items-center gap-3 flex-1 min-w-0">
-														<File className="h-5 w-5 text-primary shrink-0" />
+														<File className="h-5 w-5 text-orange-500 shrink-0" />
 														<div className="min-w-0 flex-1">
-															<p className="font-medium text-sm truncate">{doc.name}</p>
+															<p className="font-medium text-sm truncate text-white">{doc.name}</p>
 															<p className="text-xs text-neutral-500">
 																{formatFileSize(doc.size)}
 															</p>
@@ -228,7 +228,7 @@ export default function FinancialTab({
 																documents: newFinancialYear.documents?.filter((d: any) => d.id !== doc.id) || []
 															})
 														}}
-														className="ml-2"
+														className="ml-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-white"
 													>
 														<X className="h-4 w-4" />
 													</Button>
@@ -240,10 +240,10 @@ export default function FinancialTab({
 							</div>
 
 							<div className="flex justify-end gap-3">
-								<Button variant="outline" onClick={() => onSetIsAddingFinancial(false)}>
+								<Button variant="outline" onClick={() => onSetIsAddingFinancial(false)} className="border-border-dark hover:bg-border-dark text-white">
 									Cancel
 								</Button>
-								<Button onClick={onAddFinancialData}>
+								<Button onClick={onAddFinancialData} className="bg-white text-black hover:bg-neutral-200">
 									<Plus className="h-4 w-4 mr-2" />
 									Add Financial Data
 								</Button>
@@ -257,14 +257,15 @@ export default function FinancialTab({
 			{financialData.length > 0 ? (
 				<div className="space-y-4">
 					{financialData.map((data) => (
-						<Card key={data.year}>
+						<Card key={data.year} className="bg-surface-dark border-border-dark">
 							<CardContent className="p-6">
 								<div className="flex items-center justify-between mb-4">
-									<h3 className="text-xl font-bold">Fiscal Year {data.year}</h3>
+									<h3 className="text-xl font-bold text-white">Fiscal Year {data.year}</h3>
 									<Button
 										variant="outline"
 										size="sm"
 										onClick={() => onDeleteFinancialData(data.year)}
+										className="border-border-dark hover:bg-border-dark text-neutral-400 hover:text-red-400"
 									>
 										<Trash2 className="h-4 w-4" />
 									</Button>
@@ -272,44 +273,44 @@ export default function FinancialTab({
 
 								{/* Financial Metrics */}
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-									<div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-										<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+									<div className="p-4 rounded-xl bg-green-900/10 border border-green-800">
+										<p className="text-xs text-green-400 mb-1">
 											Total Revenue
 										</p>
-										<p className="text-lg font-bold text-green-700 dark:text-green-400">
+										<p className="text-lg font-bold text-white">
 											{formatCurrency(data.totalRevenue)}
 										</p>
 									</div>
-									<div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-										<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+									<div className="p-4 rounded-xl bg-blue-900/10 border border-blue-800">
+										<p className="text-xs text-blue-400 mb-1">
 											Net Income
 										</p>
-										<p className="text-lg font-bold text-blue-700 dark:text-blue-400">
+										<p className="text-lg font-bold text-white">
 											{formatCurrency(data.netIncome)}
 										</p>
 									</div>
-									<div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-										<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+									<div className="p-4 rounded-xl bg-purple-900/10 border border-purple-800">
+										<p className="text-xs text-purple-400 mb-1">
 											Total Assets
 										</p>
-										<p className="text-lg font-bold text-purple-700 dark:text-purple-400">
+										<p className="text-lg font-bold text-white">
 											{formatCurrency(data.totalAssets)}
 										</p>
 									</div>
-									<div className="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
-										<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+									<div className="p-4 rounded-xl bg-orange-900/10 border border-orange-800">
+										<p className="text-xs text-orange-400 mb-1">
 											Total Liabilities
 										</p>
-										<p className="text-lg font-bold text-orange-700 dark:text-orange-400">
+										<p className="text-lg font-bold text-white">
 											{formatCurrency(data.totalLiabilities)}
 										</p>
 									</div>
 								</div>
 
 								{/* Documents Section */}
-								<div className="border-t border-neutral-200 dark:border-neutral-800 pt-4">
+								<div className="border-t border-border-dark pt-4">
 									<div className="flex items-center justify-between mb-3">
-										<h4 className="font-semibold text-sm flex items-center gap-2">
+										<h4 className="font-semibold text-sm flex items-center gap-2 text-neutral-300">
 											<FileText className="h-4 w-4" />
 											Financial Documents
 										</h4>
@@ -324,7 +325,7 @@ export default function FinancialTab({
 											<Button
 												variant="outline"
 												size="sm"
-												className="flex items-center gap-2"
+												className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-white"
 												onClick={(e) => {
 													e.preventDefault()
 													const input = e.currentTarget
@@ -343,12 +344,12 @@ export default function FinancialTab({
 											{data.documents.map((doc) => (
 												<div
 													key={doc.id}
-													className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+													className="flex items-center justify-between p-3 rounded-xl bg-[#1a1a1a] hover:bg-neutral-800 transition-colors border border-border-dark"
 												>
 													<div className="flex items-center gap-3 flex-1 min-w-0">
-														<File className="h-5 w-5 text-primary shrink-0" />
+														<File className="h-5 w-5 text-orange-500 shrink-0" />
 														<div className="min-w-0 flex-1">
-															<p className="font-medium text-sm truncate">{doc.name}</p>
+															<p className="font-medium text-sm truncate text-white">{doc.name}</p>
 															<p className="text-xs text-neutral-500">
 																{formatFileSize(doc.size)} •{' '}
 																{new Date(doc.uploadedAt).toLocaleDateString()}
@@ -359,7 +360,7 @@ export default function FinancialTab({
 														variant="outline"
 														size="sm"
 														onClick={() => onDeleteFinancialDocument(data.year, doc.id)}
-														className="ml-2"
+														className="ml-2 border-border-dark hover:bg-border-dark text-neutral-400 hover:text-red-400"
 													>
 														<Trash2 className="h-4 w-4" />
 													</Button>
@@ -367,7 +368,7 @@ export default function FinancialTab({
 											))}
 										</div>
 									) : (
-										<p className="text-sm text-neutral-500 dark:text-neutral-400 text-center py-4">
+										<p className="text-sm text-neutral-500 text-center py-4">
 											No documents uploaded yet
 										</p>
 									)}
@@ -378,14 +379,14 @@ export default function FinancialTab({
 				</div>
 			) : (
 				!isAddingFinancial && (
-					<Card className="border-dashed">
+					<Card className="bg-surface-dark border-dashed border-border-dark">
 						<CardContent className="p-12 text-center">
-							<DollarSign className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
-							<h3 className="font-semibold text-lg mb-2">No Financial Data Yet</h3>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+							<DollarSign className="h-12 w-12 mx-auto text-neutral-600 mb-4" />
+							<h3 className="font-semibold text-lg mb-2 text-white">No Financial Data Yet</h3>
+							<p className="text-sm text-neutral-400 mb-4">
 								Add your company's financial information by year
 							</p>
-							<Button onClick={() => onSetIsAddingFinancial(true)}>
+							<Button onClick={() => onSetIsAddingFinancial(true)} className="bg-white text-black hover:bg-neutral-200">
 								<Plus className="h-4 w-4 mr-2" />
 								Add Financial Data
 							</Button>

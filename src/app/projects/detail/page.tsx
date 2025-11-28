@@ -111,7 +111,7 @@ export default function ProjectDetailPage() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
+			<div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-background-dark">
 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
 			</div>
 		)
@@ -119,18 +119,20 @@ export default function ProjectDetailPage() {
 
 	if (!project) {
 		return (
-			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-				<EmptyState
-					icon={<FolderKanban className="h-12 w-12" />}
-					title="Project Not Found"
-					description="The project you're looking for doesn't exist or has been deleted."
-					action={
-						<Button onClick={() => navigate('/app/projects')}>
-							<ArrowLeft className="h-4 w-4 mr-2" />
-							Back to Projects
-						</Button>
-					}
-				/>
+			<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+				<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+					<EmptyState
+						icon={<FolderKanban className="h-12 w-12" />}
+						title="Project Not Found"
+						description="The project you're looking for doesn't exist or has been deleted."
+						action={
+							<Button onClick={() => navigate('/app/projects')}>
+								<ArrowLeft className="h-4 w-4 mr-2" />
+								Back to Projects
+							</Button>
+						}
+					/>
+				</div>
 			</div>
 		)
 	}
@@ -138,80 +140,79 @@ export default function ProjectDetailPage() {
 	const statusBadge = getStatusBadge(project.status)
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 
-		<PageHeader
-			title={project.name}
-			description={project.description}
-			icon={FolderKanban}
-			actions={
-				<>
-					<span className={`text-xs font-medium px-2 py-1 rounded-full ${statusBadge.color}`}>
-						{statusBadge.label}
-					</span>
-					<Button onClick={() => navigate('/app/projects')} variant="outline" size="sm">
-						<ArrowLeft className="h-4 w-4 sm:mr-2" />
-						<span className="hidden sm:inline">Back</span>
-					</Button>
-					<Button onClick={handleEdit} variant="outline" size="sm">
-						<Edit2 className="h-4 w-4 sm:mr-2" />
-						<span className="hidden sm:inline">Edit</span>
-					</Button>
-					<Button onClick={handleDelete} variant="outline" size="sm" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-						<Trash2 className="h-4 w-4 sm:mr-2" />
-						<span className="hidden sm:inline">Delete</span>
-					</Button>
-				</>
-			}
-		/>
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+				<PageHeader
+					title={project.name}
+					description={project.description}
+					icon={FolderKanban}
+					actions={
+						<>
+							<span className={`text-xs font-medium px-2 py-1 rounded-full ${statusBadge.color}`}>
+								{statusBadge.label}
+							</span>
+							<Button onClick={() => navigate('/app/projects')} variant="outline" size="sm">
+								<ArrowLeft className="h-4 w-4 sm:mr-2" />
+								<span className="hidden sm:inline">Back</span>
+							</Button>
+							<Button onClick={handleEdit} variant="outline" size="sm">
+								<Edit2 className="h-4 w-4 sm:mr-2" />
+								<span className="hidden sm:inline">Edit</span>
+							</Button>
+							<Button onClick={handleDelete} variant="outline" size="sm" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+								<Trash2 className="h-4 w-4 sm:mr-2" />
+								<span className="hidden sm:inline">Delete</span>
+							</Button>
+						</>
+					}
+				/>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-				{/* Quick Stats */}
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-					<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
+					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
 								<Activity className="h-8 w-8 text-blue-600 dark:text-blue-400" />
 								<div>
 									<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Progress</p>
-									<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{project.progress}%</p>
+									<p className="text-2xl font-bold text-white">{project.progress}%</p>
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
+					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
 								<Users className="h-8 w-8 text-green-600 dark:text-green-400" />
 								<div>
 									<p className="text-sm text-green-600 dark:text-green-400 font-medium">Team Size</p>
-									<p className="text-2xl font-bold text-green-900 dark:text-green-100">{project.members.length}</p>
+									<p className="text-2xl font-bold text-white">{project.members.length}</p>
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
+					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
 								<FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
 								<div>
 									<p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Work Entries</p>
-									<p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{workEntries.length}</p>
+									<p className="text-2xl font-bold text-white">{workEntries.length}</p>
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800">
+					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-4">
 							<div className="flex items-center gap-3">
 								<Clock className="h-8 w-8 text-orange-600 dark:text-orange-400" />
 								<div>
 									<p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Total Hours</p>
-									<p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+									<p className="text-2xl font-bold text-white">
 										{workEntries.reduce((sum, entry) => {
 											if (!entry.duration) return sum
 											const match = entry.duration.match(/(\d+\.?\d*)/)
@@ -228,9 +229,9 @@ export default function ProjectDetailPage() {
 					{/* Left Column - Project Details */}
 					<div className="lg:col-span-2 space-y-6">
 						{/* Project Information */}
-						<Card>
+						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold flex items-center gap-2">
+								<h2 className="text-xl font-bold flex items-center gap-2 text-white">
 									<Target className="h-5 w-5 text-primary" />
 									Project Information
 								</h2>
@@ -238,19 +239,19 @@ export default function ProjectDetailPage() {
 							<CardContent className="space-y-4">
 								{/* Description */}
 								<div>
-									<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Description</h3>
-									<p className="text-neutral-900 dark:text-neutral-100">{project.description}</p>
+									<h3 className="text-sm font-semibold text-neutral-400 mb-2">Description</h3>
+									<p className="text-white">{project.description}</p>
 								</div>
 
 								{/* Objectives */}
 								{project.objectives && project.objectives.length > 0 && (
 									<div>
-										<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Objectives</h3>
+										<h3 className="text-sm font-semibold text-neutral-400 mb-2">Objectives</h3>
 										<ul className="space-y-2">
 											{project.objectives.map((obj, idx) => (
 												<li key={idx} className="flex items-start gap-2">
 													<ChevronRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-													<span className="text-neutral-900 dark:text-neutral-100">{obj}</span>
+													<span className="text-white">{obj}</span>
 												</li>
 											))}
 										</ul>
@@ -259,12 +260,12 @@ export default function ProjectDetailPage() {
 
 								{/* Departments */}
 								<div>
-									<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Departments</h3>
+									<h3 className="text-sm font-semibold text-neutral-400 mb-2">Departments</h3>
 									<div className="flex flex-wrap gap-2">
 										{project.departments.map((dept, idx) => (
 											<span 
 												key={idx}
-												className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm"
+												className="px-3 py-1 bg-neutral-800 rounded-full text-sm text-white"
 											>
 												{dept}
 											</span>
@@ -275,7 +276,7 @@ export default function ProjectDetailPage() {
 								{/* Tags */}
 								{project.tags && project.tags.length > 0 && (
 									<div>
-										<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Tags</h3>
+										<h3 className="text-sm font-semibold text-neutral-400 mb-2">Tags</h3>
 										<div className="flex flex-wrap gap-2">
 											{project.tags.map((tag, idx) => (
 												<span 
@@ -292,19 +293,19 @@ export default function ProjectDetailPage() {
 								{/* Timeline */}
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div>
-										<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Start Date</h3>
+										<h3 className="text-sm font-semibold text-neutral-400 mb-2">Start Date</h3>
 										<div className="flex items-center gap-2">
 											<Calendar className="h-4 w-4 text-neutral-500" />
-											<span className="text-neutral-900 dark:text-neutral-100">
+											<span className="text-white">
 												{new Date(project.startDate).toLocaleDateString()}
 											</span>
 										</div>
 									</div>
 									<div>
-										<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">End Date</h3>
+										<h3 className="text-sm font-semibold text-neutral-400 mb-2">End Date</h3>
 										<div className="flex items-center gap-2">
 											<Calendar className="h-4 w-4 text-neutral-500" />
-											<span className="text-neutral-900 dark:text-neutral-100">
+											<span className="text-white">
 												{new Date(project.endDate).toLocaleDateString()}
 											</span>
 										</div>
@@ -314,10 +315,10 @@ export default function ProjectDetailPage() {
 								{/* Progress Bar */}
 								<div>
 									<div className="flex items-center justify-between mb-2">
-										<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">Overall Progress</h3>
+										<h3 className="text-sm font-semibold text-neutral-400">Overall Progress</h3>
 										<span className="text-sm font-bold text-primary">{project.progress}%</span>
 									</div>
-									<div className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+									<div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
 										<div
 											className="h-full bg-primary transition-all duration-300"
 											style={{ width: `${project.progress}%` }}
@@ -328,10 +329,10 @@ export default function ProjectDetailPage() {
 						</Card>
 
 						{/* Work Entries */}
-						<Card>
+						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
 								<div className="flex items-center justify-between">
-									<h2 className="text-xl font-bold flex items-center gap-2">
+									<h2 className="text-xl font-bold flex items-center gap-2 text-white">
 										<FileText className="h-5 w-5 text-primary" />
 										Work Entries ({workEntries.length})
 									</h2>
@@ -360,16 +361,16 @@ export default function ProjectDetailPage() {
 										{workEntries.map((entry) => (
 											<div
 												key={entry.id}
-												className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+												className="p-4 border border-border-dark rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-[#1a1a1a]"
 												onClick={() => navigate('/app/work-history')}
 											>
 												<div className="flex items-start justify-between gap-4">
 													<div className="flex-1 min-w-0">
-														<h4 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+														<h4 className="font-semibold text-white mb-1">
 															{entry.title}
 														</h4>
 														{entry.description && (
-															<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+															<p className="text-sm text-neutral-400 line-clamp-2">
 																{entry.description}
 															</p>
 														)}
@@ -399,9 +400,9 @@ export default function ProjectDetailPage() {
 					{/* Right Column - Team & Metadata */}
 					<div className="space-y-6">
 						{/* Team Members */}
-						<Card>
+						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-lg font-bold flex items-center gap-2">
+								<h2 className="text-lg font-bold flex items-center gap-2 text-white">
 									<Users className="h-5 w-5 text-primary" />
 									Team Members
 								</h2>
@@ -411,14 +412,14 @@ export default function ProjectDetailPage() {
 									{project.members.map((member) => (
 										<div
 											key={member.id}
-											className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg"
+											className="flex items-center gap-3 p-3 bg-neutral-900 rounded-lg"
 										>
 											<div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
 												<User className="h-5 w-5 text-primary" />
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="flex items-center gap-2">
-													<p className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
+													<p className="font-semibold text-sm text-white">
 														{member.name}
 													</p>
 													{member.role === 'leader' && (
@@ -427,7 +428,7 @@ export default function ProjectDetailPage() {
 														</span>
 													)}
 												</div>
-												<p className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+												<p className="text-xs text-neutral-400 flex items-center gap-1">
 													<Briefcase className="h-3 w-3" />
 													{member.department}
 												</p>
@@ -439,54 +440,54 @@ export default function ProjectDetailPage() {
 						</Card>
 
 						{/* Project Timeline */}
-						<Card>
+						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-lg font-bold flex items-center gap-2">
+								<h2 className="text-lg font-bold flex items-center gap-2 text-white">
 									<Calendar className="h-5 w-5 text-primary" />
 									Timeline
 								</h2>
 							</CardHeader>
 							<CardContent className="space-y-3">
 								<div className="flex items-start gap-3">
-									<div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-										<CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+									<div className="w-8 h-8 rounded-full bg-green-900/30 flex items-center justify-center shrink-0">
+										<CheckCircle2 className="h-4 w-4 text-green-400" />
 									</div>
 									<div className="flex-1">
-										<p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Created</p>
-										<p className="text-xs text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm font-semibold text-white">Created</p>
+										<p className="text-xs text-neutral-400">
 											{new Date(project.createdAt).toLocaleDateString()}
 										</p>
 									</div>
 								</div>
 
 								<div className="flex items-start gap-3">
-									<div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-										<TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+									<div className="w-8 h-8 rounded-full bg-blue-900/30 flex items-center justify-center shrink-0">
+										<TrendingUp className="h-4 w-4 text-blue-400" />
 									</div>
 									<div className="flex-1">
-										<p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Start Date</p>
-										<p className="text-xs text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm font-semibold text-white">Start Date</p>
+										<p className="text-xs text-neutral-400">
 											{new Date(project.startDate).toLocaleDateString()}
 										</p>
 									</div>
 								</div>
 
 								<div className="flex items-start gap-3">
-									<div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-										<Target className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+									<div className="w-8 h-8 rounded-full bg-purple-900/30 flex items-center justify-center shrink-0">
+										<Target className="h-4 w-4 text-purple-400" />
 									</div>
 									<div className="flex-1">
-										<p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Target End Date</p>
-										<p className="text-xs text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm font-semibold text-white">Target End Date</p>
+										<p className="text-xs text-neutral-400">
 											{new Date(project.endDate).toLocaleDateString()}
 										</p>
 									</div>
 								</div>
 
 								{/* Days remaining */}
-								<div className="mt-4 p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
-									<p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Days Remaining</p>
-									<p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+								<div className="mt-4 p-3 bg-neutral-900 rounded-lg">
+									<p className="text-xs text-neutral-400 mb-1">Days Remaining</p>
+									<p className="text-lg font-bold text-white">
 										{Math.max(0, Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days
 									</p>
 								</div>
@@ -495,9 +496,9 @@ export default function ProjectDetailPage() {
 
 						{/* Files & Links */}
 						{((project.files && project.files.length > 0) || (project.links && project.links.length > 0)) && (
-							<Card>
+							<Card className="bg-surface-dark border-border-dark">
 								<CardHeader>
-									<h2 className="text-lg font-bold flex items-center gap-2">
+									<h2 className="text-lg font-bold flex items-center gap-2 text-white">
 										<LinkIcon className="h-5 w-5 text-primary" />
 										Resources
 									</h2>
@@ -506,12 +507,12 @@ export default function ProjectDetailPage() {
 									{/* Files */}
 									{project.files && project.files.length > 0 && (
 										<div>
-											<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Files</h3>
+											<h3 className="text-sm font-semibold text-neutral-400 mb-2">Files</h3>
 											<div className="space-y-2">
 												{project.files.map((file) => (
 													<div
 														key={file.id}
-														className="flex items-center gap-2 p-2 bg-neutral-50 dark:bg-neutral-900 rounded text-sm"
+														className="flex items-center gap-2 p-2 bg-neutral-900 rounded text-sm text-white"
 													>
 														<FileText className="h-4 w-4 text-neutral-500 shrink-0" />
 														<span className="flex-1 truncate">{file.name}</span>
@@ -527,7 +528,7 @@ export default function ProjectDetailPage() {
 									{/* Links */}
 									{project.links && project.links.length > 0 && (
 										<div>
-											<h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Links</h3>
+											<h3 className="text-sm font-semibold text-neutral-400 mb-2">Links</h3>
 											<div className="space-y-2">
 												{project.links.map((link) => (
 													<a
@@ -535,7 +536,7 @@ export default function ProjectDetailPage() {
 														href={link.url}
 														target="_blank"
 														rel="noopener noreferrer"
-														className="flex items-center gap-2 p-2 bg-neutral-50 dark:bg-neutral-900 rounded text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+														className="flex items-center gap-2 p-2 bg-neutral-900 rounded text-sm hover:bg-neutral-800 transition-colors"
 													>
 														<LinkIcon className="h-4 w-4 text-primary shrink-0" />
 														<span className="flex-1 truncate text-primary">{link.title}</span>
@@ -553,4 +554,3 @@ export default function ProjectDetailPage() {
 		</div>
 	)
 }
-

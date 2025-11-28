@@ -51,8 +51,8 @@ class TasksService {
 		// TODO: Replace with API call
 		// return apiClient.get<TaskRecommendation[]>('/tasks', { params: filters })
 		
-		let aiTasks = storage.get<TaskRecommendation[]>(this.AI_STORAGE_KEY) || []
-		let manualTasks = storage.get<TaskRecommendation[]>(this.MANUAL_STORAGE_KEY) || []
+		const aiTasks = storage.get<TaskRecommendation[]>(this.AI_STORAGE_KEY) || []
+		const manualTasks = storage.get<TaskRecommendation[]>(this.MANUAL_STORAGE_KEY) || []
 		
 		let allTasks = [...aiTasks, ...manualTasks]
 		

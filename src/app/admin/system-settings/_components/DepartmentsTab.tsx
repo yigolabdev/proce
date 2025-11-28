@@ -86,19 +86,19 @@ export default function DepartmentsTab({
 									<div className="space-y-3">
 										<div className="flex items-start justify-between">
 											<div className="flex items-center gap-2">
-												<Building className="h-5 w-5 text-primary" />
+												<Building className="h-5 w-5 text-orange-500" />
 												<h3 className="font-bold text-lg">{department.name}</h3>
 											</div>
 											<div className="flex items-center gap-1">
 												<button
 													onClick={() => onSetEditingDepartment(department)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:bg-neutral-100 dark:hover:bg-surface-dark rounded"
 												>
-													<Edit2 className="h-4 w-4 text-neutral-600" />
+													<Edit2 className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
 												</button>
 												<button
 													onClick={() => onDelete(department.id)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:bg-neutral-100 dark:hover:bg-surface-dark rounded"
 												>
 													<Trash2 className="h-4 w-4 text-red-500" />
 												</button>
@@ -118,11 +118,11 @@ export default function DepartmentsTab({
 			{/* Add Department Dialog */}
 			{showAddDepartment && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl">
+					<div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-neutral-200 dark:border-border-dark w-full max-w-2xl">
 						<div className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
-									<Plus className="h-5 w-5 text-primary" />
+									<Plus className="h-5 w-5 text-orange-500" />
 									Add Department
 								</h3>
 								<button

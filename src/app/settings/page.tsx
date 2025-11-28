@@ -6,7 +6,6 @@ import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import { PageHeader } from '../../components/common/PageHeader'
 import {
-	Settings as SettingsIcon,
 	User,
 	Mail,
 	Lock,
@@ -374,732 +373,750 @@ export default function SettingsPage() {
 	const isProfileChanged = JSON.stringify(profile) !== JSON.stringify(originalProfile)
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
-			{/* Header */}
-			<PageHeader
-				title="Settings"
-				description="Manage your account, preferences, and privacy settings"
-				icon={SettingsIcon}
-				tabs={{
-					items: [
-						{ id: 'profile', label: 'Profile', icon: User },
-						{ id: 'account', label: 'Account & Security', icon: Lock },
-						{ id: 'notifications', label: 'Notifications', icon: Bell },
-					],
-					activeTab,
-					onTabChange: (id) => setActiveTab(id as any),
-				}}
-			/>
-			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-
-			{/* Profile Tab */}
-			{activeTab === 'profile' && (
-				<div className="space-y-6">
-					{/* Profile Picture */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Profile Picture</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="flex items-center gap-6">
-								<div className="relative">
-									<div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold">
-										{profile.name[0] || 'U'}
-									</div>
-									<button className="absolute bottom-0 right-0 p-2 bg-white dark:bg-neutral-800 rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
-										<Camera className="h-4 w-4" />
-									</button>
-								</div>
-								<div>
-									<h3 className="font-bold text-lg mb-1">{profile.name}</h3>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-										{profile.position} • {profile.department}
-									</p>
-									<div className="flex items-center gap-2">
-										<Button size="sm" variant="outline">
-											<Upload className="h-4 w-4 mr-2" />
-											Upload Photo
-										</Button>
-										<Button size="sm" variant="outline" className="text-red-600">
-											Remove
-										</Button>
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Basic Information */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Basic Information</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<User className="inline h-4 w-4 mr-1" />
-										Full Name
-									</label>
-									<Input
-										value={profile.name}
-										onChange={(e) => handleProfileChange('name', e.target.value)}
-										placeholder="Enter your full name"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Mail className="inline h-4 w-4 mr-1" />
-										Email Address
-									</label>
-									<Input
-										type="email"
-										value={profile.email}
-										onChange={(e) => handleProfileChange('email', e.target.value)}
-										placeholder="your.email@company.com"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Phone className="inline h-4 w-4 mr-1" />
-										Phone Number
-									</label>
-									<Input
-										type="tel"
-										value={profile.phone}
-										onChange={(e) => handleProfileChange('phone', e.target.value)}
-										placeholder="+1 (555) 123-4567"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Calendar className="inline h-4 w-4 mr-1" />
-										Birth Date
-									</label>
-									<Input
-										type="date"
-										value={profile.birthDate}
-										onChange={(e) => handleProfileChange('birthDate', e.target.value)}
-									/>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Work Information */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Work Information</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Building className="inline h-4 w-4 mr-1" />
-										Department
-									</label>
-									<select
-										value={profile.department}
-										onChange={(e) => handleProfileChange('department', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-									>
-										<option value="">Select department</option>
-										{departments.map((dept) => (
-											<option key={dept.id} value={dept.name}>
-												{dept.name}
-											</option>
-										))}
-									</select>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Briefcase className="inline h-4 w-4 mr-1" />
-										Position
-									</label>
-									<select
-										value={profile.position}
-										onChange={(e) => handleProfileChange('position', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-									>
-										<option value="">Select position</option>
-										{positions.map((pos) => (
-											<option key={pos.id} value={pos.name}>
-												{pos.name}
-											</option>
-										))}
-									</select>
-								</div>
-							</div>
-
-						{/* Roles & Responsibilities Selection */}
-						<div className="mt-5">
-							<label className="block text-sm font-medium mb-2">
-								<Briefcase className="inline h-4 w-4 mr-1" />
-								Roles & Responsibilities <span className="text-neutral-500 text-xs">(Add multiple)</span>
-							</label>
-								<div className="space-y-3">
-									{/* Dropdown and Add Button */}
-									<div className="flex gap-2">
-										<select
-											value={customJobInput}
-											onChange={(e) => setCustomJobInput(e.target.value)}
-											className="flex-1 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-										>
-											<option value="">-- Select a job to add --</option>
-											{availableJobs
-												.filter((job) => !profile.jobs.includes(job.title))
-												.map((job) => (
-													<option key={job.id} value={job.title}>
-														{job.title}
-													</option>
-												))}
-										</select>
-										<Button 
-											onClick={handleAddCustomJob} 
-											size="sm"
-											disabled={!customJobInput}
-											className="px-4"
-										>
-											<Plus className="h-4 w-4 mr-1" />
-											Add
-										</Button>
-									</div>
-
-								{/* Selected Roles Display */}
-								{profile.jobs.length > 0 ? (
-									<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
-										<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
-											Selected Roles ({profile.jobs.length})
-										</p>
-											<div className="flex flex-wrap gap-2">
-												{profile.jobs.map((job) => (
-													<div
-														key={job}
-														className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20"
-													>
-														<span className="font-medium">{job}</span>
-														<button
-															onClick={() => handleRemoveJob(job)}
-															className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-															type="button"
-														>
-															<X className="h-3 w-3" />
-														</button>
-													</div>
-												))}
-											</div>
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+				{/* Header */}
+				<PageHeader
+					title="Settings"
+					description="Manage your account, preferences, and privacy settings"
+					tabs={{
+						items: [
+							{ id: 'profile', label: 'Profile', icon: User },
+							{ id: 'account', label: 'Account & Security', icon: Lock },
+							{ id: 'notifications', label: 'Notifications', icon: Bell },
+						],
+						activeTab,
+						onTabChange: (id) => setActiveTab(id as any),
+					}}
+				/>
+				
+				{/* Profile Tab */}
+				{activeTab === 'profile' && (
+					<div className="space-y-6">
+						{/* Profile Picture */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Profile Picture</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="flex items-center gap-6">
+									<div className="relative">
+										<div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold">
+											{profile.name[0] || 'U'}
 										</div>
-								) : (
-									<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
-										<p className="text-sm text-neutral-500 dark:text-neutral-400">
-											No roles added yet. Select from the dropdown above.
+										<button className="absolute bottom-0 right-0 p-2 bg-[#1a1a1a] rounded-full shadow-lg border border-border-dark hover:bg-neutral-800 transition-colors text-white">
+											<Camera className="h-4 w-4" />
+										</button>
+									</div>
+									<div>
+										<h3 className="font-bold text-lg mb-1 text-white">{profile.name}</h3>
+										<p className="text-sm text-neutral-400 mb-3">
+											{profile.position} • {profile.department}
 										</p>
+										<div className="flex items-center gap-2">
+											<Button size="sm" variant="outline" className="border-border-dark hover:bg-border-dark text-white">
+												<Upload className="h-4 w-4 mr-2" />
+												Upload Photo
+											</Button>
+											<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
+												Remove
+											</Button>
+										</div>
 									</div>
-								)}
+								</div>
+							</CardContent>
+						</Card>
 
-								{availableJobs.length === 0 && (
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-										💡 No roles available yet. Contact your administrator.
-									</p>
-								)}
-								</div>
-							</div>
-
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										Employee ID
-										<span className="text-xs text-neutral-500 ml-2">(System Generated)</span>
-									</label>
-									<Input
-										value={profile.employeeId}
-										readOnly
-										disabled
-										placeholder="EMP-2023-001"
-										className="bg-neutral-100 dark:bg-neutral-800 cursor-not-allowed"
-									/>
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-										🔒 This is a unique identifier assigned by the system
-									</p>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Join Date</label>
-									<Input
-										type="date"
-										value={profile.joinDate}
-										onChange={(e) => handleProfileChange('joinDate', e.target.value)}
-									/>
-								</div>
-							</div>
-						</CardContent>
-				</Card>
-
-				{/* Address */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Address</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">Street Address</label>
-									<Input
-										value={profile.address}
-										onChange={(e) => handleProfileChange('address', e.target.value)}
-										placeholder="123 Main Street"
-									/>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+						{/* Basic Information */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Basic Information</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
-										<label className="block text-sm font-medium mb-2">City</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<User className="inline h-4 w-4 mr-1" />
+											Full Name
+										</label>
 										<Input
-											value={profile.city}
-											onChange={(e) => handleProfileChange('city', e.target.value)}
-											placeholder="New York"
+											value={profile.name}
+											onChange={(e) => handleProfileChange('name', e.target.value)}
+											placeholder="Enter your full name"
+											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">Country</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Mail className="inline h-4 w-4 mr-1" />
+											Email Address
+										</label>
 										<Input
-											value={profile.country}
-											onChange={(e) => handleProfileChange('country', e.target.value)}
-											placeholder="United States"
+											type="email"
+											value={profile.email}
+											onChange={(e) => handleProfileChange('email', e.target.value)}
+											placeholder="your.email@company.com"
+											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2">Postal Code</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Phone className="inline h-4 w-4 mr-1" />
+											Phone Number
+										</label>
 										<Input
-											value={profile.postalCode}
-											onChange={(e) => handleProfileChange('postalCode', e.target.value)}
-											placeholder="10001"
+											type="tel"
+											value={profile.phone}
+											onChange={(e) => handleProfileChange('phone', e.target.value)}
+											placeholder="+1 (555) 123-4567"
+											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Calendar className="inline h-4 w-4 mr-1" />
+											Birth Date
+										</label>
+										<Input
+											type="date"
+											value={profile.birthDate}
+											onChange={(e) => handleProfileChange('birthDate', e.target.value)}
+											className="bg-[#1a1a1a] border-border-dark text-white"
 										/>
 									</div>
 								</div>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
 
-					{/* Bio & Skills */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Bio & Skills</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">Bio</label>
-									<Textarea
-										value={profile.bio}
-										onChange={(e) => handleProfileChange('bio', e.target.value)}
-										placeholder="Tell us about yourself..."
-										rows={4}
-										className="resize-none"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Skills</label>
-									<div className="flex gap-2 mb-3">
-										<Input
-											value={skillInput}
-											onChange={(e) => setSkillInput(e.target.value)}
-											onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-											placeholder="Add a skill (press Enter)"
-											className="flex-1"
-										/>
-										<Button onClick={handleAddSkill} size="sm">
-											Add
-										</Button>
-									</div>
-									{profile.skills.length > 0 && (
-										<div className="flex flex-wrap gap-2">
-											{profile.skills.map((skill) => (
-												<span
-													key={skill}
-													className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
-												>
-													{skill}
-													<button onClick={() => handleRemoveSkill(skill)}>
-														<AlertCircle className="h-3 w-3" />
-													</button>
-												</span>
+						{/* Work Information */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Work Information</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Building className="inline h-4 w-4 mr-1" />
+											Department
+										</label>
+										<select
+											value={profile.department}
+											onChange={(e) => handleProfileChange('department', e.target.value)}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">Select department</option>
+											{departments.map((dept) => (
+												<option key={dept.id} value={dept.name}>
+													{dept.name}
+												</option>
 											))}
+										</select>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Briefcase className="inline h-4 w-4 mr-1" />
+											Position
+										</label>
+										<select
+											value={profile.position}
+											onChange={(e) => handleProfileChange('position', e.target.value)}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="">Select position</option>
+											{positions.map((pos) => (
+												<option key={pos.id} value={pos.name}>
+													{pos.name}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+
+							{/* Roles & Responsibilities Selection */}
+							<div className="mt-5">
+								<label className="block text-sm font-medium mb-2 text-neutral-300">
+									<Briefcase className="inline h-4 w-4 mr-1" />
+									Roles & Responsibilities <span className="text-neutral-500 text-xs">(Add multiple)</span>
+								</label>
+									<div className="space-y-3">
+										{/* Dropdown and Add Button */}
+										<div className="flex gap-2">
+											<select
+												value={customJobInput}
+												onChange={(e) => setCustomJobInput(e.target.value)}
+												className="flex-1 px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											>
+												<option value="">-- Select a job to add --</option>
+												{availableJobs
+													.filter((job) => !profile.jobs.includes(job.title))
+													.map((job) => (
+														<option key={job.id} value={job.title}>
+															{job.title}
+														</option>
+													))}
+											</select>
+											<Button 
+												onClick={handleAddCustomJob} 
+												size="sm"
+												variant="primary"
+												disabled={!customJobInput}
+												className="px-4"
+											>
+												<Plus className="h-4 w-4 mr-1" />
+												Add
+											</Button>
+										</div>
+
+									{/* Selected Roles Display */}
+									{profile.jobs.length > 0 ? (
+										<div className="p-4 border border-border-dark rounded-2xl bg-[#1a1a1a]/50">
+											<p className="text-xs font-medium text-neutral-400 mb-3">
+												Selected Roles ({profile.jobs.length})
+											</p>
+												<div className="flex flex-wrap gap-2">
+													{profile.jobs.map((job) => (
+														<div
+															key={job}
+															className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20"
+														>
+															<span className="font-medium">{job}</span>
+															<button
+																onClick={() => handleRemoveJob(job)}
+																className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+																type="button"
+															>
+																<X className="h-3 w-3" />
+															</button>
+														</div>
+													))}
+												</div>
+											</div>
+									) : (
+										<div className="p-4 border border-dashed border-border-dark rounded-2xl bg-[#1a1a1a]/50 text-center">
+											<p className="text-sm text-neutral-400">
+												No roles added yet. Select from the dropdown above.
+											</p>
 										</div>
 									)}
-								</div>
-							</div>
-						</CardContent>
-					</Card>
 
-					{/* Regional Settings */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Regional Settings</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Globe className="inline h-4 w-4 mr-1" />
-										Timezone
-									</label>
-									<select
-										value={profile.timezone}
-										onChange={(e) => handleProfileChange('timezone', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="UTC">UTC</option>
-										<option value="America/New_York">Eastern Time (ET)</option>
-										<option value="America/Chicago">Central Time (CT)</option>
-										<option value="America/Denver">Mountain Time (MT)</option>
-										<option value="America/Los_Angeles">Pacific Time (PT)</option>
-										<option value="Europe/London">London (GMT)</option>
-										<option value="Asia/Seoul">Seoul (KST)</option>
-										<option value="Asia/Tokyo">Tokyo (JST)</option>
-									</select>
+									{availableJobs.length === 0 && (
+										<p className="text-xs text-neutral-400 mt-2">
+											💡 No roles available yet. Contact your administrator.
+										</p>
+									)}
+									</div>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Languages className="inline h-4 w-4 mr-1" />
-										Language
-									</label>
-									<select
-										value={profile.language}
-										onChange={(e) => handleProfileChange('language', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="en">English</option>
-										<option value="ko">한국어</option>
-										<option value="ja">日本語</option>
-										<option value="zh">中文</option>
-									</select>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Date Format</label>
-									<select
-										value={profile.dateFormat}
-										onChange={(e) => handleProfileChange('dateFormat', e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="MM/DD/YYYY">MM/DD/YYYY</option>
-										<option value="DD/MM/YYYY">DD/MM/YYYY</option>
-										<option value="YYYY-MM-DD">YYYY-MM-DD</option>
-									</select>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">
-										<Clock className="inline h-4 w-4 mr-1" />
-										Time Format
-									</label>
-									<select
-										value={profile.timeFormat}
-										onChange={(e) => handleProfileChange('timeFormat', e.target.value as '12h' | '24h')}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
-									>
-										<option value="12h">12-hour (2:30 PM)</option>
-										<option value="24h">24-hour (14:30)</option>
-									</select>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
 
-					{/* Actions */}
-					{isProfileChanged && (
-						<div className="flex items-center gap-3">
-							<Button onClick={handleSaveProfile} className="flex items-center gap-2">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											Employee ID
+											<span className="text-xs text-neutral-500 ml-2">(System Generated)</span>
+										</label>
+										<Input
+											value={profile.employeeId}
+											readOnly
+											disabled
+											placeholder="EMP-2023-001"
+											className="bg-[#1a1a1a] border-border-dark text-neutral-400 cursor-not-allowed"
+										/>
+										<p className="text-xs text-neutral-500 mt-1">
+											🔒 This is a unique identifier assigned by the system
+										</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Join Date</label>
+										<Input
+											type="date"
+											value={profile.joinDate}
+											onChange={(e) => handleProfileChange('joinDate', e.target.value)}
+											className="bg-[#1a1a1a] border-border-dark text-white"
+										/>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Address */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Address</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-5">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Street Address</label>
+										<Input
+											value={profile.address}
+											onChange={(e) => handleProfileChange('address', e.target.value)}
+											placeholder="123 Main Street"
+											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+										/>
+									</div>
+									<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+										<div>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">City</label>
+											<Input
+												value={profile.city}
+												onChange={(e) => handleProfileChange('city', e.target.value)}
+												placeholder="New York"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+										</div>
+										<div>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">Country</label>
+											<Input
+												value={profile.country}
+												onChange={(e) => handleProfileChange('country', e.target.value)}
+												placeholder="United States"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+										</div>
+										<div>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">Postal Code</label>
+											<Input
+												value={profile.postalCode}
+												onChange={(e) => handleProfileChange('postalCode', e.target.value)}
+												placeholder="10001"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Bio & Skills */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Bio & Skills</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-5">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Bio</label>
+										<Textarea
+											value={profile.bio}
+											onChange={(e) => handleProfileChange('bio', e.target.value)}
+											placeholder="Tell us about yourself..."
+											rows={4}
+											className="resize-none bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Skills</label>
+										<div className="flex gap-2 mb-3">
+											<Input
+												value={skillInput}
+												onChange={(e) => setSkillInput(e.target.value)}
+												onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
+												placeholder="Add a skill (press Enter)"
+												className="flex-1 bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+											<Button onClick={handleAddSkill} size="sm" variant="primary">
+												Add
+											</Button>
+										</div>
+										{profile.skills.length > 0 && (
+											<div className="flex flex-wrap gap-2">
+												{profile.skills.map((skill) => (
+													<span
+														key={skill}
+														className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+													>
+														{skill}
+														<button onClick={() => handleRemoveSkill(skill)}>
+															<AlertCircle className="h-3 w-3" />
+														</button>
+													</span>
+												))}
+											</div>
+										)}
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Regional Settings */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Regional Settings</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Globe className="inline h-4 w-4 mr-1" />
+											Timezone
+										</label>
+										<select
+											value={profile.timezone}
+											onChange={(e) => handleProfileChange('timezone', e.target.value)}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="UTC">UTC</option>
+											<option value="America/New_York">Eastern Time (ET)</option>
+											<option value="America/Chicago">Central Time (CT)</option>
+											<option value="America/Denver">Mountain Time (MT)</option>
+											<option value="America/Los_Angeles">Pacific Time (PT)</option>
+											<option value="Europe/London">London (GMT)</option>
+											<option value="Asia/Seoul">Seoul (KST)</option>
+											<option value="Asia/Tokyo">Tokyo (JST)</option>
+										</select>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Languages className="inline h-4 w-4 mr-1" />
+											Language
+										</label>
+										<select
+											value={profile.language}
+											onChange={(e) => handleProfileChange('language', e.target.value)}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="en">English</option>
+											<option value="ko">한국어</option>
+											<option value="ja">日本語</option>
+											<option value="zh">中文</option>
+										</select>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Date Format</label>
+										<select
+											value={profile.dateFormat}
+											onChange={(e) => handleProfileChange('dateFormat', e.target.value)}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="MM/DD/YYYY">MM/DD/YYYY</option>
+											<option value="DD/MM/YYYY">DD/MM/YYYY</option>
+											<option value="YYYY-MM-DD">YYYY-MM-DD</option>
+										</select>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">
+											<Clock className="inline h-4 w-4 mr-1" />
+											Time Format
+										</label>
+										<select
+											value={profile.timeFormat}
+											onChange={(e) => handleProfileChange('timeFormat', e.target.value as '12h' | '24h')}
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+										>
+											<option value="12h">12-hour (2:30 PM)</option>
+											<option value="24h">24-hour (14:30)</option>
+										</select>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Actions */}
+						<div className="flex items-center gap-3 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+							<Button 
+								onClick={handleSaveProfile} 
+								variant="primary"
+								className="gap-2"
+								disabled={!isProfileChanged}
+							>
 								<Save className="h-4 w-4" />
 								Save Changes
 							</Button>
-							<Button variant="outline" onClick={handleCancelProfile}>
+							<Button 
+								variant="outline" 
+								onClick={handleCancelProfile}
+								disabled={!isProfileChanged}
+							>
 								Cancel
 							</Button>
 						</div>
-					)}
-				</div>
-			)}
-
-			{/* Account & Security Tab */}
-			{activeTab === 'account' && (
-				<div className="space-y-6">
-					{/* Change Password */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold flex items-center gap-2">
-								<Lock className="h-5 w-5 text-primary" />
-								Change Password
-							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-								Update your password to keep your account secure
-							</p>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-5 max-w-md">
-								<div>
-									<label className="block text-sm font-medium mb-2">Current Password</label>
-									<div className="relative">
-										<Input
-											type={showCurrentPassword ? 'text' : 'password'}
-											value={currentPassword}
-											onChange={(e) => setCurrentPassword(e.target.value)}
-											placeholder="Enter current password"
-										/>
-										<button
-											type="button"
-											onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-										>
-											{showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-										</button>
-									</div>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">New Password</label>
-									<div className="relative">
-										<Input
-											type={showNewPassword ? 'text' : 'password'}
-											value={newPassword}
-											onChange={(e) => setNewPassword(e.target.value)}
-											placeholder="Enter new password"
-										/>
-										<button
-											type="button"
-											onClick={() => setShowNewPassword(!showNewPassword)}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-										>
-											{showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-										</button>
-									</div>
-									<p className="text-xs text-neutral-500 mt-1">Must be at least 8 characters</p>
-								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">Confirm New Password</label>
-									<div className="relative">
-										<Input
-											type={showConfirmPassword ? 'text' : 'password'}
-											value={confirmPassword}
-											onChange={(e) => setConfirmPassword(e.target.value)}
-											placeholder="Confirm new password"
-										/>
-										<button
-											type="button"
-											onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-											className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-										>
-											{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-										</button>
-									</div>
-								</div>
-								<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-									<p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-										Password Requirements:
-									</p>
-									<ul className="space-y-1 text-xs text-blue-700 dark:text-blue-300">
-										<li className="flex items-center gap-2">
-											{newPassword.length >= 8 ? (
-												<CheckCircle2 className="h-3 w-3 text-green-600" />
-											) : (
-												<AlertCircle className="h-3 w-3" />
-											)}
-											At least 8 characters
-										</li>
-										<li className="flex items-center gap-2">
-											{/[A-Z]/.test(newPassword) ? (
-												<CheckCircle2 className="h-3 w-3 text-green-600" />
-											) : (
-												<AlertCircle className="h-3 w-3" />
-											)}
-											One uppercase letter
-										</li>
-										<li className="flex items-center gap-2">
-											{/[a-z]/.test(newPassword) ? (
-												<CheckCircle2 className="h-3 w-3 text-green-600" />
-											) : (
-												<AlertCircle className="h-3 w-3" />
-											)}
-											One lowercase letter
-										</li>
-										<li className="flex items-center gap-2">
-											{/[0-9]/.test(newPassword) ? (
-												<CheckCircle2 className="h-3 w-3 text-green-600" />
-											) : (
-												<AlertCircle className="h-3 w-3" />
-											)}
-											One number
-										</li>
-									</ul>
-								</div>
-								<div className="flex items-center gap-3 pt-2">
-									<Button onClick={handlePasswordChange} className="flex items-center gap-2">
-										<Lock className="h-4 w-4" />
-										Change Password
-									</Button>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Two-Factor Authentication */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Two-Factor Authentication</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-								Add an extra layer of security to your account
-							</p>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-								<div className="flex-1">
-									<h3 className="font-medium mb-1">Authenticator App</h3>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400">
-										Use an authenticator app to generate verification codes
-									</p>
-								</div>
-								<Button size="sm" variant="outline">
-									Enable
-								</Button>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Active Sessions */}
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Active Sessions</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-								Manage your active sessions across devices
-							</p>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-3">
-								<div className="flex items-center justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-									<div>
-										<h3 className="font-medium">Current Session</h3>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
-											Chrome on Windows • New York, US
-										</p>
-									</div>
-									<span className="text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
-										Active
-									</span>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Danger Zone */}
-					<Card className="border-red-200 dark:border-red-800">
-						<CardHeader>
-							<h2 className="text-xl font-bold text-red-600">Danger Zone</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								<div className="flex items-start justify-between p-4 border border-red-200 dark:border-red-800 rounded-xl">
-									<div className="flex-1">
-										<h3 className="font-medium text-red-600">Deactivate Account</h3>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
-											Temporarily disable your account
-										</p>
-									</div>
-									<Button size="sm" variant="outline" className="text-red-600 border-red-200">
-										Deactivate
-									</Button>
-								</div>
-								<div className="flex items-start justify-between p-4 border border-red-200 dark:border-red-800 rounded-xl">
-									<div className="flex-1">
-										<h3 className="font-medium text-red-600">Delete Account</h3>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
-											Permanently delete your account and all data
-										</p>
-									</div>
-									<Button size="sm" variant="outline" className="text-red-600 border-red-200">
-										Delete
-									</Button>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				</div>
-			)}
-
-			{/* Notifications Tab */}
-			{activeTab === 'notifications' && (
-				<div className="space-y-6">
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Notification Channels</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								{[
-									{ key: 'email', label: 'Email Notifications', desc: 'Receive notifications via email' },
-									{ key: 'push', label: 'Push Notifications', desc: 'Browser push notifications' },
-									{ key: 'desktop', label: 'Desktop Notifications', desc: 'System desktop notifications' },
-									{ key: 'sms', label: 'SMS Notifications', desc: 'Text message notifications (charges may apply)' },
-								].map((item) => (
-									<div key={item.key} className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-										<div className="flex-1">
-											<h3 className="font-medium mb-1">{item.label}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400">{item.desc}</p>
-										</div>
-										<label className="relative inline-flex items-center cursor-pointer ml-4">
-											<input
-												type="checkbox"
-												checked={notifications[item.key as keyof NotificationSettings] as boolean}
-												onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-												className="sr-only peer"
-											/>
-											<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-										</label>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card>
-						<CardHeader>
-							<h2 className="text-xl font-bold">Activity Notifications</h2>
-						</CardHeader>
-						<CardContent className="p-6">
-							<div className="space-y-4">
-								{[
-									{ key: 'taskAssigned', label: 'Task Assigned', desc: 'When a new task is assigned to you' },
-									{ key: 'taskDue', label: 'Task Due', desc: 'Reminders for upcoming task deadlines' },
-									{ key: 'mentions', label: 'Mentions', desc: 'When someone mentions you' },
-									{ key: 'comments', label: 'Comments', desc: 'New comments on your work' },
-								].map((item) => (
-									<div key={item.key} className="flex items-start justify-between p-4 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-										<div className="flex-1">
-											<h3 className="font-medium mb-1">{item.label}</h3>
-											<p className="text-sm text-neutral-600 dark:text-neutral-400">{item.desc}</p>
-										</div>
-										<label className="relative inline-flex items-center cursor-pointer ml-4">
-											<input
-												type="checkbox"
-												checked={notifications[item.key as keyof NotificationSettings] as boolean}
-												onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-												className="sr-only peer"
-											/>
-											<div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
-										</label>
-									</div>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-
-					<div className="flex items-center gap-3">
-						<Button onClick={handleSaveNotifications} className="flex items-center gap-2">
-							<Save className="h-4 w-4" />
-							Save Preferences
-						</Button>
 					</div>
-				</div>
-			)}
-		</div>
+				)}
+
+				{/* Account & Security Tab */}
+				{activeTab === 'account' && (
+					<div className="space-y-6">
+						{/* Change Password */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold flex items-center gap-2 text-white">
+									<Lock className="h-5 w-5 text-primary" />
+									Change Password
+								</h2>
+								<p className="text-sm text-neutral-400 mt-1">
+									Update your password to keep your account secure
+								</p>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-5 max-w-md">
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Current Password</label>
+										<div className="relative">
+											<Input
+												type={showCurrentPassword ? 'text' : 'password'}
+												value={currentPassword}
+												onChange={(e) => setCurrentPassword(e.target.value)}
+												placeholder="Enter current password"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+											>
+												{showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+											</button>
+										</div>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">New Password</label>
+										<div className="relative">
+											<Input
+												type={showNewPassword ? 'text' : 'password'}
+												value={newPassword}
+												onChange={(e) => setNewPassword(e.target.value)}
+												placeholder="Enter new password"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowNewPassword(!showNewPassword)}
+												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+											>
+												{showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+											</button>
+										</div>
+										<p className="text-xs text-neutral-500 mt-1">Must be at least 8 characters</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">Confirm New Password</label>
+										<div className="relative">
+											<Input
+												type={showConfirmPassword ? 'text' : 'password'}
+												value={confirmPassword}
+												onChange={(e) => setConfirmPassword(e.target.value)}
+												placeholder="Confirm new password"
+												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+											>
+												{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+											</button>
+										</div>
+									</div>
+									<div className="p-4 bg-blue-900/10 border border-blue-900/30 rounded-xl">
+										<p className="text-sm font-medium text-blue-400 mb-2">
+											Password Requirements:
+										</p>
+										<ul className="space-y-1 text-xs text-blue-300">
+											<li className="flex items-center gap-2">
+												{newPassword.length >= 8 ? (
+													<CheckCircle2 className="h-3 w-3 text-green-500" />
+												) : (
+													<AlertCircle className="h-3 w-3" />
+												)}
+												At least 8 characters
+											</li>
+											<li className="flex items-center gap-2">
+												{/[A-Z]/.test(newPassword) ? (
+													<CheckCircle2 className="h-3 w-3 text-green-500" />
+												) : (
+													<AlertCircle className="h-3 w-3" />
+												)}
+												One uppercase letter
+											</li>
+											<li className="flex items-center gap-2">
+												{/[a-z]/.test(newPassword) ? (
+													<CheckCircle2 className="h-3 w-3 text-green-500" />
+												) : (
+													<AlertCircle className="h-3 w-3" />
+												)}
+												One lowercase letter
+											</li>
+											<li className="flex items-center gap-2">
+												{/[0-9]/.test(newPassword) ? (
+													<CheckCircle2 className="h-3 w-3 text-green-500" />
+												) : (
+													<AlertCircle className="h-3 w-3" />
+												)}
+												One number
+											</li>
+										</ul>
+									</div>
+									<div className="flex items-center gap-3 pt-2">
+										<Button onClick={handlePasswordChange} variant="primary" className="gap-2">
+											<Lock className="h-4 w-4" />
+											Change Password
+										</Button>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Two-Factor Authentication */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Two-Factor Authentication</h2>
+								<p className="text-sm text-neutral-400 mt-1">
+									Add an extra layer of security to your account
+								</p>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+									<div className="flex-1">
+										<h3 className="font-medium mb-1 text-white">Authenticator App</h3>
+										<p className="text-sm text-neutral-400">
+											Use an authenticator app to generate verification codes
+										</p>
+									</div>
+									<Button size="sm" variant="outline" className="border-border-dark hover:bg-border-dark text-white">
+										Enable
+									</Button>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Active Sessions */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Active Sessions</h2>
+								<p className="text-sm text-neutral-400 mt-1">
+									Manage your active sessions across devices
+								</p>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-3">
+									<div className="flex items-center justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+										<div>
+											<h3 className="font-medium text-white">Current Session</h3>
+											<p className="text-sm text-neutral-400">
+												Chrome on Windows • New York, US
+											</p>
+										</div>
+										<span className="text-xs text-green-400 bg-green-900/30 px-2 py-1 rounded-full border border-green-900/30">
+											Active
+										</span>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Danger Zone */}
+						<Card className="bg-surface-dark border-red-900/30">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-red-500">Danger Zone</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-4">
+									<div className="flex items-start justify-between p-4 border border-red-900/30 rounded-xl bg-red-900/10">
+										<div className="flex-1">
+											<h3 className="font-medium text-red-400">Deactivate Account</h3>
+											<p className="text-sm text-red-300/70">
+												Temporarily disable your account
+											</p>
+										</div>
+										<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
+											Deactivate
+										</Button>
+									</div>
+									<div className="flex items-start justify-between p-4 border border-red-900/30 rounded-xl bg-red-900/10">
+										<div className="flex-1">
+											<h3 className="font-medium text-red-400">Delete Account</h3>
+											<p className="text-sm text-red-300/70">
+												Permanently delete your account and all data
+											</p>
+										</div>
+										<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
+											Delete
+										</Button>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+				)}
+
+				{/* Notifications Tab */}
+				{activeTab === 'notifications' && (
+					<div className="space-y-6">
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Notification Channels</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-4">
+									{[
+										{ key: 'email', label: 'Email Notifications', desc: 'Receive notifications via email' },
+										{ key: 'push', label: 'Push Notifications', desc: 'Browser push notifications' },
+										{ key: 'desktop', label: 'Desktop Notifications', desc: 'System desktop notifications' },
+										{ key: 'sms', label: 'SMS Notifications', desc: 'Text message notifications (charges may apply)' },
+									].map((item) => (
+										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+											<div className="flex-1">
+												<h3 className="font-medium mb-1 text-white">{item.label}</h3>
+												<p className="text-sm text-neutral-400">{item.desc}</p>
+											</div>
+											<label className="relative inline-flex items-center cursor-pointer ml-4">
+												<input
+													type="checkbox"
+													checked={notifications[item.key as keyof NotificationSettings] as boolean}
+													onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
+													className="sr-only peer"
+												/>
+												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
+											</label>
+										</div>
+									))}
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<h2 className="text-xl font-bold text-white">Activity Notifications</h2>
+							</CardHeader>
+							<CardContent className="p-6">
+								<div className="space-y-4">
+									{[
+										{ key: 'taskAssigned', label: 'Task Assigned', desc: 'When a new task is assigned to you' },
+										{ key: 'taskDue', label: 'Task Due', desc: 'Reminders for upcoming task deadlines' },
+										{ key: 'mentions', label: 'Mentions', desc: 'When someone mentions you' },
+										{ key: 'comments', label: 'Comments', desc: 'New comments on your work' },
+									].map((item) => (
+										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+											<div className="flex-1">
+												<h3 className="font-medium mb-1 text-white">{item.label}</h3>
+												<p className="text-sm text-neutral-400">{item.desc}</p>
+											</div>
+											<label className="relative inline-flex items-center cursor-pointer ml-4">
+												<input
+													type="checkbox"
+													checked={notifications[item.key as keyof NotificationSettings] as boolean}
+													onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
+													className="sr-only peer"
+												/>
+												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
+											</label>
+										</div>
+									))}
+								</div>
+							</CardContent>
+						</Card>
+
+						<div className="flex items-center gap-3">
+							<Button onClick={handleSaveNotifications} variant="primary" className="gap-2">
+								<Save className="h-4 w-4" />
+								Save Preferences
+							</Button>
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }

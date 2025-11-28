@@ -10,6 +10,7 @@ import {
 	MailOpen,
 	Trash2,
 	Archive,
+	ArchiveRestore,
 	Star,
 	Clock,
 	CheckCircle2,
@@ -20,7 +21,6 @@ import {
 	FolderKanban,
 	MessageSquare,
 	Zap,
-	TrendingUp,
 	RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -37,6 +37,7 @@ interface Message {
 	timestamp: Date
 	isRead: boolean
 	isStarred: boolean
+	isArchived?: boolean
 	type: 'task_assigned' | 'review_received' | 'project_update' | 'team_message' | 'approval_request'
 	priority: 'urgent' | 'high' | 'normal' | 'low'
 	// Additional data
@@ -60,7 +61,7 @@ export default function MessagesPage() {
 	
 	// Messages state
 	const [messages, setMessages] = useState<Message[]>([])
-	const [filter, setFilter] = useState<'all' | 'unread' | 'starred'>('all')
+	const [filter, setFilter] = useState<'all' | 'unread' | 'starred' | 'archived'>('all')
 	const [typeFilter, setTypeFilter] = useState<string>('all')
 	const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
 
@@ -77,6 +78,7 @@ export default function MessagesPage() {
 			const messagesWithDates = savedMessages.map((msg: any) => ({
 				...msg,
 				timestamp: new Date(msg.timestamp),
+				isArchived: msg.isArchived || false, // Ensure isArchived is initialized
 			}))
 			setMessages(messagesWithDates)
 		} else {
@@ -93,6 +95,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 30),
 					isRead: false,
 					isStarred: true,
+					isArchived: false,
 					type: 'task_assigned',
 					priority: 'urgent',
 					relatedId: 'task-001',
@@ -120,6 +123,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
 					isRead: false,
 					isStarred: false,
+					isArchived: false,
 					type: 'review_received',
 					priority: 'normal',
 					relatedPage: '/app/work-review',
@@ -143,6 +147,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
 					isRead: true,
 					isStarred: true,
+					isArchived: false,
 					type: 'review_received',
 					priority: 'high',
 					relatedPage: '/app/work-review',
@@ -167,6 +172,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
 					isRead: true,
 					isStarred: false,
+					isArchived: false,
 					type: 'task_assigned',
 					priority: 'normal',
 					relatedId: 'task-002',
@@ -193,6 +199,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
 					isRead: true,
 					isStarred: false,
+					isArchived: false,
 					type: 'project_update',
 					priority: 'normal',
 					relatedPage: '/app/projects',
@@ -214,6 +221,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
 					isRead: true,
 					isStarred: false,
+					isArchived: false,
 					type: 'team_message',
 					priority: 'normal',
 					quickActions: [
@@ -236,6 +244,7 @@ export default function MessagesPage() {
 					timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4),
 					isRead: true,
 					isStarred: false,
+					isArchived: false,
 					type: 'approval_request',
 					priority: 'normal',
 					quickActions: [
@@ -284,11 +293,15 @@ export default function MessagesPage() {
 
 	const handleArchive = (id: string) => {
 		setMessages((prev) => {
-			const updated = prev.filter((msg) => msg.id !== id)
+			const updated = prev.map((msg) => (msg.id === id ? { ...msg, isArchived: !msg.isArchived } : msg))
 			storage.set('messages', updated)
 			return updated
 		})
-		toast.success('Message archived')
+		// Check the new state to determine message
+		const msg = messages.find(m => m.id === id)
+		const isNowArchived = !msg?.isArchived // Predict new state
+		toast.success(isNowArchived ? 'Message archived' : 'Message restored')
+		
 		if (selectedMessage?.id === id) {
 			setSelectedMessage(null)
 		}
@@ -344,15 +357,15 @@ export default function MessagesPage() {
 	const getTypeIcon = (type: Message['type']) => {
 		switch (type) {
 			case 'task_assigned':
-				return <CheckCircle2 className="h-4 w-4 text-blue-500" />
+				return <CheckCircle2 className="h-4 w-4 text-neutral-400" />
 			case 'review_received':
-				return <MessageSquare className="h-4 w-4 text-purple-500" />
+				return <MessageSquare className="h-4 w-4 text-neutral-400" />
 			case 'project_update':
-				return <FolderKanban className="h-4 w-4 text-green-500" />
+				return <FolderKanban className="h-4 w-4 text-neutral-400" />
 			case 'team_message':
-				return <Users className="h-4 w-4 text-orange-500" />
+				return <Users className="h-4 w-4 text-neutral-400" />
 			case 'approval_request':
-				return <Clock className="h-4 w-4 text-amber-500" />
+				return <Clock className="h-4 w-4 text-neutral-400" />
 		}
 	}
 
@@ -371,19 +384,6 @@ export default function MessagesPage() {
 		}
 	}
 
-	const getPriorityBadge = (priority: Message['priority']) => {
-		switch (priority) {
-			case 'urgent':
-				return { label: '🔴 URGENT', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }
-			case 'high':
-				return { label: 'HIGH', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' }
-			case 'normal':
-				return { label: 'NORMAL', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
-			case 'low':
-				return { label: 'LOW', color: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400' }
-		}
-	}
-
 	const formatTimestamp = (date: Date) => {
 		const now = new Date()
 		const diff = now.getTime() - date.getTime()
@@ -399,6 +399,14 @@ export default function MessagesPage() {
 
 	// Filtered messages
 	const filteredMessages = messages.filter((msg) => {
+		// Special case for archived view
+		if (filter === 'archived') {
+			return msg.isArchived
+		}
+
+		// Default behavior: Hide archived messages in inbox/starred/unread
+		if (msg.isArchived) return false
+
 		// Filter by read/starred
 		if (filter === 'unread' && msg.isRead) return false
 		if (filter === 'starred' && !msg.isStarred) return false
@@ -411,104 +419,104 @@ export default function MessagesPage() {
 
 	// Statistics
 	const stats = {
-		unread: messages.filter((m) => !m.isRead).length,
-		urgent: messages.filter((m) => m.priority === 'urgent' && !m.isRead).length,
-		tasks: messages.filter((m) => m.type === 'task_assigned').length,
-		reviews: messages.filter((m) => m.type === 'review_received').length,
+		unread: messages.filter((m) => !m.isRead && !m.isArchived).length,
+		urgent: messages.filter((m) => m.priority === 'urgent' && !m.isRead && !m.isArchived).length,
+		tasks: messages.filter((m) => m.type === 'task_assigned' && !m.isArchived).length,
+		reviews: messages.filter((m) => m.type === 'review_received' && !m.isArchived).length,
+		archived: messages.filter((m) => m.isArchived).length,
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
 			<Toaster />
 			
+			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
 				title="Messages"
-				description="모든 업무 알림과 커뮤니케이션을 한곳에서 관리하세요"
-				icon={Mail}
+					description="Inbox for your tasks, reviews, and notifications"
 				actions={
-					<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2">
+						<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-white">
 						<RefreshCw className="h-4 w-4" />
 						<span className="hidden sm:inline">Refresh</span>
 					</Button>
 				}
 			/>
 			
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 				{/* Quick Stats */}
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					<Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<Mail className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+					<Card className="bg-surface-dark border-border-dark">
+						<CardContent className="p-5 flex items-center justify-between">
 								<div>
-									<p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Unread</p>
-									<p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{stats.unread}</p>
+								<p className="text-sm text-neutral-400 font-medium mb-1">Unread</p>
+								<p className="text-2xl font-bold text-white">{stats.unread}</p>
 								</div>
+							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
+								<Mail className="h-5 w-5" />
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-800">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<Zap className="h-6 w-6 text-red-600 dark:text-red-400" />
+					<Card className="bg-surface-dark border-border-dark">
+						<CardContent className="p-5 flex items-center justify-between">
 								<div>
-									<p className="text-sm text-red-600 dark:text-red-400 font-medium">Urgent</p>
-									<p className="text-2xl font-bold text-red-900 dark:text-red-100">{stats.urgent}</p>
+								<p className="text-sm text-neutral-400 font-medium mb-1">Urgent</p>
+								<p className="text-2xl font-bold text-white">{stats.urgent}</p>
 								</div>
+							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
+								<Zap className="h-5 w-5" />
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<CheckCircle2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+					<Card className="bg-surface-dark border-border-dark">
+						<CardContent className="p-5 flex items-center justify-between">
 								<div>
-									<p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Tasks</p>
-									<p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.tasks}</p>
+								<p className="text-sm text-neutral-400 font-medium mb-1">Tasks</p>
+								<p className="text-2xl font-bold text-white">{stats.tasks}</p>
 								</div>
+							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
+								<CheckCircle2 className="h-5 w-5" />
 							</div>
 						</CardContent>
 					</Card>
 
-					<Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-								<MessageSquare className="h-6 w-6 text-green-600 dark:text-green-400" />
+					<Card className="bg-surface-dark border-border-dark">
+						<CardContent className="p-5 flex items-center justify-between">
 								<div>
-									<p className="text-sm text-green-600 dark:text-green-400 font-medium">Reviews</p>
-									<p className="text-2xl font-bold text-green-900 dark:text-green-100">{stats.reviews}</p>
+								<p className="text-sm text-neutral-400 font-medium mb-1">Reviews</p>
+								<p className="text-2xl font-bold text-white">{stats.reviews}</p>
 								</div>
+							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
+								<MessageSquare className="h-5 w-5" />
 							</div>
 						</CardContent>
 					</Card>
 				</div>
 
 				{/* Filters */}
-				<Card>
+				<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4">
 						<div className="flex flex-col sm:flex-row gap-4">
 							{/* Status Filter */}
 							<div className="flex items-center gap-2 flex-wrap">
-								<span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Status:</span>
+								<span className="text-sm font-medium text-neutral-400">Status:</span>
 								<button
 									onClick={() => setFilter('all')}
 									className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 										filter === 'all'
-											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											? 'bg-neutral-800 text-white border border-neutral-700'
+											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									All ({messages.length})
+									All ({messages.filter(m => !m.isArchived).length})
 								</button>
 								<button
 									onClick={() => setFilter('unread')}
 									className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 										filter === 'unread'
-											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											? 'bg-neutral-800 text-white border border-neutral-700'
+											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
 									Unread ({stats.unread})
@@ -517,21 +525,31 @@ export default function MessagesPage() {
 									onClick={() => setFilter('starred')}
 									className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 										filter === 'starred'
-											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											? 'bg-neutral-800 text-white border border-neutral-700'
+											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									Starred ({messages.filter((m) => m.isStarred).length})
+									Starred ({messages.filter((m) => m.isStarred && !m.isArchived).length})
+								</button>
+								<button
+									onClick={() => setFilter('archived')}
+									className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+										filter === 'archived'
+											? 'bg-neutral-800 text-white border border-neutral-700'
+											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
+									}`}
+								>
+									Archived ({stats.archived})
 								</button>
 							</div>
 
 							{/* Type Filter */}
 							<div className="flex items-center gap-2 flex-wrap">
-								<span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Type:</span>
+								<span className="text-sm font-medium text-neutral-400">Type:</span>
 								<select
 									value={typeFilter}
 									onChange={(e) => setTypeFilter(e.target.value)}
-									className="px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="px-3 py-1.5 text-sm border border-border-dark rounded-lg bg-[#1a1a1a] text-white focus:outline-none focus:border-neutral-700"
 								>
 									<option value="all">All Types</option>
 									<option value="task_assigned">Tasks</option>
@@ -549,29 +567,27 @@ export default function MessagesPage() {
 				<div className="space-y-3">
 					{filteredMessages.length === 0 ? (
 						<EmptyState
-							icon={<Mail className="h-12 w-12" />}
+							icon={filter === 'archived' ? <Archive className="h-12 w-12 text-neutral-600" /> : <Mail className="h-12 w-12 text-neutral-600" />}
 							title={
 								filter === 'unread' ? 'No Unread Messages' : 
 								filter === 'starred' ? 'No Starred Messages' : 
+								filter === 'archived' ? 'No Archived Messages' :
 								'No Messages'
 							}
 							description={
-								filter === 'all' ? "모든 메시지를 확인했습니다! 새로운 알림이 오면 여기에 표시됩니다." :
-								filter === 'unread' ? '모든 메시지를 읽었습니다. 잘하셨어요! 👏' :
-								'중요한 메시지에 별표를 표시하여 나중에 쉽게 찾을 수 있습니다.'
+								filter === 'all' ? "You're all caught up! New notifications will appear here." :
+								filter === 'unread' ? "You've read all your messages. Great job! 👏" :
+								filter === 'archived' ? "Messages you archive will appear here for safekeeping." :
+								"Mark important messages with a star to find them easily later."
 							}
 						/>
 					) : (
 						filteredMessages.map((message) => {
-							const priorityBadge = getPriorityBadge(message.priority)
-							
 							return (
 								<Card
 									key={message.id}
-									className={`transition-all hover:shadow-lg cursor-pointer ${
-										!message.isRead ? 'border-l-4 border-l-primary bg-blue-50/30 dark:bg-blue-900/10' : ''
-									} ${
-										message.priority === 'urgent' ? 'ring-2 ring-red-200 dark:ring-red-800' : ''
+									className={`transition-all hover:border-neutral-700 cursor-pointer bg-surface-dark border-border-dark group ${
+										!message.isRead ? 'bg-[#151515]' : ''
 									}`}
 									onClick={() => handleOpenMessage(message)}
 								>
@@ -583,53 +599,56 @@ export default function MessagesPage() {
 													<div className="flex-1 min-w-0">
 														<div className="flex items-center gap-2 mb-2 flex-wrap">
 															{message.priority === 'urgent' && (
-																<span className={`text-xs font-bold px-2 py-1 rounded ${priorityBadge.color} animate-pulse`}>
-																	{priorityBadge.label}
+																<span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-900/30 text-red-400 border border-red-900/30 animate-pulse">
+																	URGENT
 																</span>
 															)}
-															<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+															<span className="text-xs font-medium text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
 																{getTypeLabel(message.type)}
 															</span>
-															<span className={`text-sm ${!message.isRead ? 'font-bold' : 'font-medium'}`}>
+															<span className={`text-sm text-neutral-300 ${!message.isRead ? 'font-bold text-white' : ''}`}>
 																{message.from}
 															</span>
 															{message.fromDepartment && (
-																<span className="text-xs text-neutral-500 dark:text-neutral-400">
+																<span className="text-xs text-neutral-500">
 																	• {message.fromDepartment}
 																</span>
+															)}
+															{!message.isRead && (
+																<span className="w-2 h-2 rounded-full bg-orange-500" />
 															)}
 														</div>
 														<h3
 															className={`text-base mb-1 ${
-																!message.isRead ? 'font-bold text-neutral-900 dark:text-neutral-100' : 'font-medium'
+																!message.isRead ? 'font-bold text-white' : 'font-medium text-neutral-300'
 															}`}
 														>
 															{message.subject}
 														</h3>
-														<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+														<p className="text-sm text-neutral-400 line-clamp-2">
 															{message.preview}
 														</p>
 														
 														{/* AI Insight Preview */}
 														{message.aiInsight && !message.isRead && (
-															<div className="mt-2 flex items-center gap-2 text-xs text-primary">
-																<Sparkles className="h-3 w-3" />
-																<span>{message.aiInsight.summary}</span>
+															<div className="mt-3 flex items-center gap-2 text-xs p-2 rounded-lg bg-neutral-800 border border-neutral-700 w-fit">
+																<Sparkles className="h-3 w-3 text-neutral-400" />
+																<span className="text-neutral-300">{message.aiInsight.summary}</span>
 															</div>
 														)}
 													</div>
 													<div className="flex flex-col items-end gap-2 shrink-0">
-														<span className="text-xs text-neutral-500 dark:text-neutral-400">
+														<span className="text-xs text-neutral-500">
 															{formatTimestamp(message.timestamp)}
 														</span>
 														{message.aiInsight?.deadline && !message.isRead && (
-															<span className="text-xs px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded">
-																⏰ {message.aiInsight.deadline}
+															<span className="text-xs px-2 py-0.5 bg-red-900/30 text-red-400 border border-red-900/30 rounded">
+																Due {message.aiInsight.deadline}
 															</span>
 														)}
 													</div>
 												</div>
-												<div className="flex items-center gap-2 mt-3">
+												<div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
 													{!message.isRead && (
 														<Button
 															size="sm"
@@ -638,7 +657,7 @@ export default function MessagesPage() {
 																e.stopPropagation()
 																handleMarkAsRead(message.id)
 															}}
-															className="text-xs"
+															className="h-7 text-xs border-border-dark hover:bg-border-dark text-neutral-300"
 														>
 															<MailOpen className="h-3 w-3 mr-1" />
 															Read
@@ -652,8 +671,9 @@ export default function MessagesPage() {
 														className={`p-1.5 rounded-lg transition-colors ${
 															message.isStarred
 																? 'text-yellow-500 hover:text-yellow-600'
-																: 'text-neutral-400 hover:text-yellow-500'
+																: 'text-neutral-500 hover:text-yellow-500 hover:bg-border-dark'
 														}`}
+														title={message.isStarred ? "Unstar" : "Star"}
 													>
 														<Star className={`h-4 w-4 ${message.isStarred ? 'fill-current' : ''}`} />
 													</button>
@@ -662,16 +682,22 @@ export default function MessagesPage() {
 															e.stopPropagation()
 															handleArchive(message.id)
 														}}
-														className="p-1.5 rounded-lg text-neutral-400 hover:text-blue-500 transition-colors"
+														className="p-1.5 rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-border-dark transition-colors"
+														title={message.isArchived ? "Restore" : "Archive"}
 													>
-														<Archive className="h-4 w-4" />
+														{message.isArchived ? (
+															<ArchiveRestore className="h-4 w-4" />
+														) : (
+															<Archive className="h-4 w-4" />
+														)}
 													</button>
 													<button
 														onClick={(e) => {
 															e.stopPropagation()
 															handleDeleteMessage(message.id)
 														}}
-														className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 transition-colors"
+														className="p-1.5 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-border-dark transition-colors"
+														title="Delete"
 													>
 														<Trash2 className="h-4 w-4" />
 													</button>
@@ -687,26 +713,26 @@ export default function MessagesPage() {
 
 				{/* Message Detail Modal */}
 				{selectedMessage && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-						<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+						<div className="bg-surface-dark rounded-2xl shadow-2xl border border-border-dark w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
 							{/* Header */}
-							<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+							<div className="p-6 border-b border-border-dark">
 								<div className="flex items-start justify-between gap-4">
 									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2 mb-2 flex-wrap">
+										<div className="flex items-center gap-2 mb-3 flex-wrap">
 											{getTypeIcon(selectedMessage.type)}
-											<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+											<span className="text-xs font-medium text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
 												{getTypeLabel(selectedMessage.type)}
 											</span>
-											{selectedMessage.priority !== 'normal' && (
-												<span className={`text-xs font-bold px-2 py-1 rounded ${getPriorityBadge(selectedMessage.priority).color}`}>
-													{getPriorityBadge(selectedMessage.priority).label}
+											{selectedMessage.priority === 'urgent' && (
+												<span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-900/30 text-red-400 border border-red-900/30">
+													URGENT
 												</span>
 											)}
 										</div>
-										<h2 className="text-2xl font-bold mb-2">{selectedMessage.subject}</h2>
-										<div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-											<span className="font-medium">{selectedMessage.from}</span>
+										<h2 className="text-2xl font-bold mb-2 text-white">{selectedMessage.subject}</h2>
+										<div className="flex items-center gap-2 text-sm text-neutral-400">
+											<span className="font-medium text-neutral-300">{selectedMessage.from}</span>
 											{selectedMessage.fromDepartment && (
 												<>
 													<span>•</span>
@@ -719,7 +745,7 @@ export default function MessagesPage() {
 									</div>
 									<button
 										onClick={handleCloseMessage}
-										className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 shrink-0"
+										className="text-neutral-500 hover:text-white shrink-0"
 									>
 										<X className="h-6 w-6" />
 									</button>
@@ -727,45 +753,40 @@ export default function MessagesPage() {
 							</div>
 
 							{/* Content */}
-							<div className="flex-1 overflow-y-auto p-6 space-y-6">
+							<div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0a0a0a]">
 								{/* AI Insight */}
 								{selectedMessage.aiInsight && (
-									<div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
+									<div className="p-5 bg-neutral-800/50 border border-neutral-700 rounded-2xl">
 										<div className="flex items-start gap-3">
-											<Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-											<div className="flex-1 space-y-2">
-												<h3 className="font-bold text-blue-900 dark:text-blue-100">
-													AI 분석 및 추천
+											<Sparkles className="h-5 w-5 text-neutral-400 shrink-0 mt-0.5" />
+											<div className="flex-1 space-y-3">
+												<h3 className="font-bold text-neutral-200">
+													AI Insight & Recommendation
 												</h3>
-												<p className="text-sm text-blue-700 dark:text-blue-300">
+												<p className="text-sm text-neutral-300 leading-relaxed">
 													{selectedMessage.aiInsight.summary}
 												</p>
-												<div className="grid grid-cols-2 gap-2 mt-3">
+												<div className="flex gap-4 pt-1">
 													{selectedMessage.aiInsight.estimatedTime && (
-														<div className="flex items-center gap-2 text-xs">
-															<Clock className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-															<span className="text-blue-700 dark:text-blue-300">
-																예상 시간: {selectedMessage.aiInsight.estimatedTime}
+														<div className="flex items-center gap-2 text-xs px-2 py-1 bg-surface-dark rounded-md border border-border-dark">
+															<Clock className="h-3 w-3 text-neutral-400" />
+															<span className="text-neutral-300">
+																Est. Time: {selectedMessage.aiInsight.estimatedTime}
 															</span>
 														</div>
 													)}
 													{selectedMessage.aiInsight.deadline && (
-														<div className="flex items-center gap-2 text-xs">
-															<AlertCircle className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-															<span className="text-blue-700 dark:text-blue-300">
-																마감: {selectedMessage.aiInsight.deadline}
+														<div className="flex items-center gap-2 text-xs px-2 py-1 bg-surface-dark rounded-md border border-border-dark">
+															<AlertCircle className="h-3 w-3 text-red-400" />
+															<span className="text-neutral-300">
+																Deadline: {selectedMessage.aiInsight.deadline}
 															</span>
 														</div>
 													)}
 												</div>
 												{selectedMessage.aiInsight.recommendation && (
-													<div className="mt-3 p-3 bg-white/50 dark:bg-neutral-900/50 rounded-lg">
-														<div className="flex items-start gap-2">
-															<TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-															<p className="text-xs text-blue-800 dark:text-blue-200">
+													<div className="mt-2 text-xs text-neutral-400 bg-neutral-800 p-2 rounded-lg">
 																💡 {selectedMessage.aiInsight.recommendation}
-															</p>
-														</div>
 													</div>
 												)}
 											</div>
@@ -775,18 +796,18 @@ export default function MessagesPage() {
 
 								{/* Original Content */}
 								<div>
-									<h3 className="font-bold mb-3 flex items-center gap-2">
-										<Mail className="h-5 w-5 text-primary" />
-										메시지 내용
+									<h3 className="font-bold mb-3 flex items-center gap-2 text-neutral-300">
+										<Mail className="h-4 w-4 text-neutral-500" />
+										Message Content
 									</h3>
-									<div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 whitespace-pre-wrap text-sm">
+									<div className="p-6 bg-surface-dark rounded-2xl border border-border-dark whitespace-pre-wrap text-sm text-neutral-300 leading-relaxed">
 										{selectedMessage.content}
 									</div>
 								</div>
 							</div>
 
 							{/* Footer Actions */}
-							<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+							<div className="p-6 border-t border-border-dark bg-surface-dark">
 								<div className="flex items-center justify-between gap-4">
 									<div className="flex items-center gap-2">
 										<button
@@ -796,9 +817,10 @@ export default function MessagesPage() {
 											}}
 											className={`p-2 rounded-lg transition-colors ${
 												selectedMessage.isStarred
-													? 'text-yellow-500 hover:text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
-													: 'text-neutral-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+													? 'text-yellow-500 bg-yellow-500/10'
+													: 'text-neutral-500 hover:text-yellow-500 hover:bg-border-dark'
 											}`}
+											title={selectedMessage.isStarred ? "Unstar" : "Star"}
 										>
 											<Star className={`h-5 w-5 ${selectedMessage.isStarred ? 'fill-current' : ''}`} />
 										</button>
@@ -807,28 +829,34 @@ export default function MessagesPage() {
 												e.stopPropagation()
 												handleArchive(selectedMessage.id)
 											}}
-											className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+											className="p-2 rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-border-dark transition-colors"
+											title={selectedMessage.isArchived ? "Restore" : "Archive"}
 										>
-											<Archive className="h-5 w-5" />
+											{selectedMessage.isArchived ? (
+												<ArchiveRestore className="h-5 w-5" />
+											) : (
+												<Archive className="h-5 w-5" />
+											)}
 										</button>
 										<button
 											onClick={(e) => {
 												e.stopPropagation()
 												handleDeleteMessage(selectedMessage.id)
 											}}
-											className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+											className="p-2 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-border-dark transition-colors"
+											title="Delete"
 										>
 											<Trash2 className="h-5 w-5" />
 										</button>
 									</div>
 									<div className="flex items-center gap-2 flex-wrap">
-										<Button variant="outline" onClick={handleCloseMessage}>
+										<Button variant="outline" onClick={handleCloseMessage} className="border-border-dark hover:bg-border-dark text-white">
 											Close
 										</Button>
 										{selectedMessage.quickActions?.map((qa, idx) => (
 											<Button
 												key={idx}
-												variant={qa.variant || 'outline'}
+												variant={qa.variant === 'primary' ? 'brand' : 'outline'}
 												onClick={() => handleQuickAction(qa.action)}
 											>
 												{qa.label}
