@@ -30,6 +30,7 @@ import {
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import { useAuth } from '../../context/AuthContext'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface UserProfile {
 	// Basic Info
@@ -84,6 +85,7 @@ interface NotificationSettings {
 }
 
 export default function SettingsPage() {
+	const { t } = useI18n()
 	const { user } = useAuth()
 	const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'notifications'>('profile')
 	
@@ -321,16 +323,16 @@ export default function SettingsPage() {
 		try {
 			localStorage.setItem('userProfile', JSON.stringify(profile))
 			setOriginalProfile(profile)
-			toast.success('Profile updated successfully!')
+			toast.success(t('settingsPage.success'))
 		} catch (error) {
 			console.error('Failed to save profile:', error)
-			toast.error('Failed to save profile')
+			toast.error(t('settingsPage.error'))
 		}
 	}
 
 	const handleCancelProfile = () => {
 		setProfile(originalProfile)
-		toast.info('Changes cancelled')
+		toast.info(t('settingsPage.cancel'))
 	}
 
 	const handlePasswordChange = () => {
@@ -340,7 +342,7 @@ export default function SettingsPage() {
 		}
 
 		if (newPassword.length < 8) {
-			toast.error('New password must be at least 8 characters')
+			toast.error(t('settingsPage.account.reqLength'))
 			return
 		}
 
@@ -363,7 +365,7 @@ export default function SettingsPage() {
 	const handleSaveNotifications = () => {
 		try {
 			localStorage.setItem('notificationSettings', JSON.stringify(notifications))
-			toast.success('Notification settings saved!')
+			toast.success(t('settingsPage.success'))
 		} catch (error) {
 			console.error('Failed to save notifications:', error)
 			toast.error('Failed to save settings')
@@ -379,13 +381,13 @@ export default function SettingsPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 				{/* Header */}
 				<PageHeader
-					title="Settings"
-					description="Manage your account, preferences, and privacy settings"
+					title={t('settingsPage.tabs.profile')}
+					description={t('settings.description')}
 					tabs={{
 						items: [
-							{ id: 'profile', label: 'Profile', icon: User },
-							{ id: 'account', label: 'Account & Security', icon: Lock },
-							{ id: 'notifications', label: 'Notifications', icon: Bell },
+							{ id: 'profile', label: t('settingsPage.tabs.profile'), icon: User },
+							{ id: 'account', label: t('settingsPage.tabs.account'), icon: Lock },
+							{ id: 'notifications', label: t('settingsPage.tabs.notifications'), icon: Bell },
 						],
 						activeTab,
 						onTabChange: (id) => setActiveTab(id as any),
@@ -398,7 +400,7 @@ export default function SettingsPage() {
 						{/* Profile Picture */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Profile Picture</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.picture')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="flex items-center gap-6">
@@ -418,10 +420,10 @@ export default function SettingsPage() {
 										<div className="flex items-center gap-2">
 											<Button size="sm" variant="outline" className="border-border-dark hover:bg-border-dark text-white">
 												<Upload className="h-4 w-4 mr-2" />
-												Upload Photo
+												{t('settingsPage.profile.uploadPhoto')}
 											</Button>
 											<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
-												Remove
+												{t('settingsPage.profile.remove')}
 											</Button>
 										</div>
 									</div>
@@ -432,14 +434,14 @@ export default function SettingsPage() {
 						{/* Basic Information */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Basic Information</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.basicInfo')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<User className="inline h-4 w-4 mr-1" />
-											Full Name
+											{t('settingsPage.profile.fullName')}
 										</label>
 										<Input
 											value={profile.name}
@@ -451,7 +453,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Mail className="inline h-4 w-4 mr-1" />
-											Email Address
+											{t('settingsPage.profile.email')}
 										</label>
 										<Input
 											type="email"
@@ -464,7 +466,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Phone className="inline h-4 w-4 mr-1" />
-											Phone Number
+											{t('settingsPage.profile.phone')}
 										</label>
 										<Input
 											type="tel"
@@ -477,7 +479,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Calendar className="inline h-4 w-4 mr-1" />
-											Birth Date
+											{t('settingsPage.profile.birthDate')}
 										</label>
 										<Input
 											type="date"
@@ -493,14 +495,14 @@ export default function SettingsPage() {
 						{/* Work Information */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Work Information</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.workInfo')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Building className="inline h-4 w-4 mr-1" />
-											Department
+											{t('settingsPage.profile.department')}
 										</label>
 										<select
 											value={profile.department}
@@ -518,7 +520,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Briefcase className="inline h-4 w-4 mr-1" />
-											Position
+											{t('settingsPage.profile.position')}
 										</label>
 										<select
 											value={profile.position}
@@ -539,7 +541,7 @@ export default function SettingsPage() {
 							<div className="mt-5">
 								<label className="block text-sm font-medium mb-2 text-neutral-300">
 									<Briefcase className="inline h-4 w-4 mr-1" />
-									Roles & Responsibilities <span className="text-neutral-500 text-xs">(Add multiple)</span>
+									{t('settingsPage.profile.roles')} <span className="text-neutral-500 text-xs">({t('settingsPage.profile.addRole')})</span>
 								</label>
 									<div className="space-y-3">
 										{/* Dropdown and Add Button */}
@@ -549,7 +551,7 @@ export default function SettingsPage() {
 												onChange={(e) => setCustomJobInput(e.target.value)}
 												className="flex-1 px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
 											>
-												<option value="">-- Select a job to add --</option>
+												<option value="">-- {t('settingsPage.profile.selectJob')} --</option>
 												{availableJobs
 													.filter((job) => !profile.jobs.includes(job.title))
 													.map((job) => (
@@ -566,7 +568,7 @@ export default function SettingsPage() {
 												className="px-4"
 											>
 												<Plus className="h-4 w-4 mr-1" />
-												Add
+												{t('common.add')}
 											</Button>
 										</div>
 
@@ -574,7 +576,7 @@ export default function SettingsPage() {
 									{profile.jobs.length > 0 ? (
 										<div className="p-4 border border-border-dark rounded-2xl bg-[#1a1a1a]/50">
 											<p className="text-xs font-medium text-neutral-400 mb-3">
-												Selected Roles ({profile.jobs.length})
+												{t('settingsPage.profile.selectedRoles')} ({profile.jobs.length})
 											</p>
 												<div className="flex flex-wrap gap-2">
 													{profile.jobs.map((job) => (
@@ -597,15 +599,9 @@ export default function SettingsPage() {
 									) : (
 										<div className="p-4 border border-dashed border-border-dark rounded-2xl bg-[#1a1a1a]/50 text-center">
 											<p className="text-sm text-neutral-400">
-												No roles added yet. Select from the dropdown above.
+												{t('settingsPage.profile.noRoles')}
 											</p>
 										</div>
-									)}
-
-									{availableJobs.length === 0 && (
-										<p className="text-xs text-neutral-400 mt-2">
-											💡 No roles available yet. Contact your administrator.
-										</p>
 									)}
 									</div>
 								</div>
@@ -613,8 +609,8 @@ export default function SettingsPage() {
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
-											Employee ID
-											<span className="text-xs text-neutral-500 ml-2">(System Generated)</span>
+											{t('settingsPage.profile.employeeId')}
+											<span className="text-xs text-neutral-500 ml-2">({t('settingsPage.profile.systemGenerated')})</span>
 										</label>
 										<Input
 											value={profile.employeeId}
@@ -624,11 +620,11 @@ export default function SettingsPage() {
 											className="bg-[#1a1a1a] border-border-dark text-neutral-400 cursor-not-allowed"
 										/>
 										<p className="text-xs text-neutral-500 mt-1">
-											🔒 This is a unique identifier assigned by the system
+											🔒 {t('settingsPage.profile.uniqueId')}
 										</p>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Join Date</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.joinDate')}</label>
 										<Input
 											type="date"
 											value={profile.joinDate}
@@ -643,12 +639,12 @@ export default function SettingsPage() {
 						{/* Address */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Address</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.address')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-5">
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Street Address</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.street')}</label>
 										<Input
 											value={profile.address}
 											onChange={(e) => handleProfileChange('address', e.target.value)}
@@ -658,7 +654,7 @@ export default function SettingsPage() {
 									</div>
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 										<div>
-											<label className="block text-sm font-medium mb-2 text-neutral-300">City</label>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.city')}</label>
 											<Input
 												value={profile.city}
 												onChange={(e) => handleProfileChange('city', e.target.value)}
@@ -667,7 +663,7 @@ export default function SettingsPage() {
 											/>
 										</div>
 										<div>
-											<label className="block text-sm font-medium mb-2 text-neutral-300">Country</label>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.country')}</label>
 											<Input
 												value={profile.country}
 												onChange={(e) => handleProfileChange('country', e.target.value)}
@@ -676,7 +672,7 @@ export default function SettingsPage() {
 											/>
 										</div>
 										<div>
-											<label className="block text-sm font-medium mb-2 text-neutral-300">Postal Code</label>
+											<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.postalCode')}</label>
 											<Input
 												value={profile.postalCode}
 												onChange={(e) => handleProfileChange('postalCode', e.target.value)}
@@ -692,32 +688,32 @@ export default function SettingsPage() {
 						{/* Bio & Skills */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Bio & Skills</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.bioSkills')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-5">
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Bio</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.bio')}</label>
 										<Textarea
 											value={profile.bio}
 											onChange={(e) => handleProfileChange('bio', e.target.value)}
-											placeholder="Tell us about yourself..."
+											placeholder={t('settingsPage.profile.bioPlaceholder')}
 											rows={4}
 											className="resize-none bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Skills</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.skills')}</label>
 										<div className="flex gap-2 mb-3">
 											<Input
 												value={skillInput}
 												onChange={(e) => setSkillInput(e.target.value)}
 												onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-												placeholder="Add a skill (press Enter)"
+												placeholder={t('settingsPage.profile.addSkill')}
 												className="flex-1 bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
 											/>
 											<Button onClick={handleAddSkill} size="sm" variant="primary">
-												Add
+												{t('common.add')}
 											</Button>
 										</div>
 										{profile.skills.length > 0 && (
@@ -743,14 +739,14 @@ export default function SettingsPage() {
 						{/* Regional Settings */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Regional Settings</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.profile.regional')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Globe className="inline h-4 w-4 mr-1" />
-											Timezone
+											{t('settingsPage.profile.timezone')}
 										</label>
 										<select
 											value={profile.timezone}
@@ -770,7 +766,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Languages className="inline h-4 w-4 mr-1" />
-											Language
+											{t('settingsPage.profile.language')}
 										</label>
 										<select
 											value={profile.language}
@@ -784,7 +780,7 @@ export default function SettingsPage() {
 										</select>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Date Format</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.profile.dateFormat')}</label>
 										<select
 											value={profile.dateFormat}
 											onChange={(e) => handleProfileChange('dateFormat', e.target.value)}
@@ -798,7 +794,7 @@ export default function SettingsPage() {
 									<div>
 										<label className="block text-sm font-medium mb-2 text-neutral-300">
 											<Clock className="inline h-4 w-4 mr-1" />
-											Time Format
+											{t('settingsPage.profile.timeFormat')}
 										</label>
 										<select
 											value={profile.timeFormat}
@@ -822,14 +818,14 @@ export default function SettingsPage() {
 								disabled={!isProfileChanged}
 							>
 								<Save className="h-4 w-4" />
-								Save Changes
+								{t('settingsPage.saveChanges')}
 							</Button>
 							<Button 
 								variant="outline" 
 								onClick={handleCancelProfile}
 								disabled={!isProfileChanged}
 							>
-								Cancel
+								{t('settingsPage.cancel')}
 							</Button>
 						</div>
 					</div>
@@ -843,16 +839,16 @@ export default function SettingsPage() {
 							<CardHeader>
 								<h2 className="text-xl font-bold flex items-center gap-2 text-white">
 									<Lock className="h-5 w-5 text-primary" />
-									Change Password
+									{t('settingsPage.account.changePassword')}
 								</h2>
 								<p className="text-sm text-neutral-400 mt-1">
-									Update your password to keep your account secure
+									{t('settingsPage.account.updatePassword')}
 								</p>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-5 max-w-md">
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Current Password</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.account.currentPassword')}</label>
 										<div className="relative">
 											<Input
 												type={showCurrentPassword ? 'text' : 'password'}
@@ -871,7 +867,7 @@ export default function SettingsPage() {
 										</div>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">New Password</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.account.newPassword')}</label>
 										<div className="relative">
 											<Input
 												type={showNewPassword ? 'text' : 'password'}
@@ -888,10 +884,10 @@ export default function SettingsPage() {
 												{showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 											</button>
 										</div>
-										<p className="text-xs text-neutral-500 mt-1">Must be at least 8 characters</p>
+										<p className="text-xs text-neutral-500 mt-1">{t('settingsPage.account.reqLength')}</p>
 									</div>
 									<div>
-										<label className="block text-sm font-medium mb-2 text-neutral-300">Confirm New Password</label>
+										<label className="block text-sm font-medium mb-2 text-neutral-300">{t('settingsPage.account.confirmPassword')}</label>
 										<div className="relative">
 											<Input
 												type={showConfirmPassword ? 'text' : 'password'}
@@ -911,7 +907,7 @@ export default function SettingsPage() {
 									</div>
 									<div className="p-4 bg-blue-900/10 border border-blue-900/30 rounded-xl">
 										<p className="text-sm font-medium text-blue-400 mb-2">
-											Password Requirements:
+											{t('settingsPage.account.passwordRequirements')}
 										</p>
 										<ul className="space-y-1 text-xs text-blue-300">
 											<li className="flex items-center gap-2">
@@ -920,7 +916,7 @@ export default function SettingsPage() {
 												) : (
 													<AlertCircle className="h-3 w-3" />
 												)}
-												At least 8 characters
+												{t('settingsPage.account.reqLength')}
 											</li>
 											<li className="flex items-center gap-2">
 												{/[A-Z]/.test(newPassword) ? (
@@ -928,7 +924,7 @@ export default function SettingsPage() {
 												) : (
 													<AlertCircle className="h-3 w-3" />
 												)}
-												One uppercase letter
+												{t('settingsPage.account.reqUpper')}
 											</li>
 											<li className="flex items-center gap-2">
 												{/[a-z]/.test(newPassword) ? (
@@ -936,7 +932,7 @@ export default function SettingsPage() {
 												) : (
 													<AlertCircle className="h-3 w-3" />
 												)}
-												One lowercase letter
+												{t('settingsPage.account.reqLower')}
 											</li>
 											<li className="flex items-center gap-2">
 												{/[0-9]/.test(newPassword) ? (
@@ -944,14 +940,14 @@ export default function SettingsPage() {
 												) : (
 													<AlertCircle className="h-3 w-3" />
 												)}
-												One number
+												{t('settingsPage.account.reqNumber')}
 											</li>
 										</ul>
 									</div>
 									<div className="flex items-center gap-3 pt-2">
 										<Button onClick={handlePasswordChange} variant="primary" className="gap-2">
 											<Lock className="h-4 w-4" />
-											Change Password
+											{t('settingsPage.account.changePassword')}
 										</Button>
 									</div>
 								</div>
@@ -961,21 +957,21 @@ export default function SettingsPage() {
 						{/* Two-Factor Authentication */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Two-Factor Authentication</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.account.twoFactor')}</h2>
 								<p className="text-sm text-neutral-400 mt-1">
-									Add an extra layer of security to your account
+									{t('settingsPage.account.extraSecurity')}
 								</p>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
 									<div className="flex-1">
-										<h3 className="font-medium mb-1 text-white">Authenticator App</h3>
+										<h3 className="font-medium mb-1 text-white">{t('settingsPage.account.authenticatorApp')}</h3>
 										<p className="text-sm text-neutral-400">
-											Use an authenticator app to generate verification codes
+											{t('settingsPage.account.authenticatorDesc')}
 										</p>
 									</div>
 									<Button size="sm" variant="outline" className="border-border-dark hover:bg-border-dark text-white">
-										Enable
+										{t('settingsPage.account.enable')}
 									</Button>
 								</div>
 							</CardContent>
@@ -984,22 +980,22 @@ export default function SettingsPage() {
 						{/* Active Sessions */}
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Active Sessions</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.account.activeSessions')}</h2>
 								<p className="text-sm text-neutral-400 mt-1">
-									Manage your active sessions across devices
+									{t('settingsPage.account.manageSessions')}
 								</p>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-3">
 									<div className="flex items-center justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
 										<div>
-											<h3 className="font-medium text-white">Current Session</h3>
+											<h3 className="font-medium text-white">{t('settingsPage.account.currentSession')}</h3>
 											<p className="text-sm text-neutral-400">
 												Chrome on Windows • New York, US
 											</p>
 										</div>
 										<span className="text-xs text-green-400 bg-green-900/30 px-2 py-1 rounded-full border border-green-900/30">
-											Active
+											{t('input.active')}
 										</span>
 									</div>
 								</div>
@@ -1009,30 +1005,30 @@ export default function SettingsPage() {
 						{/* Danger Zone */}
 						<Card className="bg-surface-dark border-red-900/30">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-red-500">Danger Zone</h2>
+								<h2 className="text-xl font-bold text-red-500">{t('settingsPage.account.dangerZone')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-4">
 									<div className="flex items-start justify-between p-4 border border-red-900/30 rounded-xl bg-red-900/10">
 										<div className="flex-1">
-											<h3 className="font-medium text-red-400">Deactivate Account</h3>
+											<h3 className="font-medium text-red-400">{t('settingsPage.account.deactivate')}</h3>
 											<p className="text-sm text-red-300/70">
-												Temporarily disable your account
+												{t('settingsPage.account.deactivateDesc')}
 											</p>
 										</div>
 										<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
-											Deactivate
+											{t('settingsPage.account.deactivate')}
 										</Button>
 									</div>
 									<div className="flex items-start justify-between p-4 border border-red-900/30 rounded-xl bg-red-900/10">
 										<div className="flex-1">
-											<h3 className="font-medium text-red-400">Delete Account</h3>
+											<h3 className="font-medium text-red-400">{t('settingsPage.account.delete')}</h3>
 											<p className="text-sm text-red-300/70">
-												Permanently delete your account and all data
+												{t('settingsPage.account.deleteDesc')}
 											</p>
 										</div>
 										<Button size="sm" variant="danger" className="bg-red-900/20 text-red-400 border-red-900/30 hover:bg-red-900/40">
-											Delete
+											{t('common.delete')}
 										</Button>
 									</div>
 								</div>
@@ -1046,15 +1042,15 @@ export default function SettingsPage() {
 					<div className="space-y-6">
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Notification Channels</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.notifications.channels')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-4">
 									{[
-										{ key: 'email', label: 'Email Notifications', desc: 'Receive notifications via email' },
-										{ key: 'push', label: 'Push Notifications', desc: 'Browser push notifications' },
-										{ key: 'desktop', label: 'Desktop Notifications', desc: 'System desktop notifications' },
-										{ key: 'sms', label: 'SMS Notifications', desc: 'Text message notifications (charges may apply)' },
+										{ key: 'email', label: t('settingsPage.notifications.email'), desc: t('settingsPage.notifications.emailDesc') },
+										{ key: 'push', label: t('settingsPage.notifications.push'), desc: t('settingsPage.notifications.pushDesc') },
+										{ key: 'desktop', label: t('settingsPage.notifications.desktop'), desc: t('settingsPage.notifications.desktopDesc') },
+										{ key: 'sms', label: t('settingsPage.notifications.sms'), desc: t('settingsPage.notifications.smsDesc') },
 									].map((item) => (
 										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
 											<div className="flex-1">
@@ -1078,15 +1074,15 @@ export default function SettingsPage() {
 
 						<Card className="bg-surface-dark border-border-dark">
 							<CardHeader>
-								<h2 className="text-xl font-bold text-white">Activity Notifications</h2>
+								<h2 className="text-xl font-bold text-white">{t('settingsPage.notifications.activity')}</h2>
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-4">
 									{[
-										{ key: 'taskAssigned', label: 'Task Assigned', desc: 'When a new task is assigned to you' },
-										{ key: 'taskDue', label: 'Task Due', desc: 'Reminders for upcoming task deadlines' },
-										{ key: 'mentions', label: 'Mentions', desc: 'When someone mentions you' },
-										{ key: 'comments', label: 'Comments', desc: 'New comments on your work' },
+										{ key: 'taskAssigned', label: t('settingsPage.notifications.taskAssigned'), desc: t('settingsPage.notifications.taskAssignedDesc') },
+										{ key: 'taskDue', label: t('settingsPage.notifications.taskDue'), desc: t('settingsPage.notifications.taskDueDesc') },
+										{ key: 'mentions', label: t('settingsPage.notifications.mentions'), desc: t('settingsPage.notifications.mentionsDesc') },
+										{ key: 'comments', label: t('settingsPage.notifications.comments'), desc: t('settingsPage.notifications.commentsDesc') },
 									].map((item) => (
 										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
 											<div className="flex-1">
@@ -1111,7 +1107,7 @@ export default function SettingsPage() {
 						<div className="flex items-center gap-3">
 							<Button onClick={handleSaveNotifications} variant="primary" className="gap-2">
 								<Save className="h-4 w-4" />
-								Save Preferences
+								{t('settingsPage.notifications.savePreferences')}
 							</Button>
 						</div>
 					</div>

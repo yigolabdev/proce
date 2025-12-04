@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/I18nProvider'
 import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent } from '../../../components/ui/Card'
 import { PageHeader } from '../../../components/common/PageHeader'
@@ -9,7 +10,8 @@ import {
 	Briefcase,
 	CheckCircle2,
 	FileText,
-	Clock
+	Clock,
+	History,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
@@ -21,6 +23,7 @@ import CompanyInfoTab from './_components/CompanyInfoTab'
 import DocumentsTab from './_components/DocumentsTab'
 import LeadershipTab from './_components/LeadershipTab'
 import FinancialTab from './_components/FinancialTab'
+import HistoryTab from './_components/HistoryTab'
 import type {
 	CompanyInfo,
 	LeadershipMember,
@@ -28,11 +31,13 @@ import type {
 	FinancialData,
 	UploadedDocument,
 	WorkplaceSettings,
+	HistoricalData,
 } from './_types/types'
 
 // Company Settings Page
 export default function CompanySettingsPage() {
-	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'goals' | 'financial' | 'documents' | 'workplace'>('company')
+	const { t } = useI18n()
+	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'goals' | 'financial' | 'documents' | 'workplace' | 'history'>('company')
 	
 	// Company Info State
 	const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
@@ -410,6 +415,22 @@ export default function CompanySettingsPage() {
 		quietHours: { start: '22:00', end: '08:00' },
 	})
 
+	// Historical Data State
+	const [historicalData, setHistoricalData] = useState<HistoricalData[]>([
+		{
+			id: '1',
+			projectName: 'Legacy System Migration',
+			description: 'Migrated on-premise monolithic system to cloud-based microservices architecture.',
+			startDate: '2022-01-15',
+			endDate: '2022-11-30',
+			outcome: 'Reduced maintenance costs by 40% and improved uptime to 99.99%.',
+			technologies: ['AWS', 'Docker', 'Kubernetes', 'Node.js'],
+			teamSize: 12,
+			budget: '500,000,000 KRW',
+			keyLearnings: 'Importance of comprehensive automated testing before migration.'
+		}
+	])
+
 	// Available departments from system settings
 	const [availableDepartments, setAvailableDepartments] = useState<{ id: string; name: string }[]>([])
 
@@ -470,6 +491,15 @@ export default function CompanySettingsPage() {
 			console.error('Failed to load workplace settings:', error)
 		}
 		
+		try {
+			const savedHistory = storage.get<any>('historicalData')
+			if (savedHistory && Array.isArray(savedHistory) && savedHistory.length > 0) {
+				setHistoricalData(savedHistory)
+			}
+		} catch (error) {
+			console.error('Failed to load historical data:', error)
+		}
+
 		// Load departments from system settings
 		try {
 			const savedDepartments = storage.get<any>('departments')
@@ -798,6 +828,33 @@ export default function CompanySettingsPage() {
 		}
 	}
 
+	const handleAddHistory = (data: Omit<HistoricalData, 'id'>) => {
+		const newRecord: HistoricalData = {
+			...data,
+			id: Date.now().toString(),
+		}
+		const updatedHistory = [...historicalData, newRecord]
+		setHistoricalData(updatedHistory)
+		localStorage.setItem('historicalData', JSON.stringify(updatedHistory))
+		toast.success('Historical record added')
+	}
+
+	const handleUpdateHistory = (id: string, data: Partial<HistoricalData>) => {
+		const updatedHistory = historicalData.map(item => 
+			item.id === id ? { ...item, ...data } : item
+		)
+		setHistoricalData(updatedHistory)
+		localStorage.setItem('historicalData', JSON.stringify(updatedHistory))
+		toast.success('Historical record updated')
+	}
+
+	const handleDeleteHistory = (id: string) => {
+		const updatedHistory = historicalData.filter(item => item.id !== id)
+		setHistoricalData(updatedHistory)
+		localStorage.setItem('historicalData', JSON.stringify(updatedHistory))
+		toast.success('Historical record deleted')
+	}
+
 	const handleDeleteFinancialData = (year: string) => {
 		const updatedData = financialData.filter(f => f.year !== year)
 		setFinancialData(updatedData)
@@ -822,17 +879,18 @@ export default function CompanySettingsPage() {
 				<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 					{/* Header */}
 					<PageHeader
-						title="Company Settings"
-						description="Manage company information, leadership, goals, and financial data"
+						title={t('companySettings.title')}
+						description={t('companySettings.description')}
 						tabs={{
 							items: [
-								{ id: 'company', label: 'Company Info', icon: Building2 },
-								{ id: 'business', label: 'Business', icon: Briefcase },
-								{ id: 'leadership', label: 'Leadership', icon: Users },
-								{ id: 'goals', label: 'Company Goals', icon: Target },
-								{ id: 'financial', label: 'Financial', icon: DollarSign },
-								{ id: 'workplace', label: 'Workplace', icon: Clock },
-								{ id: 'documents', label: 'Documents', icon: FileText },
+								{ id: 'company', label: t('companySettings.tabs.company'), icon: Building2 },
+								{ id: 'business', label: t('companySettings.tabs.business'), icon: Briefcase },
+								{ id: 'leadership', label: t('companySettings.tabs.leadership'), icon: Users },
+								{ id: 'goals', label: t('companySettings.tabs.goals'), icon: Target },
+								{ id: 'financial', label: t('companySettings.tabs.financial'), icon: DollarSign },
+								{ id: 'workplace', label: t('companySettings.tabs.workplace'), icon: Clock },
+								{ id: 'documents', label: t('companySettings.tabs.documents'), icon: FileText },
+								{ id: 'history', label: t('companySettings.tabs.history'), icon: History },
 							],
 							activeTab,
 							onTabChange: (id) => setActiveTab(id as any),
@@ -843,6 +901,7 @@ export default function CompanySettingsPage() {
 								'financial': 'Finance',
 								'workplace': 'Work',
 								'documents': 'Docs',
+								'history': 'History',
 							}
 						}}
 					>
@@ -959,6 +1018,16 @@ export default function CompanySettingsPage() {
 								onUpload={handleGeneralFileUpload}
 								onDelete={handleDeleteGeneralDocument}
 								formatFileSize={formatFileSize}
+							/>
+						)}
+
+						{/* History Tab */}
+						{activeTab === 'history' && (
+							<HistoryTab
+								historicalData={historicalData}
+								onAdd={handleAddHistory}
+								onUpdate={handleUpdateHistory}
+								onDelete={handleDeleteHistory}
 							/>
 						)}
 					</div>

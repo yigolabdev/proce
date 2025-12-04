@@ -3,6 +3,7 @@
  */
 
 import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../../../i18n/I18nProvider'
 import { useRhythm } from '../../../context/RhythmContext'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
@@ -23,6 +24,7 @@ import { storage } from '../../../utils/storage'
 export function NeedsReviewSection() {
 	const navigate = useNavigate()
 	const { needsReview, refreshRhythm } = useRhythm()
+	const { t, formatDate } = useI18n()
 
 	const handleMarkAsRead = (item: LoopItem) => {
 		const reviews = storage.get<any[]>('received_reviews') || []
@@ -31,7 +33,7 @@ export function NeedsReviewSection() {
 		)
 		storage.set('received_reviews', updatedReviews)
 		refreshRhythm()
-		toast.success('Review marked as read')
+		toast.success(t('common.success'))
 	}
 
 	const handleNavigateToSource = () => {
@@ -46,7 +48,7 @@ export function NeedsReviewSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<MessageSquare className="h-4 w-4 text-orange-600" />
-							Unread Reviews
+							{t('review.unread')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -54,7 +56,7 @@ export function NeedsReviewSection() {
 							{needsReview.length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Waiting for your attention
+							{t('rhythm.needsAttention')}
 						</p>
 					</CardContent>
 				</Card>
@@ -63,7 +65,7 @@ export function NeedsReviewSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<CheckCircle2 className="h-4 w-4 text-green-600" />
-							Approved
+							{t('review.approved')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -73,7 +75,7 @@ export function NeedsReviewSection() {
 							).length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Positive feedback
+							{t('rhythm.needsReviewSection.positiveFeedback')}
 						</p>
 					</CardContent>
 				</Card>
@@ -82,7 +84,7 @@ export function NeedsReviewSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<XCircle className="h-4 w-4 text-red-600" />
-							Changes Requested
+							{t('review.changes')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -92,7 +94,7 @@ export function NeedsReviewSection() {
 							).length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Needs action
+							{t('rhythm.needsReviewSection.needsAction')}
 						</p>
 					</CardContent>
 				</Card>
@@ -122,18 +124,18 @@ export function NeedsReviewSection() {
 												{isApproved && (
 													<span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium flex items-center gap-1">
 														<CheckCircle2 className="h-3 w-3" />
-														Approved
+														{t('review.approved')}
 													</span>
 												)}
 												{isRejected && (
 													<span className="text-xs px-2 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-medium flex items-center gap-1">
 														<XCircle className="h-3 w-3" />
-														Changes Requested
+														{t('review.changes')}
 													</span>
 												)}
 												{!isApproved && !isRejected && (
 													<span className="text-xs px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
-														Comment
+														{t('rhythm.needsReviewSection.comment')}
 													</span>
 												)}
 											</div>
@@ -156,7 +158,7 @@ export function NeedsReviewSection() {
 												{item.originalData?.reviewedAt && (
 													<div className="flex items-center gap-1">
 														<Clock className="h-4 w-4" />
-														{new Date(item.originalData.reviewedAt).toLocaleString()}
+														{formatDate(item.originalData.reviewedAt)}
 													</div>
 												)}
 												{item.projectName && (
@@ -173,7 +175,7 @@ export function NeedsReviewSection() {
 												variant="outline"
 												size="sm"
 											>
-												Mark as Read
+												{t('messages.markRead')}
 											</Button>
 											<Button
 												onClick={handleNavigateToSource}
@@ -192,11 +194,11 @@ export function NeedsReviewSection() {
 			) : (
 				<EmptyState
 					icon={<CheckCircle2 className="h-12 w-12" />}
-					title="No reviews pending"
-					description="You've reviewed all feedback. Great job!"
+					title={t('review.allCaughtUp')}
+					description={t('review.noPending')}
 					action={
 						<Button onClick={() => navigate('/app/work-review')}>
-							View All Reviews
+							{t('review.viewAll')}
 						</Button>
 					}
 				/>

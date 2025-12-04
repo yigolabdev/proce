@@ -225,7 +225,9 @@ export default function LandingPage() {
 						<Button 
 							type="submit" 
 							disabled={isSubmitting}
-							className="w-full h-12 rounded-xl bg-transparent border border-orange-500 text-white hover:bg-orange-500 hover:text-white transition-all duration-300 font-medium"
+							variant="brand"
+							size="lg"
+							className="w-full"
 						>
 							{isSubmitting ? (
 								<Loader2 className="h-5 w-5 animate-spin" />

@@ -3,6 +3,7 @@
  */
 
 import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../../../i18n/I18nProvider'
 import { useRhythm } from '../../../context/RhythmContext'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
@@ -21,6 +22,7 @@ import type { LoopItem } from '../../../services/rhythm/types'
 export function InProgressSection() {
 	const navigate = useNavigate()
 	const { inProgress } = useRhythm()
+	const { t, formatDate } = useI18n()
 
 	const handleNavigateToSource = (item: LoopItem) => {
 		if (item.type === 'task') {
@@ -47,7 +49,7 @@ export function InProgressSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<PlayCircle className="h-4 w-4 text-blue-600" />
-							Active Tasks
+							{t('rhythm.inProgressSection.activeTasks')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -55,7 +57,7 @@ export function InProgressSection() {
 							{inProgress.length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Currently in progress
+							{t('rhythm.inProgressSection.currentlyInProgress')}
 						</p>
 					</CardContent>
 				</Card>
@@ -64,7 +66,7 @@ export function InProgressSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<TrendingUp className="h-4 w-4 text-green-600" />
-							High Priority
+							{t('rhythm.inProgressSection.highPriority')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -72,7 +74,7 @@ export function InProgressSection() {
 							{inProgress.filter(item => item.priority === 'high').length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Needs focus
+							{t('rhythm.inProgressSection.needsFocus')}
 						</p>
 					</CardContent>
 				</Card>
@@ -81,7 +83,7 @@ export function InProgressSection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<Clock className="h-4 w-4 text-orange-600" />
-							Due Soon
+							{t('rhythm.inProgressSection.dueSoon')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -93,7 +95,7 @@ export function InProgressSection() {
 							}).length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Within 24 hours
+							{t('rhythm.inProgressSection.within24Hours')}
 						</p>
 					</CardContent>
 				</Card>
@@ -112,11 +114,11 @@ export function InProgressSection() {
 									<div className="flex-1">
 										<div className="flex items-center gap-2 mb-2">
 											<span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(item.priority)}`}>
-												{item.priority.toUpperCase()}
+												{t(`common.priorities.${item.priority}`)}
 											</span>
 											{item.type === 'task' && (
 												<span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-													Task
+													{t('rhythm.task')}
 												</span>
 											)}
 										</div>
@@ -130,7 +132,7 @@ export function InProgressSection() {
 										{item.progress !== undefined && (
 											<div className="mb-3">
 												<div className="flex items-center justify-between text-sm mb-1">
-													<span className="text-neutral-600 dark:text-neutral-400">Progress</span>
+													<span className="text-neutral-600 dark:text-neutral-400">{t('rhythm.inProgressSection.progress')}</span>
 													<span className="font-medium">{item.progress}%</span>
 												</div>
 												<div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
@@ -158,7 +160,7 @@ export function InProgressSection() {
 											{item.dueDate && (
 												<div className="flex items-center gap-1">
 													<Calendar className="h-4 w-4" />
-													Due: {new Date(item.dueDate).toLocaleDateString()}
+													{t('common.deadline')}: {formatDate(item.dueDate)}
 												</div>
 											)}
 										</div>
@@ -178,11 +180,11 @@ export function InProgressSection() {
 			) : (
 				<EmptyState
 					icon={<PlayCircle className="h-12 w-12" />}
-					title="No tasks in progress"
-					description="Accept a task from AI Recommendations to get started"
+					title={t('rhythm.noTasksInProgress')}
+					description={t('rhythm.startFromAi')}
 					action={
 						<Button onClick={() => navigate('/app/ai-recommendations')}>
-							View Recommendations
+							{t('rhythm.inProgressSection.viewRecommendations')}
 						</Button>
 					}
 				/>

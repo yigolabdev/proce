@@ -48,10 +48,13 @@ export interface WorkEntry {
 	submittedById?: string // User ID (preferred)
 	submittedByName?: string // User name (denormalized)
 	department?: string
+	createdBy?: string // User name who created this entry
+	createdById?: string // User ID who created this entry
 	
 	// Status & Review
 	status?: WorkEntryStatus
 	reviewedBy?: string
+	reviewedById?: string
 	reviewedByName?: string
 	reviewedAt?: Date | string
 	reviewComments?: string
@@ -334,6 +337,7 @@ export interface TaskRecommendation {
 	aiReason?: string // AI 추천 이유
 	suggestedBy?: string // 제안자
 	tags?: string[]
+	completedWorkEntries?: string[] // 이 태스크와 연결된 완료된 WorkEntry ID들
 	relatedMembers?: Array<{
 		id: string
 		name: string
@@ -415,6 +419,63 @@ export interface Message {
 	tags?: string[]
 }
 
+// ==================== Review Types ====================
+
+export type ReviewType = 'approved' | 'rejected' | 'changes_requested'
+export type ReviewStatus = 'pending' | 'completed' | 'cancelled'
+
+/**
+ * Pending Review - 리뷰 대기 중 (리뷰어가 처리해야 함)
+ */
+export interface PendingReview {
+	id: string
+	workEntryId: string
+	workTitle: string
+	workDescription: string
+	projectId: string
+	projectName: string
+	submittedBy: string
+	submittedById: string
+	submittedByDepartment?: string
+	reviewerId: string
+	reviewerName?: string
+	reviewerRole?: string
+	reviewerDepartment?: string
+	status: 'pending'
+	submittedAt: Date | string
+	tags?: string[]
+	files?: FileAttachment[]
+	links?: LinkResource[]
+	category?: string
+	priority?: 'high' | 'medium' | 'low'
+	isConfidential?: boolean
+}
+
+/**
+ * Received Review - 받은 리뷰 (리뷰 결과)
+ */
+export interface ReceivedReview {
+	id: string
+	workEntryId: string
+	workTitle: string
+	workDescription: string
+	projectId?: string
+	projectName?: string
+	reviewType: ReviewType
+	reviewedBy: string
+	reviewedById: string
+	reviewedByDepartment?: string
+	reviewedAt: Date | string
+	reviewComments: string
+	isRead: boolean
+	tags?: string[]
+	files?: FileAttachment[]
+	links?: LinkResource[]
+	category?: string
+	priority?: 'high' | 'medium' | 'low'
+	isConfidential?: boolean
+}
+
 // ==================== localStorage Keys ====================
 
 export const STORAGE_KEYS = {
@@ -424,6 +485,10 @@ export const STORAGE_KEYS = {
 	WORK_CATEGORIES: 'workCategories',
 	WORK_TAGS: 'workTags',
 	WORK_TEMPLATES: 'workTemplates',
+	
+	// Reviews
+	PENDING_REVIEWS: 'pending_reviews',
+	RECEIVED_REVIEWS: 'received_reviews',
 	
 	// Projects & OKR
 	PROJECTS: 'projects',
@@ -460,6 +525,8 @@ export interface StorageTypeMap {
 	[STORAGE_KEYS.WORK_CATEGORIES]: WorkCategory[]
 	[STORAGE_KEYS.WORK_TAGS]: WorkTag[]
 	[STORAGE_KEYS.WORK_TEMPLATES]: WorkTemplate[]
+	[STORAGE_KEYS.PENDING_REVIEWS]: PendingReview[]
+	[STORAGE_KEYS.RECEIVED_REVIEWS]: ReceivedReview[]
 	[STORAGE_KEYS.PROJECTS]: Project[]
 	[STORAGE_KEYS.OBJECTIVES]: Objective[]
 	[STORAGE_KEYS.DEPARTMENTS]: Department[]

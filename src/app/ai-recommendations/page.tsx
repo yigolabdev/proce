@@ -1,11 +1,14 @@
+import { useI18n } from '../../i18n/I18nProvider'
 import { storage } from '../../utils/storage'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { Badge, StatusBadge, PriorityBadge } from '../../components/common/Badge'
 import {
 	Sparkles,
 	CheckCircle2,
@@ -73,6 +76,7 @@ export default function AIRecommendationsPage() {
 	const navigate = useNavigate()
 	const { user } = useAuth()
 	const { updateAfterTaskChange } = useRhythmUpdate()
+	const { t, language } = useI18n()
 	
 	// AI Recommendations state
 	const [recommendations, setRecommendations] = useState<TaskRecommendation[]>([])
@@ -450,9 +454,9 @@ export default function AIRecommendationsPage() {
 
 			// Work Input 페이지로 이동
 			navigate('/app/input')
-			toast.success('🚀 Starting task now! Redirecting to Work Input...')
+			toast.success(t('aiRec.toasts.startingTask'))
 		} else {
-			toast.success('✅ Task accepted! You can start it from Work Rhythm or Work Input.')
+			toast.success(t('aiRec.toasts.taskAccepted'))
 		}
 	}
 
@@ -464,23 +468,23 @@ export default function AIRecommendationsPage() {
 		// 리듬 상태 업데이트
 		updateAfterTaskChange()
 		
-		toast.info('Task declined. We\'ll adjust future recommendations.')
+		toast.info(t('aiRec.toasts.taskDeclined'))
 	}
 
 	const handleRefreshRecommendations = () => {
 		loadRecommendations()
-		toast.success('Recommendations refreshed')
+		toast.success(t('aiRec.toasts.refreshed'))
 	}
 	
 	// Handle manual task creation
 	const handleCreateManualTask = () => {
 		if (!manualTaskForm.title.trim()) {
-			toast.error('Please enter a task title')
+			toast.error(t('aiRec.toasts.enterTitle'))
 			return
 		}
 		
 		if (!manualTaskForm.assignedToId) {
-			toast.error('Please select an assignee')
+			toast.error(t('aiRec.toasts.selectAssignee'))
 			return
 		}
 		
@@ -551,8 +555,8 @@ export default function AIRecommendationsPage() {
 		// 리듬 상태 업데이트
 		updateAfterTaskChange()
 		
-		toast.success(`Task assigned to ${assignedUser?.name}`, {
-			description: 'Notification sent to Messages',
+		toast.success(t('aiRec.toasts.taskAssigned', { name: assignedUser?.name || '' }), {
+			description: t('aiRec.toasts.notificationSent'),
 		})
 	}
 	
@@ -587,8 +591,8 @@ export default function AIRecommendationsPage() {
 			{/* Header */}
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			<PageHeader
-				title="AI Recommendations"
-				description="AI-powered task recommendations based on your work data"
+				title={t('aiRec.title')}
+				description={t('aiRec.description')}
 				actions={
 					<div className="flex gap-3">
 						<Button
@@ -597,7 +601,7 @@ export default function AIRecommendationsPage() {
 							className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 border-none rounded-full"
 						>
 							<Plus className="h-4 w-4" />
-							<span className="hidden sm:inline">Create Task</span>
+							<span className="hidden sm:inline">{t('aiRec.createTask')}</span>
 						</Button>
 						<Button
 							variant="outline"
@@ -607,7 +611,7 @@ export default function AIRecommendationsPage() {
 							className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-white rounded-full"
 						>
 							<RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-							<span className="hidden sm:inline">Refresh</span>
+							<span className="hidden sm:inline">{t('aiRec.refresh')}</span>
 						</Button>
 					</div>
 				}
@@ -669,7 +673,7 @@ export default function AIRecommendationsPage() {
 					<CardContent className="p-5">
 						<div className="flex items-start justify-between">
 							<div>
-								<p className="text-sm text-neutral-500 font-medium mb-1">AI Generated</p>
+								<p className="text-sm text-neutral-500 font-medium mb-1">{t('aiRec.aiGenerated')}</p>
 								<p className="text-2xl font-bold text-white">
 									{aiGeneratedCount}
 								</p>
@@ -686,7 +690,7 @@ export default function AIRecommendationsPage() {
 					<CardContent className="p-5">
 						<div className="flex items-start justify-between">
 							<div>
-								<p className="text-sm text-neutral-500 font-medium mb-1">Total Pending</p>
+								<p className="text-sm text-neutral-500 font-medium mb-1">{t('aiRec.totalPending')}</p>
 								<p className="text-2xl font-bold text-white">
 									{pendingRecommendations.length}
 								</p>
@@ -703,7 +707,7 @@ export default function AIRecommendationsPage() {
 					<CardContent className="p-5">
 						<div className="flex items-start justify-between">
 							<div>
-								<p className="text-sm text-neutral-500 font-medium mb-1">Manual Tasks</p>
+								<p className="text-sm text-neutral-500 font-medium mb-1">{t('aiRec.manualTasks')}</p>
 								<p className="text-2xl font-bold text-white">
 									{manualTaskCount}
 								</p>
@@ -720,7 +724,7 @@ export default function AIRecommendationsPage() {
 					<CardContent className="p-5">
 						<div className="flex items-start justify-between">
 							<div>
-								<p className="text-sm text-neutral-500 font-medium mb-1">Accepted</p>
+								<p className="text-sm text-neutral-500 font-medium mb-1">{t('aiRec.accepted')}</p>
 								<p className="text-2xl font-bold text-white">
 									{acceptedCount}
 								</p>
@@ -737,7 +741,7 @@ export default function AIRecommendationsPage() {
 			<div className="mt-8">
 				<h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
 					<Sparkles className="h-5 w-5 text-orange-500" />
-					Recommended Actions
+					{t('aiRec.recommendedActions')}
 				</h2>
 				<div className={isLoading || pendingRecommendations.length === 0 ? "space-y-4" : "grid grid-cols-1 xl:grid-cols-2 gap-6"}>
 					{isLoading ? (
@@ -745,7 +749,7 @@ export default function AIRecommendationsPage() {
 						<CardContent className="p-12 text-center">
 							<RefreshCw className="h-12 w-12 mx-auto mb-4 text-orange-500 animate-spin" />
 							<p className="text-neutral-400">
-								Loading recommendations...
+								{t('aiRec.loading')}
 							</p>
 						</CardContent>
 					</Card>
@@ -753,13 +757,13 @@ export default function AIRecommendationsPage() {
 					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-12 text-center">
 							<Sparkles className="h-16 w-16 mx-auto mb-4 text-neutral-700" />
-							<h3 className="text-lg font-bold mb-2 text-white">All Caught Up!</h3>
+							<h3 className="text-lg font-bold mb-2 text-white">{t('aiRec.allCaughtUp')}</h3>
 							<p className="text-neutral-400 mb-4">
-								No new recommendations at the moment. Check back later!
+								{t('aiRec.noNewRecs')}
 							</p>
 							<Button onClick={handleRefreshRecommendations} className="bg-white text-black hover:bg-neutral-200">
 								<RefreshCw className="h-4 w-4 mr-2" />
-								Refresh Recommendations
+								{t('aiRec.refresh')}
 							</Button>
 						</CardContent>
 					</Card>
@@ -784,13 +788,13 @@ export default function AIRecommendationsPage() {
 											{task.isManual && (
 												<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
 													<Users className="h-3 w-3" />
-													MANUAL
+													{t('aiRec.manual')}
 												</span>
 											)}
 											{!task.isManual && task.id.startsWith('ai-') && (
 												<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
 													<Sparkles className="h-3 w-3" />
-													AI GENERATED
+													{t('aiRec.aiGenerated')}
 												</span>
 											)}
 											
@@ -800,7 +804,7 @@ export default function AIRecommendationsPage() {
 													task.priority
 												)}`}
 											>
-												{task.priority}
+												{task.priority.toUpperCase()}
 											</span>
 											
 											{/* Category Badge */}
@@ -836,7 +840,7 @@ export default function AIRecommendationsPage() {
 											<div className="flex items-center gap-2">
 												<Users className="h-4 w-4" />
 												<span>
-													Assigned to: <span className="font-medium text-neutral-300">{task.assignedTo}</span>
+													{t('aiRec.assignTo')}: <span className="font-medium text-neutral-300">{task.assignedTo}</span>
 												</span>
 											</div>
 										)}
@@ -844,7 +848,7 @@ export default function AIRecommendationsPage() {
 											<div className="flex items-center gap-2">
 												<Calendar className="h-4 w-4" />
 												<span>
-													Deadline: <span className="font-medium text-neutral-300">{new Date(task.deadline).toLocaleDateString()}</span>
+													{t('aiRec.deadline')}: <span className="font-medium text-neutral-300">{new Date(task.deadline).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US')}</span>
 												</span>
 											</div>
 										)}
@@ -856,11 +860,11 @@ export default function AIRecommendationsPage() {
 											<Brain className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
 											<div className="flex-1 min-w-0">
 												<p className="text-xs font-medium text-neutral-400 mb-0.5">
-													Data Source
+													{t('aiRec.dataSource')}
 												</p>
 												<p className="text-sm text-neutral-300">
 													{task.dataSource}
-													{task.createdBy && <span className="text-neutral-500"> • Created by {task.createdBy}</span>}
+													{task.createdBy && <span className="text-neutral-500"> • {t('aiRec.createdBy')} {task.createdBy}</span>}
 												</p>
 											</div>
 										</div>
@@ -877,7 +881,7 @@ export default function AIRecommendationsPage() {
 										className="w-full flex items-center justify-center gap-2"
 									>
 										<Zap className="h-4 w-4" />
-										Accept & Start Task
+										{t('aiRec.acceptStart')}
 									</Button>
 								</div>
 								</div>
@@ -904,10 +908,10 @@ export default function AIRecommendationsPage() {
 								<div className="flex-1">
 									<div className="flex items-center gap-2 mb-2">
 										<Plus className="h-6 w-6 text-primary" />
-										<h2 className="text-2xl font-bold">Create Manual Task</h2>
+										<h2 className="text-2xl font-bold">{t('aiRec.createManual')}</h2>
 									</div>
 									<p className="text-sm text-neutral-600 dark:text-neutral-400">
-										Add a task manually to your recommendations list
+										{t('aiRec.addManualDesc')}
 									</p>
 								</div>
 								<button
@@ -924,13 +928,13 @@ export default function AIRecommendationsPage() {
 							{/* Title */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Task Title <span className="text-red-500">*</span>
+									{t('aiRec.taskTitle')} <span className="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									value={manualTaskForm.title}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, title: e.target.value }))}
-									placeholder="Enter task title"
+									placeholder={t('aiRec.taskTitlePlaceholder')}
 									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								/>
 							</div>
@@ -938,12 +942,12 @@ export default function AIRecommendationsPage() {
 							{/* Description */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Description
+									{t('aiRec.description')}
 								</label>
 								<textarea
 									value={manualTaskForm.description}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, description: e.target.value }))}
-									placeholder="Enter task description"
+									placeholder={t('aiRec.descriptionPlaceholder')}
 									rows={4}
 									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 								/>
@@ -952,29 +956,29 @@ export default function AIRecommendationsPage() {
 							{/* Priority */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Priority
+									{t('aiRec.priority')}
 								</label>
 								<select
 									value={manualTaskForm.priority}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, priority: e.target.value as 'high' | 'medium' | 'low' }))}
 									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								>
-									<option value="low">Low</option>
-									<option value="medium">Medium</option>
-									<option value="high">High</option>
+									<option value="low">{t('aiRec.low')}</option>
+									<option value="medium">{t('aiRec.medium')}</option>
+									<option value="high">{t('aiRec.high')}</option>
 								</select>
 							</div>
 
 							{/* Category */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Category
+									{t('aiRec.category')}
 								</label>
 								<input
 									type="text"
 									value={manualTaskForm.category}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, category: e.target.value }))}
-									placeholder="e.g., Development, Design, Marketing"
+									placeholder={t('aiRec.categoryPlaceholder')}
 									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								/>
 							</div>
@@ -982,14 +986,14 @@ export default function AIRecommendationsPage() {
 							{/* Project */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Project
+									{t('aiRec.project')}
 								</label>
 								<select
 									value={manualTaskForm.projectId}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, projectId: e.target.value }))}
 									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								>
-									<option value="">No Project</option>
+									<option value="">{t('aiRec.noProject')}</option>
 									{projects.map((project) => (
 										<option key={project.id} value={project.id}>
 											{project.name}
@@ -1001,7 +1005,7 @@ export default function AIRecommendationsPage() {
 							{/* Deadline */}
 							<div>
 								<label className="block text-sm font-medium mb-2">
-									Deadline
+									{t('aiRec.deadline')}
 								</label>
 								<input
 									type="date"
@@ -1014,13 +1018,13 @@ export default function AIRecommendationsPage() {
 							{/* Assign To */}
 							<div className="space-y-4">
 								<label className="block text-sm font-medium">
-									Assign To <span className="text-red-500">*</span>
+									{t('aiRec.assignTo')} <span className="text-red-500">*</span>
 								</label>
 								
 								{/* Step 1: Department Selection */}
 								<div>
 									<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-										Step 1: Select Department
+										{t('aiRec.selectDepartment')}
 									</label>
 									<select
 										value={manualTaskForm.selectedDepartment}
@@ -1031,12 +1035,12 @@ export default function AIRecommendationsPage() {
 										}))}
 										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 									>
-										<option value="">Choose a department...</option>
+										<option value="">{t('aiRec.chooseDepartment')}</option>
 										{Array.from(new Set(users.map(u => u.department).filter(Boolean))).sort().map((dept) => {
 											const deptCount = users.filter(u => u.department === dept).length
 											return (
 												<option key={dept} value={dept}>
-													{dept} ({deptCount} {deptCount === 1 ? 'person' : 'people'})
+													{dept} ({deptCount} {deptCount === 1 ? t('aiRec.person') : t('aiRec.people')})
 												</option>
 											)
 										})}
@@ -1047,7 +1051,7 @@ export default function AIRecommendationsPage() {
 								{manualTaskForm.selectedDepartment && (
 									<div className="animate-fadeIn">
 										<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-											Step 2: Select Person
+											{t('aiRec.selectPerson')}
 										</label>
 										<select
 											value={manualTaskForm.assignedToId}
@@ -1055,7 +1059,9 @@ export default function AIRecommendationsPage() {
 											className="w-full px-3 py-2 border-2 border-primary/50 dark:border-primary/30 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
 											required
 										>
-											<option value="">Select a person from {manualTaskForm.selectedDepartment}...</option>
+											<option value="">
+												{t('aiRec.selectPersonFromDepartment').replace('{department}', manualTaskForm.selectedDepartment)}
+											</option>
 											{users
 												.filter(user => user.department === manualTaskForm.selectedDepartment)
 												.sort((a, b) => a.name.localeCompare(b.name))
@@ -1077,7 +1083,7 @@ export default function AIRecommendationsPage() {
 															{users.find(u => u.id === manualTaskForm.assignedToId)?.name}
 														</p>
 														<p className="text-xs text-neutral-600 dark:text-neutral-400">
-															{users.find(u => u.id === manualTaskForm.assignedToId)?.email}
+															{t('aiRec.selectedUserInfo')}
 														</p>
 													</div>
 													<span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
@@ -1090,7 +1096,7 @@ export default function AIRecommendationsPage() {
 								)}
 								
 								<p className="text-xs text-neutral-500 dark:text-neutral-400">
-									💡 The selected person will receive a notification in Messages
+									💡 {t('aiRec.notificationSent')}
 								</p>
 							</div>
 						</div>
@@ -1103,14 +1109,14 @@ export default function AIRecommendationsPage() {
 									className="flex-1 flex items-center justify-center gap-2"
 								>
 									<Plus className="h-4 w-4" />
-									Create Task
+									{t('aiRec.createTask')}
 								</Button>
 								<Button
 									variant="outline"
 									onClick={() => setShowManualTaskModal(false)}
 									className="px-6"
 								>
-									Cancel
+									{t('aiRec.cancel')}
 								</Button>
 							</div>
 						</div>
@@ -1134,7 +1140,7 @@ export default function AIRecommendationsPage() {
 								<div className="flex-1">
 									<div className="flex items-center gap-2 mb-3">
 										<Sparkles className="h-6 w-6 text-primary" />
-										<h2 className="text-2xl font-bold">AI Analysis & Instructions</h2>
+										<h2 className="text-2xl font-bold">{t('aiRec.aiAnalysis')}</h2>
 									</div>
 									<div className="flex items-center gap-2 mb-2">
 										<span
@@ -1142,7 +1148,7 @@ export default function AIRecommendationsPage() {
 												selectedTask.priority
 											)}`}
 										>
-											{selectedTask.priority.toUpperCase()} PRIORITY
+											{selectedTask.priority.toUpperCase()} {t('aiRec.priority')}
 										</span>
 										<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
 											{selectedTask.category}
@@ -1170,10 +1176,10 @@ export default function AIRecommendationsPage() {
 									<Target className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
 									<div className="flex-1">
 										<h4 className="font-bold text-blue-900 dark:text-blue-100 mb-1">
-											Project: {selectedTask.aiAnalysis.projectName}
+											{t('aiRec.project')}: {selectedTask.aiAnalysis.projectName}
 										</h4>
 										<p className="text-sm text-blue-700 dark:text-blue-300">
-											Analysis Date: {new Date(selectedTask.aiAnalysis.analysisDate).toLocaleString()}
+											{t('aiRec.analysisDate')}: {new Date(selectedTask.aiAnalysis.analysisDate).toLocaleString()}
 										</p>
 									</div>
 								</div>
@@ -1183,7 +1189,7 @@ export default function AIRecommendationsPage() {
 							<div>
 								<div className="flex items-center gap-2 mb-3">
 									<Brain className="h-5 w-5 text-primary" />
-									<h4 className="font-bold text-lg">Why AI Recommends This</h4>
+									<h4 className="font-bold text-lg">{t('aiRec.whyAiRecommends')}</h4>
 								</div>
 								<div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
 									<p className="text-sm leading-relaxed">{selectedTask.aiAnalysis.analysisReason}</p>
@@ -1194,7 +1200,7 @@ export default function AIRecommendationsPage() {
 						<div>
 							<div className="flex items-center gap-2 mb-3">
 								<Users className="h-5 w-5 text-primary" />
-								<h4 className="font-bold text-lg">Team Members</h4>
+								<h4 className="font-bold text-lg">{t('aiRec.teamMembers')}</h4>
 							</div>
 							
 							{/* Active Participants */}
@@ -1203,7 +1209,7 @@ export default function AIRecommendationsPage() {
 									<div className="flex items-center gap-2 mb-2">
 										<div className="w-2 h-2 rounded-full bg-green-500"></div>
 										<h5 className="text-sm font-semibold text-green-700 dark:text-green-400">
-											Active Participants ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'active').length})
+											{t('aiRec.activeParticipants')} ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'active').length})
 										</h5>
 									</div>
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1240,7 +1246,7 @@ export default function AIRecommendationsPage() {
 									<div className="flex items-center gap-2 mb-2">
 										<div className="w-2 h-2 rounded-full bg-blue-500"></div>
 										<h5 className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-											Related Members ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'related').length})
+											{t('aiRec.relatedMembers')} ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'related').length})
 										</h5>
 									</div>
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1276,7 +1282,7 @@ export default function AIRecommendationsPage() {
 							<div>
 								<div className="flex items-center gap-2 mb-3">
 									<CheckCircle2 className="h-5 w-5 text-primary" />
-									<h4 className="font-bold text-lg">Detailed Instructions</h4>
+									<h4 className="font-bold text-lg">{t('aiRec.detailedInstructions')}</h4>
 								</div>
 								<div className="space-y-2">
 									{selectedTask.aiAnalysis.detailedInstructions.map((instruction, index) => (
@@ -1297,7 +1303,7 @@ export default function AIRecommendationsPage() {
 							<div>
 								<div className="flex items-center gap-2 mb-3">
 									<Target className="h-5 w-5 text-primary" />
-									<h4 className="font-bold text-lg">Expected Outcome</h4>
+									<h4 className="font-bold text-lg">{t('aiRec.expectedOutcome')}</h4>
 								</div>
 								<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
 									<p className="text-sm leading-relaxed text-green-900 dark:text-green-100">
@@ -1310,7 +1316,7 @@ export default function AIRecommendationsPage() {
 							<div>
 								<div className="flex items-center gap-2 mb-3">
 									<Lightbulb className="h-5 w-5 text-primary" />
-									<h4 className="font-bold text-lg">AI Recommendations</h4>
+									<h4 className="font-bold text-lg">{t('aiRec.aiRecommendations')}</h4>
 								</div>
 								<div className="space-y-2">
 									{selectedTask.aiAnalysis.recommendations.map((rec, index) => (
@@ -1329,7 +1335,7 @@ export default function AIRecommendationsPage() {
 							<div>
 								<div className="flex items-center gap-2 mb-3">
 									<AlertTriangle className="h-5 w-5 text-red-600" />
-									<h4 className="font-bold text-lg">Risk Factors</h4>
+									<h4 className="font-bold text-lg">{t('aiRec.riskFactors')}</h4>
 								</div>
 								<div className="space-y-2">
 									{selectedTask.aiAnalysis.riskFactors.map((risk, index) => (
@@ -1358,7 +1364,7 @@ export default function AIRecommendationsPage() {
 									className="flex-1 flex items-center justify-center gap-2"
 								>
 									<CheckCircle2 className="h-4 w-4" />
-									Accept & Create Task
+									{t('aiRec.acceptCreate')}
 								</Button>
 								<Button
 									variant="outline"
@@ -1370,14 +1376,14 @@ export default function AIRecommendationsPage() {
 									className="flex-1 flex items-center justify-center gap-2"
 								>
 									<XCircle className="h-4 w-4" />
-									Decline Task
+									{t('aiRec.decline')}
 								</Button>
 								<Button
 									variant="outline"
 									onClick={() => setSelectedTask(null)}
 									className="px-6"
 								>
-									Close
+									{t('common.close')}
 								</Button>
 							</div>
 						</div>

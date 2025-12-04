@@ -17,24 +17,26 @@ import { InProgressSection } from './_components/InProgressSection'
 import { NeedsReviewSection } from './_components/NeedsReviewSection'
 import { CompletedSection } from './_components/CompletedSection'
 import { TeamRhythmSection } from './_components/TeamRhythmSection'
+import { useI18n } from '../../i18n/I18nProvider'
 
 type TabType = 'today' | 'in-progress' | 'needs-review' | 'completed' | 'team'
 
 export default function WorkRhythmPage() {
 	const { loading, refreshRhythm } = useRhythm()
+	const { t } = useI18n()
 	const [activeTab, setActiveTab] = useState<TabType>('today')
 
 	const handleRefresh = async () => {
 		await refreshRhythm()
-		toast.success('Work Rhythm refreshed')
+		toast.success(t('common.success'))
 	}
 
 	const tabs = [
-		{ id: 'today' as TabType, label: 'Today', icon: Clock, count: null },
-		{ id: 'in-progress' as TabType, label: 'In Progress', icon: PlayCircle, count: null },
-		{ id: 'needs-review' as TabType, label: 'Needs Review', icon: AlertTriangle, count: null },
-		{ id: 'completed' as TabType, label: 'Completed', icon: CheckCircle2, count: null },
-		{ id: 'team' as TabType, label: 'Team Rhythm', icon: Users, count: null },
+		{ id: 'today' as TabType, label: t('rhythm.today'), icon: Clock, count: null },
+		{ id: 'in-progress' as TabType, label: t('rhythm.inProgress'), icon: PlayCircle, count: null },
+		{ id: 'needs-review' as TabType, label: t('rhythm.needsReview'), icon: AlertTriangle, count: null },
+		{ id: 'completed' as TabType, label: t('rhythm.completed'), icon: CheckCircle2, count: null },
+		{ id: 'team' as TabType, label: t('rhythm.teamRhythm'), icon: Users, count: null },
 	]
 
 	if (loading) {
@@ -50,12 +52,12 @@ export default function WorkRhythmPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 				{/* Header */}
 				<PageHeader
-					title="Work Rhythm"
-					description="Your work execution flow and team status"
+					title={t('rhythm.title')}
+					description={t('rhythm.description')}
 					actions={
 						<Button onClick={handleRefresh} variant="outline" size="sm">
 							<RefreshCw className="h-4 w-4 sm:mr-2" />
-							<span className="hidden sm:inline">Refresh</span>
+							<span className="hidden sm:inline">{t('common.refresh')}</span>
 						</Button>
 					}
 				/>

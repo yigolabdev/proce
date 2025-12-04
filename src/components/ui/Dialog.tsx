@@ -1,23 +1,99 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import type { PropsWithChildren } from 'react'
+import { forwardRef, type ComponentPropsWithoutRef, type HTMLAttributes, type PropsWithChildren } from 'react'
 import clsx from 'clsx'
 
 export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger
 export const DialogClose = DialogPrimitive.Close
 
-export function DialogContent({ className, children }: PropsWithChildren<{ className?: string }>) {
-	return (
-		<DialogPrimitive.Portal>
-			<DialogPrimitive.Overlay className="fixed inset-0 bg-black/40" />
-			<DialogPrimitive.Content
-				className={clsx(
-					'fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-lg focus:outline-none',
-					className,
-				)}
-			>
-				{children}
-			</DialogPrimitive.Content>
-		</DialogPrimitive.Portal>
-	)
-}
+export const DialogPortal = DialogPrimitive.Portal
+
+export const DialogOverlay = forwardRef<
+	React.ElementRef<typeof DialogPrimitive.Overlay>,
+	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+	<DialogPrimitive.Overlay
+		ref={ref}
+		className={clsx(
+			'fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+			className
+		)}
+		{...props}
+	/>
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+
+export const DialogContent = forwardRef<
+	React.ElementRef<typeof DialogPrimitive.Content>,
+	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+	<DialogPortal>
+		<DialogOverlay />
+		<DialogPrimitive.Content
+			ref={ref}
+			className={clsx(
+				'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-neutral-200 bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full dark:border-neutral-800 dark:bg-neutral-900',
+				className
+			)}
+			{...props}
+		>
+			{children}
+		</DialogPrimitive.Content>
+	</DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
+
+export const DialogHeader = ({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) => (
+	<div
+		className={clsx(
+			'flex flex-col space-y-1.5 text-center sm:text-left',
+			className
+		)}
+		{...props}
+	/>
+)
+DialogHeader.displayName = 'DialogHeader'
+
+export const DialogFooter = ({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) => (
+	<div
+		className={clsx(
+			'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+			className
+		)}
+		{...props}
+	/>
+)
+DialogFooter.displayName = 'DialogFooter'
+
+export const DialogTitle = forwardRef<
+	React.ElementRef<typeof DialogPrimitive.Title>,
+	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+	<DialogPrimitive.Title
+		ref={ref}
+		className={clsx(
+			'text-lg font-semibold leading-none tracking-tight',
+			className
+		)}
+		{...props}
+	/>
+))
+DialogTitle.displayName = DialogPrimitive.Title.displayName
+
+export const DialogDescription = forwardRef<
+	React.ElementRef<typeof DialogPrimitive.Description>,
+	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+	<DialogPrimitive.Description
+		ref={ref}
+		className={clsx('text-sm text-neutral-500 dark:text-neutral-400', className)}
+		{...props}
+	/>
+))
+DialogDescription.displayName = DialogPrimitive.Description.displayName

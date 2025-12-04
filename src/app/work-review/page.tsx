@@ -1,11 +1,16 @@
 import { storage } from '../../utils/storage'
-import { useState, useEffect, useMemo } from 'react'
+import { useI18n } from '../../i18n/I18nProvider'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
+import { useAuth } from '../../context/AuthContext'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { Badge, StatusBadge, PriorityBadge } from '../../components/common/Badge'
+import { Skeleton } from '../../components/common/Skeleton'
 import {
 	MessageSquare,
 	Clock,
@@ -22,56 +27,34 @@ import {
 	Mail,
 	ThumbsUp,
 	ThumbsDown,
+	Tag,
+	Link as LinkIcon,
+	Paperclip,
+	Shield
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
-
-// Review/Comment received by the current user
-interface ReceivedReview {
-	id: string
-	workEntryId: string
-	workTitle: string
-	workDescription: string
-	projectId?: string
-	projectName?: string
-	reviewType: 'approved' | 'rejected' | 'changes_requested'
-	reviewedBy: string
-	reviewedByDepartment?: string
-	reviewedAt: Date
-	reviewComments: string
-	isRead: boolean
-}
-
-// Review pending for the current user (as a reviewer)
-interface PendingReview {
-	id: string
-	workEntryId: string
-	workTitle: string
-	workDescription: string
-	projectId: string
-	projectName: string
-	submittedBy: string
-	submittedById?: string
-	submittedByDepartment?: string
-	reviewerId: string
-	status: 'pending'
-	submittedAt: Date | string
-}
+import type { PendingReview, ReceivedReview } from '../../types/common.types'
+import { createReviewCompletionMessage, saveMessage } from '../../utils/messageHelpers'
+import { parsePendingReviewsFromStorage, parseReceivedReviewsFromStorage } from '../../utils/mappers'
 
 export default function WorkReviewPage() {
 	const navigate = useNavigate()
+	const { t, locale } = useI18n()
+	const { user } = useAuth()
 	
-	// State
+	// State - use custom hooks for better management
 	const [activeTab, setActiveTab] = useState<'pending' | 'received'>('pending')
-	const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([])
-	const [reviews, setReviews] = useState<ReceivedReview[]>([])
+	const [pendingReviews, setPendingReviews, loadingPending] = useLocalStorage<PendingReview[]>('pending_reviews', [])
+	const [reviews, setReviews, loadingReceived] = useLocalStorage<ReceivedReview[]>('received_reviews', [])
+	const [projects, setProjects] = useLocalStorage<Array<{ id: string; name: string }>>('projects', [])
 	const [filteredReviews, setFilteredReviews] = useState<ReceivedReview[]>([])
-	const [loading, setLoading] = useState(true)
 	const [filterType, setFilterType] = useState<string>('all')
 	const [filterProject, setFilterProject] = useState<string>('all')
 	const [filterRead, setFilterRead] = useState<string>('all')
 	const [expandedReviews, setExpandedReviews] = useState<string[]>([])
-	const [projects, setProjects] = useState<Array<{ id: string; name: string }>>([])
+
+	const loading = loadingPending || loadingReceived
 
 	// Keyboard shortcuts
 	useKeyboardShortcuts({
@@ -79,192 +62,32 @@ export default function WorkReviewPage() {
 		newWork: () => navigate('/app/input'),
 	})
 
-	// Load data
+	// Parse dates for reviews (useEffect to convert dates from storage)
 	useEffect(() => {
-		loadData()
-	}, [])
-
-	const loadData = async () => {
-		setLoading(true)
-		try {
-			// Load projects
-			const savedProjects = storage.get<any[]>('projects')
-			if (savedProjects && savedProjects.length > 0) {
-				setProjects(savedProjects.map((p: any) => ({ id: p.id, name: p.name })))
-			} else {
-				const mockProjects = [
-					{ id: 'proj-1', name: 'Website Redesign' },
-					{ id: 'proj-2', name: 'Mobile App Development' },
-					{ id: 'proj-3', name: 'API Integration' },
-					{ id: 'proj-4', name: 'Data Analytics Platform' },
-					{ id: 'proj-5', name: 'Customer Portal V2' },
-					{ id: 'proj-6', name: 'Infrastructure Modernization' },
-					{ id: 'proj-7', name: 'Marketing Automation' },
-					{ id: 'proj-8', name: 'AI/ML Pipeline' },
-				]
-				setProjects(mockProjects)
+		if (pendingReviews.length > 0) {
+			const parsed = parsePendingReviewsFromStorage(pendingReviews as any)
+			if (JSON.stringify(parsed) !== JSON.stringify(pendingReviews)) {
+				setPendingReviews(parsed)
 			}
-
-			// Load pending reviews (To Review)
-			const savedPending = storage.get<any[]>('pending_reviews')
-			if (savedPending && savedPending.length > 0) {
-				setPendingReviews(savedPending)
-			} else {
-				// Mock pending reviews
-				setPendingReviews([
-					{
-						id: 'pending-1',
-						workEntryId: 'work-new-1',
-						workTitle: 'New Feature Implementation',
-						workDescription: 'Implemented the new dashboard widget system.',
-						projectId: 'proj-1',
-						projectName: 'Website Redesign',
-						submittedBy: 'John Doe',
-						submittedById: 'user-1',
-						submittedByDepartment: 'Engineering',
-						reviewerId: 'current-user',
-						status: 'pending',
-						submittedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-					},
-					{
-						id: 'pending-2',
-						workEntryId: 'work-new-2',
-						workTitle: 'Data Pipeline Fix',
-						workDescription: 'Fixed the data ingestion issue in the ETL pipeline.',
-						projectId: 'proj-4',
-						projectName: 'Data Analytics Platform',
-						submittedBy: 'Alice Smith',
-						submittedById: 'user-2',
-						submittedByDepartment: 'Engineering',
-						reviewerId: 'current-user',
-						status: 'pending',
-						submittedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString()
-					},
-					{
-						id: 'pending-3',
-						workEntryId: 'work-new-3',
-						workTitle: 'Security Audit Report',
-						workDescription: 'Completed the quarterly security audit report.',
-						projectId: 'proj-6',
-						projectName: 'Infrastructure Modernization',
-						submittedBy: 'Bob Jones',
-						submittedById: 'user-3',
-						submittedByDepartment: 'Security',
-						reviewerId: 'current-user',
-						status: 'pending',
-						submittedAt: new Date(Date.now() - 1000 * 60 * 240).toISOString()
-					}
-				])
-			}
-
-			// Load received reviews
-			const savedReviews = storage.get<any[]>('received_reviews')
-			if (savedReviews && savedReviews.length > 0) {
-				const reviewsWithDates = savedReviews.map((review: any) => ({
-					...review,
-					reviewedAt: new Date(review.reviewedAt),
-				}))
-				setReviews(reviewsWithDates)
-			} else {
-				// Mock received reviews - Enhanced dataset
-				const mockReviews: ReceivedReview[] = [
-					{
-						id: 'review-1',
-						workEntryId: 'work-1',
-						workTitle: 'Implemented User Authentication System',
-						workDescription: 'Completed the comprehensive user authentication module with JWT tokens, OAuth 2.0 integration, multi-factor authentication, and advanced security features including rate limiting and session management.',
-						projectId: 'proj-2',
-						projectName: 'Mobile App Development',
-						reviewType: 'approved',
-						reviewedBy: 'Sarah Chen (Tech Lead)',
-						reviewedByDepartment: 'Engineering',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-						reviewComments: 'Excellent work! 🎉 The authentication implementation is exceptional and follows all security best practices. The code is clean, well-tested, and properly documented.\n\n✅ **Strengths:**\n• Comprehensive test coverage (98%)\n• Advanced security (password hashing, CSRF, XSS protection)\n• Clear API documentation with examples\n• Proper error handling and user feedback\n• OAuth integration (Google, GitHub, LinkedIn)\n• MFA support with backup codes\n• Session management and token refresh\n\n**Performance Metrics:**\n• Login time: 340ms (excellent)\n• Token validation: 12ms (excellent)\n• Memory usage: +2.3MB (acceptable)\n\nApproved for production deployment! This sets a high standard for the team.',
-						isRead: false,
-					},
-					{
-						id: 'review-2',
-						workEntryId: 'work-2',
-						workTitle: 'Dashboard UI/UX Redesign',
-						workDescription: 'Updated the main dashboard with a modern layout, improved data visualization, dark mode support, and responsive design for mobile/tablet devices.',
-						projectId: 'proj-1',
-						projectName: 'Website Redesign',
-						reviewType: 'changes_requested',
-						reviewedBy: 'Mike Johnson (Design Lead)',
-						reviewedByDepartment: 'Design',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
-						reviewComments: 'Good progress on the dashboard redesign! The new layout is much cleaner and more intuitive. However, I have a few important suggestions before we can approve:\n\n📝 **Changes Requested:**\n\n1. **Accessibility Issues (High Priority)**\n   - Color contrast in dark mode needs improvement (currently 3.2:1, need 4.5:1 for WCAG AA)\n   - Missing ARIA labels on interactive elements\n   - Keyboard navigation issues on the chart filters\n\n2. **Responsive Design (Medium Priority)**\n   - Tablet view (768px - 1024px) has layout breaking issues\n   - Charts overflow on mobile landscape mode\n   - Sidebar toggle doesn\'t work on iPad\n\n3. **Loading States (Medium Priority)**\n   - Add skeleton screens for async data\n   - Loading spinners need positioning fix\n   - Empty states need better messaging\n\n4. **Interaction Polish (Low Priority)**\n   - Add hover states for all interactive elements\n   - Smooth transitions on data updates\n   - Tooltip positioning issues on charts\n\nPlease address the High and Medium priority items and resubmit. Happy to review again once updated!',
-						isRead: false,
-					},
-					{
-						id: 'review-3',
-						workEntryId: 'work-3',
-						workTitle: 'API Optimization',
-						workDescription: 'Optimized database queries for the reporting API endpoint, reducing response time by 40%.',
-						projectId: 'proj-3',
-						projectName: 'API Integration',
-						reviewType: 'approved',
-						reviewedBy: 'David Kim (Senior Dev)',
-						reviewedByDepartment: 'Engineering',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-						reviewComments: 'Great job on the query optimization! The response times are much better now.',
-						isRead: true,
-					},
-					{
-						id: 'review-4',
-						workEntryId: 'work-4',
-						workTitle: 'Marketing Landing Page',
-						workDescription: 'Created the new landing page for the Q4 marketing campaign with A/B testing support.',
-						projectId: 'proj-7',
-						projectName: 'Marketing Automation',
-						reviewType: 'approved',
-						reviewedBy: 'Sarah Lee (Marketing Lead)',
-						reviewedByDepartment: 'Marketing',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 48),
-						reviewComments: 'Love the new design! It looks fantastic and the A/B testing setup is exactly what we needed.',
-						isRead: true,
-					},
-					{
-						id: 'review-5',
-						workEntryId: 'work-5',
-						workTitle: 'Customer Portal Analytics',
-						workDescription: 'Implemented the analytics dashboard for the customer portal.',
-						projectId: 'proj-5',
-						projectName: 'Customer Portal V2',
-						reviewType: 'rejected',
-						reviewedBy: 'James Park (Product Manager)',
-						reviewedByDepartment: 'Product',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 72),
-						reviewComments: 'The analytics are not accurate. Please double check the data aggregation logic.',
-						isRead: true,
-					},
-					{
-						id: 'review-6',
-						workEntryId: 'work-6',
-						workTitle: 'Internal Tools Update',
-						workDescription: 'Updated the internal admin tools with new user management features.',
-						projectId: 'proj-6',
-						projectName: 'Infrastructure Modernization',
-						reviewType: 'changes_requested',
-						reviewedBy: 'Alex Chen (DevOps)',
-						reviewedByDepartment: 'Engineering',
-						reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 96),
-						reviewComments: 'Please add audit logs for the user management actions.',
-						isRead: true,
-					}
-				]
-				setReviews(mockReviews)
-			}
-		} catch (error) {
-			console.error('Failed to load data:', error)
-			toast.error('Failed to load reviews')
-		} finally {
-			setLoading(false)
 		}
-	}
+	}, []) // Only run once on mount
 
-	// Handle review action
-	const handleReviewAction = (review: PendingReview, action: 'approve' | 'reject', comment: string) => {
+	useEffect(() => {
+		if (reviews.length > 0) {
+			const parsed = parseReceivedReviewsFromStorage(reviews as any)
+			if (JSON.stringify(parsed) !== JSON.stringify(reviews)) {
+				setReviews(parsed)
+			}
+		}
+	}, []) // Only run once on mount
+
+	// Handle review action - Memoized for performance
+	const handleReviewAction = useCallback((review: PendingReview, action: 'approve' | 'reject', comment: string) => {
+		if (!user) {
+			toast.error('User not authenticated')
+			return
+		}
+
 		// 1. Remove from pending reviews
 		const updatedPending = pendingReviews.filter(r => r.id !== review.id)
 		setPendingReviews(updatedPending)
@@ -274,14 +97,21 @@ export default function WorkReviewPage() {
 		const workEntries = storage.get<any[]>('workEntries') || []
 		const updatedEntries = workEntries.map(entry => 
 			entry.id === review.workEntryId 
-				? { ...entry, status: action === 'approve' ? 'approved' : 'rejected' }
+				? { 
+					...entry, 
+					status: action === 'approve' ? 'approved' : 'rejected',
+					reviewedBy: user.name,
+					reviewedById: user.id,
+					reviewedAt: new Date().toISOString(),
+					reviewComments: comment || (action === 'approve' ? 'Approved.' : 'Rejected.')
+				}
 				: entry
 		)
 		storage.set('workEntries', updatedEntries)
 
 		// 3. Add to received reviews (Notify submitter)
-		const receivedReviews = storage.get<any[]>('received_reviews') || []
-		const newReceivedReview = {
+		const receivedReviews = storage.get<ReceivedReview[]>('received_reviews') || []
+		const newReceivedReview: ReceivedReview = {
 			id: `review-${Date.now()}`,
 			workEntryId: review.workEntryId,
 			workTitle: review.workTitle,
@@ -289,39 +119,50 @@ export default function WorkReviewPage() {
 			projectId: review.projectId,
 			projectName: review.projectName,
 			reviewType: action === 'approve' ? 'approved' : 'rejected',
-			reviewedBy: 'Current User', // In real app, get from auth context
-			reviewedByDepartment: 'Management',
-			reviewedAt: new Date().toISOString(),
+			reviewedBy: user.name,
+			reviewedById: user.id,
+			reviewedByDepartment: user.department,
+			reviewedAt: new Date(),
 			reviewComments: comment || (action === 'approve' ? 'Approved.' : 'Rejected.'),
-			isRead: false
+			isRead: false,
+			tags: review.tags,
+			files: review.files,
+			links: review.links,
+			category: review.category,
+			priority: review.priority,
+			isConfidential: review.isConfidential
 		}
 		storage.set('received_reviews', [newReceivedReview, ...receivedReviews])
 
-		// 4. Send Message
-		const messages = storage.get<any[]>('messages') || []
-		messages.unshift({
-			id: `msg-review-${Date.now()}`,
-			type: 'notification',
-			priority: 'normal',
-			subject: `Work Review: ${action === 'approve' ? 'Approved' : 'Rejected'} - ${review.workTitle}`,
-			from: 'Current User',
-			fromDepartment: 'Management',
-			preview: `Your work "${review.workTitle}" was ${action === 'approve' ? 'approved' : 'rejected'}`,
-			content: `Your work submission "${review.workTitle}" has been ${action === 'approve' ? 'approved' : 'rejected'}.\n\n**Comments:**\n${comment}`,
-			timestamp: new Date(),
-			isRead: false,
-			recipientId: review.submittedById,
-			relatedType: 'work',
-			relatedId: review.workEntryId
+		// 4. Send Message using helper function
+		const message = createReviewCompletionMessage({
+			workEntryId: review.workEntryId,
+			workTitle: review.workTitle,
+			reviewType: action === 'approve' ? 'approved' : 'rejected',
+			reviewerName: user.name,
+			reviewerDepartment: user.department,
+			submitterName: review.submittedBy,
+			submitterId: review.submittedById,
+			reviewComments: comment || (action === 'approve' ? 'Approved.' : 'Rejected.')
 		})
-		storage.set('messages', messages)
+		saveMessage(message)
 
 		toast.success(`Work ${action === 'approve' ? 'Approved' : 'Rejected'}`, {
 			description: `Notification sent to ${review.submittedBy}`
 		})
-	}
+	}, [user, pendingReviews, setPendingReviews])
 
-	// Filter reviews
+	// Mark review as read - Memoized
+	const markAsRead = useCallback((reviewId: string) => {
+		setReviews(prev => {
+			const updated = prev.map(r => 
+				r.id === reviewId ? { ...r, isRead: true } : r
+			)
+			return updated
+		})
+	}, [setReviews])
+
+	// Filter reviews - Using useMemo for better performance
 	useEffect(() => {
 		let filtered = reviews
 
@@ -348,7 +189,7 @@ export default function WorkReviewPage() {
 		setFilteredReviews(filtered)
 	}, [reviews, filterType, filterProject, filterRead])
 
-	// Statistics
+	// Statistics - Memoized for performance
 	const statistics = useMemo(() => {
 		const filtered = filterProject === 'all' 
 			? reviews 
@@ -362,17 +203,6 @@ export default function WorkReviewPage() {
 			rejected: filtered.filter(r => r.reviewType === 'rejected').length,
 		}
 	}, [reviews, filterProject])
-
-	// Mark review as read
-	const markAsRead = (reviewId: string) => {
-		setReviews(prev => {
-			const updated = prev.map(r => 
-				r.id === reviewId ? { ...r, isRead: true } : r
-			)
-			storage.set('received_reviews', updated)
-			return updated
-		})
-	}
 
 	// Toggle expanded review
 	const toggleExpanded = (reviewId: string) => {
@@ -388,13 +218,13 @@ export default function WorkReviewPage() {
 	const getReviewTypeBadge = (type: string) => {
 		switch (type) {
 			case 'approved':
-				return { label: 'Approved', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle2 }
+				return { label: t('common.statuses.approved'), color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle2 }
 			case 'rejected':
-				return { label: 'Rejected', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: XCircle }
+				return { label: t('common.statuses.rejected'), color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: XCircle }
 			case 'changes_requested':
-				return { label: 'Changes Requested', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', icon: AlertCircle }
+				return { label: t('common.statuses.changesRequested'), color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', icon: AlertCircle }
 			default:
-				return { label: 'Unknown', color: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400', icon: MessageSquare }
+				return { label: t('common.status'), color: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400', icon: MessageSquare }
 		}
 	}
 
@@ -402,11 +232,11 @@ export default function WorkReviewPage() {
 	const formatTimeAgo = (date: Date) => {
 		const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
 		
-		if (seconds < 60) return 'Just now'
-		if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-		if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
-		return date.toLocaleDateString()
+		if (seconds < 60) return t('common.time.justNow')
+		if (seconds < 3600) return `${Math.floor(seconds / 60)}${t('common.time.minutes')} ${t('common.time.ago')}`
+		if (seconds < 86400) return `${Math.floor(seconds / 3600)}${t('common.time.hours')} ${t('common.time.ago')}`
+		if (seconds < 604800) return `${Math.floor(seconds / 86400)}${t('common.time.days')} ${t('common.time.ago')}`
+		return date.toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US')
 	}
 
 	if (loading) {
@@ -424,8 +254,8 @@ export default function WorkReviewPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
-				title="Received Reviews"
-				description="View and manage feedback on your work submissions"
+				title={t('review.title')}
+				description={t('review.description')}
 			/>
 			
 				<div className="space-y-6">
@@ -439,7 +269,7 @@ export default function WorkReviewPage() {
 								: 'border-transparent text-neutral-500 hover:text-neutral-300'
 						}`}
 					>
-						To Review ({pendingReviews.length})
+						{t('review.toReview')} ({pendingReviews.length})
 					</button>
 					<button
 						onClick={() => setActiveTab('received')}
@@ -449,7 +279,7 @@ export default function WorkReviewPage() {
 								: 'border-transparent text-neutral-500 hover:text-neutral-300'
 						}`}
 					>
-						My Reviews ({reviews.length})
+						{t('review.myReviews')} ({reviews.length})
 					</button>
 				</div>
 
@@ -461,9 +291,9 @@ export default function WorkReviewPage() {
 									<div className="p-4 rounded-full bg-surface-dark mb-4">
 										<CheckCircle2 className="h-8 w-8 text-neutral-500" />
 									</div>
-									<h3 className="text-lg font-medium text-white mb-2">All Caught Up!</h3>
+									<h3 className="text-lg font-medium text-white mb-2">{t('review.allCaughtUp')}</h3>
 									<p className="text-neutral-500 max-w-md">
-										You have no pending reviews at the moment. Great job keeping up!
+										{t('review.noPending')}
 									</p>
 								</div>
 						) : (
@@ -489,9 +319,92 @@ export default function WorkReviewPage() {
 														<span className="text-neutral-500">• {review.submittedByDepartment}</span>
 													)}
 												</div>
-													<div className="bg-surface-dark p-4 rounded-lg text-sm text-neutral-300 border border-border-dark">
-													{review.workDescription}
-												</div>
+													<div className="bg-surface-dark p-4 rounded-lg text-sm text-neutral-300 border border-border-dark space-y-4">
+														<p>{review.workDescription}</p>
+														
+														{/* Metadata Section */}
+														<div className="flex flex-wrap gap-3 border-t border-border-dark pt-3 mt-3">
+															{/* Priority */}
+															{review.priority && (
+																<span className={`text-[10px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-medium ${
+																	review.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+																	review.priority === 'medium' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+																	'bg-blue-500/10 text-blue-400 border-blue-500/20'
+																}`}>
+																	{t(`common.priorities.${review.priority}`) || review.priority}
+																</span>
+															)}
+															
+															{/* Category */}
+															{review.category && (
+																<span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 border border-neutral-700 uppercase tracking-wider font-medium">
+																	{review.category}
+																</span>
+															)}
+
+															{/* Confidential */}
+															{review.isConfidential && (
+																<span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1 uppercase tracking-wider font-medium">
+																	<Shield className="h-3 w-3" />
+																	{t('input.confidential')}
+																</span>
+															)}
+														</div>
+
+														{/* Tags */}
+														{review.tags && review.tags.length > 0 && (
+															<div className="flex flex-wrap gap-2">
+																{review.tags.map(tag => (
+																	<span key={tag} className="text-xs flex items-center gap-1 text-neutral-400 bg-neutral-800/50 px-2 py-1 rounded">
+																		<Tag className="h-3 w-3" />
+																		{tag}
+																	</span>
+																))}
+															</div>
+														)}
+
+														{/* Files & Links */}
+														{(review.files?.length > 0 || review.links?.length > 0) && (
+															<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+																{review.files && review.files.length > 0 && (
+																	<div className="space-y-2">
+																		<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+																			<Paperclip className="h-3 w-3" /> {t('common.attachments')}
+																		</span>
+																		<div className="space-y-1">
+																			{review.files.map((file, idx) => (
+																				<div key={idx} className="flex items-center gap-2 text-xs text-neutral-300 bg-neutral-800 p-2 rounded border border-neutral-700">
+																					<FileText className="h-3 w-3 text-neutral-500" />
+																					<span className="truncate">{file.name}</span>
+																				</div>
+																			))}
+																		</div>
+																	</div>
+																)}
+																{review.links && review.links.length > 0 && (
+																	<div className="space-y-2">
+																		<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+																			<LinkIcon className="h-3 w-3" /> {t('common.links')}
+																		</span>
+																		<div className="space-y-1">
+																			{review.links.map((link, idx) => (
+																				<a 
+																					key={idx} 
+																					href={link.url}
+																					target="_blank"
+																					rel="noopener noreferrer"
+																					className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 bg-neutral-800 p-2 rounded border border-neutral-700 transition-colors"
+																				>
+																					<LinkIcon className="h-3 w-3" />
+																					<span className="truncate">{link.title}</span>
+																				</a>
+																			))}
+																		</div>
+																	</div>
+																)}
+															</div>
+														)}
+													</div>
 											</div>
 										</div>
 											<div className="mt-6 pt-4 border-t border-border-dark flex gap-3">
@@ -500,14 +413,14 @@ export default function WorkReviewPage() {
 												variant="primary"
 												className="flex-1 h-10"
 											>
-												<CheckCircle2 className="mr-2 h-4 w-4" /> Approve
+												<CheckCircle2 className="mr-2 h-4 w-4" /> {t('review.approved')}
 											</Button>
 											<Button 
 												onClick={() => handleReviewAction(review, 'reject', '')}
 												variant="danger"
 												className="flex-1 h-10"
 											>
-												<XCircle className="mr-2 h-4 w-4" /> Reject
+												<XCircle className="mr-2 h-4 w-4" /> {t('review.rejected')}
 											</Button>
 										</div>
 										</div>
@@ -529,7 +442,7 @@ export default function WorkReviewPage() {
 										<MessageSquare className="h-6 w-6" />
 									</div>
 								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">Total</p>
+										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.total')}</p>
 										<p className="text-xl font-bold text-white">{statistics.total}</p>
 								</div>
 							</div>
@@ -543,7 +456,7 @@ export default function WorkReviewPage() {
 										<Mail className="h-6 w-6" />
 									</div>
 								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">Unread</p>
+										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.unread')}</p>
 										<p className="text-xl font-bold text-white">{statistics.unread}</p>
 								</div>
 							</div>
@@ -557,7 +470,7 @@ export default function WorkReviewPage() {
 										<ThumbsUp className="h-6 w-6" />
 									</div>
 								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">Approved</p>
+										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.approved')}</p>
 										<p className="text-xl font-bold text-white">{statistics.approved}</p>
 								</div>
 							</div>
@@ -571,7 +484,7 @@ export default function WorkReviewPage() {
 										<AlertCircle className="h-6 w-6" />
 									</div>
 								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">Changes</p>
+										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.changes')}</p>
 										<p className="text-xl font-bold text-white">{statistics.changesRequested}</p>
 								</div>
 							</div>
@@ -585,7 +498,7 @@ export default function WorkReviewPage() {
 										<ThumbsDown className="h-6 w-6" />
 									</div>
 								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">Rejected</p>
+										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.rejected')}</p>
 										<p className="text-xl font-bold text-white">{statistics.rejected}</p>
 								</div>
 							</div>
@@ -601,29 +514,29 @@ export default function WorkReviewPage() {
 							
 							{/* Review Type Filter */}
 							<div className="flex items-center gap-2">
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Type:</span>
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.type')}</span>
 								<select
 									value={filterType}
 									onChange={(e) => setFilterType(e.target.value)}
 										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
 								>
-									<option value="all">All Types</option>
-									<option value="approved">Approved</option>
-									<option value="changes_requested">Changes Requested</option>
-									<option value="rejected">Rejected</option>
+									<option value="all">{t('messages.allTypes')}</option>
+									<option value="approved">{t('review.approved')}</option>
+									<option value="changes_requested">{t('review.changes')}</option>
+									<option value="rejected">{t('review.rejected')}</option>
 								</select>
 							</div>
 
 							{/* Project Filter */}
 							<div className="flex items-center gap-2">
 								<FolderKanban className="h-4 w-4 text-neutral-500" />
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Project:</span>
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.project')}</span>
 								<select
 									value={filterProject}
 									onChange={(e) => setFilterProject(e.target.value)}
 										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
 								>
-									<option value="all">All Projects</option>
+									<option value="all">{t('projects.allProjects')}</option>
 									{projects.map((project) => (
 										<option key={project.id} value={project.id}>
 											{project.name}
@@ -635,15 +548,15 @@ export default function WorkReviewPage() {
 							{/* Read Status Filter */}
 							<div className="flex items-center gap-2">
 								<Mail className="h-4 w-4 text-neutral-500" />
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Status:</span>
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.status')}</span>
 								<select
 									value={filterRead}
 									onChange={(e) => setFilterRead(e.target.value)}
 										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
 								>
-									<option value="all">All</option>
-									<option value="unread">Unread</option>
-									<option value="read">Read</option>
+									<option value="all">{t('common.all')}</option>
+									<option value="unread">{t('review.unread')}</option>
+									<option value="read">{t('common.read')}</option>
 								</select>
 							</div>
 						</div>
@@ -656,9 +569,9 @@ export default function WorkReviewPage() {
 							<div className="p-4 rounded-full bg-surface-dark mb-4">
 								<MessageSquare className="h-8 w-8 text-neutral-500" />
 							</div>
-							<h3 className="text-lg font-medium text-white mb-2">No reviews found</h3>
+							<h3 className="text-lg font-medium text-white mb-2">{t('review.noReviews')}</h3>
 							<p className="text-neutral-500 mb-6 max-w-md">
-								You haven't received any reviews matching the selected filters.
+								{t('review.noReviewsDesc')}
 							</p>
 							<Button
 								onClick={() => {
@@ -669,7 +582,7 @@ export default function WorkReviewPage() {
 								variant="outline"
 								className="rounded-full"
 							>
-								View All Reviews
+								{t('review.viewAll')}
 							</Button>
 						</div>
 				) : (
@@ -697,7 +610,7 @@ export default function WorkReviewPage() {
 														{/* Unread Badge */}
 														{!review.isRead && (
 																<span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500 text-white uppercase tracking-wider">
-																NEW
+																{t('common.new')}
 															</span>
 														)}
 														
@@ -767,18 +680,101 @@ export default function WorkReviewPage() {
 													<div>
 															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
 																<FileText className="h-3 w-3" />
-																Original Submission
+																{t('review.originalSubmission')}
 														</h4>
-															<p className="text-sm text-neutral-300 bg-surface-dark p-3 rounded-lg border border-border-dark">
-															{review.workDescription}
-														</p>
+															<div className="text-sm text-neutral-300 bg-surface-dark p-4 rounded-lg border border-border-dark space-y-4">
+															<p>{review.workDescription}</p>
+
+														{/* Metadata Section */}
+															<div className="flex flex-wrap gap-3 border-t border-border-dark pt-3 mt-3">
+																{/* Priority */}
+																{review.priority && (
+																	<span className={`text-[10px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-medium ${
+																		review.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+																		review.priority === 'medium' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+																		'bg-blue-500/10 text-blue-400 border-blue-500/20'
+																	}`}>
+																		{t(`common.priorities.${review.priority}`) || review.priority}
+																	</span>
+																)}
+																
+																{/* Category */}
+																{review.category && (
+																	<span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 border border-neutral-700 uppercase tracking-wider font-medium">
+																		{review.category}
+																	</span>
+																)}
+
+																{/* Confidential */}
+																{review.isConfidential && (
+																	<span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1 uppercase tracking-wider font-medium">
+																		<Shield className="h-3 w-3" />
+																		{t('input.confidential')}
+																	</span>
+																)}
+															</div>
+
+															{/* Tags */}
+															{review.tags && review.tags.length > 0 && (
+																<div className="flex flex-wrap gap-2">
+																	{review.tags.map(tag => (
+																		<span key={tag} className="text-xs flex items-center gap-1 text-neutral-400 bg-neutral-800/50 px-2 py-1 rounded">
+																			<Tag className="h-3 w-3" />
+																			{tag}
+																		</span>
+																	))}
+																</div>
+															)}
+
+															{/* Files & Links */}
+															{(review.files?.length > 0 || review.links?.length > 0) && (
+																<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+																	{review.files && review.files.length > 0 && (
+																		<div className="space-y-2">
+																			<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+																				<Paperclip className="h-3 w-3" /> {t('common.attachments')}
+																			</span>
+																			<div className="space-y-1">
+																				{review.files.map((file, idx) => (
+																					<div key={idx} className="flex items-center gap-2 text-xs text-neutral-300 bg-neutral-800 p-2 rounded border border-neutral-700">
+																						<FileText className="h-3 w-3 text-neutral-500" />
+																						<span className="truncate">{file.name}</span>
+																					</div>
+																				))}
+																			</div>
+																		</div>
+																	)}
+																	{review.links && review.links.length > 0 && (
+																		<div className="space-y-2">
+																			<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+																				<LinkIcon className="h-3 w-3" /> {t('common.links')}
+																			</span>
+																			<div className="space-y-1">
+																				{review.links.map((link, idx) => (
+																					<a 
+																						key={idx} 
+																						href={link.url}
+																						target="_blank"
+																						rel="noopener noreferrer"
+																						className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 bg-neutral-800 p-2 rounded border border-neutral-700 transition-colors"
+																					>
+																						<LinkIcon className="h-3 w-3" />
+																						<span className="truncate">{link.title}</span>
+																					</a>
+																				))}
+																			</div>
+																		</div>
+																	)}
+																</div>
+															)}
+														</div>
 													</div>
 
 													{/* Review Comments */}
 													<div>
 															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
 																<MessageSquare className="h-3 w-3" />
-																Feedback
+																{t('review.feedback')}
 														</h4>
 															<div className={`p-4 rounded-lg border-l-2 bg-surface-dark ${
 															review.reviewType === 'approved' 
@@ -805,7 +801,7 @@ export default function WorkReviewPage() {
 																	className="flex items-center gap-2 h-9"
 															>
 																<FileText className="h-4 w-4" />
-																Update Work
+																{t('review.updateWork')}
 															</Button>
 														)}
 														{review.reviewType === 'rejected' && (
@@ -818,7 +814,7 @@ export default function WorkReviewPage() {
 																	className="flex items-center gap-2 h-9"
 															>
 																<FileText className="h-4 w-4" />
-																Resubmit Work
+																{t('review.resubmit')}
 															</Button>
 														)}
 														<Button
@@ -828,7 +824,7 @@ export default function WorkReviewPage() {
 															}}
 																className="h-9"
 														>
-															View Work History
+															{t('review.viewHistory')}
 														</Button>
 													</div>
 												</div>

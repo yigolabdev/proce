@@ -116,6 +116,20 @@ export interface WorkplaceSettings {
 	}
 }
 
+export interface HistoricalData {
+	id: string
+	projectName: string
+	description: string
+	startDate: string
+	endDate: string
+	outcome: string
+	technologies?: string[]
+	teamSize?: number
+	budget?: string
+	keyLearnings?: string
+	metrics?: Array<{ name: string; value: string }>
+}
+
 // Constants
 export const POSITION_OPTIONS = [
 	'CEO',

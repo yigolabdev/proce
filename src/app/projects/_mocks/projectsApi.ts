@@ -437,6 +437,30 @@ export const mockProjects: Project[] = [
 	},
 ]
 
+export const mockAIProjects = [
+	{
+		id: 'rec-1',
+		title: 'Global Market Expansion Initiative',
+		description: 'Strategic project to enter new international markets based on recent growth metrics.',
+		tags: ['Strategy', 'Expansion'],
+		confidence: 92
+	},
+	{
+		id: 'rec-2',
+		title: 'Customer Experience AI Integration',
+		description: 'Implementation of AI-driven support tools to reduce response times.',
+		tags: ['AI', 'Customer Support'],
+		confidence: 88
+	},
+	{
+		id: 'rec-3',
+		title: 'Internal Knowledge Base Modernization',
+		description: 'Revamping internal documentation systems to improve productivity.',
+		tags: ['Internal', 'Knowledge'],
+		confidence: 85
+	}
+]
+
 /**
  * 프로젝트 목업 데이터를 localStorage에 초기화하는 함수
  */
@@ -504,4 +528,3 @@ export const projectsApi = {
 		await new Promise((resolve) => setTimeout(resolve, 300))
 	},
 }
-

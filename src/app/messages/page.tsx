@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { EmptyState } from '../../components/common/EmptyState'
 import { storage } from '../../utils/storage'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
 	Mail,
 	MailOpen,
@@ -58,6 +59,7 @@ interface Message {
 
 export default function MessagesPage() {
 	const navigate = useNavigate()
+	const { t } = useI18n()
 	
 	// Messages state
 	const [messages, setMessages] = useState<Message[]>([])
@@ -109,7 +111,7 @@ export default function MessagesPage() {
 						summary: 'Urgent bug fix required for payment gateway affecting international customers',
 						estimatedTime: '3-4 hours',
 						deadline: 'Today EOD',
-						recommendation: '우선 처리 추천: 고객 영향도가 높고 마감 시간이 촉박합니다',
+						recommendation: 'Recommended for priority: High customer impact and tight deadline',
 					},
 				},
 				// Work Review - Approved
@@ -133,7 +135,7 @@ export default function MessagesPage() {
 					],
 					aiInsight: {
 						summary: 'Work approved with positive feedback. High quality implementation recognized.',
-						recommendation: '축하합니다! 팀 리더가 당신의 작업을 높이 평가했습니다',
+						recommendation: 'Congratulations! Your team lead highly appreciated your work',
 					},
 				},
 				// Work Review - Changes Requested
@@ -156,9 +158,9 @@ export default function MessagesPage() {
 						{ label: 'Update Work', action: 'update', variant: 'primary' },
 					],
 					aiInsight: {
-						summary: '4가지 수정 사항이 요청되었습니다: 색상 대비, 반응형, 로딩 상태, 호버 효과',
+						summary: '4 changes requested: Color contrast, Responsive, Loading states, Hover effects',
 						estimatedTime: '2-3 hours',
-						recommendation: '수정 후 재제출이 필요합니다',
+						recommendation: 'Resubmission required after changes',
 					},
 				},
 				// New Task Assignment
@@ -182,10 +184,10 @@ export default function MessagesPage() {
 						{ label: 'View Task', action: 'view', variant: 'outline' },
 					],
 					aiInsight: {
-						summary: 'API 문서 업데이트 작업 - 새로운 v2.0 엔드포인트 문서화',
+						summary: 'API Documentation Update - New v2.0 endpoints documentation',
 						estimatedTime: '4-5 hours',
 						deadline: 'End of week',
-						recommendation: '이번 주 내 완료 가능한 작업량입니다',
+						recommendation: 'Feasible to complete within this week',
 					},
 				},
 				// Project Update
@@ -207,7 +209,7 @@ export default function MessagesPage() {
 						{ label: 'View Project', action: 'view', variant: 'outline' },
 					],
 					aiInsight: {
-						summary: 'Mobile App 프로젝트가 절반 완료되었습니다. 순조롭게 진행 중',
+						summary: 'Mobile App project 50% complete. Progressing smoothly.',
 					},
 				},
 				// Team Message
@@ -229,7 +231,7 @@ export default function MessagesPage() {
 						{ label: 'Volunteer', action: 'accept', variant: 'secondary' },
 					],
 					aiInsight: {
-						summary: 'Marketing 팀이 기술 지원 요청 - 랜딩 페이지 최적화 및 분석',
+						summary: 'Marketing team requests tech support - Landing page optimization & analytics',
 						estimatedTime: '6-8 hours total',
 					},
 				},
@@ -253,8 +255,8 @@ export default function MessagesPage() {
 						{ label: 'Request Info', action: 'reply', variant: 'secondary' },
 					],
 					aiInsight: {
-						summary: '3일 휴가 신청 - 남은 휴가 8일, 업무 인수인계 완료',
-						recommendation: '팀 업무량 정상, 승인 가능',
+						summary: '3-day leave request - 8 days remaining, work handover complete',
+						recommendation: 'Team workload normal, approval recommended',
 					},
 				},
 			]
@@ -285,7 +287,7 @@ export default function MessagesPage() {
 			storage.set('messages', updated)
 			return updated
 		})
-		toast.success('Message deleted')
+		toast.success(t('messages.messageDeleted'))
 		if (selectedMessage?.id === id) {
 			setSelectedMessage(null)
 		}
@@ -300,7 +302,7 @@ export default function MessagesPage() {
 		// Check the new state to determine message
 		const msg = messages.find(m => m.id === id)
 		const isNowArchived = !msg?.isArchived // Predict new state
-		toast.success(isNowArchived ? 'Message archived' : 'Message restored')
+		toast.success(isNowArchived ? t('messages.messageArchived') : t('messages.messageRestored'))
 		
 		if (selectedMessage?.id === id) {
 			setSelectedMessage(null)
@@ -318,12 +320,24 @@ export default function MessagesPage() {
 		setSelectedMessage(null)
 	}
 
+	const getQuickActionLabel = (action: string) => {
+		switch (action) {
+			case 'accept': return t('messages.acceptTask')
+			case 'view': return t('messages.viewDetails')
+			case 'reply': return t('messages.askQuestion')
+			case 'update': return t('messages.updateWork')
+			case 'approve': return t('messages.approve')
+			case 'decline': return t('messages.decline')
+			default: return action
+		}
+	}
+
 	const handleQuickAction = (action: string) => {
 		if (!selectedMessage) return
 
 		switch (action) {
 			case 'accept':
-				toast.success('Task accepted!')
+				toast.success(t('messages.taskAccepted'))
 				if (selectedMessage.relatedPage) {
 					navigate(selectedMessage.relatedPage)
 				}
@@ -335,17 +349,17 @@ export default function MessagesPage() {
 				break
 			case 'update':
 				navigate('/app/input')
-				toast.info('Redirecting to update work...')
+				toast.info(t('messages.redirectingToUpdateWork'))
 				break
 			case 'reply':
-				toast.info('Reply feature coming soon!')
+				toast.info(t('messages.replyFeatureComingSoon'))
 				break
 			case 'approve':
-				toast.success('Approved!')
+				toast.success(t('messages.approved'))
 				handleArchive(selectedMessage.id)
 				break
 			case 'decline':
-				toast.info('Declined')
+				toast.info(t('messages.declined'))
 				handleArchive(selectedMessage.id)
 				break
 			default:
@@ -372,15 +386,15 @@ export default function MessagesPage() {
 	const getTypeLabel = (type: Message['type']) => {
 		switch (type) {
 			case 'task_assigned':
-				return 'Task'
+				return t('messages.taskAssigned')
 			case 'review_received':
-				return 'Review'
+				return t('messages.reviewReceived')
 			case 'project_update':
-				return 'Project'
+				return t('messages.projectUpdate')
 			case 'team_message':
-				return 'Team'
+				return t('messages.teamMessage')
 			case 'approval_request':
-				return 'Approval'
+				return t('messages.approvalRequest')
 		}
 	}
 
@@ -433,12 +447,12 @@ export default function MessagesPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
-				title="Messages"
-					description="Inbox for your tasks, reviews, and notifications"
+				title={t('messages.title')}
+				description={t('messages.description')}
 				actions={
-						<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-white">
+					<Button variant="outline" size="sm" onClick={loadMessages} className="flex items-center gap-2 border-border-dark hover:bg-border-dark text-white">
 						<RefreshCw className="h-4 w-4" />
-						<span className="hidden sm:inline">Refresh</span>
+						<span className="hidden sm:inline">{t('messages.refresh')}</span>
 					</Button>
 				}
 			/>
@@ -447,10 +461,10 @@ export default function MessagesPage() {
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-5 flex items-center justify-between">
-								<div>
-								<p className="text-sm text-neutral-400 font-medium mb-1">Unread</p>
+							<div>
+								<p className="text-sm text-neutral-400 font-medium mb-1">{t('messages.unread')}</p>
 								<p className="text-2xl font-bold text-white">{stats.unread}</p>
-								</div>
+							</div>
 							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
 								<Mail className="h-5 w-5" />
 							</div>
@@ -459,10 +473,10 @@ export default function MessagesPage() {
 
 					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-5 flex items-center justify-between">
-								<div>
-								<p className="text-sm text-neutral-400 font-medium mb-1">Urgent</p>
+							<div>
+								<p className="text-sm text-neutral-400 font-medium mb-1">{t('messages.urgent')}</p>
 								<p className="text-2xl font-bold text-white">{stats.urgent}</p>
-								</div>
+							</div>
 							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
 								<Zap className="h-5 w-5" />
 							</div>
@@ -471,10 +485,10 @@ export default function MessagesPage() {
 
 					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-5 flex items-center justify-between">
-								<div>
-								<p className="text-sm text-neutral-400 font-medium mb-1">Tasks</p>
+							<div>
+								<p className="text-sm text-neutral-400 font-medium mb-1">{t('messages.tasks')}</p>
 								<p className="text-2xl font-bold text-white">{stats.tasks}</p>
-								</div>
+							</div>
 							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
 								<CheckCircle2 className="h-5 w-5" />
 							</div>
@@ -483,10 +497,10 @@ export default function MessagesPage() {
 
 					<Card className="bg-surface-dark border-border-dark">
 						<CardContent className="p-5 flex items-center justify-between">
-								<div>
-								<p className="text-sm text-neutral-400 font-medium mb-1">Reviews</p>
+							<div>
+								<p className="text-sm text-neutral-400 font-medium mb-1">{t('messages.reviews')}</p>
 								<p className="text-2xl font-bold text-white">{stats.reviews}</p>
-								</div>
+							</div>
 							<div className="p-3 rounded-xl bg-neutral-800 text-neutral-400">
 								<MessageSquare className="h-5 w-5" />
 							</div>
@@ -500,7 +514,7 @@ export default function MessagesPage() {
 						<div className="flex flex-col sm:flex-row gap-4">
 							{/* Status Filter */}
 							<div className="flex items-center gap-2 flex-wrap">
-								<span className="text-sm font-medium text-neutral-400">Status:</span>
+								<span className="text-sm font-medium text-neutral-400">{t('messages.status')}</span>
 								<button
 									onClick={() => setFilter('all')}
 									className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
@@ -509,7 +523,7 @@ export default function MessagesPage() {
 											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									All ({messages.filter(m => !m.isArchived).length})
+									{t('messages.all')} ({messages.filter(m => !m.isArchived).length})
 								</button>
 								<button
 									onClick={() => setFilter('unread')}
@@ -519,7 +533,7 @@ export default function MessagesPage() {
 											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									Unread ({stats.unread})
+									{t('messages.unread')} ({stats.unread})
 								</button>
 								<button
 									onClick={() => setFilter('starred')}
@@ -529,7 +543,7 @@ export default function MessagesPage() {
 											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									Starred ({messages.filter((m) => m.isStarred && !m.isArchived).length})
+									{t('messages.starred')} ({messages.filter((m) => m.isStarred && !m.isArchived).length})
 								</button>
 								<button
 									onClick={() => setFilter('archived')}
@@ -539,24 +553,24 @@ export default function MessagesPage() {
 											: 'bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800'
 									}`}
 								>
-									Archived ({stats.archived})
+									{t('messages.archived')} ({stats.archived})
 								</button>
 							</div>
 
 							{/* Type Filter */}
 							<div className="flex items-center gap-2 flex-wrap">
-								<span className="text-sm font-medium text-neutral-400">Type:</span>
+								<span className="text-sm font-medium text-neutral-400">{t('messages.type')}</span>
 								<select
 									value={typeFilter}
 									onChange={(e) => setTypeFilter(e.target.value)}
 									className="px-3 py-1.5 text-sm border border-border-dark rounded-lg bg-[#1a1a1a] text-white focus:outline-none focus:border-neutral-700"
 								>
-									<option value="all">All Types</option>
-									<option value="task_assigned">Tasks</option>
-									<option value="review_received">Reviews</option>
-									<option value="project_update">Projects</option>
+									<option value="all">{t('messages.all')}</option>
+									<option value="task_assigned">{t('messages.tasks')}</option>
+									<option value="review_received">{t('messages.reviews')}</option>
+									<option value="project_update">{t('common.project')}</option>
 									<option value="team_message">Team</option>
-									<option value="approval_request">Approvals</option>
+									<option value="approval_request">Approval</option>
 								</select>
 							</div>
 						</div>
@@ -569,16 +583,16 @@ export default function MessagesPage() {
 						<EmptyState
 							icon={filter === 'archived' ? <Archive className="h-12 w-12 text-neutral-600" /> : <Mail className="h-12 w-12 text-neutral-600" />}
 							title={
-								filter === 'unread' ? 'No Unread Messages' : 
-								filter === 'starred' ? 'No Starred Messages' : 
-								filter === 'archived' ? 'No Archived Messages' :
-								'No Messages'
+								filter === 'unread' ? t('messages.noMessages') : 
+								filter === 'starred' ? t('messages.noMessages') : 
+								filter === 'archived' ? t('messages.noMessages') :
+								t('messages.noMessages')
 							}
 							description={
-								filter === 'all' ? "You're all caught up! New notifications will appear here." :
-								filter === 'unread' ? "You've read all your messages. Great job! 👏" :
-								filter === 'archived' ? "Messages you archive will appear here for safekeeping." :
-								"Mark important messages with a star to find them easily later."
+								filter === 'all' ? t('messages.allCaughtUp') :
+								filter === 'unread' ? t('messages.allCaughtUp') :
+								filter === 'archived' ? t('messages.allCaughtUp') :
+								t('messages.allCaughtUp')
 							}
 						/>
 					) : (
@@ -643,7 +657,7 @@ export default function MessagesPage() {
 														</span>
 														{message.aiInsight?.deadline && !message.isRead && (
 															<span className="text-xs px-2 py-0.5 bg-red-900/30 text-red-400 border border-red-900/30 rounded">
-																Due {message.aiInsight.deadline}
+																{t('messages.deadline')} {message.aiInsight.deadline}
 															</span>
 														)}
 													</div>
@@ -660,7 +674,7 @@ export default function MessagesPage() {
 															className="h-7 text-xs border-border-dark hover:bg-border-dark text-neutral-300"
 														>
 															<MailOpen className="h-3 w-3 mr-1" />
-															Read
+															{t('messages.markRead')}
 														</Button>
 													)}
 													<button
@@ -683,7 +697,7 @@ export default function MessagesPage() {
 															handleArchive(message.id)
 														}}
 														className="p-1.5 rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-border-dark transition-colors"
-														title={message.isArchived ? "Restore" : "Archive"}
+														title={message.isArchived ? t('messages.restore') : t('messages.archived')}
 													>
 														{message.isArchived ? (
 															<ArchiveRestore className="h-4 w-4" />
@@ -697,7 +711,7 @@ export default function MessagesPage() {
 															handleDeleteMessage(message.id)
 														}}
 														className="p-1.5 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-border-dark transition-colors"
-														title="Delete"
+														title={t('messages.delete')}
 													>
 														<Trash2 className="h-4 w-4" />
 													</button>
@@ -726,7 +740,7 @@ export default function MessagesPage() {
 											</span>
 											{selectedMessage.priority === 'urgent' && (
 												<span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-900/30 text-red-400 border border-red-900/30">
-													URGENT
+													{t('messages.urgent').toUpperCase()}
 												</span>
 											)}
 										</div>
@@ -761,7 +775,7 @@ export default function MessagesPage() {
 											<Sparkles className="h-5 w-5 text-neutral-400 shrink-0 mt-0.5" />
 											<div className="flex-1 space-y-3">
 												<h3 className="font-bold text-neutral-200">
-													AI Insight & Recommendation
+													{t('messages.aiInsight')}
 												</h3>
 												<p className="text-sm text-neutral-300 leading-relaxed">
 													{selectedMessage.aiInsight.summary}
@@ -771,7 +785,7 @@ export default function MessagesPage() {
 														<div className="flex items-center gap-2 text-xs px-2 py-1 bg-surface-dark rounded-md border border-border-dark">
 															<Clock className="h-3 w-3 text-neutral-400" />
 															<span className="text-neutral-300">
-																Est. Time: {selectedMessage.aiInsight.estimatedTime}
+																{t('messages.estTime')}: {selectedMessage.aiInsight.estimatedTime}
 															</span>
 														</div>
 													)}
@@ -779,7 +793,7 @@ export default function MessagesPage() {
 														<div className="flex items-center gap-2 text-xs px-2 py-1 bg-surface-dark rounded-md border border-border-dark">
 															<AlertCircle className="h-3 w-3 text-red-400" />
 															<span className="text-neutral-300">
-																Deadline: {selectedMessage.aiInsight.deadline}
+																{t('messages.deadline')}: {selectedMessage.aiInsight.deadline}
 															</span>
 														</div>
 													)}
@@ -798,7 +812,7 @@ export default function MessagesPage() {
 								<div>
 									<h3 className="font-bold mb-3 flex items-center gap-2 text-neutral-300">
 										<Mail className="h-4 w-4 text-neutral-500" />
-										Message Content
+										{t('messages.messageContent')}
 									</h3>
 									<div className="p-6 bg-surface-dark rounded-2xl border border-border-dark whitespace-pre-wrap text-sm text-neutral-300 leading-relaxed">
 										{selectedMessage.content}
@@ -830,7 +844,7 @@ export default function MessagesPage() {
 												handleArchive(selectedMessage.id)
 											}}
 											className="p-2 rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-border-dark transition-colors"
-											title={selectedMessage.isArchived ? "Restore" : "Archive"}
+											title={selectedMessage.isArchived ? t('messages.restore') : t('messages.archived')}
 										>
 											{selectedMessage.isArchived ? (
 												<ArchiveRestore className="h-5 w-5" />
@@ -844,14 +858,14 @@ export default function MessagesPage() {
 												handleDeleteMessage(selectedMessage.id)
 											}}
 											className="p-2 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-border-dark transition-colors"
-											title="Delete"
+											title={t('messages.delete')}
 										>
 											<Trash2 className="h-5 w-5" />
 										</button>
 									</div>
 									<div className="flex items-center gap-2 flex-wrap">
 										<Button variant="outline" onClick={handleCloseMessage} className="border-border-dark hover:bg-border-dark text-white">
-											Close
+											{t('messages.close')}
 										</Button>
 										{selectedMessage.quickActions?.map((qa, idx) => (
 											<Button
@@ -859,7 +873,7 @@ export default function MessagesPage() {
 												variant={qa.variant === 'primary' ? 'brand' : 'outline'}
 												onClick={() => handleQuickAction(qa.action)}
 											>
-												{qa.label}
+												{getQuickActionLabel(qa.action) || qa.label}
 											</Button>
 										))}
 									</div>

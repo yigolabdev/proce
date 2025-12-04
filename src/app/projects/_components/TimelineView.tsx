@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
+import { useI18n } from '../../../i18n/I18nProvider'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import { Calendar, ChevronLeft, ChevronRight, Users, Clock } from 'lucide-react'
 import type { Project } from '../../../types/common.types'
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, isWithinInterval, differenceInDays } from 'date-fns'
+import { ko as koLocale, enUS as enLocale } from 'date-fns/locale'
 
 interface TimelineViewProps {
 	projects: Project[]
@@ -11,8 +13,10 @@ interface TimelineViewProps {
 }
 
 export default function TimelineView({ projects, onProjectClick }: TimelineViewProps) {
+	const { t, locale } = useI18n()
 	const [currentMonth, setCurrentMonth] = useState(new Date())
 	const [viewMode, setViewMode] = useState<'month' | 'quarter' | 'year'>('quarter')
+	const dateLocale = locale === 'ko' ? koLocale : enLocale
 
 	// Calculate date range based on view mode
 	const dateRange = useMemo(() => {
@@ -87,7 +91,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 						<div className="flex items-center gap-4">
 							<h3 className="text-lg font-bold flex items-center gap-2 text-white">
 								<Calendar className="h-5 w-5 text-orange-500" />
-								Project Timeline
+								{t('projectsPage.timeline')}
 							</h3>
 							<div className="flex items-center gap-2">
 								<Button
@@ -104,7 +108,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									size="sm"
 									className="border-border-dark hover:bg-border-dark text-white"
 								>
-									Today
+									{t('rhythm.today')}
 								</Button>
 								<Button
 									onClick={handleNextPeriod}
@@ -115,7 +119,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									<ChevronRight className="h-4 w-4" />
 								</Button>
 								<span className="text-sm font-medium ml-2 text-neutral-300">
-									{format(dateRange.start, 'MMM yyyy')} - {format(dateRange.end, 'MMM yyyy')}
+									{format(dateRange.start, 'MMM yyyy', { locale: dateLocale })} - {format(dateRange.end, 'MMM yyyy', { locale: dateLocale })}
 								</span>
 							</div>
 						</div>
@@ -168,7 +172,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 												key={idx}
 												className="flex-1 text-xs font-medium text-neutral-400 text-center border-r border-neutral-800 last:border-r-0"
 											>
-												{format(monthDate, 'MMM yyyy')}
+												{format(monthDate, 'MMM yyyy', { locale: dateLocale })}
 											</div>
 										)
 									})}
@@ -184,7 +188,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 									}}
 								>
 									<div className="absolute -top-2 -left-8 text-xs font-medium text-red-500">
-										Today
+										{t('rhythm.today')}
 									</div>
 								</div>
 							)}
@@ -240,7 +244,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 														{/* Hover info */}
 														<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 															<div className="bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-																{format(new Date(project.startDate), 'MMM d')} - {format(new Date(project.endDate), 'MMM d, yyyy')}
+																{format(new Date(project.startDate), 'MMM d', { locale: dateLocale })} - {format(new Date(project.endDate), 'MMM d, yyyy', { locale: dateLocale })}
 															</div>
 														</div>
 													</div>
@@ -292,19 +296,19 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 					<div className="flex items-center gap-6 text-xs text-neutral-400">
 						<div className="flex items-center gap-2">
 							<div className="w-4 h-4 rounded bg-blue-500" />
-							<span>Active</span>
+							<span>{t('projectsPage.active')}</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-4 h-4 rounded bg-green-500" />
-							<span>Completed</span>
+							<span>{t('projectsPage.completed')}</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-4 h-4 rounded bg-yellow-500" />
-							<span>Planning</span>
+							<span>{t('projectsPage.planning')}</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-4 h-4 rounded bg-orange-500" />
-							<span>On Hold</span>
+							<span>{t('projectsPage.onHold')}</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-2 h-2 rounded-full bg-orange-500" />
@@ -312,7 +316,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-0.5 h-4 bg-red-500" />
-							<span>Today</span>
+							<span>{t('rhythm.today')}</span>
 						</div>
 					</div>
 				</CardContent>

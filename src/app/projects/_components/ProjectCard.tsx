@@ -6,6 +6,7 @@
  */
 
 import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../../../i18n/I18nProvider'
 import { Card, CardHeader, CardContent } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
 import {
@@ -37,17 +38,18 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project, workEntriesCount = 0, latestWorkEntry }: ProjectCardProps) {
 	const navigate = useNavigate()
+	const { t, locale } = useI18n()
 
 	const formatTimeAgo = (date: Date | string) => {
 		const d = toDate(date)
 		if (!d) return 'Unknown'
 		const seconds = Math.floor((new Date().getTime() - d.getTime()) / 1000)
 		
-		if (seconds < 60) return 'Just now'
-		if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-		if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-		if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
-		return d.toLocaleDateString()
+		if (seconds < 60) return t('workReview.justNow')
+		if (seconds < 3600) return `${Math.floor(seconds / 60)}${t('workReview.minutesAgo')}`
+		if (seconds < 86400) return `${Math.floor(seconds / 3600)}${t('workReview.hoursAgo')}`
+		if (seconds < 604800) return `${Math.floor(seconds / 86400)}${t('workReview.daysAgo')}`
+		return d.toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US')
 	}
 
 	const getStatusBadge = (status: string) => {
@@ -55,27 +57,27 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 			completed: {
 				icon: CheckCircle2,
 				className: 'bg-green-500/10 text-green-400 border border-green-500/20',
-				label: 'Completed',
+				label: t('projectsPage.completed'),
 			},
 			active: {
 				icon: Clock,
 				className: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-				label: 'Active',
+				label: t('projectsPage.active'),
 			},
 			planning: {
 				icon: AlertCircle,
 				className: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
-				label: 'Planning',
+				label: t('projectsPage.planning'),
 			},
 			'on-hold': {
 				icon: AlertCircle,
 				className: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
-				label: 'On Hold',
+				label: t('projectsPage.onHold'),
 			},
 			cancelled: {
 				icon: AlertCircle,
 				className: 'bg-red-500/10 text-red-400 border border-red-500/20',
-				label: 'Cancelled',
+				label: t('projectsPage.cancelled'),
 			},
 		}
 
@@ -92,7 +94,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 
 	const formatDate = (date: Date | string) => {
 		const d = typeof date === 'string' ? new Date(date) : date
-		return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+		return d.toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 	}
 
 	const getDepartmentsList = () => {
@@ -135,7 +137,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 					{/* Progress Bar */}
 					<div>
 						<div className="flex items-center justify-between text-sm mb-2">
-							<span className="text-neutral-400">Progress</span>
+							<span className="text-neutral-400">{t('input.taskProgress').split(' ')[1]}</span>
 							<span className="font-semibold text-white">{project.progress}%</span>
 						</div>
 						<div className="w-full bg-neutral-800 rounded-full h-2">
@@ -223,7 +225,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 							{workEntriesCount > 0 && (
 								<div className="flex items-center gap-1.5">
 									<Clock className="h-4 w-4" />
-									<span>{workEntriesCount} entries</span>
+									<span>{workEntriesCount} {t('projectsPage.entries')}</span>
 								</div>
 							)}
 						</div>
@@ -234,7 +236,7 @@ export default function ProjectCard({ project, workEntriesCount = 0, latestWorkE
 						onClick={() => navigate(`/app/projects/${project.id}`)}
 						className="border-border-dark hover:bg-border-dark text-neutral-300 hover:text-white transition-colors"
 					>
-						<span>View Details</span>
+						<span>{t('rhythm.viewDetails')}</span>
 						<ArrowRight className="h-4 w-4 ml-1" />
 					</Button>
 					</div>

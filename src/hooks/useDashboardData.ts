@@ -2,11 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { storage } from '../utils/storage'
 import { useAuth } from '../context/AuthContext'
 import { parseWorkEntriesFromStorage } from '../utils/mappers'
-import { toDate } from '../utils/dateUtils'
+import { toDate, formatLocalDate } from '../utils/dateUtils'
 import type { WorkEntry } from '../types/common.types'
+import type { DashboardStats, PerformanceDataPoint } from '../types/dashboard.types'
+import { useI18n } from '../i18n/I18nProvider'
 
 export function useDashboardData() {
 	const { user } = useAuth()
+	const { locale } = useI18n()
 	const currentUserId = user?.id || ''
 	
 	const [loading, setLoading] = useState(true)
@@ -53,7 +56,7 @@ export function useDashboardData() {
 		loadData()
 	}, [])
 
-	const personalStats = useMemo(() => {
+	const personalStats = useMemo<DashboardStats>(() => {
 		const myEntries = workEntries.filter(e => e.submittedById === currentUserId)
 		
 		const totalHours = myEntries.reduce((sum, entry) => {
@@ -92,8 +95,8 @@ export function useDashboardData() {
 			.slice(0, 3)
 	}, [workEntries, currentUserId])
 
-	const performanceData = useMemo(() => {
-		const days = []
+	const performanceData = useMemo<PerformanceDataPoint[]>(() => {
+		const days: PerformanceDataPoint[] = []
 		for (let i = 6; i >= 0; i--) {
 			const date = new Date()
 			date.setDate(date.getDate() - i)
@@ -109,13 +112,13 @@ export function useDashboardData() {
 			}, 0)
 
 			days.push({
-				name: date.toLocaleDateString('en-US', { weekday: 'short' }),
+				name: formatLocalDate(date, locale, { weekday: 'short' }),
 				hours: hours,
 				focus: hours > 4 ? 'High' : 'Normal'
 			})
 		}
 		return days
-	}, [workEntries, currentUserId])
+	}, [workEntries, currentUserId, locale])
 
 	return {
 		loading,

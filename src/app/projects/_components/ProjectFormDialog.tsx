@@ -6,6 +6,7 @@
  */
 
 import { useState, useRef } from 'react'
+import { useI18n } from '../../../i18n/I18nProvider'
 import { Button } from '../../../components/ui/Button'
 import Input from '../../../components/ui/Input'
 import Textarea from '../../../components/ui/Textarea'
@@ -48,6 +49,7 @@ export default function ProjectFormDialog({
 	onSubmit,
 	availableDepartments,
 }: ProjectFormDialogProps) {
+	const { t } = useI18n()
 	// Form states
 	const [projectName, setProjectName] = useState('')
 	const [projectDescription, setProjectDescription] = useState('')
@@ -219,7 +221,7 @@ export default function ProjectFormDialog({
 			<div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-3xl my-8">
 				<div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 p-6 rounded-t-3xl z-10">
 					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-bold">Create New Project</h2>
+						<h2 className="text-2xl font-bold">{t('projectsPage.createProject')}</h2>
 						<button
 							onClick={() => {
 								resetForm()
@@ -237,21 +239,21 @@ export default function ProjectFormDialog({
 					<div className="space-y-4">
 						<div>
 							<label className="block text-sm font-medium mb-2">
-								Project Name <span className="text-red-500">*</span>
+								{t('input.projectLabel')} <span className="text-red-500">*</span>
 							</label>
 							<Input
 								value={projectName}
 								onChange={(e) => setProjectName(e.target.value)}
-								placeholder="Enter project name"
+								placeholder={t('input.projectLabel')}
 							/>
 						</div>
 
 						<div>
-							<label className="block text-sm font-medium mb-2">Description</label>
+							<label className="block text-sm font-medium mb-2">{t('input.descriptionLabel')}</label>
 							<Textarea
 								value={projectDescription}
 								onChange={(e) => setProjectDescription(e.target.value)}
-								placeholder="Describe the project goals and scope"
+								placeholder={t('input.descriptionPlaceholder')}
 								rows={3}
 							/>
 						</div>
@@ -261,7 +263,7 @@ export default function ProjectFormDialog({
 					<div>
 						<label className="block text-sm font-medium mb-2">
 							<Building2 className="inline h-4 w-4 mr-1" />
-							Departments
+							{t('input.department')}
 						</label>
 						<div className="flex gap-2 mb-3">
 							<select
@@ -269,7 +271,7 @@ export default function ProjectFormDialog({
 								onChange={(e) => setSelectedDept(e.target.value)}
 								className="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
 							>
-								<option value="">Select Department</option>
+								<option value="">{t('aiRecommendations.selectDepartment')}</option>
 								{availableDepartments.map((dept) => (
 									<option key={dept.id} value={dept.id}>
 										{dept.name}
@@ -278,7 +280,7 @@ export default function ProjectFormDialog({
 							</select>
 							<Button onClick={handleAddDepartment} size="sm">
 								<Plus className="h-4 w-4 mr-1" />
-								Add
+								{t('common.add')}
 							</Button>
 						</div>
 						{projectDepartments.length > 0 && (
@@ -306,19 +308,19 @@ export default function ProjectFormDialog({
 					<div>
 						<label className="block text-sm font-medium mb-2">
 							<Target className="inline h-4 w-4 mr-1" />
-							Project Objectives
+							{t('aiRecommendations.expectedOutcome')}
 						</label>
 						<div className="flex gap-2 mb-3">
 							<Input
 								value={objectiveInput}
 								onChange={(e) => setObjectiveInput(e.target.value)}
 								onKeyPress={(e) => e.key === 'Enter' && handleAddObjective()}
-								placeholder="Add an objective"
+								placeholder={t('aiRecommendations.expectedOutcome')}
 								className="flex-1"
 							/>
 							<Button onClick={handleAddObjective} size="sm">
 								<Plus className="h-4 w-4 mr-1" />
-								Add
+								{t('common.add')}
 							</Button>
 						</div>
 						{projectObjectives.length > 0 && (
@@ -359,7 +361,7 @@ export default function ProjectFormDialog({
 						<div>
 							<label className="block text-sm font-medium mb-2">
 								<Calendar className="inline h-4 w-4 mr-1" />
-								End Date <span className="text-red-500">*</span>
+								{t('aiRecommendations.deadline')} <span className="text-red-500">*</span>
 							</label>
 							<input
 								type="date"
@@ -375,8 +377,8 @@ export default function ProjectFormDialog({
 					<div>
 						<label className="block text-sm font-medium mb-2">
 							<Upload className="inline h-4 w-4 mr-1" />
-							File Attachments
-							<span className="text-xs font-normal text-neutral-500 ml-2">Optional</span>
+							{t('input.fileAttachments')}
+							<span className="text-xs font-normal text-neutral-500 ml-2">{t('common.optional')}</span>
 						</label>
 						<div
 							className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${
@@ -397,14 +399,14 @@ export default function ProjectFormDialog({
 							/>
 							<Upload className="h-12 w-12 mx-auto mb-3 text-neutral-400" />
 							<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-								Drag and drop files here, or click to select
+								{t('input.dragDropInfo')}
 							</p>
 							<Button
 								variant="outline"
 								size="sm"
 								onClick={() => fileInputRef.current?.click()}
 							>
-								Choose Files
+								{t('input.browseFiles')}
 							</Button>
 						</div>
 
@@ -438,8 +440,8 @@ export default function ProjectFormDialog({
 					<div>
 						<label className="block text-sm font-medium mb-2">
 							<Link2 className="inline h-4 w-4 mr-1" />
-							Related Links
-							<span className="text-xs font-normal text-neutral-500 ml-2">Optional</span>
+							{t('input.linksConnections')}
+							<span className="text-xs font-normal text-neutral-500 ml-2">{t('common.optional')}</span>
 						</label>
 						<div className="flex gap-2 mb-3">
 							<Input
@@ -447,12 +449,12 @@ export default function ProjectFormDialog({
 								value={linkInput}
 								onChange={(e) => setLinkInput(e.target.value)}
 								onKeyPress={(e) => e.key === 'Enter' && handleAddLink()}
-								placeholder="https://example.com"
+								placeholder={t('input.addLinkPlaceholder')}
 								className="flex-1"
 							/>
 							<Button onClick={handleAddLink} size="sm">
 								<Plus className="h-4 w-4 mr-1" />
-								Add
+								{t('common.add')}
 							</Button>
 						</div>
 
@@ -497,14 +499,14 @@ export default function ProjectFormDialog({
 							variant="outline"
 							className="flex-1"
 						>
-							Cancel
+							{t('common.cancel')}
 						</Button>
 						<Button
 							onClick={handleSubmit}
 							disabled={!projectName || !startDate || !endDate}
 							className="flex-1"
 						>
-							Create Project
+							{t('projectsPage.createProject')}
 						</Button>
 					</div>
 				</div>

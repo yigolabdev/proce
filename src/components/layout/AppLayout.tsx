@@ -6,6 +6,8 @@ import type { UserRole } from '../../types/auth.types'
 import { useState, useEffect, Fragment } from 'react'
 import { storage } from '../../utils/storage'
 import { Clock } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
+import { LanguageSwitcher } from '../common/LanguageSwitcher'
 
 interface MenuItem {
 	to: string
@@ -17,6 +19,7 @@ interface MenuItem {
 
 export default function AppLayout() {
 	const { user } = useAuth()
+	const { t } = useI18n()
 	const [unreadMessages, setUnreadMessages] = useState(0)
 	const [unreadReviews, setUnreadReviews] = useState(0)
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -81,33 +84,33 @@ export default function AppLayout() {
 	// Menu definition by role
 	const menuGroups = [
 	{
-		title: 'Work',
+		title: t('menu.work'),
 		roles: ['user', 'admin', 'executive'] as UserRole[],
 		items: [
-			{ to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/rhythm', label: 'Work Rhythm', icon: Clock, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/input', label: 'Work Input', icon: FileText, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/messages', label: 'Messages', icon: Mail, roles: ['user', 'admin', 'executive'], badge: unreadMessages },
-			{ to: '/app/ai-recommendations', label: 'AI Suggestions', icon: Sparkles, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/work-history', label: 'Work History', icon: History, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/work-review', label: 'Work Review', icon: CheckCircle2, roles: ['user', 'admin', 'executive'], badge: unreadReviews },
-			{ to: '/app/projects', label: 'Projects', icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/dashboard', label: t('menu.dashboard'), icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/rhythm', label: t('menu.workRhythm'), icon: Clock, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/input', label: t('menu.workInput'), icon: FileText, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/messages', label: t('menu.messages'), icon: Mail, roles: ['user', 'admin', 'executive'], badge: unreadMessages },
+			{ to: '/app/ai-recommendations', label: t('menu.aiSuggestions'), icon: Sparkles, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/work-history', label: t('menu.workHistory'), icon: History, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/work-review', label: t('menu.workReview'), icon: CheckCircle2, roles: ['user', 'admin', 'executive'], badge: unreadReviews },
+			{ to: '/app/projects', label: t('menu.projects'), icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
 	},
 		{
-			title: 'Administration',
+			title: t('menu.administration'),
 			roles: ['admin', 'executive'] as UserRole[],
 			items: [
-				{ to: '/app/admin/users', label: 'User Management', icon: Users, roles: ['admin', 'executive'] },
-				{ to: '/app/admin/system-settings', label: 'System Settings', icon: Settings, roles: ['admin', 'executive'] },
+				{ to: '/app/admin/users', label: t('menu.userManagement'), icon: Users, roles: ['admin', 'executive'] },
+				{ to: '/app/admin/system-settings', label: t('menu.systemSettings'), icon: Settings, roles: ['admin', 'executive'] },
 			] as MenuItem[],
 		},
 	{
-		title: 'Executive',
+		title: t('menu.executive'),
 		roles: ['executive', 'admin'] as UserRole[],
 		items: [
-			{ to: '/app/executive', label: 'Analytics & Insights', icon: BarChart3, roles: ['executive', 'admin'] },
-			{ to: '/app/admin/company-settings', label: 'Company Settings', icon: Building2, roles: ['executive', 'admin'] },
+			{ to: '/app/executive', label: t('menu.analyticsInsights'), icon: BarChart3, roles: ['executive', 'admin'] },
+			{ to: '/app/admin/company-settings', label: t('menu.companySettings'), icon: Building2, roles: ['executive', 'admin'] },
 		] as MenuItem[],
 	},
 ]
@@ -138,8 +141,14 @@ const visibleMenuGroups = menuGroups
 				</div>
 				<div className="flex flex-col">
 					<div className="text-base font-bold text-white tracking-tight leading-none mb-1">Proce</div>
-					<div className="text-[10px] text-neutral-500 font-medium tracking-widest uppercase">Workspace</div>
+					<div className="text-[10px] text-neutral-500 font-medium tracking-widest uppercase">{t('menu.workspace')}</div>
 				</div>
+				
+				{/* Desktop Language Switcher (in sidebar header) */}
+				<div className="hidden lg:block ml-auto scale-75 origin-right">
+					<LanguageSwitcher />
+				</div>
+
 				{/* Mobile close button */}
 				<button
 					onClick={() => setIsMobileSidebarOpen(false)}
@@ -170,10 +179,10 @@ const visibleMenuGroups = menuGroups
 				{/* System Group */}
 				<div>
 					<div className="px-4 mb-3 text-[11px] font-bold uppercase tracking-widest text-neutral-600">
-						System
+						{t('menu.system')}
 					</div>
 					<div className="space-y-1.5">
-						{link('/app/settings', 'Settings', Settings)}
+						{link('/app/settings', t('menu.settings'), Settings)}
 					</div>
 				</div>
 			</nav>
@@ -201,7 +210,7 @@ const visibleMenuGroups = menuGroups
                             className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 text-xs font-medium bg-[#1a1a1a] text-neutral-400 hover:text-white hover:bg-[#252525] transition-all border border-transparent hover:border-[#333]"
                         >
                             <LogOut size={14} />
-                            <span>Sign out</span>
+                            <span>{t('menu.signOut')}</span>
                         </Link>
                     </div>
 				)}

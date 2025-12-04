@@ -23,10 +23,12 @@ import {
 	Sparkles,
 } from 'lucide-react'
 import type { LoopItem } from '../../../services/rhythm/types'
+import { useI18n } from '../../../i18n/I18nProvider'
 
 export function TodaySection() {
 	const navigate = useNavigate()
 	const { todayStatus, requestNextActions } = useRhythm()
+	const { t, formatDate, language } = useI18n()
 	const [showingNext, setShowingNext] = useState(false)
 	const [nextActions, setNextActions] = useState<any>(null)
 
@@ -59,8 +61,8 @@ export function TodaySection() {
 		return (
 			<EmptyState
 				icon={<Clock className="h-12 w-12" />}
-				title="No Today Status"
-				description="Unable to load today's status"
+				title={t('common.noData')}
+				description={t('rhythm.failedToLoadData')}
 			/>
 		)
 	}
@@ -79,19 +81,19 @@ export function TodaySection() {
 							) : (
 								<Target className="h-4 w-4 text-primary" />
 							)}
-							Status
+							{t('rhythm.status')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
 							{isLoopComplete ? (
-								<span className="text-green-600">Complete</span>
+								<span className="text-green-600">{t('rhythm.completed')}</span>
 							) : (
-								<span>{summary.pending} pending</span>
+								<span>{summary.pending} {t('rhythm.pending')}</span>
 							)}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							{summary.completed} completed today
+							{summary.completed} {t('rhythm.completedToday')}
 						</p>
 					</CardContent>
 				</Card>
@@ -100,7 +102,7 @@ export function TodaySection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<AlertCircle className="h-4 w-4 text-red-600" />
-							Urgent
+							{t('rhythm.urgent')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -108,7 +110,7 @@ export function TodaySection() {
 							{urgent.length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Needs immediate attention
+							{t('rhythm.needsAttention')}
 						</p>
 					</CardContent>
 				</Card>
@@ -117,7 +119,7 @@ export function TodaySection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<Calendar className="h-4 w-4 text-blue-600" />
-							Scheduled
+							{t('rhythm.scheduled')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -125,7 +127,7 @@ export function TodaySection() {
 							{scheduled.length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Due today
+							{t('rhythm.dueToday')}
 						</p>
 					</CardContent>
 				</Card>
@@ -134,7 +136,7 @@ export function TodaySection() {
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<AlertCircle className="h-4 w-4 text-orange-600" />
-							Reviews
+							{t('rhythm.needsReview')}
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
@@ -142,7 +144,7 @@ export function TodaySection() {
 							{needsReview.length}
 						</div>
 						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-							Needs your attention
+							{t('rhythm.needsYourAttention')}
 						</p>
 					</CardContent>
 				</Card>
@@ -156,10 +158,10 @@ export function TodaySection() {
 							<CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400 shrink-0" />
 							<div className="flex-1">
 								<h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-1">
-									오늘의 루프는 모두 완료되었습니다! 🎉
+									{t('rhythm.loopComplete')}
 								</h3>
 								<p className="text-sm text-green-700 dark:text-green-300 mb-4">
-									수고하셨습니다! 편히 쉬셔도 됩니다.
+									{t('rhythm.loopCompleteDesc')}
 								</p>
 								
 								{!showingNext && (
@@ -169,7 +171,7 @@ export function TodaySection() {
 										className="border-green-300 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
 									>
 										<Sparkles className="h-4 w-4 mr-2" />
-										다음 할 수 있는 작업 보기 (선택 사항)
+										{t('rhythm.showNextActions')} ({t('common.optional')})
 									</Button>
 								)}
 							</div>
@@ -183,7 +185,7 @@ export function TodaySection() {
 				<div>
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="h-5 w-5 text-red-600" />
-						<h2 className="text-xl font-semibold">Urgent Tasks</h2>
+						<h2 className="text-xl font-semibold">{t('rhythm.urgentTasks')}</h2>
 						<span className="text-sm text-neutral-600 dark:text-neutral-400">
 							({urgent.length})
 						</span>
@@ -199,11 +201,11 @@ export function TodaySection() {
 										<div className="flex-1">
 											<div className="flex items-center gap-2 mb-2">
 												<span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(item.priority)}`}>
-													{item.priority.toUpperCase()}
+													{t(`common.priorities.${item.priority}`)}
 												</span>
 												{item.type === 'task' && (
 													<span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-														Task
+														{t('rhythm.task')}
 													</span>
 												)}
 											</div>
@@ -229,7 +231,7 @@ export function TodaySection() {
 												{item.dueDate && (
 													<div className="flex items-center gap-1">
 														<Clock className="h-4 w-4" />
-														{new Date(item.dueDate).toLocaleString()}
+														{new Date(item.dueDate).toLocaleString(language === 'ko' ? 'ko-KR' : 'en-US')}
 													</div>
 												)}
 											</div>
@@ -254,7 +256,7 @@ export function TodaySection() {
 				<div>
 					<div className="flex items-center gap-2 mb-4">
 						<Calendar className="h-5 w-5 text-blue-600" />
-						<h2 className="text-xl font-semibold">Scheduled for Today</h2>
+						<h2 className="text-xl font-semibold">{t('rhythm.scheduledTasks')}</h2>
 						<span className="text-sm text-neutral-600 dark:text-neutral-400">
 							({scheduled.length})
 						</span>
@@ -270,7 +272,7 @@ export function TodaySection() {
 										<div className="flex-1">
 											<div className="flex items-center gap-2 mb-2">
 												<span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(item.priority)}`}>
-													{item.priority.toUpperCase()}
+													{t(`common.priorities.${item.priority}`)}
 												</span>
 											</div>
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
@@ -289,7 +291,7 @@ export function TodaySection() {
 												{item.dueDate && (
 													<div className="flex items-center gap-1">
 														<Clock className="h-4 w-4" />
-														{new Date(item.dueDate).toLocaleString()}
+														{new Date(item.dueDate).toLocaleString(language === 'ko' ? 'ko-KR' : 'en-US')}
 													</div>
 												)}
 											</div>
@@ -314,7 +316,7 @@ export function TodaySection() {
 				<div>
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="h-5 w-5 text-orange-600" />
-						<h2 className="text-xl font-semibold">Needs Your Review</h2>
+						<h2 className="text-xl font-semibold">{t('rhythm.reviewTasks')}</h2>
 						<span className="text-sm text-neutral-600 dark:text-neutral-400">
 							({needsReview.length})
 						</span>
@@ -355,7 +357,7 @@ export function TodaySection() {
 				<div>
 					<div className="flex items-center gap-2 mb-4">
 						<TrendingUp className="h-5 w-5 text-purple-600" />
-						<h2 className="text-xl font-semibold">Next Up (Optional)</h2>
+						<h2 className="text-xl font-semibold">{t('rhythm.nextUp')} ({t('common.optional')})</h2>
 						<span className="text-sm text-neutral-600 dark:text-neutral-400">
 							({nextActions.nextUp.length})
 						</span>
@@ -395,8 +397,8 @@ export function TodaySection() {
 			{!isLoopComplete && urgent.length === 0 && scheduled.length === 0 && needsReview.length === 0 && (
 				<EmptyState
 					icon={<CheckCircle2 className="h-12 w-12" />}
-					title="No tasks for today"
-					description="You're all caught up! Enjoy your day."
+					title={t('rhythm.noTasksToday')}
+					description={t('rhythm.allCaughtUp')}
 				/>
 			)}
 		</div>

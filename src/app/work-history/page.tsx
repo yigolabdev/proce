@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider'
 import { storage } from '../../utils/storage'
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -34,6 +35,7 @@ import { toDate } from '../../utils/dateUtils'
 export default function WorkHistoryPage() {
 	const navigate = useNavigate()
 	const { user } = useAuth()
+	const { t } = useI18n()
 	const [entries, setEntries] = useState<WorkEntry[]>([])
 	const [filteredEntries, setFilteredEntries] = useState<WorkEntry[]>([])
 	const [expandedEntries, setExpandedEntries] = useState<string[]>([])
@@ -495,12 +497,12 @@ export default function WorkHistoryPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
 			<PageHeader
-				title="Team Work History"
-				description="View and track work history across the entire team"
+				title={t('workHistory.title')}
+				description={t('workHistory.description')}
 				actions={
 						<Button onClick={() => navigate('/app/input')} size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 border-none">
 						<Plus className="h-4 w-4 sm:mr-2" />
-						<span className="hidden sm:inline">New Entry</span>
+						<span className="hidden sm:inline">{t('workHistory.newEntry')}</span>
 					</Button>
 				}
 			/>
@@ -512,7 +514,7 @@ export default function WorkHistoryPage() {
 							<CardContent className="p-5">
 								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-neutral-500 font-medium mb-1">Total Entries</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">{t('workHistory.totalEntries')}</p>
 										<p className="text-2xl font-bold text-white">{statistics.total}</p>
 									</div>
 									<div className="p-2 bg-surface-dark rounded-lg text-blue-500">
@@ -526,7 +528,7 @@ export default function WorkHistoryPage() {
 							<CardContent className="p-5">
 								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-neutral-500 font-medium mb-1">This Week</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">{t('workHistory.thisWeek')}</p>
 										<p className="text-2xl font-bold text-white">{statistics.thisWeek}</p>
 									</div>
 									<div className="p-2 bg-surface-dark rounded-lg text-green-500">
@@ -540,7 +542,7 @@ export default function WorkHistoryPage() {
 							<CardContent className="p-5">
 								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-neutral-500 font-medium mb-1">Total Hours</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">{t('workHistory.totalHours')}</p>
 										<p className="text-2xl font-bold text-white">{statistics.totalHours.toFixed(1)}h</p>
 									</div>
 									<div className="p-2 bg-surface-dark rounded-lg text-purple-500">
@@ -554,7 +556,7 @@ export default function WorkHistoryPage() {
 							<CardContent className="p-5">
 								<div className="flex items-start justify-between">
 									<div>
-										<p className="text-sm text-neutral-500 font-medium mb-1">Team Members</p>
+										<p className="text-sm text-neutral-500 font-medium mb-1">{t('workHistory.teamMembers')}</p>
 										<p className="text-2xl font-bold text-white">{users.length}</p>
 									</div>
 									<div className="p-2 bg-surface-dark rounded-lg text-orange-500">
@@ -568,34 +570,36 @@ export default function WorkHistoryPage() {
 				{/* Search and Filters */}
 					<Card className="bg-surface-dark border-border-dark">
 					<CardContent className="p-4 space-y-4">
-						{/* Search */}
-						<div className="relative">
+						<div className="flex flex-col sm:flex-row gap-4">
+							{/* Search */}
+							<div className="relative flex-1">
 								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
-							<Input
-								type="text"
-								placeholder="Search by title, description, tags, or person..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								<Input
+									type="text"
+									placeholder={t('workHistory.searchPlaceholder')}
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
 									className="pl-10 bg-surface-dark border-border-dark text-white placeholder-neutral-600 focus:ring-orange-500 focus:border-orange-500"
-							/>
-						</div>
+								/>
+							</div>
 
-						{/* Filter Toggle */}
-						<button
-							onClick={() => setShowFilters(!showFilters)}
-								className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors"
-						>
-							<Filter className="h-4 w-4" />
-							{showFilters ? 'Hide Filters' : 'Show Filters'}
-							{showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-						</button>
+							{/* Filter Toggle */}
+							<button
+								onClick={() => setShowFilters(!showFilters)}
+								className="flex items-center justify-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors whitespace-nowrap px-4 py-2 rounded-md hover:bg-white/5"
+							>
+								<Filter className="h-4 w-4" />
+								{showFilters ? t('workHistory.hideFilters') : t('workHistory.showFilters')}
+								{showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+							</button>
+						</div>
 
 						{/* Filters */}
 						{showFilters && (
 								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border-dark">
 								{/* Category Filter */}
 								<div>
-										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Category</label>
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">{t('workHistory.category')}</label>
 									<select
 										value={selectedCategory}
 										onChange={(e) => setSelectedCategory(e.target.value)}
@@ -603,7 +607,7 @@ export default function WorkHistoryPage() {
 									>
 										{categories.map((cat) => (
 											<option key={cat.id} value={cat.id}>
-												{cat.label}
+												{t(`common.categories.${cat.id}`)}
 											</option>
 										))}
 									</select>
@@ -612,14 +616,14 @@ export default function WorkHistoryPage() {
 								{/* Project Filter */}
 								<div>
 										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
-										Project
+										{t('workHistory.project')}
 									</label>
 									<select
 										value={selectedProject}
 										onChange={(e) => setSelectedProject(e.target.value)}
 											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
-										<option value="all">All Projects</option>
+										<option value="all">{t('projectsPage.allProjects')}</option>
 										{projects.map((proj) => (
 											<option key={proj.id} value={proj.id}>
 												{proj.name}
@@ -631,14 +635,14 @@ export default function WorkHistoryPage() {
 								{/* Department Filter */}
 								<div>
 										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
-										Department
+										{t('workHistory.department')}
 									</label>
 									<select
 										value={selectedDepartment}
 										onChange={(e) => setSelectedDepartment(e.target.value)}
 											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
-										<option value="all">All Departments</option>
+										<option value="all">{t('workHistory.allTeamMembers')}</option>
 										{departments.map((dept) => (
 											<option key={dept} value={dept}>
 												{dept}
@@ -650,16 +654,16 @@ export default function WorkHistoryPage() {
 								{/* User Filter */}
 								<div>
 										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">
-										Team Member
+										{t('workHistory.teamMember')}
 									</label>
 									<select
 										value={selectedUser}
 										onChange={(e) => setSelectedUser(e.target.value)}
 											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
-										<option value="all">All Team Members</option>
-										<option value="me">My History Only</option>
-										<optgroup label="Team Members">
+										<option value="all">{t('workHistory.allTeamMembers')}</option>
+										<option value="me">{t('workHistory.myHistoryOnly')}</option>
+										<optgroup label={t('workHistory.teamMembers')}>
 											{users.map((user) => (
 												<option key={user.id} value={user.id}>
 													{user.name} ({user.department})
@@ -671,14 +675,14 @@ export default function WorkHistoryPage() {
 
 								{/* Sort */}
 								<div>
-										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Sort By</label>
+										<label className="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">{t('workHistory.sortBy')}</label>
 									<select
 										value={sortBy}
 										onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
 											className="w-full px-3 py-2 border border-border-dark rounded-lg bg-surface-dark text-white focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none"
 									>
-										<option value="date">Date (Newest First)</option>
-										<option value="title">Title (A-Z)</option>
+										<option value="date">{t('workHistory.dateNewestFirst')}</option>
+										<option value="title">{t('workHistory.titleAZ')}</option>
 									</select>
 								</div>
 							</div>
@@ -689,8 +693,8 @@ export default function WorkHistoryPage() {
 				{/* Results Summary */}
 					<div className="flex items-center justify-between text-sm text-neutral-500">
 					<p>
-							Showing <span className="font-semibold text-white">{filteredEntries.length}</span>{' '}
-							of <span className="font-semibold text-white">{entries.length}</span> entries
+							{t('workHistory.showing')} <span className="font-semibold text-white">{filteredEntries.length}</span>{' '}
+							{t('workHistory.of')} <span className="font-semibold text-white">{entries.length}</span> {t('workHistory.entries')}
 					</p>
 					{(selectedCategory !== 'all' || selectedProject !== 'all' || selectedDepartment !== 'all' || selectedUser !== 'all') && (
 						<button
@@ -703,7 +707,7 @@ export default function WorkHistoryPage() {
 							}}
 								className="text-orange-500 hover:text-orange-400 text-xs font-medium"
 						>
-							Clear all filters
+							{t('workHistory.clearAllFilters')}
 						</button>
 					)}
 				</div>
@@ -714,11 +718,11 @@ export default function WorkHistoryPage() {
 							<div className="p-4 rounded-full bg-surface-dark mb-4">
 								<FileText className="h-8 w-8 text-neutral-500" />
 							</div>
-							<h3 className="text-lg font-medium text-white mb-2">No work entries found</h3>
+							<h3 className="text-lg font-medium text-white mb-2">{t('workHistory.noWorkEntriesFound')}</h3>
 							<p className="text-neutral-500 mb-6 max-w-md">
 								{searchQuery || selectedCategory !== 'all' || selectedProject !== 'all'
-								? 'Try adjusting your filters or search query'
-									: 'No work has been logged yet'}
+								? t('workHistory.noWorkEntriesFoundDescription')
+									: t('workHistory.noWorkLoggedYet')}
 							</p>
 							{searchQuery || selectedCategory !== 'all' || selectedProject !== 'all' ? (
 									<Button
@@ -732,11 +736,11 @@ export default function WorkHistoryPage() {
 										}}
 									className="border-border-dark hover:bg-border-dark text-white"
 									>
-										Clear Filters
+										{t('workHistory.clearAllFilters')}
 									</Button>
 							) : (
 								<Button onClick={() => navigate('/app/input')} className="rounded-full bg-white text-black hover:bg-neutral-200">
-										Log Work
+										{t('workHistory.logWork')}
 									</Button>
 							)}
 						</div>
@@ -759,13 +763,13 @@ export default function WorkHistoryPage() {
 																entry.category === 'meeting' ? 'bg-purple-900/30 text-purple-400' :
 																'bg-neutral-800 text-neutral-400'
 															}`}>
-															{categories.find((c) => c.id === entry.category)?.label || entry.category}
+															{t(`common.categories.${entry.category}`) || entry.category}
 														</span>
 
 														{/* Status Badge */}
 														{entry.status === 'approved' && (
 																<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-green-900/30 text-green-400">
-																Approved
+																{t('common.statuses.approved')}
 															</span>
 														)}
 
@@ -834,7 +838,7 @@ export default function WorkHistoryPage() {
 													<div className="space-y-4 pt-4 border-t border-border-dark mt-4">
 													{/* Description */}
 													<div>
-															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Description</h4>
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">{t('workHistory.description')}</h4>
 															<p className="text-sm text-neutral-300 whitespace-pre-wrap leading-relaxed bg-surface-dark p-3 rounded-lg border border-border-dark">
 															{entry.description}
 														</p>
@@ -844,7 +848,7 @@ export default function WorkHistoryPage() {
 												{entry.files && entry.files.length > 0 && (
 													<div>
 															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-																Attachments
+																{t('workHistory.attachments')}
 														</h4>
 														<div className="space-y-2">
 															{entry.files.map((file) => (
@@ -871,7 +875,7 @@ export default function WorkHistoryPage() {
 												{/* Links */}
 												{entry.links && entry.links.length > 0 && (
 													<div>
-															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Links</h4>
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">{t('workHistory.links')}</h4>
 															<div className="flex flex-wrap gap-2">
 															{entry.links.map((link) => (
 																	<a

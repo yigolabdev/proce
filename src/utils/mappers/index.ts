@@ -6,4 +6,4 @@
 
 export * from './workEntry.mapper'
 export * from './project.mapper'
-
+export * from './review.mapper'

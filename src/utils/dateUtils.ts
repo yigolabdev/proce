@@ -116,36 +116,54 @@ export function parseProjectDates<T extends Record<string, any>>(project: T): T 
 
 /**
  * 날짜를 로컬 포맷으로 변환
+ * @param date - 날짜
+ * @param locale - 로케일 코드 (기본값: 'en-US')
+ * @param options - Intl.DateTimeFormatOptions
  */
-export function formatLocalDate(date: Date | string | undefined | null): string {
+export function formatLocalDate(
+	date: Date | string | undefined | null, 
+	locale: string = 'en-US',
+	options: Intl.DateTimeFormatOptions = {}
+): string {
 	if (!date) return '-'
 	const d = toDate(date)
 	if (!d) return '-'
-	return d.toLocaleDateString()
+	
+	// 로케일 매핑
+	const targetLocale = locale === 'ko' ? 'ko-KR' : 'en-US'
+	return d.toLocaleDateString(targetLocale, options)
 }
 
 /**
- * 날짜를 상대 시간으로 변환 (예: "2 days ago")
+ * 날짜를 상대 시간으로 변환 (예: "2 days ago", "2일 전")
+ * @param date - 날짜
+ * @param locale - 로케일 코드 (기본값: 'en-US')
  */
-export function formatRelativeTime(date: Date | string | undefined | null): string {
+export function formatRelativeTime(
+	date: Date | string | undefined | null, 
+	locale: string = 'en-US'
+): string {
 	if (!date) return '-'
 	const d = toDate(date)
 	if (!d) return '-'
 	
 	const now = new Date()
-	const diffInMs = now.getTime() - d.getTime()
-	const diffInSeconds = Math.floor(diffInMs / 1000)
-	const diffInMinutes = Math.floor(diffInSeconds / 60)
-	const diffInHours = Math.floor(diffInMinutes / 60)
-	const diffInDays = Math.floor(diffInHours / 24)
+	const diffInSeconds = Math.floor((d.getTime() - now.getTime()) / 1000)
 	
-	if (diffInSeconds < 60) return 'just now'
-	if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`
-	if (diffInHours < 24) return `${diffInHours} hours ago`
-	if (diffInDays < 7) return `${diffInDays} days ago`
-	if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`
-	if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`
-	return `${Math.floor(diffInDays / 365)} years ago`
+	// 로케일 매핑
+	const targetLocale = locale === 'ko' ? 'ko-KR' : 'en-US'
+	const rtf = new Intl.RelativeTimeFormat(targetLocale, { numeric: 'auto' })
+	
+	const absDiff = Math.abs(diffInSeconds)
+	
+	if (absDiff < 60) return rtf.format(diffInSeconds, 'second')
+	if (absDiff < 3600) return rtf.format(Math.ceil(diffInSeconds / 60), 'minute')
+	if (absDiff < 86400) return rtf.format(Math.ceil(diffInSeconds / 3600), 'hour')
+	if (absDiff < 604800) return rtf.format(Math.ceil(diffInSeconds / 86400), 'day') // 7 days
+	if (absDiff < 2592000) return rtf.format(Math.ceil(diffInSeconds / 604800), 'week') // 30 days
+	if (absDiff < 31536000) return rtf.format(Math.ceil(diffInSeconds / 2592000), 'month') // 365 days
+	
+	return rtf.format(Math.ceil(diffInSeconds / 31536000), 'year')
 }
 
 /**
@@ -172,3 +190,34 @@ export function daysRemaining(deadline: Date | string | undefined | null): numbe
 	return daysBetween(new Date(), deadline)
 }
 
+/**
+ * Review의 날짜 필드를 Date로 변환
+ */
+export function parseReviewDates<T extends Record<string, any>>(review: T): T {
+	return parseDates(review, [
+		'submittedAt',
+		'reviewedAt',
+	] as (keyof T)[])
+}
+
+/**
+ * Message의 날짜 필드를 Date로 변환
+ */
+export function parseMessageDates<T extends Record<string, any>>(message: T): T {
+	return parseDates(message, [
+		'date',
+		'timestamp',
+	] as (keyof T)[])
+}
+
+/**
+ * Task의 날짜 필드를 Date로 변환
+ */
+export function parseTaskDates<T extends Record<string, any>>(task: T): T {
+	return parseDates(task, [
+		'createdAt',
+		'acceptedAt',
+		'completedAt',
+		'deadline',
+	] as (keyof T)[])
+}
