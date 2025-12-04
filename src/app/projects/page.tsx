@@ -21,7 +21,7 @@ import {
 import { toast } from 'sonner'
 import Toaster from '../../components/ui/Toaster'
 import type { Project, WorkEntry, Department } from '../../types/common.types'
-import { initializeMockProjects, mockAIProjects } from './_mocks/projectsApi'
+import { initializeMockProjects } from './_mocks/projectsApi'
 import ProjectFormDialog, { type ProjectFormData } from './_components/ProjectFormDialog'
 import ProjectCard from './_components/ProjectCard'
 import TimelineView from './_components/TimelineView'
@@ -47,7 +47,12 @@ export default function ProjectsPage() {
 	const [filterStatus, setFilterStatus] = useState<string>('all')
 	const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list')
 	const [initialProjectData, setInitialProjectData] = useState<Partial<ProjectFormData> | undefined>(undefined)
-	const [topAIProjects, setTopAIProjects] = useState<Array<{id: string, title: string, description: string, tags: string[], confidence: number}>>([])
+	useKeyboardShortcuts({
+		newProject: () => setShowCreateDialog(true),
+		cancel: () => setShowCreateDialog(false),
+		goToDashboard: () => navigate('/app/dashboard'),
+		newWork: () => navigate('/app/input'),
+	})
 
 	// Keyboard shortcuts
 	useKeyboardShortcuts({
@@ -61,8 +66,6 @@ export default function ProjectsPage() {
 	useEffect(() => {
 		initializeMockProjects()
 		loadAllData()
-		// Load top AI projects from mock
-		setTopAIProjects(mockAIProjects)
 	}, [])
 
 	const loadAllData = async () => {
@@ -162,27 +165,13 @@ export default function ProjectsPage() {
 				duration: 5000,
 			})
 		}, 1000)
-		} catch (error) {
-			console.error('Failed to create project:', error)
-			toast.error(t('projects.failedToCreateProject'))
-		}
+	} catch (error) {
+		console.error('Failed to create project:', error)
+		toast.error(t('projects.failedToCreateProject'))
 	}
+}
 
-	const handleAIProjectSelect = (projectData: Partial<Project>) => {
-		setInitialProjectData({
-			name: projectData.name || '',
-			description: projectData.description || '',
-			departments: [], // User needs to select
-			objectives: projectData.objectives || [],
-			startDate: projectData.startDate ? projectData.startDate.toISOString().split('T')[0] : '',
-			endDate: projectData.endDate ? projectData.endDate.toISOString().split('T')[0] : '',
-			files: [],
-			links: []
-		})
-		setShowCreateDialog(true)
-	}
-
-	// Note: Delete functionality will be added to ProjectCard context menu later
+// Note: Delete functionality will be added to ProjectCard context menu later
 
 	// Filter projects by status
 	const filteredProjects = projects.filter((project) => {

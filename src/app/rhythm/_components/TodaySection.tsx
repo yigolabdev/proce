@@ -28,7 +28,7 @@ import { useI18n } from '../../../i18n/I18nProvider'
 export function TodaySection() {
 	const navigate = useNavigate()
 	const { todayStatus, requestNextActions } = useRhythm()
-	const { t, formatDate, language } = useI18n()
+	const { t, language } = useI18n()
 	const [showingNext, setShowingNext] = useState(false)
 	const [nextActions, setNextActions] = useState<any>(null)
 

@@ -5,7 +5,6 @@
  */
 
 import { storage } from './storage'
-import type { PendingReview, ReceivedReview } from '../types/common.types'
 
 export interface MessageData {
 	id: string
@@ -165,7 +164,6 @@ export function createTaskCompletionMessage(params: {
 	workEntryId: string
 }): MessageData {
 	const {
-		taskId,
 		taskTitle,
 		completedBy,
 		completedByDepartment,

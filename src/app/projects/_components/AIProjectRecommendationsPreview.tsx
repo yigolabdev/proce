@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { Button } from '../../../components/ui/Button'
-import { Sparkles, Target, ArrowRight, Calendar, Users, Lightbulb } from 'lucide-react'
-import { storage } from '../../../utils/storage'
-import type { CompanyInfo, CompanyKPI, HistoricalData } from '../../admin/company-settings/_types/types'
-import type { Project } from '../../../types/common.types'
+import { Sparkles, ArrowRight, Lightbulb } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface RecommendedProject {

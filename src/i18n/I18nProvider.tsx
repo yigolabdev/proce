@@ -4,8 +4,6 @@ import { translations } from './index'
 
 export type Locale = 'en' | 'ko'
 
-type Dictionary = Record<string, any>
-
 interface I18nContextValue {
 	locale: Locale
 	setLocale: (locale: Locale) => void

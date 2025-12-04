@@ -45,7 +45,7 @@ export default function WorkReviewPage() {
 	const [activeTab, setActiveTab] = useState<'pending' | 'received'>('pending')
 	const [pendingReviews, setPendingReviews, loadingPending] = useLocalStorage<PendingReview[]>('pending_reviews', [])
 	const [reviews, setReviews, loadingReceived] = useLocalStorage<ReceivedReview[]>('received_reviews', [])
-	const [projects, setProjects] = useLocalStorage<Array<{ id: string; name: string }>>('projects', [])
+	const [projects] = useLocalStorage<Array<{ id: string; name: string }>>('projects', [])
 	const [filteredReviews, setFilteredReviews] = useState<ReceivedReview[]>([])
 	const [filterType, setFilterType] = useState<string>('all')
 	const [filterProject, setFilterProject] = useState<string>('all')
@@ -365,8 +365,8 @@ export default function WorkReviewPage() {
 															</div>
 														)}
 
-														{/* Files & Links */}
-														{(review.files?.length > 0 || review.links?.length > 0) && (
+													{/* Files & Links */}
+													{((review.files && review.files.length > 0) || (review.links && review.links.length > 0)) && (
 															<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
 																{review.files && review.files.length > 0 && (
 																	<div className="space-y-2">
@@ -728,8 +728,8 @@ export default function WorkReviewPage() {
 																</div>
 															)}
 
-															{/* Files & Links */}
-															{(review.files?.length > 0 || review.links?.length > 0) && (
+													{/* Files & Links */}
+													{((review.files && review.files.length > 0) || (review.links && review.links.length > 0)) && (
 																<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
 																	{review.files && review.files.length > 0 && (
 																		<div className="space-y-2">

@@ -1,5 +1,5 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { forwardRef, type ComponentPropsWithoutRef, type HTMLAttributes, type PropsWithChildren } from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 import clsx from 'clsx'
 
 export const Dialog = DialogPrimitive.Root

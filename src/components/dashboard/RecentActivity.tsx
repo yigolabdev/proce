@@ -14,7 +14,9 @@ export function RecentActivity({ activities }: RecentActivityProps) {
 	const navigate = useNavigate()
 	const { t, locale } = useI18n()
 
-	const getStatusLabel = (status: string) => {
+	const getStatusLabel = (status: string | undefined): string => {
+		if (!status) return t('common.statuses.pending')
+		
 		const keyMap: Record<string, string> = {
 			approved: 'statuses.approved',
 			pending: 'statuses.pending',

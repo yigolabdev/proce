@@ -19,8 +19,8 @@ function validateEmail(email: string) {
 
 export default function SignInForm() {
 	const navigate = useNavigate()
-	const { locale, setLocale, t } = useI18n()
-	const tt = useMemo(() => t(authI18n), [t, locale])
+	const { locale, setLocale } = useI18n()
+	const tt = useMemo(() => authI18n[locale as keyof typeof authI18n], [locale])
 	const { theme, toggle } = useTheme()
 
 	const [email, setEmail] = useState('')
@@ -47,7 +47,7 @@ export default function SignInForm() {
 		setEmailError(undefined)
 		const clean = email.trim().toLowerCase()
 		if (!validateEmail(clean)) {
-			setEmailError(tt('errors.invalidEmail'))
+			setEmailError(tt.errors.invalidEmail)
 			return
 		}
 		if (!password) {
@@ -60,7 +60,7 @@ export default function SignInForm() {
 			const res = await signInWithPassword(clean, password)
 			if (!res.ok) {
 				track('sign_in_error', { error: res.error })
-				toast.error(tt('errors.invalidCredentials'))
+				toast.error(tt.errors.invalidCredentials)
 				return
 			}
 			track('sign_in_success')

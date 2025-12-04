@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/Dialog'
-import { Sparkles, Info, CheckCircle2, ChevronRight } from 'lucide-react'
+import { Sparkles, Info, CheckCircle2 } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Card, CardContent } from '../ui/Card'
 
