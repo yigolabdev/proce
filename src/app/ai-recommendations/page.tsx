@@ -1,13 +1,12 @@
 import { useI18n } from '../../i18n/I18nProvider'
 import { storage } from '../../utils/storage'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { Badge, StatusBadge, PriorityBadge } from '../../components/common/Badge'
 import {
 	Sparkles,

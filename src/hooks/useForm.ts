@@ -1,4 +1,4 @@
-import { useState, useCallback, ChangeEvent } from 'react'
+import { useState, useCallback, type ChangeEvent } from 'react'
 
 export interface ValidationRule<T> {
 	required?: boolean | string

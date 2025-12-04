@@ -183,8 +183,12 @@ export default function WorkReviewPage() {
 			filtered = filtered.filter(r => r.isRead)
 		}
 
-		// Sort by date (newest first)
-		filtered.sort((a, b) => b.reviewedAt.getTime() - a.reviewedAt.getTime())
+	// Sort by date (newest first)
+	filtered.sort((a, b) => {
+		const aTime = typeof a.reviewedAt === 'string' ? new Date(a.reviewedAt).getTime() : a.reviewedAt.getTime()
+		const bTime = typeof b.reviewedAt === 'string' ? new Date(b.reviewedAt).getTime() : b.reviewedAt.getTime()
+		return bTime - aTime
+	})
 
 		setFilteredReviews(filtered)
 	}, [reviews, filterType, filterProject, filterRead])
@@ -646,8 +650,8 @@ export default function WorkReviewPage() {
 															</span>
 														</div>
 														<div className="flex items-center gap-1.5">
-																<Clock className="h-3.5 w-3.5" />
-															<span>{formatTimeAgo(review.reviewedAt)}</span>
+													<Clock className="h-3.5 w-3.5" />
+												<span>{formatTimeAgo(typeof review.reviewedAt === 'string' ? new Date(review.reviewedAt) : review.reviewedAt)}</span>
 														</div>
 														<div className="flex items-center gap-1.5">
 																<Calendar className="h-3.5 w-3.5" />

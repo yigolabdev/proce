@@ -5,8 +5,8 @@
  * 타입 안전성과 자동 동기화 제공
  */
 
-import { useState, useEffect, useCallback, Dispatch, SetStateAction } from 'react'
-import { storage } from '../storage'
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react'
+import { storage } from '../utils/storage'
 
 type SetValue<T> = Dispatch<SetStateAction<T>>
 

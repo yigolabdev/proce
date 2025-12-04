@@ -1,4 +1,4 @@
-import { TaskRecommendation, RecommendationInsight } from '../_types'
+import type { TaskRecommendation, RecommendationInsight } from '../_types'
 
 export const MOCK_RECOMMENDATIONS: TaskRecommendation[] = [
 	{

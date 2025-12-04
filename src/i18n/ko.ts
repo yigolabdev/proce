@@ -107,7 +107,7 @@ export const ko = {
       financial: '재무',
       workplace: '근무 환경',
       documents: '문서',
-      history: '프로젝트 이력',
+      projectHistory: '프로젝트 이력',
     },
     history: {
       title: '과거 프로젝트 및 성과',
@@ -480,7 +480,7 @@ export const ko = {
   },
   workHistory: {
     title: '팀 업무 기록',
-    description: '전체 팀의 업무 기록 보기 및 추적',
+    pageDescription: '전체 팀의 업무 기록 보기 및 추적',
     newEntry: '새 항목',
     totalEntries: '총 항목',
     thisWeek: '이번 주',
@@ -497,7 +497,7 @@ export const ko = {
     clearAllFilters: '모든 필터 지우기',
     noEntries: '업무 항목을 찾을 수 없습니다',
     logWork: '업무 기록하기',
-    description: '설명',
+    fieldDescription: '설명',
     attachments: '첨부파일',
     links: '링크',
     category: '카테고리',

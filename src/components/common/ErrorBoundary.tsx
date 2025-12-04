@@ -4,7 +4,7 @@
  * React 컴포넌트 트리에서 발생하는 에러를 캐치하고 fallback UI를 표시
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import React, { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '../ui/Button'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 
@@ -89,8 +89,8 @@ export class ErrorBoundary extends Component<Props, State> {
 								We're sorry for the inconvenience. The error has been logged and we'll look into it.
 							</p>
 
-							{/* 개발 환경에서만 에러 상세 정보 표시 */}
-							{process.env.NODE_ENV === 'development' && this.state.error && (
+			{/* 개발 환경에서만 에러 상세 정보 표시 */}
+			{import.meta.env.DEV && this.state.error && (
 								<div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-left">
 									<p className="text-sm font-mono text-red-400 mb-2">
 										{this.state.error.toString()}

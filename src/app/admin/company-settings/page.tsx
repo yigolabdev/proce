@@ -889,9 +889,9 @@ export default function CompanySettingsPage() {
 								{ id: 'goals', label: t('companySettings.tabs.goals'), icon: Target },
 								{ id: 'financial', label: t('companySettings.tabs.financial'), icon: DollarSign },
 								{ id: 'workplace', label: t('companySettings.tabs.workplace'), icon: Clock },
-								{ id: 'documents', label: t('companySettings.tabs.documents'), icon: FileText },
-								{ id: 'history', label: t('companySettings.tabs.history'), icon: History },
-							],
+							{ id: 'documents', label: t('companySettings.tabs.documents'), icon: FileText },
+							{ id: 'history', label: t('companySettings.tabs.projectHistory'), icon: History },
+						],
 							activeTab,
 							onTabChange: (id) => setActiveTab(id as any),
 							mobileLabels: {

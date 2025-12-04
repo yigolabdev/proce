@@ -263,7 +263,7 @@ export const en = {
       financial: 'Financial',
       workplace: 'Workplace',
       documents: 'Documents',
-      history: 'Project History',
+      projectHistory: 'Project History',
     },
     history: {
       title: 'Historical Projects & Achievements',
@@ -582,7 +582,7 @@ export const en = {
   },
   workHistory: {
     title: 'Team Work History',
-    description: 'View and track work history across the entire team',
+    pageDescription: 'View and track work history across the entire team',
     newEntry: 'New Entry',
     totalEntries: 'Total Entries',
     thisWeek: 'This Week',
@@ -599,7 +599,7 @@ export const en = {
     clearAllFilters: 'Clear all filters',
     noEntries: 'No work entries found',
     logWork: 'Log Work',
-    description: 'Description',
+    fieldDescription: 'Description',
     attachments: 'Attachments',
     links: 'Links',
     category: 'Category',

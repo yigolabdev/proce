@@ -1,6 +1,6 @@
-import { Card, CardContent } from '../../../../components/ui/Card'
+import { Card, CardContent } from '../../../components/ui/Card'
 import { TrendingUp, Clock, Calendar, Brain } from 'lucide-react'
-import { RecommendationInsight } from '../_types'
+import type { RecommendationInsight } from '../_types'
 
 interface RecommendationInsightsProps {
 	insights: RecommendationInsight[]

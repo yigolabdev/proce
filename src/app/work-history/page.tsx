@@ -496,9 +496,9 @@ export default function WorkHistoryPage() {
 			
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			{/* Header */}
-			<PageHeader
-				title={t('workHistory.title')}
-				description={t('workHistory.description')}
+		<PageHeader
+			title={t('workHistory.title')}
+			description={t('workHistory.pageDescription')}
 				actions={
 						<Button onClick={() => navigate('/app/input')} size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 border-none">
 						<Plus className="h-4 w-4 sm:mr-2" />
