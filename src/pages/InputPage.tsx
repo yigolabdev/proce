@@ -1867,11 +1867,12 @@ export default function InputPage() {
 			onClose={() => setShowDecisionDialog(false)}
 		/>
 
-		{/* Tips Dialog */}
-		<TipsDialog
-			isOpen={showTipsDialog}
-			onClose={() => setShowTipsDialog(false)}
-		/>
+	{/* Tips Dialog */}
+	<TipsDialog
+		isOpen={showTipsDialog}
+		onClose={() => setShowTipsDialog(false)}
+	/>
 	</div>
+</div>
 	)
 }

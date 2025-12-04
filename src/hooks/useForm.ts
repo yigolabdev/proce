@@ -1,9 +1,3 @@
-/**
- * Custom Hook: useForm
- * 
- * 폼 상태 관리 및 유효성 검사를 위한 hook
- */
-
 import { useState, useCallback, ChangeEvent } from 'react'
 
 export interface ValidationRule<T> {
@@ -14,13 +8,9 @@ export interface ValidationRule<T> {
 	custom?: (value: any, values: T) => string | undefined
 }
 
-export type ValidationRules<T> = {
-	[K in keyof T]?: ValidationRule<T>
-}
+export type ValidationRules<T> = Partial<Record<keyof T, ValidationRule<T>>>
 
-export interface FormErrors<T> {
-	[K in keyof T]?: string
-}
+export type FormErrors<T> = Partial<Record<keyof T, string>>
 
 interface UseFormOptions<T> {
 	initialValues: T
@@ -33,16 +23,11 @@ interface UseFormOptions<T> {
 interface UseFormReturn<T> {
 	values: T
 	errors: FormErrors<T>
-	touched: { [K in keyof T]?: boolean }
+	touched: Partial<Record<keyof T, boolean>>
 	isSubmitting: boolean
 	isValid: boolean
-	
-	handleChange: (
-		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-	) => void
-	handleBlur: (
-		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-	) => void
+	handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+	handleBlur: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
 	handleSubmit: (e?: React.FormEvent) => Promise<void>
 	setFieldValue: <K extends keyof T>(field: K, value: T[K]) => void
 	setFieldError: <K extends keyof T>(field: K, error: string) => void
@@ -51,35 +36,6 @@ interface UseFormReturn<T> {
 	validateField: <K extends keyof T>(field: K) => string | undefined
 }
 
-/**
- * 폼 관리를 위한 hook
- * 
- * @example
- * interface LoginForm {
- *   email: string
- *   password: string
- * }
- * 
- * const { values, errors, handleChange, handleSubmit } = useForm<LoginForm>({
- *   initialValues: { email: '', password: '' },
- *   validationRules: {
- *     email: {
- *       required: 'Email is required',
- *       pattern: {
- *         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
- *         message: 'Invalid email address'
- *       }
- *     },
- *     password: {
- *       required: true,
- *       minLength: { value: 8, message: 'Password must be at least 8 characters' }
- *     }
- *   },
- *   onSubmit: async (values) => {
- *     await login(values)
- *   }
- * })
- */
 export function useForm<T extends Record<string, any>>({
 	initialValues,
 	validationRules,
@@ -89,10 +45,9 @@ export function useForm<T extends Record<string, any>>({
 }: UseFormOptions<T>): UseFormReturn<T> {
 	const [values, setValues] = useState<T>(initialValues)
 	const [errors, setErrors] = useState<FormErrors<T>>({})
-	const [touched, setTouched] = useState<{ [K in keyof T]?: boolean }>({})
+	const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	// 필드 유효성 검사
 	const validateField = useCallback(
 		<K extends keyof T>(field: K): string | undefined => {
 			if (!validationRules || !validationRules[field]) {
@@ -102,7 +57,6 @@ export function useForm<T extends Record<string, any>>({
 			const rule = validationRules[field]!
 			const value = values[field]
 
-			// Required 검사
 			if (rule.required) {
 				if (!value || (typeof value === 'string' && value.trim() === '')) {
 					return typeof rule.required === 'string'
@@ -111,7 +65,6 @@ export function useForm<T extends Record<string, any>>({
 				}
 			}
 
-			// MinLength 검사
 			if (rule.minLength && typeof value === 'string') {
 				const minLength = typeof rule.minLength === 'number' 
 					? rule.minLength 
@@ -125,7 +78,6 @@ export function useForm<T extends Record<string, any>>({
 				}
 			}
 
-			// MaxLength 검사
 			if (rule.maxLength && typeof value === 'string') {
 				const maxLength = typeof rule.maxLength === 'number'
 					? rule.maxLength
@@ -139,7 +91,6 @@ export function useForm<T extends Record<string, any>>({
 				}
 			}
 
-			// Pattern 검사
 			if (rule.pattern && typeof value === 'string') {
 				const pattern = rule.pattern instanceof RegExp
 					? rule.pattern
@@ -153,7 +104,6 @@ export function useForm<T extends Record<string, any>>({
 				}
 			}
 
-			// Custom 검사
 			if (rule.custom) {
 				return rule.custom(value, values)
 			}
@@ -163,7 +113,6 @@ export function useForm<T extends Record<string, any>>({
 		[values, validationRules]
 	)
 
-	// 모든 필드 유효성 검사
 	const validateForm = useCallback((): boolean => {
 		if (!validationRules) return true
 
@@ -183,13 +132,11 @@ export function useForm<T extends Record<string, any>>({
 		return isValid
 	}, [validationRules, validateField])
 
-	// 입력 변경 핸들러
 	const handleChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 			const { name, value, type } = e.target
 			const field = name as keyof T
 
-			// Checkbox 처리
 			const newValue = type === 'checkbox' 
 				? (e.target as HTMLInputElement).checked 
 				: value
@@ -204,7 +151,6 @@ export function useForm<T extends Record<string, any>>({
 		[validateOnChange, validateField]
 	)
 
-	// Blur 핸들러
 	const handleBlur = useCallback(
 		(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 			const { name } = e.target
@@ -220,18 +166,16 @@ export function useForm<T extends Record<string, any>>({
 		[validateOnBlur, validateField]
 	)
 
-	// Submit 핸들러
 	const handleSubmit = useCallback(
 		async (e?: React.FormEvent) => {
 			if (e) {
 				e.preventDefault()
 			}
 
-			// 모든 필드를 touched로 표시
 			const allTouched = Object.keys(values).reduce((acc, key) => ({
 				...acc,
 				[key]: true
-			}), {})
+			}), {} as Partial<Record<keyof T, boolean>>)
 			setTouched(allTouched)
 
 			const isValid = validateForm()
@@ -250,22 +194,18 @@ export function useForm<T extends Record<string, any>>({
 		[values, validateForm, onSubmit]
 	)
 
-	// 개별 필드 값 설정
 	const setFieldValue = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
 		setValues((prev) => ({ ...prev, [field]: value }))
 	}, [])
 
-	// 개별 필드 에러 설정
 	const setFieldError = useCallback(<K extends keyof T>(field: K, error: string) => {
 		setErrors((prev) => ({ ...prev, [field]: error }))
 	}, [])
 
-	// 개별 필드 touched 설정
 	const setFieldTouched = useCallback(<K extends keyof T>(field: K, touched: boolean) => {
 		setTouched((prev) => ({ ...prev, [field]: touched }))
 	}, [])
 
-	// 폼 리셋
 	const reset = useCallback(() => {
 		setValues(initialValues)
 		setErrors({})
@@ -273,7 +213,6 @@ export function useForm<T extends Record<string, any>>({
 		setIsSubmitting(false)
 	}, [initialValues])
 
-	// 전체 폼 유효성 여부
 	const isValid = Object.keys(errors).length === 0
 
 	return {
