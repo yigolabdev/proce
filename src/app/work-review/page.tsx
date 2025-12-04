@@ -9,8 +9,6 @@ import { LoadingState } from '../../components/common/LoadingState'
 import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts'
 import { useAuth } from '../../context/AuthContext'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { Badge, StatusBadge, PriorityBadge } from '../../components/common/Badge'
-import { Skeleton } from '../../components/common/Skeleton'
 import {
 	MessageSquare,
 	Clock,

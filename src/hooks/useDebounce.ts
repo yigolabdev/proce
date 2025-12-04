@@ -60,7 +60,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 	delay: number = 500,
 	deps: React.DependencyList = []
 ): (...args: Parameters<T>) => void {
-	const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+	const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null)
 
 	useEffect(() => {
 		return () => {

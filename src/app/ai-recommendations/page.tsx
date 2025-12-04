@@ -7,7 +7,6 @@ import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
-import { Badge, StatusBadge, PriorityBadge } from '../../components/common/Badge'
 import {
 	Sparkles,
 	CheckCircle2,

@@ -30,6 +30,9 @@ interface ProjectFormDialogProps {
 	onClose: () => void
 	onSubmit: (formData: ProjectFormData) => void
 	availableDepartments: { id: string; name: string }[]
+	initialData?: Partial<ProjectFormData>
+	title?: string
+	submitLabel?: string
 }
 
 export interface ProjectFormData {
@@ -48,21 +51,24 @@ export default function ProjectFormDialog({
 	onClose,
 	onSubmit,
 	availableDepartments,
+	initialData,
+	title,
+	submitLabel,
 }: ProjectFormDialogProps) {
 	const { t } = useI18n()
 	// Form states
-	const [projectName, setProjectName] = useState('')
-	const [projectDescription, setProjectDescription] = useState('')
-	const [projectDepartments, setProjectDepartments] = useState<string[]>([])
-	const [projectObjectives, setProjectObjectives] = useState<string[]>([])
+	const [projectName, setProjectName] = useState(initialData?.name || '')
+	const [projectDescription, setProjectDescription] = useState(initialData?.description || '')
+	const [projectDepartments, setProjectDepartments] = useState<string[]>(initialData?.departments || [])
+	const [projectObjectives, setProjectObjectives] = useState<string[]>(initialData?.objectives || [])
 	const [objectiveInput, setObjectiveInput] = useState('')
-	const [startDate, setStartDate] = useState('')
-	const [endDate, setEndDate] = useState('')
+	const [startDate, setStartDate] = useState(initialData?.startDate || '')
+	const [endDate, setEndDate] = useState(initialData?.endDate || '')
 	const [selectedDept, setSelectedDept] = useState('')
 
 	// Files and Links states
-	const [files, setFiles] = useState<FileAttachment[]>([])
-	const [links, setLinks] = useState<LinkResource[]>([])
+	const [files, setFiles] = useState<FileAttachment[]>(initialData?.files || [])
+	const [links, setLinks] = useState<LinkResource[]>(initialData?.links || [])
 	const [linkInput, setLinkInput] = useState('')
 	const [isDragging, setIsDragging] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
@@ -221,7 +227,7 @@ export default function ProjectFormDialog({
 			<div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-3xl my-8">
 				<div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 p-6 rounded-t-3xl z-10">
 					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-bold">{t('projectsPage.createProject')}</h2>
+						<h2 className="text-2xl font-bold">{title || t('projects.createProject')}</h2>
 						<button
 							onClick={() => {
 								resetForm()
@@ -501,13 +507,13 @@ export default function ProjectFormDialog({
 						>
 							{t('common.cancel')}
 						</Button>
-						<Button
-							onClick={handleSubmit}
-							disabled={!projectName || !startDate || !endDate}
-							className="flex-1"
-						>
-							{t('projectsPage.createProject')}
-						</Button>
+					<Button
+						onClick={handleSubmit}
+						disabled={!projectName || !startDate || !endDate}
+						className="flex-1"
+					>
+						{submitLabel || t('projects.createProject')}
+					</Button>
 					</div>
 				</div>
 			</div>
