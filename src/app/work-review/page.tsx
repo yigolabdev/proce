@@ -220,13 +220,13 @@ export default function WorkReviewPage() {
 	const getReviewTypeBadge = (type: string) => {
 		switch (type) {
 			case 'approved':
-				return { label: t('common.statuses.approved'), color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle2 }
+				return { label: t('common.statuses.approved'), color: 'bg-green-100 bg-green-900/text-green-400', icon: CheckCircle2 }
 			case 'rejected':
-				return { label: t('common.statuses.rejected'), color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: XCircle }
+				return { label: t('common.statuses.rejected'), color: 'bg-red-100 bg-red-900/text-red-400', icon: XCircle }
 			case 'changes_requested':
-				return { label: t('common.statuses.changesRequested'), color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', icon: AlertCircle }
+				return { label: t('common.statuses.changesRequested'), color: 'bg-orange-100 bg-orange-900/text-orange-400', icon: AlertCircle }
 			default:
-				return { label: t('common.status'), color: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400', icon: MessageSquare }
+				return { label: t('common.status'), color: 'bg-neutral-100 bg-neutral-800 dark:text-neutral-400', icon: MessageSquare }
 		}
 	}
 
@@ -250,10 +250,10 @@ export default function WorkReviewPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+		<div className="min-h-screen bg-background-dark text-neutral-100">
 			<Toaster />
 			
-			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6 sm:space-y-8">
 			{/* Header */}
 			<PageHeader
 				title={t('review.title')}
@@ -261,33 +261,33 @@ export default function WorkReviewPage() {
 			/>
 			
 				<div className="space-y-6">
-				{/* Tabs */}
-					<div className="flex border-b border-border-dark mb-6">
-					<button
-						onClick={() => setActiveTab('pending')}
-						className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-							activeTab === 'pending'
-								? 'border-orange-500 text-orange-500'
-								: 'border-transparent text-neutral-500 hover:text-neutral-300'
-						}`}
-					>
-						{t('review.toReview')} ({pendingReviews.length})
-					</button>
-					<button
-						onClick={() => setActiveTab('received')}
-						className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-							activeTab === 'received'
-								? 'border-orange-500 text-orange-500'
-								: 'border-transparent text-neutral-500 hover:text-neutral-300'
-						}`}
-					>
-						{t('review.myReviews')} ({reviews.length})
-					</button>
-				</div>
+			{/* Tabs - Mobile Optimized */}
+				<div className="flex border-b border-border-dark overflow-x-auto scrollbar-hide">
+				<button
+					onClick={() => setActiveTab('pending')}
+					className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+						activeTab === 'pending'
+							? 'border-orange-500 text-orange-500'
+							: 'border-transparent text-neutral-500 hover:text-neutral-300'
+					}`}
+				>
+					{t('review.toReview')} ({pendingReviews.length})
+				</button>
+				<button
+					onClick={() => setActiveTab('received')}
+					className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+						activeTab === 'received'
+							? 'border-orange-500 text-orange-500'
+							: 'border-transparent text-neutral-500 hover:text-neutral-300'
+					}`}
+				>
+					{t('review.myReviews')} ({reviews.length})
+				</button>
+			</div>
 
-				{/* Pending Reviews (To Review) */}
-				{activeTab === 'pending' && (
-					<div className={pendingReviews.length === 0 ? "space-y-4" : "grid grid-cols-1 lg:grid-cols-2 gap-6"}>
+			{/* Pending Reviews (To Review) - Mobile Optimized */}
+			{activeTab === 'pending' && (
+				<div className={pendingReviews.length === 0 ? "space-y-4" : "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"}>
 						{pendingReviews.length === 0 ? (
 								<div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border-dark rounded-xl bg-surface-dark/50">
 									<div className="p-4 rounded-full bg-surface-dark mb-4">
@@ -432,95 +432,97 @@ export default function WorkReviewPage() {
 					</div>
 				)}
 
-				{/* Received Reviews (My Reviews) */}
-				{activeTab === 'received' && (
-						<div className="space-y-6">
-						{/* Statistics */}
-				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-						<Card className="bg-surface-dark border-border-dark">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-									<div className="p-2 bg-surface-dark rounded-lg text-blue-500">
-										<MessageSquare className="h-6 w-6" />
-									</div>
-								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.total')}</p>
-										<p className="text-xl font-bold text-white">{statistics.total}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-						<Card className="bg-surface-dark border-border-dark">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-									<div className="p-2 bg-surface-dark rounded-lg text-purple-500">
-										<Mail className="h-6 w-6" />
-									</div>
-								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.unread')}</p>
-										<p className="text-xl font-bold text-white">{statistics.unread}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-						<Card className="bg-surface-dark border-border-dark">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-									<div className="p-2 bg-surface-dark rounded-lg text-green-500">
-										<ThumbsUp className="h-6 w-6" />
-									</div>
-								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.approved')}</p>
-										<p className="text-xl font-bold text-white">{statistics.approved}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-						<Card className="bg-surface-dark border-border-dark">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-									<div className="p-2 bg-surface-dark rounded-lg text-orange-500">
-										<AlertCircle className="h-6 w-6" />
-									</div>
-								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.changes')}</p>
-										<p className="text-xl font-bold text-white">{statistics.changesRequested}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-						<Card className="bg-surface-dark border-border-dark">
-						<CardContent className="p-4">
-							<div className="flex items-center gap-3">
-									<div className="p-2 bg-surface-dark rounded-lg text-red-500">
-										<ThumbsDown className="h-6 w-6" />
-									</div>
-								<div>
-										<p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{t('review.rejected')}</p>
-										<p className="text-xl font-bold text-white">{statistics.rejected}</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				</div>
-
-				{/* Filters */}
-					<Card className="bg-surface-dark border-border-dark">
+			{/* Received Reviews (My Reviews) */}
+			{activeTab === 'received' && (
+					<div className="space-y-6">
+			{/* Statistics - Improved Compact Layout & Mobile Responsive */}
+	<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
+					<Card className="bg-surface-dark border-border-dark hover:border-blue-500/50 transition-all">
 					<CardContent className="p-4">
-						<div className="flex items-center gap-4 flex-wrap">
-							<Filter className="h-4 w-4 text-neutral-500" />
-							
+						<div className="flex items-center gap-2">
+								<div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+									<MessageSquare className="h-5 w-5" />
+								</div>
+							<div>
+									<p className="text-2xl font-bold text-white">{statistics.total}</p>
+									<p className="text-xs text-neutral-500 font-medium">{t('review.total')}</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+					<Card className="bg-surface-dark border-border-dark hover:border-purple-500/50 transition-all">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-2">
+								<div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+									<Mail className="h-5 w-5" />
+								</div>
+							<div>
+									<p className="text-2xl font-bold text-white">{statistics.unread}</p>
+									<p className="text-xs text-neutral-500 font-medium">{t('review.unread')}</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+					<Card className="bg-surface-dark border-border-dark hover:border-green-500/50 transition-all">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-2">
+								<div className="p-2 bg-green-500/10 rounded-lg text-green-500">
+									<ThumbsUp className="h-5 w-5" />
+								</div>
+							<div>
+									<p className="text-2xl font-bold text-white">{statistics.approved}</p>
+									<p className="text-xs text-neutral-500 font-medium">{t('review.approved')}</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+					<Card className="bg-surface-dark border-border-dark hover:border-orange-500/50 transition-all">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-2">
+								<div className="p-2 bg-orange-500/10 rounded-lg text-orange-500">
+									<AlertCircle className="h-5 w-5" />
+								</div>
+							<div>
+									<p className="text-2xl font-bold text-white">{statistics.changesRequested}</p>
+									<p className="text-xs text-neutral-500 font-medium">{t('review.changes')}</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+
+					<Card className="bg-surface-dark border-border-dark hover:border-red-500/50 transition-all">
+					<CardContent className="p-4">
+						<div className="flex items-center gap-2">
+								<div className="p-2 bg-red-500/10 rounded-lg text-red-500">
+									<ThumbsDown className="h-5 w-5" />
+								</div>
+							<div>
+									<p className="text-2xl font-bold text-white">{statistics.rejected}</p>
+									<p className="text-xs text-neutral-500 font-medium">{t('review.rejected')}</p>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Filters - Mobile Optimized */}
+				<Card className="bg-surface-dark border-border-dark">
+				<CardContent className="p-3 sm:p-4">
+					<div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-col sm:flex-row">
+						<Filter className="h-4 w-4 text-neutral-500 flex-shrink-0 hidden sm:block" />
+						
+						{/* Filter Group - Stack on Mobile */}
+						<div className="flex items-center gap-3 sm:gap-4 flex-wrap w-full sm:w-auto">
 							{/* Review Type Filter */}
-							<div className="flex items-center gap-2">
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.type')}</span>
+							<div className="flex items-center gap-2 flex-1 sm:flex-initial">
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider hidden sm:inline">{t('common.type')}</span>
 								<select
 									value={filterType}
 									onChange={(e) => setFilterType(e.target.value)}
-										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
+										className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500 w-full sm:w-auto"
 								>
 									<option value="all">{t('messages.allTypes')}</option>
 									<option value="approved">{t('review.approved')}</option>
@@ -530,13 +532,13 @@ export default function WorkReviewPage() {
 							</div>
 
 							{/* Project Filter */}
-							<div className="flex items-center gap-2">
-								<FolderKanban className="h-4 w-4 text-neutral-500" />
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.project')}</span>
+							<div className="flex items-center gap-2 flex-1 sm:flex-initial">
+								<FolderKanban className="h-4 w-4 text-neutral-500 flex-shrink-0 sm:hidden" />
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider hidden sm:inline">{t('common.project')}</span>
 								<select
 									value={filterProject}
 									onChange={(e) => setFilterProject(e.target.value)}
-										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
+										className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500 w-full sm:w-auto"
 								>
 									<option value="all">{t('projects.allProjects')}</option>
 									{projects.map((project) => (
@@ -548,13 +550,13 @@ export default function WorkReviewPage() {
 							</div>
 
 							{/* Read Status Filter */}
-							<div className="flex items-center gap-2">
-								<Mail className="h-4 w-4 text-neutral-500" />
-									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{t('common.status')}</span>
+							<div className="flex items-center gap-2 flex-1 sm:flex-initial">
+								<Mail className="h-4 w-4 text-neutral-500 flex-shrink-0 sm:hidden" />
+									<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider hidden sm:inline">{t('common.status')}</span>
 								<select
 									value={filterRead}
 									onChange={(e) => setFilterRead(e.target.value)}
-										className="px-3 py-1.5 text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500"
+										className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm bg-surface-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-orange-500 w-full sm:w-auto"
 								>
 									<option value="all">{t('common.all')}</option>
 									<option value="unread">{t('review.unread')}</option>
@@ -562,284 +564,347 @@ export default function WorkReviewPage() {
 								</select>
 							</div>
 						</div>
+						</div>
 					</CardContent>
 				</Card>
 
-				{/* Reviews List */}
-				{filteredReviews.length === 0 ? (
-						<div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border-dark rounded-xl bg-surface-dark/50">
-							<div className="p-4 rounded-full bg-surface-dark mb-4">
-								<MessageSquare className="h-8 w-8 text-neutral-500" />
-							</div>
-							<h3 className="text-lg font-medium text-white mb-2">{t('review.noReviews')}</h3>
-							<p className="text-neutral-500 mb-6 max-w-md">
-								{t('review.noReviewsDesc')}
-							</p>
-							<Button
-								onClick={() => {
-									setFilterType('all')
-									setFilterProject('all')
-									setFilterRead('all')
-								}}
-								variant="outline"
-								className="rounded-full"
-							>
-								{t('review.viewAll')}
-							</Button>
+			{/* Reviews List - Improved Compact Design */}
+			{filteredReviews.length === 0 ? (
+					<div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border-dark rounded-xl bg-surface-dark/50">
+						<div className="p-4 rounded-full bg-surface-dark mb-4">
+							<MessageSquare className="h-8 w-8 text-neutral-500" />
 						</div>
-				) : (
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						{filteredReviews.map((review) => {
-							const isExpanded = expandedReviews.includes(review.id)
-							const badge = getReviewTypeBadge(review.reviewType)
-							const BadgeIcon = badge.icon
+						<h3 className="text-lg font-medium text-white mb-2">{t('review.noReviews')}</h3>
+						<p className="text-neutral-500 mb-6 max-w-md">
+							{t('review.noReviewsDesc')}
+						</p>
+						<Button
+							onClick={() => {
+								setFilterType('all')
+								setFilterProject('all')
+								setFilterRead('all')
+							}}
+							variant="outline"
+							className="rounded-full"
+						>
+							{t('review.viewAll')}
+						</Button>
+					</div>
+			) : (
+				<div className="space-y-3">
+					{filteredReviews.map((review) => {
+						const isExpanded = expandedReviews.includes(review.id)
+						const badge = getReviewTypeBadge(review.reviewType)
+						const BadgeIcon = badge.icon
 
-							return (
-									<div
-									key={review.id}
-										className={`group bg-surface-dark border border-border-dark rounded-xl transition-all overflow-hidden ${
-										!review.isRead 
-												? 'border-l-4 border-l-orange-500' 
-												: 'hover:border-neutral-700'
-									}`}
-								>
-										<div className="p-6">
-										<div className="space-y-4">
-											{/* Header */}
-											<div className="flex items-start justify-between gap-4">
-												<div className="flex-1 min-w-0">
-														<div className="flex items-center gap-2 mb-3 flex-wrap">
-														{/* Unread Badge */}
-														{!review.isRead && (
-																<span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500 text-white uppercase tracking-wider">
-																{t('common.new')}
-															</span>
-														)}
-														
-														{/* Review Type Badge */}
-															<span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-																review.reviewType === 'approved' ? 'bg-green-900/30 text-green-400' :
-																review.reviewType === 'rejected' ? 'bg-red-900/30 text-red-400' :
-																'bg-orange-900/30 text-orange-400'
-															} flex items-center gap-1`}>
-															<BadgeIcon className="h-3 w-3" />
-															{badge.label}
-														</span>
+						return (
+								<div
+								key={review.id}
+									className={`group bg-surface-dark border rounded-xl transition-all overflow-hidden cursor-pointer ${
+									!review.isRead 
+											? 'border-l-4 border-l-orange-500 hover:shadow-lg hover:shadow-orange-500/10' 
+											: 'border-border-dark hover:border-neutral-700 hover:shadow-lg'
+								}`}
+									onClick={() => {
+										toggleExpanded(review.id)
+										if (!review.isRead) {
+											markAsRead(review.id)
+										}
+									}}
+							>
+									{/* Compact Header - Always Visible */}
+									<div className="p-4">
+									<div className="flex items-start justify-between gap-4">
+										<div className="flex-1 min-w-0">
+											{/* Badges Row */}
+											<div className="flex items-center gap-2 mb-2 flex-wrap">
+												{/* Unread Indicator */}
+												{!review.isRead && (
+													<div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+												)}
+												
+												{/* Review Type Badge */}
+													<span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+														review.reviewType === 'approved' ? 'bg-green-900/30 text-green-400 border border-green-500/20' :
+														review.reviewType === 'rejected' ? 'bg-red-900/30 text-red-400 border border-red-500/20' :
+														'bg-orange-900/30 text-orange-400 border border-orange-500/20'
+													} flex items-center gap-1`}>
+													<BadgeIcon className="h-3 w-3" />
+													{badge.label}
+												</span>
 
-														{/* Project Badge */}
-														{review.projectName && (
-																<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-neutral-800 text-neutral-300 flex items-center gap-1">
-																<FolderKanban className="h-3 w-3" />
-																{review.projectName}
-															</span>
-														)}
-													</div>
-
-														<h3 className="text-lg font-bold text-white mb-2 group-hover:text-orange-500 transition-colors">{review.workTitle}</h3>
-													
-														<div className="flex items-center gap-4 text-xs text-neutral-500 flex-wrap">
-														<div className="flex items-center gap-1.5">
-																<User className="h-3.5 w-3.5" />
-																<span className="text-neutral-400">
-																{review.reviewedBy}
-																{review.reviewedByDepartment && (
-																	<span className="text-neutral-500"> • {review.reviewedByDepartment}</span>
-																)}
-															</span>
-														</div>
-														<div className="flex items-center gap-1.5">
-													<Clock className="h-3.5 w-3.5" />
-												<span>{formatTimeAgo(typeof review.reviewedAt === 'string' ? new Date(review.reviewedAt) : review.reviewedAt)}</span>
-														</div>
-														<div className="flex items-center gap-1.5">
-																<Calendar className="h-3.5 w-3.5" />
-															<span>{review.reviewedAt.toLocaleString()}</span>
-														</div>
-													</div>
-												</div>
-
-												<button
-													onClick={() => {
-														toggleExpanded(review.id)
-														if (!review.isRead) {
-															markAsRead(review.id)
-														}
-													}}
-														className="p-1 rounded-full hover:bg-surface-dark text-neutral-500 hover:text-white transition-colors"
-												>
-													{isExpanded ? (
-														<ChevronUp className="h-5 w-5" />
-													) : (
-														<ChevronDown className="h-5 w-5" />
-													)}
-												</button>
+												{/* Project Badge */}
+												{review.projectName && (
+														<span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-neutral-800 text-neutral-300 flex items-center gap-1 border border-neutral-700">
+														<FolderKanban className="h-3 w-3" />
+														{review.projectName}
+													</span>
+												)}
 											</div>
 
-											{/* Expanded Content */}
-											{isExpanded && (
-													<div className="space-y-4 pt-4 border-t border-border-dark mt-4">
+											{/* Title */}
+												<h3 className="text-base font-bold text-white mb-1.5 group-hover:text-orange-500 transition-colors line-clamp-1">{review.workTitle}</h3>
+											
+											{/* Meta Info */}
+												<div className="flex items-center gap-3 text-xs text-neutral-500 flex-wrap">
+												<div className="flex items-center gap-1">
+														<User className="h-3.5 w-3.5" />
+														<span className="text-neutral-400">{review.reviewedBy}</span>
+														{review.reviewedByDepartment && (
+															<span className="text-neutral-600">• {review.reviewedByDepartment}</span>
+														)}
+												</div>
+												<div className="flex items-center gap-1">
+													<Clock className="h-3.5 w-3.5" />
+												<span>{formatTimeAgo(typeof review.reviewedAt === 'string' ? new Date(review.reviewedAt) : review.reviewedAt)}</span>
+												</div>
+											</div>
+										</div>
+
+										{/* Expand Button */}
+										<div className="flex items-center gap-2">
+											<div
+													className={`p-1.5 rounded-lg transition-all ${
+													isExpanded 
+														? 'bg-orange-500/20 text-orange-500' 
+														: 'bg-surface-dark text-neutral-500 group-hover:text-white'
+												}`}
+											>
+												{isExpanded ? (
+													<ChevronUp className="h-4 w-4" />
+												) : (
+													<ChevronDown className="h-4 w-4" />
+												)}
+											</div>
+										</div>
+									</div>
+
+									{/* Expanded Content - Detailed View */}
+									{isExpanded && (
+											<div className="space-y-4 pt-4 border-t border-border-dark mt-4 animate-in fade-in duration-200">
+											{/* Work Details Section */}
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{/* Left Column - Main Content */}
+												<div className="space-y-4">
 													{/* Original Work Description */}
 													<div>
 															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-																<FileText className="h-3 w-3" />
+																<FileText className="h-3.5 w-3.5" />
 																{t('review.originalSubmission')}
 														</h4>
-															<div className="text-sm text-neutral-300 bg-surface-dark p-4 rounded-lg border border-border-dark space-y-4">
-															<p>{review.workDescription}</p>
-
-														{/* Metadata Section */}
-															<div className="flex flex-wrap gap-3 border-t border-border-dark pt-3 mt-3">
-																{/* Priority */}
-																{review.priority && (
-																	<span className={`text-[10px] px-2 py-0.5 rounded-full border uppercase tracking-wider font-medium ${
-																		review.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-																		review.priority === 'medium' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
-																		'bg-blue-500/10 text-blue-400 border-blue-500/20'
-																	}`}>
-																		{t(`common.priorities.${review.priority}`) || review.priority}
-																	</span>
-																)}
-																
-																{/* Category */}
-																{review.category && (
-																	<span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 border border-neutral-700 uppercase tracking-wider font-medium">
-																		{review.category}
-																	</span>
-																)}
-
-																{/* Confidential */}
-																{review.isConfidential && (
-																	<span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1 uppercase tracking-wider font-medium">
-																		<Shield className="h-3 w-3" />
-																		{t('input.confidential')}
-																	</span>
-																)}
-															</div>
-
-															{/* Tags */}
-															{review.tags && review.tags.length > 0 && (
-																<div className="flex flex-wrap gap-2">
-																	{review.tags.map(tag => (
-																		<span key={tag} className="text-xs flex items-center gap-1 text-neutral-400 bg-neutral-800/50 px-2 py-1 rounded">
-																			<Tag className="h-3 w-3" />
-																			{tag}
-																		</span>
-																	))}
-																</div>
-															)}
-
-													{/* Files & Links */}
-													{((review.files && review.files.length > 0) || (review.links && review.links.length > 0)) && (
-																<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-																	{review.files && review.files.length > 0 && (
-																		<div className="space-y-2">
-																			<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
-																				<Paperclip className="h-3 w-3" /> {t('common.attachments')}
-																			</span>
-																			<div className="space-y-1">
-																				{review.files.map((file, idx) => (
-																					<div key={idx} className="flex items-center gap-2 text-xs text-neutral-300 bg-neutral-800 p-2 rounded border border-neutral-700">
-																						<FileText className="h-3 w-3 text-neutral-500" />
-																						<span className="truncate">{file.name}</span>
-																					</div>
-																				))}
-																			</div>
-																		</div>
-																	)}
-																	{review.links && review.links.length > 0 && (
-																		<div className="space-y-2">
-																			<span className="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
-																				<LinkIcon className="h-3 w-3" /> {t('common.links')}
-																			</span>
-																			<div className="space-y-1">
-																				{review.links.map((link, idx) => (
-																					<a 
-																						key={idx} 
-																						href={link.url}
-																						target="_blank"
-																						rel="noopener noreferrer"
-																						className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 bg-neutral-800 p-2 rounded border border-neutral-700 transition-colors"
-																					>
-																						<LinkIcon className="h-3 w-3" />
-																						<span className="truncate">{link.title}</span>
-																					</a>
-																				))}
-																			</div>
-																		</div>
-																	)}
-																</div>
-															)}
+															<div className="text-sm text-neutral-300 bg-neutral-900/50 p-4 rounded-lg border border-border-dark">
+															<p className="leading-relaxed whitespace-pre-wrap">{review.workDescription}</p>
 														</div>
 													</div>
 
-													{/* Review Comments */}
+													{/* Review Feedback */}
 													<div>
 															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-																<MessageSquare className="h-3 w-3" />
+																<MessageSquare className="h-3.5 w-3.5" />
 																{t('review.feedback')}
 														</h4>
-															<div className={`p-4 rounded-lg border-l-2 bg-surface-dark ${
+															<div className={`p-4 rounded-lg border-l-4 ${
 															review.reviewType === 'approved' 
-																	? 'border-l-green-500' 
+																	? 'bg-green-500/10 border-l-green-500' 
 																: review.reviewType === 'rejected'
-																	? 'border-l-red-500'
-																	: 'border-l-orange-500'
+																	? 'bg-red-500/10 border-l-red-500'
+																	: 'bg-orange-500/10 border-l-orange-500'
 														}`}>
 																<p className="text-sm text-white whitespace-pre-wrap leading-relaxed">
 																{review.reviewComments}
 															</p>
 														</div>
 													</div>
-
-													{/* Actions */}
-													<div className="flex items-center gap-3 pt-2">
-														{review.reviewType === 'changes_requested' && (
-															<Button
-																onClick={() => {
-																	navigate('/app/input')
-																	toast.info('Redirecting to update your work...')
-																}}
-																	variant="brand"
-																	className="flex items-center gap-2 h-9"
-															>
-																<FileText className="h-4 w-4" />
-																{t('review.updateWork')}
-															</Button>
-														)}
-														{review.reviewType === 'rejected' && (
-															<Button
-																onClick={() => {
-																	navigate('/app/input')
-																	toast.info('Redirecting to resubmit...')
-																}}
-																	variant="primary"
-																	className="flex items-center gap-2 h-9"
-															>
-																<FileText className="h-4 w-4" />
-																{t('review.resubmit')}
-															</Button>
-														)}
-														<Button
-															variant="outline"
-															onClick={() => {
-																navigate('/app/work-history')
-															}}
-																className="h-9"
-														>
-															{t('review.viewHistory')}
-														</Button>
-													</div>
 												</div>
-											)}
+
+												{/* Right Column - Metadata & Attachments */}
+												<div className="space-y-4">
+													{/* Metadata Grid */}
+													<div>
+															<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+																<Tag className="h-3.5 w-3.5" />
+																상세 정보
+														</h4>
+														<div className="space-y-3">
+															{/* Date & Time */}
+															<div className="bg-neutral-900/50 p-3 rounded-lg border border-border-dark">
+																<div className="flex items-center gap-2 text-xs text-neutral-500 mb-1">
+																	<Calendar className="h-3.5 w-3.5" />
+																	검토 완료 일시
+																</div>
+																<div className="text-sm text-white font-medium">
+																	{(typeof review.reviewedAt === 'string' ? new Date(review.reviewedAt) : review.reviewedAt).toLocaleString('ko-KR', {
+																		year: 'numeric',
+																		month: 'long',
+																		day: 'numeric',
+																		hour: '2-digit',
+																		minute: '2-digit'
+																	})}
+																</div>
+															</div>
+
+															{/* Priority */}
+															{review.priority && (
+																<div className="bg-neutral-900/50 p-3 rounded-lg border border-border-dark">
+																	<div className="flex items-center justify-between">
+																		<span className="text-xs text-neutral-500">우선순위</span>
+																		<span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+																			review.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+																			review.priority === 'medium' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+																			'bg-blue-500/10 text-blue-400 border-blue-500/20'
+																		}`}>
+																			{t(`common.priorities.${review.priority}`) || review.priority}
+																		</span>
+																	</div>
+																</div>
+															)}
+															
+															{/* Category */}
+															{review.category && (
+																<div className="bg-neutral-900/50 p-3 rounded-lg border border-border-dark">
+																	<div className="flex items-center justify-between">
+																		<span className="text-xs text-neutral-500">카테고리</span>
+																		<span className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 font-medium">
+																			{review.category}
+																		</span>
+																	</div>
+																</div>
+															)}
+
+															{/* Confidential */}
+															{review.isConfidential && (
+																<div className="bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">
+																	<div className="flex items-center gap-2 text-amber-400">
+																		<Shield className="h-4 w-4" />
+																		<span className="text-xs font-medium">{t('input.confidential')}</span>
+																	</div>
+																</div>
+															)}
+														</div>
+													</div>
+
+													{/* Tags */}
+													{review.tags && review.tags.length > 0 && (
+														<div>
+																<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+																	<Tag className="h-3.5 w-3.5" />
+																	태그
+															</h4>
+															<div className="flex flex-wrap gap-2">
+																{review.tags.map(tag => (
+																	<span key={tag} className="text-xs flex items-center gap-1 text-neutral-300 bg-neutral-800/50 px-2.5 py-1 rounded-full border border-neutral-700 hover:border-orange-500/50 transition-colors">
+																		<Tag className="h-3 w-3" />
+																		{tag}
+																	</span>
+																))}
+															</div>
+														</div>
+													)}
+
+													{/* Files & Links */}
+													{((review.files && review.files.length > 0) || (review.links && review.links.length > 0)) && (
+														<div className="space-y-3">
+															{review.files && review.files.length > 0 && (
+																<div>
+																	<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+																		<Paperclip className="h-3.5 w-3.5" />
+																		{t('common.attachments')} ({review.files.length})
+																	</h4>
+																	<div className="space-y-2">
+																		{review.files.map((file, idx) => (
+																			<div key={idx} className="flex items-center gap-2 text-xs text-neutral-300 bg-neutral-900/50 p-2.5 rounded-lg border border-border-dark hover:border-orange-500/50 transition-colors">
+																				<FileText className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+																				<span className="truncate flex-1">{file.name}</span>
+																				<span className="text-neutral-600 text-[10px]">
+																					{(file.size / 1024).toFixed(1)}KB
+																				</span>
+																			</div>
+																		))}
+																	</div>
+																</div>
+															)}
+															{review.links && review.links.length > 0 && (
+																<div>
+																	<h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+																		<LinkIcon className="h-3.5 w-3.5" />
+																		{t('common.links')} ({review.links.length})
+																	</h4>
+																	<div className="space-y-2">
+																		{review.links.map((link, idx) => (
+																			<a 
+																				key={idx} 
+																				href={link.url}
+																				target="_blank"
+																				rel="noopener noreferrer"
+																				onClick={(e) => e.stopPropagation()}
+																				className="flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 bg-neutral-900/50 p-2.5 rounded-lg border border-border-dark hover:border-blue-500/50 transition-colors group"
+																			>
+																				<LinkIcon className="h-4 w-4 flex-shrink-0" />
+																				<span className="truncate flex-1 group-hover:underline">{link.title}</span>
+																				<svg className="h-3 w-3 text-neutral-600 group-hover:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+																				</svg>
+																			</a>
+																		))}
+																	</div>
+																</div>
+															)}
+														</div>
+													)}
+												</div>
+											</div>
+
+											{/* Action Buttons */}
+											<div className="flex items-center gap-3 pt-4 border-t border-border-dark">
+												{review.reviewType === 'changes_requested' && (
+													<Button
+														onClick={(e) => {
+															e.stopPropagation()
+															navigate('/app/input')
+															toast.info('업무 수정 페이지로 이동합니다...')
+														}}
+															variant="brand"
+															className="flex items-center gap-2 h-9"
+													>
+														<FileText className="h-4 w-4" />
+														{t('review.updateWork')}
+													</Button>
+												)}
+												{review.reviewType === 'rejected' && (
+													<Button
+														onClick={(e) => {
+															e.stopPropagation()
+															navigate('/app/input')
+															toast.info('업무 재제출 페이지로 이동합니다...')
+														}}
+															variant="primary"
+															className="flex items-center gap-2 h-9"
+													>
+														<FileText className="h-4 w-4" />
+														{t('review.resubmit')}
+													</Button>
+												)}
+												<Button
+													variant="outline"
+													onClick={(e) => {
+														e.stopPropagation()
+														navigate('/app/work-history')
+													}}
+														className="h-9"
+												>
+													{t('review.viewHistory')}
+												</Button>
+											</div>
 										</div>
-										</div>
-									</div>
-							)
-						})}
-					</div>
-				)}
-					</div>
-				)}
+									)}
+								</div>
+							</div>
+						)
+					})}
+				</div>
+			)}
+				</div>
+			)}
 				</div>
 			</div>
 		</div>
