@@ -162,10 +162,10 @@ export function useWorkInput(): UseWorkInputReturn {
 				projectId: formData.projectId,
 				projectName: projects.find(p => p.id === formData.projectId)?.name || '',
 				tags: formData.tags,
-				date: new Date(),
-				status: 'completed' as const,
-				timeSpent: 0,
-				userId: 'current-user', // TODO: Get from auth context
+			date: new Date(),
+			status: 'completed' as const,
+			// timeSpent: 0, // Not in WorkEntry type
+			userId: 'current-user', // TODO: Get from auth context
 				userName: 'Current User', // TODO: Get from auth context
 				department: 'Engineering', // TODO: Get from auth context
 				files: formData.files,

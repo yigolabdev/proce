@@ -42,7 +42,7 @@ function validateEmail(email: string) {
 export default function LandingPage() {
 	const navigate = useNavigate()
 	const { login } = useAuth()
-	const { t, locale, setLocale } = useI18n()
+	const { locale, setLocale } = useI18n() // t not used
 	const tt = useMemo(() => authI18n[locale as keyof typeof authI18n], [locale])
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')

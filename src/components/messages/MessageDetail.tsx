@@ -138,7 +138,7 @@ export function MessageDetail({
 							<Button
 								key={index}
 								onClick={() => onQuickAction?.(action.action)}
-								variant={action.variant || 'outline'}
+								variant={(action.variant === 'success' ? 'brand' : action.variant) || 'outline'}
 								size="sm"
 							>
 								{action.label}
