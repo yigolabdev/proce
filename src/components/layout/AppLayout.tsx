@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
-import { useState, useEffect, Fragment, useCallback, useMemo } from 'react'
+import { useState, useEffect, Fragment, useMemo } from 'react'
 import { storage } from '../../utils/storage'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -49,8 +49,8 @@ export default function AppLayout() {
 		setIsMobileSidebarOpen(false)
 	}, [location.pathname])
 
-	// Memoize link component to prevent recreation on every render
-	const link = useCallback((to: string, label: string, Icon: any, badge?: number) => (
+	// Link component - NOT memoized as it returns JSX directly
+	const renderLink = (to: string, label: string, Icon: any, badge?: number) => (
 		<NavLink
 			key={to}
 			to={to}
@@ -80,7 +80,7 @@ export default function AppLayout() {
 				</>
 			)}
 		</NavLink>
-	), [])
+	)
 
 	// Menu definition by role - memoized to prevent recreation
 	const menuGroups = useMemo(() => [
@@ -164,7 +164,7 @@ const visibleMenuGroups = useMemo(() => menuGroups
 						<div className="space-y-1.5">
 						{group.items.map((item) => (
 							<Fragment key={item.to}>
-								{link(item.to, item.label, item.icon, item.badge)}
+								{renderLink(item.to, item.label, item.icon, item.badge)}
 							</Fragment>
 						))}
 						</div>
@@ -177,7 +177,7 @@ const visibleMenuGroups = useMemo(() => menuGroups
 						{t('menu.system')}
 					</div>
 					<div className="space-y-1.5">
-						{link('/app/settings', t('menu.settings'), Settings)}
+						{renderLink('/app/settings', t('menu.settings'), Settings)}
 					</div>
 				</div>
 			</nav>
