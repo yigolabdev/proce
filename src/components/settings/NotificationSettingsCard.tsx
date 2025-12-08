@@ -4,10 +4,10 @@
  */
 
 import React from 'react'
-import { Card, CardContent } from '../../ui/Card'
-import { Button } from '../../ui/Button'
+import { Card, CardContent } from '../ui/Card'
+import { Button } from '../ui/Button'
 import { Bell, BellOff, Clock } from 'lucide-react'
-import type { NotificationSettings } from '../../../utils/notificationUtils'
+import type { NotificationSettings } from '../../utils/notificationUtils'
 
 export interface NotificationSettingsCardProps {
 	settings: NotificationSettings

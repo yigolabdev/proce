@@ -4,9 +4,9 @@
  */
 
 import React from 'react'
-import { Card, CardContent } from '../../ui/Card'
+import { Card, CardContent } from '../ui/Card'
 import { Globe, Check } from 'lucide-react'
-import { useI18n } from '../../../i18n/I18nProvider'
+import { useI18n } from '../../i18n/I18nProvider'
 
 export function LanguageSettings() {
 	const { locale, setLocale, t } = useI18n()

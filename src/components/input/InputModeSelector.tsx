@@ -4,9 +4,9 @@
  */
 
 import React from 'react'
-import { Tabs } from '../../ui/Tabs'
+import { Tabs } from '../ui/Tabs'
 import { FileText, Target, Sparkles } from 'lucide-react'
-import type { InputMode } from '../../../types/workInput.types'
+import type { InputMode } from '../../types/workInput.types'
 
 export interface InputModeSelectorProps {
 	mode: InputMode

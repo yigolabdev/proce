@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
-import Textarea from '../../ui/Textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
+import Textarea from '../ui/Textarea'
 import { Send, X } from 'lucide-react'
 import { toast } from 'sonner'
 

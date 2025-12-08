@@ -5,8 +5,8 @@
 
 import React from 'react'
 import { X, Tag } from 'lucide-react'
-import Input from '../../ui/Input'
-import { Button } from '../../ui/Button'
+import Input from '../ui/Input'
+import { Button } from '../ui/Button'
 
 export interface TagInputProps {
 	tags: string[]

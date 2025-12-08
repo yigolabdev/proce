@@ -102,6 +102,7 @@ export default function ProjectDetailPage() {
 			userName: newMemberEmail.split('@')[0],
 			userEmail: newMemberEmail,
 			role: newMemberRole,
+			permissions: ['read'], // 기본 권한 추가
 		}
 		
 		const success = ProjectMemberManager.addMember(

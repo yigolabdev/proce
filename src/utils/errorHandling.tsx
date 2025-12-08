@@ -3,9 +3,9 @@
  * 통합 에러 처리 및 바운더리 시스템
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import React, { Component, type ErrorInfo, type ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
-import { Button } from '../../components/ui/Button'
+import { Button } from '../components/ui/Button'
 
 /**
  * 에러 타입 정의

@@ -417,6 +417,15 @@ export interface Message {
 	isArchived: boolean
 	sender?: string
 	tags?: string[]
+	// 추가 필드들
+	subject?: string
+	from?: string
+	relatedPage?: string
+	threadId?: string | null
+	replyTo?: string | null
+	attachments?: string[]
+	mentions?: string[]
+	readAt?: Date | string | null
 }
 
 // ==================== Review Types ====================

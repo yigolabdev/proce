@@ -5,8 +5,8 @@
 
 import React from 'react'
 import { UserCheck, MessageSquare } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import Textarea from '../../ui/Textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import Textarea from '../ui/Textarea'
 
 export interface Reviewer {
 	id: string

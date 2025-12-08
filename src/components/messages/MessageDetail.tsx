@@ -4,8 +4,8 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
 import {
 	X,
 	Reply,
@@ -17,7 +17,7 @@ import {
 	User,
 	ExternalLink,
 } from 'lucide-react'
-import type { Message } from '../../../types/common.types'
+import type { Message } from '../../types/common.types'
 
 export interface MessageDetailProps {
 	message: Message

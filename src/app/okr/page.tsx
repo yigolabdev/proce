@@ -7,7 +7,7 @@
  * - 재사용 가능한 컴포넌트로 UI 구성
  */
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { PageHeader } from '../../components/common/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { Tabs } from '../../components/ui/Tabs'
@@ -97,10 +97,10 @@ export default function OKRPage() {
 		<div className="min-h-screen bg-background-dark">
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 				{/* Page Header */}
-				<PageHeader
-					title="OKR Management"
-					description="Set and track your objectives and key results"
-					action={
+			<PageHeader
+				title="OKR Management"
+				description="Set and track your objectives and key results"
+				actions={
 						<Button onClick={handleCreateObjective} variant="brand">
 							<Plus className="h-4 w-4 mr-2" />
 							New Objective

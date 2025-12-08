@@ -449,8 +449,11 @@ export class DataValidator {
 		}
 		
 		// 날짜 유효성 검증
-		if (entry.date && isNaN(entry.date.getTime())) {
-			errors.push('Invalid date')
+		if (entry.date) {
+			const dateObj = entry.date instanceof Date ? entry.date : new Date(entry.date)
+			if (isNaN(dateObj.getTime())) {
+				errors.push('Invalid date')
+			}
 		}
 		
 		return {
@@ -466,11 +469,17 @@ export class DataValidator {
 		const errors: string[] = []
 		
 		// 날짜 유효성
-		if (project.startDate && isNaN(project.startDate.getTime())) {
-			errors.push('Invalid startDate')
+		if (project.startDate) {
+			const dateObj = project.startDate instanceof Date ? project.startDate : new Date(project.startDate)
+			if (isNaN(dateObj.getTime())) {
+				errors.push('Invalid startDate')
+			}
 		}
-		if (project.endDate && isNaN(project.endDate.getTime())) {
-			errors.push('Invalid endDate')
+		if (project.endDate) {
+			const dateObj = project.endDate instanceof Date ? project.endDate : new Date(project.endDate)
+			if (isNaN(dateObj.getTime())) {
+				errors.push('Invalid endDate')
+			}
 		}
 		
 		// 시작일이 종료일보다 늦은지 확인

@@ -4,8 +4,8 @@
  */
 
 import React from 'react'
-import { Card, CardContent } from '../../ui/Card'
-import { Button } from '../../ui/Button'
+import { Card, CardContent } from '../ui/Card'
+import { Button } from '../ui/Button'
 import {
 	ChevronDown,
 	ChevronUp,
@@ -19,7 +19,7 @@ import {
 	XCircle,
 	Clock as Pending,
 } from 'lucide-react'
-import type { WorkEntry } from '../../../types/common.types'
+import type { WorkEntry } from '../../types/common.types'
 
 export interface WorkEntryCardProps {
 	entry: WorkEntry

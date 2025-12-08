@@ -4,12 +4,12 @@
  */
 
 import React from 'react'
-import { Card, CardContent } from '../../ui/Card'
-import { Button } from '../../ui/Button'
-import Input from '../../ui/Input'
+import { Card, CardContent } from '../ui/Card'
+import { Button } from '../ui/Button'
+import Input from '../ui/Input'
 import { Search, Filter, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
-import type { WorkHistoryFilters as Filters } from '../../../hooks/useWorkHistory'
-import type { Project } from '../../../types/common.types'
+import type { WorkHistoryFilters as Filters } from '../../hooks/useWorkHistory'
+import type { Project } from '../../types/common.types'
 
 export interface WorkHistoryFiltersProps {
 	filters: Filters

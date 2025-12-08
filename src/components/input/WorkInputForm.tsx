@@ -4,10 +4,10 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
-import Input from '../../ui/Input'
-import Textarea from '../../ui/Textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
+import Input from '../ui/Input'
+import Textarea from '../ui/Textarea'
 import { FileText, Save, Send, Shield } from 'lucide-react'
 import type { WorkInputFormData, Project, WorkCategory } from '../../../types'
 

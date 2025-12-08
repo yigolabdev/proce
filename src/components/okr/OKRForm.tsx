@@ -4,13 +4,13 @@
  */
 
 import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
-import Input from '../../ui/Input'
-import Textarea from '../../ui/Textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
+import Input from '../ui/Input'
+import Textarea from '../ui/Textarea'
 import { Target, X, Save } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Objective, ObjectiveFormData } from '../../../types/okr.types'
+import type { Objective, ObjectiveFormData } from '../../types/okr.types'
 
 export interface OKRFormProps {
 	objective?: Objective

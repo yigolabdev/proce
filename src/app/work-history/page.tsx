@@ -54,9 +54,9 @@ export default function WorkHistoryPage() {
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-6">
 				{/* Page Header */}
 		<PageHeader
-					title="Work History"
-					description="View and manage your work entries"
-					action={
+				title="Work History"
+				description="View and manage your work entries"
+				actions={
 						<Button onClick={() => navigate('/app/input')} variant="brand">
 							<Plus className="h-4 w-4 mr-2" />
 							New Entry

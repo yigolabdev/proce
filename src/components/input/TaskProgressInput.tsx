@@ -4,11 +4,11 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import Input from '../../ui/Input'
-import Textarea from '../../ui/Textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import Input from '../ui/Input'
+import Textarea from '../ui/Textarea'
 import { Target, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react'
-import type { TaskProgress } from '../../../types/workInput.types'
+import type { TaskProgress } from '../../types/workInput.types'
 
 export interface TaskProgressInputProps {
 	taskProgress: TaskProgress

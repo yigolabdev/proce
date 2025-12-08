@@ -5,11 +5,11 @@
 
 import React, { useState } from 'react'
 import { Link2, X, ExternalLink } from 'lucide-react'
-import Input from '../../ui/Input'
-import { Button } from '../../ui/Button'
-import { Card, CardContent } from '../../ui/Card'
+import Input from '../ui/Input'
+import { Button } from '../ui/Button'
+import { Card, CardContent } from '../ui/Card'
 import { toast } from 'sonner'
-import type { LinkResource } from '../../../types/common.types'
+import type { LinkResource } from '../../types/common.types'
 
 export interface LinkInputProps {
 	links: LinkResource[]

@@ -3,7 +3,7 @@
  * AI 추천 로직 통합 (Inbox, AI Recommendations 페이지에서 공유)
  */
 
-import { differenceInDays, differenceInHours } from 'date-fns'
+import { differenceInDays } from 'date-fns'
 import type { WorkEntry, Project } from '../../types/common.types'
 
 /**

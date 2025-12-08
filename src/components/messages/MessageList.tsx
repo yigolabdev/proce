@@ -4,8 +4,8 @@
  */
 
 import React from 'react'
-import { Card } from '../../ui/Card'
-import { Button } from '../../ui/Button'
+import { Card } from '../ui/Card'
+import { Button } from '../ui/Button'
 import {
 	Mail,
 	MailOpen,
@@ -17,7 +17,7 @@ import {
 	MessageSquare,
 	Zap,
 } from 'lucide-react'
-import type { Message } from '../../../types/common.types'
+import type { Message } from '../../types/common.types'
 
 export interface MessageListProps {
 	messages: Message[]

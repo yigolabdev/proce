@@ -4,9 +4,9 @@
  */
 
 import React from 'react'
-import { Button } from '../../ui/Button'
+import { Button } from '../ui/Button'
 import { Edit, Trash2, User, TrendingUp, AlertCircle } from 'lucide-react'
-import type { KeyResult } from '../../../types/okr.types'
+import type { KeyResult } from '../../types/okr.types'
 
 export interface KeyResultItemProps {
 	keyResult: KeyResult

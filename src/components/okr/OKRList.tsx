@@ -4,10 +4,10 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
 import { Target, Edit, Trash2, Users, Calendar, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react'
-import type { Objective } from '../../../types/okr.types'
+import type { Objective } from '../../types/okr.types'
 
 export interface OKRListProps {
 	objectives: Objective[]

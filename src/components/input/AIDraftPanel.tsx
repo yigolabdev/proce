@@ -4,13 +4,13 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/Card'
-import { Button } from '../../ui/Button'
-import Textarea from '../../ui/Textarea'
-import Input from '../../ui/Input'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Button } from '../ui/Button'
+import Textarea from '../ui/Textarea'
+import Input from '../ui/Input'
 import { Sparkles, Wand2, Copy, RefreshCw, Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { AIDraft } from '../../../types/workInput.types'
+import type { AIDraft } from '../../types/workInput.types'
 
 export interface AIDraftPanelProps {
 	draft: AIDraft
