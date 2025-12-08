@@ -57,7 +57,7 @@ export function RhythmProvider({ children }: { children: ReactNode }) {
 		const userId = userIdRef.current
 		const userRole = userRoleRef.current
 		
-		if (!userId) return
+		if (!userId || !userRole) return
 		
 		setLoading(true)
 		try {
