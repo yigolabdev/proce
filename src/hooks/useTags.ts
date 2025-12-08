@@ -104,7 +104,7 @@ export function useTags(initialTags: string[] = []): UseTagsReturn {
 		addTag,
 		removeTag,
 		clearTags,
-		handleTagInputKeyPress,
+		// handleTagInputKeyPress, // Internal helper
 		suggestions: getFilteredSuggestions(),
 	}
 }
