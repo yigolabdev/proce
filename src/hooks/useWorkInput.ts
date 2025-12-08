@@ -180,6 +180,7 @@ export function useWorkInput(): UseWorkInputReturn {
 
 		// Track history
 		HistoryTracker.addHistory({
+			id: `history-${Date.now()}`,
 			workEntryId: newEntry.id,
 			action: 'created',
 			changedBy: 'Current User',

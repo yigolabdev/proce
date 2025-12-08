@@ -16,10 +16,10 @@ export function useTags(initialTags: string[] = []): UseTagsReturn {
 	// Load tag suggestions from storage
 	useEffect(() => {
 		try {
-			const allWorkEntries = storage.get<any[]>('workEntries', [])
+			const allWorkEntries = storage.get<any[]>('workEntries', []) || []
 			const allTags = new Set<string>()
 
-			(allWorkEntries || []).forEach(entry => {
+			allWorkEntries.forEach((entry: any) => {
 				if (entry.tags && Array.isArray(entry.tags)) {
 					entry.tags.forEach((tag: string) => allTags.add(tag))
 				}
