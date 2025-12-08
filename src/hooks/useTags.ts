@@ -74,17 +74,6 @@ export function useTags(initialTags: string[] = []): UseTagsReturn {
 	}, [])
 
 	/**
-	 * Handle tag input key press
-	 */
-	// Helper function (not exported)
-	// const handleTagInputKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter' || e.key === ',') {
-			e.preventDefault()
-			addTag(tagInput)
-		}
-	}, [tagInput, addTag])
-
-	/**
 	 * Get filtered suggestions
 	 */
 	const getFilteredSuggestions = useCallback((): string[] => {
