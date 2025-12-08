@@ -7,7 +7,7 @@
  * - 재사용 가능한 컴포넌트로 UI 구성
  */
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../components/common/PageHeader'
 import { Button } from '../../components/ui/Button'
@@ -46,7 +46,7 @@ export default function WorkHistoryPage() {
 	}
 
 	if (history.isLoading) {
-		return <LoadingState message="Loading work history..." />
+		return <LoadingState />
 	}
 
 	return (

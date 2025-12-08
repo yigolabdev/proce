@@ -402,8 +402,8 @@ export interface WorkspaceSettings {
 
 // ==================== Message Types ====================
 
-export type MessageType = 'info' | 'warning' | 'alert' | 'success'
-export type MessagePriority = 'low' | 'medium' | 'high' | 'urgent'
+export type MessageType = 'info' | 'warning' | 'alert' | 'success' | 'task_assigned' | 'review_received' | 'project_update' | 'team_message' | 'approval_request' | 'reply'
+export type MessagePriority = 'low' | 'medium' | 'high' | 'urgent' | 'normal'
 
 export interface Message {
 	id: string
@@ -420,12 +420,25 @@ export interface Message {
 	// 추가 필드들
 	subject?: string
 	from?: string
+	fromDepartment?: string
 	relatedPage?: string
 	threadId?: string | null
 	replyTo?: string | null
 	attachments?: string[]
 	mentions?: string[]
 	readAt?: Date | string | null
+	timestamp?: Date | string
+	preview?: string
+	replyCount?: number
+	aiInsight?: {
+		summary: string
+		action: string
+		priority: string
+	}
+	quickActions?: Array<{
+		label: string
+		action: string
+	}>
 }
 
 // ==================== Review Types ====================

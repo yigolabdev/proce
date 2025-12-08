@@ -7,7 +7,6 @@
  * - 재사용 가능한 컴포넌트로 UI 구성
  */
 
-import React from 'react'
 import { PageHeader } from '../components/common/PageHeader'
 import { useI18n } from '../i18n/I18nProvider'
 import { toast } from 'sonner'

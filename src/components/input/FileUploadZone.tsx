@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useState } from 'react'
-import { Upload, X, FileText, Image as ImageIcon, File } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, File } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Card, CardContent } from '../ui/Card'
 import type { FileAttachment } from '../../types/common.types'

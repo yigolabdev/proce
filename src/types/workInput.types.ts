@@ -3,7 +3,33 @@
  * InputPage 관련 타입 정의
  */
 
-import type { WorkEntry, FileAttachment, LinkResource, Project, WorkCategory } from './common.types'
+import type { LinkResource, Project, WorkCategory } from './common.types'
+
+// Export FileAttachment
+export interface FileAttachment {
+	id: string
+	name: string
+	size: number
+	type: string
+	uploadedAt: Date
+	url?: string
+}
+
+// Export AIDraft
+export interface AIDraft {
+	content: string
+	tone: 'professional' | 'casual' | 'detailed' | 'concise'
+	keywords?: string[]
+}
+
+// Export TaskProgress
+export interface TaskProgress {
+	totalItems: number
+	completedItems: number
+	milestone: string
+	nextSteps: string
+	blockers: string
+}
 
 /**
  * 입력 모드
@@ -62,7 +88,7 @@ export interface AsyncDiscussionData {
 /**
  * 자동 저장 상태
  */
-export type AutoSaveStatus = 'idle' | 'saving' | 'saved'
+export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 /**
  * 업무 초안

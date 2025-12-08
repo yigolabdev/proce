@@ -7,7 +7,7 @@
  * - 재사용 가능한 컴포넌트로 UI 구성
  */
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { PageHeader } from '../../components/common/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { Tabs } from '../../components/ui/Tabs'
@@ -107,11 +107,10 @@ export default function MessagesPage() {
 		<div className="min-h-screen bg-background-dark">
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-6">
 				{/* Page Header */}
-				<PageHeader
-					title="Messages"
-					description="Manage your notifications and communications"
-					badge={messages.unreadCount > 0 ? `${messages.unreadCount} unread` : undefined}
-				/>
+			<PageHeader
+				title="Messages"
+				description="Manage your notifications and communications"
+			/>
 
 				{/* Filter Tabs */}
 				<Tabs
@@ -169,11 +168,11 @@ export default function MessagesPage() {
 					<div>
 						{showComposer && messages.selectedMessage ? (
 							<MessageComposer
-								replyTo={{
-									id: messages.selectedMessage.id,
-									subject: messages.selectedMessage.subject,
-									from: messages.selectedMessage.from,
-								}}
+							replyTo={{
+								id: messages.selectedMessage.id,
+								subject: messages.selectedMessage.subject || messages.selectedMessage.title,
+								from: messages.selectedMessage.from || messages.selectedMessage.sender,
+							}}
 								onSend={handleSendReply}
 								onCancel={() => setShowComposer(false)}
 							/>
