@@ -1,4 +1,4 @@
-import { NavLink, Outlet, Link } from 'react-router-dom'
+import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
 import Toaster from '../ui/Toaster'
@@ -18,6 +18,7 @@ interface MenuItem {
 export default function AppLayout() {
 	const { user } = useAuth()
 	const { t } = useI18n()
+	const location = useLocation()
 	const [unreadMessages, setUnreadMessages] = useState(0)
 	const [unreadReviews, setUnreadReviews] = useState(0)
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -46,7 +47,7 @@ export default function AppLayout() {
 	// Close mobile sidebar when route changes
 	useEffect(() => {
 		setIsMobileSidebarOpen(false)
-	}, [window.location.pathname])
+	}, [location.pathname])
 
 	const link = (to: string, label: string, Icon: any, badge?: number) => (
 		<NavLink
