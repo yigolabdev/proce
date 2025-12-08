@@ -48,7 +48,7 @@ export default function SettingsPage() {
 
 	const handleSaveQuietHours = (start: string, end: string) => {
 		settings.updateNotificationSettings({
-			quietHours: { start, end },
+			quietHours: { enabled: true, start, end },
 		})
 		toast.success('Quiet hours saved')
 	}

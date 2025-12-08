@@ -44,7 +44,10 @@ export default function InputPage() {
 	const aiDraft = useAIDraft()
 
 	// Auto-save
-	const { status: autoSaveStatus } = useAutoSave(workInput.formData, workInput.saveDraft)
+	const { status: autoSaveStatus } = useAutoSave({
+		data: workInput.formData,
+		onSave: workInput.saveDraft,
+	})
 
 	// Apply AI draft
 	const handleApplyAIDraft = (content?: { title: string; description: string; category: string; tags: string[] }) => {

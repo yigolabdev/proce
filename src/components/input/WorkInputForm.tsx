@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Button } from '../ui/Button'
 import Input from '../ui/Input'
 import Textarea from '../ui/Textarea'
-import { FileText, Save, Send, Shield } from 'lucide-react'
+import { FileText, Shield } from 'lucide-react'
 import type { WorkInputFormData, Project, WorkCategory } from '../../types/workInput.types'
 
 export interface WorkInputFormProps {
@@ -27,7 +27,7 @@ export function WorkInputForm({
 	onSubmit,
 	projects,
 	categories,
-	reviewers,
+	// reviewers,
 	disabled,
 	children,
 }: WorkInputFormProps) {

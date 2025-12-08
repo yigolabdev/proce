@@ -62,9 +62,9 @@ export function useWorkInput(): UseWorkInputReturn {
 			const savedCategories = storage.get<WorkCategory[]>('workCategories', [])
 			const savedUsers = storage.get<any[]>('users', [])
 
-			setProjects(savedProjects)
-			setCategories(savedCategories)
-			setReviewers(savedUsers.filter(u => u.role !== 'user'))
+			setProjects(savedProjects || [])
+			setCategories(savedCategories || [])
+			setReviewers((savedUsers || []).filter(u => u.role !== 'user'))
 		} catch (error) {
 			console.error('Failed to load initial data:', error)
 			toast.error('Failed to load data')
@@ -163,7 +163,7 @@ export function useWorkInput(): UseWorkInputReturn {
 				projectName: projects.find(p => p.id === formData.projectId)?.name || '',
 				tags: formData.tags,
 				date: new Date(),
-				status: 'completed',
+				status: 'completed' as const,
 				timeSpent: 0,
 				userId: 'current-user', // TODO: Get from auth context
 				userName: 'Current User', // TODO: Get from auth context
@@ -173,18 +173,24 @@ export function useWorkInput(): UseWorkInputReturn {
 				isConfidential: formData.isConfidential,
 			}
 
-			// Save to storage
-			const entries = storage.get<WorkEntry[]>('workEntries', [])
-			entries.unshift(newEntry)
-			storage.set('workEntries', entries)
+		// Save to storage
+		const entries = storage.get<WorkEntry[]>('workEntries', []) || []
+		entries.unshift(newEntry)
+		storage.set('workEntries', entries)
 
-			// Track history
-			HistoryTracker.addHistoryEntry(newEntry, 'created', 'Current User', 'Engineering')
+		// Track history
+		HistoryTracker.addHistory({
+			entryId: newEntry.id,
+			action: 'created',
+			changedBy: 'Current User',
+			department: 'Engineering',
+			timestamp: new Date(),
+		})
 
-			// Create review request if reviewer is selected
-			if (formData.reviewerId) {
-				const pendingReviews = storage.get<any[]>('pending_reviews', [])
-				pendingReviews.push({
+		// Create review request if reviewer is selected
+		if (formData.reviewerId) {
+			const pendingReviews = storage.get<any[]>('pending_reviews', []) || []
+			pendingReviews.push({
 					id: `review-${Date.now()}`,
 					workEntryId: newEntry.id,
 					workTitle: newEntry.title,
@@ -221,9 +227,9 @@ export function useWorkInput(): UseWorkInputReturn {
 			setAutoSaveStatus('saving')
 			storage.set(DRAFT_KEY, formData)
 			
-			// Also save to drafts list
-			const drafts = storage.get<WorkDraft[]>('work_drafts', [])
-			const existingIndex = drafts.findIndex(d => d.id === 'auto-draft')
+		// Also save to drafts list
+		const drafts = storage.get<WorkDraft[]>('work_drafts', []) || []
+		const existingIndex = drafts.findIndex(d => d.id === 'auto-draft')
 			
 			const draft: WorkDraft = {
 				id: 'auto-draft',

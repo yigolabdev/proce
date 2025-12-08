@@ -65,7 +65,7 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 			setIsLoading(true)
 			const savedMessages = storage.get<any[]>('messages', [])
 			
-			const messagesWithDates = savedMessages.map((msg: any) => ({
+			const messagesWithDates = ((savedMessages || [])).map((msg: any) => ({
 				...msg,
 				timestamp: new Date(msg.timestamp),
 				isArchived: msg.isArchived || false,
