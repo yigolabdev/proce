@@ -167,7 +167,6 @@ export function useWorkInput(): UseWorkInputReturn {
 			// timeSpent: 0, // Not in WorkEntry type
 			// userId: 'current-user', // Not in WorkEntry type
 			submittedBy: 'Current User', // TODO: Get from auth context
-				userName: 'Current User', // TODO: Get from auth context
 				department: 'Engineering', // TODO: Get from auth context
 				files: formData.files,
 				links: formData.links,
