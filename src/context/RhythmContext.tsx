@@ -4,7 +4,7 @@
  * 리듬 기반 상태를 전역으로 관리하는 Context
  */
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react'
 import { rhythmService } from '../services/rhythm/rhythmService'
 import type { TodayStatus, LoopItem, TeamRhythmView, OptionalNextActions } from '../services/rhythm/types'
 import { useAuth } from './AuthContext'
@@ -41,21 +41,33 @@ export function RhythmProvider({ children }: { children: ReactNode }) {
 	const [loading, setLoading] = useState(false)
 	const [showingNextActions, setShowingNextActions] = useState(false)
 	
+	// user.id와 user.role을 ref로 저장하여 안정적인 참조 유지
+	const userIdRef = useRef(user?.id)
+	const userRoleRef = useRef(user?.role)
+	
+	useEffect(() => {
+		userIdRef.current = user?.id
+		userRoleRef.current = user?.role
+	}, [user?.id, user?.role])
+	
 	/**
 	 * 리듬 데이터 새로고침
 	 */
 	const refreshRhythm = useCallback(async () => {
-		if (!user?.id) return
+		const userId = userIdRef.current
+		const userRole = userRoleRef.current
+		
+		if (!userId) return
 		
 		setLoading(true)
 		try {
 			// 병렬로 모든 데이터 로드
 			const [today, progress, review, done, team] = await Promise.all([
-				rhythmService.getTodayStatus(user.id),
-				rhythmService.getInProgress(user.id),
-				rhythmService.getNeedsReview(user.id),
-				rhythmService.getCompleted(user.id),
-				rhythmService.getTeamRhythm(user.id, user.role),
+				rhythmService.getTodayStatus(userId),
+				rhythmService.getInProgress(userId),
+				rhythmService.getNeedsReview(userId),
+				rhythmService.getCompleted(userId),
+				rhythmService.getTeamRhythm(userId, userRole),
 			])
 			
 			setTodayStatus(today)
@@ -68,32 +80,36 @@ export function RhythmProvider({ children }: { children: ReactNode }) {
 		} finally {
 			setLoading(false)
 		}
-	}, [user?.id, user?.role])
+	}, []) // 의존성 배열을 비움
 	
 	/**
 	 * 선택적 다음 작업 요청
 	 */
 	const requestNextActions = useCallback(async () => {
-		if (!user?.id) return null
+		const userId = userIdRef.current
+		if (!userId) return null
 		
 		try {
-			const nextActions = await rhythmService.getOptionalNextActions(user.id)
+			const nextActions = await rhythmService.getOptionalNextActions(userId)
 			setShowingNextActions(true)
 			return nextActions
 		} catch (error) {
 			console.error('Failed to get next actions:', error)
 			return null
 		}
-	}, [user?.id])
+	}, [])
 	
 	// 초기 로드 및 자동 새로고침
 	useEffect(() => {
+		if (!user?.id) return
+		
 		refreshRhythm()
 		
 		// 30초마다 자동 새로고침
 		const interval = setInterval(refreshRhythm, 30000)
 		return () => clearInterval(interval)
-	}, [refreshRhythm])
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user?.id]) // user.id가 변경될 때만 실행
 	
 	// Memoize context value to prevent unnecessary re-renders
 	const value: RhythmContextValue = useMemo(() => ({

@@ -116,7 +116,8 @@ export function useDashboardData() {
 	// 초기 로딩 및 lastUpdate 변경 시 재로딩
 	useEffect(() => {
 		loadData()
-	}, [loadData, lastUpdate])
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [lastUpdate])
 
 	// 통계 계산 메모이제이션 (의존성 최소화)
 	const personalStats = useMemo<DashboardStats>(() => {

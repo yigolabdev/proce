@@ -15,6 +15,7 @@ const IntegrationsContext = createContext<IntegrationsContextValue | null>(null)
 export function IntegrationsProvider({ children }: PropsWithChildren) {
 	const [integrations, setIntegrations] = useState<Record<string, IntegrationSettings>>({});
 	const [isLoading, setIsLoading] = useState(true);
+	const [isInitialized, setIsInitialized] = useState(false);
 
 	const reload = useCallback(async () => {
 		setIsLoading(true);
@@ -36,9 +37,14 @@ export function IntegrationsProvider({ children }: PropsWithChildren) {
 		[reload]
 	);
 
+	// 초기화 시 한 번만 실행
 	useEffect(() => {
-		reload();
-	}, [reload]);
+		if (!isInitialized) {
+			reload();
+			setIsInitialized(true);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const value = useMemo(
 		() => ({ integrations, updateIntegration, reload, isLoading }),

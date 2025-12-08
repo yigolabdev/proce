@@ -82,9 +82,11 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 		}
 	}, [onError])
 
+	// 초기 로딩만 수행
 	useEffect(() => {
 		loadMessages()
-	}, [loadMessages])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	// Filter messages
 	const filteredMessages = messages.filter((msg) => {
@@ -103,15 +105,7 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 	// Unread count
 	const unreadCount = messages.filter((msg) => !msg.isRead && !msg.isArchived).length
 
-	// Select message
-	const selectMessage = useCallback((message: Message | null) => {
-		setSelectedMessage(message)
-		if (message && !message.isRead) {
-			markAsRead(message.id)
-		}
-	}, [])
-
-	// Mark as read
+	// Mark as read (moved up before selectMessage)
 	const markAsRead = useCallback((id: string) => {
 		setMessages((prev) => {
 			const updated = prev.map((msg) =>
@@ -121,6 +115,14 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 			return updated
 		})
 	}, [])
+
+	// Select message
+	const selectMessage = useCallback((message: Message | null) => {
+		setSelectedMessage(message)
+		if (message && !message.isRead) {
+			markAsRead(message.id)
+		}
+	}, [markAsRead])
 
 	// Mark as unread
 	const markAsUnread = useCallback((id: string) => {
@@ -180,18 +182,19 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 
 	// Send reply
 	const sendReply = useCallback(async (messageId: string, content: string) => {
-		const parentMessage = messages.find((m) => m.id === messageId)
-		if (!parentMessage) return
-
-		const replyMessage = MessageUtils.createReply(
-			parentMessage,
-			content,
-			'Current User', // Replace with actual user
-			'user-current-id',
-			undefined // fromDepartment
-		)
-
+		// Use setState callback to avoid dependency on messages
 		setMessages((prev) => {
+			const parentMessage = prev.find((m) => m.id === messageId)
+			if (!parentMessage) return prev
+
+			const replyMessage = MessageUtils.createReply(
+				parentMessage,
+				content,
+				'Current User', // Replace with actual user
+				'user-current-id',
+				undefined // fromDepartment
+			)
+
 			const updated = [...prev, replyMessage]
 			storage.set('messages', updated)
 			return updated
@@ -207,7 +210,7 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 			storage.set('messages', updated)
 			return updated
 		})
-	}, [messages])
+	}, [])
 
 	// Load thread
 	const loadThread = useCallback((messageId: string) => {

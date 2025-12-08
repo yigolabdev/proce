@@ -116,36 +116,36 @@ const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType>)
 // Build app routes with conditional dev routes
 const appRoutes = [
 	// 작업자 메뉴
-	{ path: '/app/dashboard', element: withSuspense(DashboardPage) },
-	{ path: '/app/input', element: withSuspense(InputPage) },
-	{ path: '/app/projects/recommendations', element: withSuspense(ProjectRecommendationsPage) },
-	{ path: '/app/projects/:id', element: withSuspense(ProjectDetailPage) },
-	{ path: '/app/projects', element: withSuspense(ProjectsPage) },
-	{ path: '/app/work-history', element: withSuspense(WorkHistoryPage) },
-	{ path: '/app/work-review', element: withSuspense(WorkReviewPage) },
-	{ path: '/app/messages', element: withSuspense(MessagesPage) },
-	{ path: '/app/ai-recommendations', element: withSuspense(AIRecommendationsPage) },
-	{ path: '/app/inbox', element: <Navigate to="/app/messages" replace /> },
-	// { path: '/app/okr', element: withSuspense(OKRPage) },
+	{ path: 'dashboard', element: withSuspense(DashboardPage) },
+	{ path: 'input', element: withSuspense(InputPage) },
+	{ path: 'projects/recommendations', element: withSuspense(ProjectRecommendationsPage) },
+	{ path: 'projects/:id', element: withSuspense(ProjectDetailPage) },
+	{ path: 'projects', element: withSuspense(ProjectsPage) },
+	{ path: 'work-history', element: withSuspense(WorkHistoryPage) },
+	{ path: 'work-review', element: withSuspense(WorkReviewPage) },
+	{ path: 'messages', element: withSuspense(MessagesPage) },
+	{ path: 'ai-recommendations', element: withSuspense(AIRecommendationsPage) },
+	{ path: 'inbox', element: <Navigate to="/app/messages" replace /> },
+	// { path: 'okr', element: withSuspense(OKRPage) },
 	// 관리자 메뉴
-	{ path: '/app/admin/users', element: withSuspense(UsersManagementPage) },
-	{ path: '/app/admin/system-settings', element: withSuspense(SystemSettingsPage) },
-	{ path: '/app/admin/company-settings', element: withSuspense(CompanySettingsPage), errorElement: <RouteError /> },
+	{ path: 'admin/users', element: withSuspense(UsersManagementPage) },
+	{ path: 'admin/system-settings', element: withSuspense(SystemSettingsPage) },
+	{ path: 'admin/company-settings', element: withSuspense(CompanySettingsPage), errorElement: <RouteError /> },
 	// 임원 메뉴
-	{ path: '/app/executive', element: withSuspense(ExecutiveDashboardPage) },
-	{ path: '/app/executive/goals', element: withSuspense(ExecutiveGoalsPage) },
-	{ path: '/app/analytics', element: <Navigate to="/app/executive" replace /> },
-	{ path: '/app/performance', element: withSuspense(PerformancePage) },
+	{ path: 'executive', element: withSuspense(ExecutiveDashboardPage) },
+	{ path: 'executive/goals', element: withSuspense(ExecutiveGoalsPage) },
+	{ path: 'analytics', element: <Navigate to="/app/executive" replace /> },
+	{ path: 'performance', element: withSuspense(PerformancePage) },
 	// 기타
-	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
-	{ path: '/app/integrations', element: withSuspense(IntegrationsPage) },
-	{ path: '/app/guide', element: <Navigate to="/app/dashboard" replace /> },
-	{ path: '/app/workflow', element: <Navigate to="/app/dashboard" replace /> },
-	{ path: '/app/settings', element: withSuspense(SettingsPage) },
+	{ path: 'org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
+	{ path: 'integrations', element: withSuspense(IntegrationsPage) },
+	{ path: 'guide', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: 'workflow', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: 'settings', element: withSuspense(SettingsPage) },
 		
 	// Work Rhythm - Redirect to dashboard (준비 중)
-	{ path: '/app/rhythm', element: <Navigate to="/app/dashboard" replace /> },
-	{ path: '/app/rhythm/*', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: 'rhythm', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: 'rhythm/*', element: <Navigate to="/app/dashboard" replace /> },
 ]
 
 // 라우터 설정 - 컴포넌트 외부에서 한 번만 생성
