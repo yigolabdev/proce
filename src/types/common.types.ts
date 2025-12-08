@@ -20,7 +20,7 @@ export interface LinkResource {
 	addedAt?: Date | string
 }
 
-export type WorkEntryStatus = 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected'
+export type WorkEntryStatus = 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected' | 'completed'
 
 export interface WorkEntry {
 	id: string

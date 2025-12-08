@@ -53,7 +53,7 @@ export function MessageDetail({
 							)}
 							<div className="flex items-center gap-1">
 								<Clock className="h-4 w-4" />
-								{message.timestamp.toLocaleString()}
+								{(message.timestamp || message.date) && new Date(message.timestamp || message.date).toLocaleString()}
 							</div>
 						</div>
 					</div>
@@ -138,7 +138,7 @@ export function MessageDetail({
 							<Button
 								key={index}
 								onClick={() => onQuickAction?.(action.action)}
-								variant={action.variant === 'primary' ? 'brand' : 'outline'}
+								variant={(action.variant === 'primary' ? 'brand' : action.variant) as any || 'outline'}
 								size="sm"
 							>
 								{action.label}

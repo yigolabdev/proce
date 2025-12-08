@@ -154,7 +154,7 @@ export function MessageList({
 										<div className="flex items-center gap-2 shrink-0">
 											<span className="text-xs text-neutral-500 flex items-center gap-1">
 												<Clock className="h-3 w-3" />
-												{formatTime(message.timestamp)}
+												{formatTime(message.timestamp || message.date)}
 											</span>
 											<Button
 												onClick={(e) => {

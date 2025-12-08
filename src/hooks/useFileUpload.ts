@@ -192,7 +192,7 @@ export function useFileUpload(): UseFileUploadReturn {
 		removeFile,
 		clearFiles,
 		isUploading,
-		formatFileSize,
+		// formatFileSize, // Helper function
 	}
 }
 
