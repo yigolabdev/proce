@@ -163,6 +163,7 @@ export function useWorkInput(): UseWorkInputReturn {
 				projectName: projects.find(p => p.id === formData.projectId)?.name || '',
 				tags: formData.tags,
 			date: new Date(),
+			duration: 0, // TODO: Calculate actual duration
 			status: 'completed' as const,
 			// timeSpent: 0, // Not in WorkEntry type
 			// userId: 'current-user', // Not in WorkEntry type
