@@ -12,15 +12,15 @@ export interface UseAIDraftReturn {
 	isGenerating: boolean
 	updateDraft: (updates: Partial<AIDraft>) => void
 	generateDraft: () => Promise<void>
-	applyDraft: (onApply: (content: string) => void) => void
+	applyDraft: (onApply: (content: AIDraft['generatedContent']) => void) => void
 	clearDraft: () => void
 }
 
 const INITIAL_DRAFT: AIDraft = {
 	prompt: '',
-	keywords: '',
+	keywords: [],
 	tone: 'professional',
-	generatedContent: '',
+	content: '',
 }
 
 export function useAIDraft(initialDraft?: Partial<AIDraft>): UseAIDraftReturn {
@@ -42,38 +42,36 @@ export function useAIDraft(initialDraft?: Partial<AIDraft>): UseAIDraftReturn {
 
 		setIsGenerating(true)
 		try {
-			// Simulate AI generation (replace with actual API call)
+			// Simulate AI generation
 			await new Promise((resolve) => setTimeout(resolve, 2000))
 
-			// Mock AI response based on prompt
-			const mockContent = generateMockContent(draft)
+			const generatedContent = {
+				title: `[${draft.tone}] ${draft.prompt.substring(0, 50)}`,
+				description: `Generated content for: "${draft.prompt}"\n\nTone: ${draft.tone}\nKeywords: ${Array.isArray(draft.keywords) ? draft.keywords.join(', ') : ''}`,
+				category: 'development',
+				tags: Array.isArray(draft.keywords) ? draft.keywords : [],
+			}
 
 			setDraft((prev) => ({
 				...prev,
-				generatedContent: mockContent,
+				generatedContent,
 			}))
 
-			toast.success('Draft generated successfully!')
+			toast.success('AI draft generated successfully!')
 		} catch (error) {
-			console.error('Failed to generate draft:', error)
-			toast.error('Failed to generate draft. Please try again.')
+			console.error('Failed to generate AI draft:', error)
+			toast.error('Failed to generate AI draft')
 		} finally {
 			setIsGenerating(false)
 		}
-	}, [draft])
+	}, [draft.prompt, draft.tone, draft.keywords])
 
-	const applyDraft = useCallback(
-		(onApply: (content: string) => void) => {
-			if (!draft.generatedContent) {
-				toast.error('No draft to apply')
-				return
-			}
-
+	const applyDraft = useCallback((onApply: (content: AIDraft['generatedContent']) => void) => {
+		if (draft.generatedContent) {
 			onApply(draft.generatedContent)
-			toast.success('Draft applied to description')
-		},
-		[draft.generatedContent]
-	)
+			toast.success('Draft applied successfully!')
+		}
+	}, [draft.generatedContent])
 
 	const clearDraft = useCallback(() => {
 		setDraft(INITIAL_DRAFT)
@@ -88,61 +86,3 @@ export function useAIDraft(initialDraft?: Partial<AIDraft>): UseAIDraftReturn {
 		clearDraft,
 	}
 }
-
-/**
- * Generate mock AI content based on prompt
- * TODO: Replace with actual AI API integration
- */
-function generateMockContent(draft: AIDraft): string {
-	const { prompt, keywords, tone } = draft
-
-	let content = ''
-
-	// Generate based on tone
-	switch (tone) {
-		case 'professional':
-			content = `I have successfully completed work on ${prompt}. `
-			if (keywords) {
-				content += `This involved ${keywords}. `
-			}
-			content += `The implementation was thorough and meets all requirements. Key outcomes include improved system performance and enhanced user experience.`
-			break
-
-		case 'casual':
-			content = `Worked on ${prompt} today. `
-			if (keywords) {
-				content += `Focused mainly on ${keywords}. `
-			}
-			content += `Everything went smoothly and the results look good!`
-			break
-
-		case 'detailed':
-			content = `Completed comprehensive work on ${prompt}.\n\n`
-			content += `**Activities:**\n`
-			content += `- Analyzed requirements and existing implementation\n`
-			content += `- Developed and tested solution\n`
-			if (keywords) {
-				content += `- Applied best practices in ${keywords}\n`
-			}
-			content += `- Validated results and documented changes\n\n`
-			content += `**Outcomes:**\n`
-			content += `- Enhanced functionality and reliability\n`
-			content += `- Improved code quality and maintainability\n`
-			content += `- Met all acceptance criteria`
-			break
-
-		case 'concise':
-			content = `Completed: ${prompt}`
-			if (keywords) {
-				content += ` (${keywords})`
-			}
-			content += `. Tested and verified.`
-			break
-
-		default:
-			content = prompt
-	}
-
-	return content
-}
-

@@ -170,8 +170,8 @@ export default function MessagesPage() {
 							<MessageComposer
 							replyTo={{
 								id: messages.selectedMessage.id,
-								subject: messages.selectedMessage.subject || messages.selectedMessage.title,
-								from: messages.selectedMessage.from || messages.selectedMessage.sender,
+								subject: messages.selectedMessage.subject || messages.selectedMessage.title || '',
+								from: messages.selectedMessage.from || messages.selectedMessage.sender || '',
 							}}
 								onSend={handleSendReply}
 								onCancel={() => setShowComposer(false)}

@@ -214,15 +214,15 @@ export function WorkEntryCard({
 							</div>
 						)}
 
-						{/* Review Comment */}
-						{entry.reviewComment && (
-							<div>
-								<h4 className="text-sm font-medium text-neutral-400 mb-2">Review Comment</h4>
-								<p className="text-neutral-300 p-3 bg-neutral-900 rounded">
-									{entry.reviewComment}
-								</p>
-							</div>
-						)}
+					{/* Review Comment */}
+					{entry.reviewComments && entry.reviewComments.length > 0 && (
+						<div>
+							<h4 className="text-sm font-medium text-neutral-400 mb-2">Review Comment</h4>
+							<p className="text-neutral-300 p-3 bg-neutral-900 rounded">
+								{entry.reviewComments[0]}
+							</p>
+						</div>
+					)}
 					</div>
 				)}
 			</CardContent>

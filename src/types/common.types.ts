@@ -434,10 +434,14 @@ export interface Message {
 		summary: string
 		action: string
 		priority: string
+		estimatedTime?: string
+		deadline?: string
+		recommendation?: string
 	}
 	quickActions?: Array<{
 		label: string
 		action: string
+		variant?: 'brand' | 'success' | 'danger' | 'default'
 	}>
 }
 

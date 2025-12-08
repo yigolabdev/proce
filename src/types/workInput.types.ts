@@ -13,13 +13,21 @@ export interface FileAttachment {
 	type: string
 	uploadedAt: Date
 	url?: string
+	data?: string // Base64 data
 }
 
 // Export AIDraft
 export interface AIDraft {
+	prompt?: string
 	content: string
 	tone: 'professional' | 'casual' | 'detailed' | 'concise'
 	keywords?: string[]
+	generatedContent?: {
+		title: string
+		description: string
+		category: string
+		tags: string[]
+	}
 }
 
 // Export TaskProgress
