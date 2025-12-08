@@ -175,7 +175,8 @@ export function useFileUpload(): UseFileUploadReturn {
 	/**
 	 * Format file size
 	 */
-	const formatFileSize = useCallback((bytes: number): string => {
+	// Helper function (not exported)
+	// const formatFileSize = useCallback((bytes: number): string => {
 		if (bytes === 0) return '0 Bytes'
 
 		const k = 1024
