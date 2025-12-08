@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
-import { useState, useEffect, Fragment, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { storage } from '../../utils/storage'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -48,39 +48,6 @@ export default function AppLayout() {
 	useEffect(() => {
 		setIsMobileSidebarOpen(false)
 	}, [location.pathname])
-
-	// Link component - NOT memoized as it returns JSX directly
-	const renderLink = (to: string, label: string, Icon: any, badge?: number) => (
-		<NavLink
-			key={to}
-			to={to}
-			end
-			className={({ isActive }) =>
-				`relative flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm transition-all duration-300 group overflow-hidden ${
-					isActive 
-						? 'text-white bg-white/5 font-medium shadow-[0_0_20px_-10px_rgba(255,255,255,0.1)] border border-white/5' 
-						: 'text-neutral-500 hover:text-neutral-200 hover:bg-white/5'
-				}`
-			}
-		>
-			{({ isActive }) => (
-				<>
-					{isActive && (
-						<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-500/80 rounded-r-full blur-[2px]" />
-					)}
-					<Icon size={20} className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-orange-500' : 'group-hover:text-neutral-300'}`} />
-					<span className="flex-1 truncate tracking-wide">{label}</span>
-					{badge !== undefined && badge > 0 && (
-						<span className={`shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-sm transition-colors ${
-							isActive ? 'bg-orange-500 text-white' : 'bg-neutral-800 text-neutral-400 group-hover:bg-neutral-700 group-hover:text-white'
-						}`}>
-							{badge > 99 ? '99+' : badge}
-						</span>
-					)}
-				</>
-			)}
-		</NavLink>
-	)
 
 	// Menu definition by role - memoized to prevent recreation
 	const menuGroups = useMemo(() => [
@@ -163,9 +130,35 @@ const visibleMenuGroups = useMemo(() => menuGroups
 						</div>
 						<div className="space-y-1.5">
 						{group.items.map((item) => (
-							<Fragment key={item.to}>
-								{renderLink(item.to, item.label, item.icon, item.badge)}
-							</Fragment>
+							<NavLink
+								key={item.to}
+								to={item.to}
+								end
+								className={({ isActive }) =>
+									`relative flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm transition-all duration-300 group overflow-hidden ${
+										isActive 
+											? 'text-white bg-white/5 font-medium shadow-[0_0_20px_-10px_rgba(255,255,255,0.1)] border border-white/5' 
+											: 'text-neutral-500 hover:text-neutral-200 hover:bg-white/5'
+									}`
+								}
+							>
+								{({ isActive }) => (
+									<>
+										{isActive && (
+											<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-500/80 rounded-r-full blur-[2px]" />
+										)}
+										<item.icon size={20} className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-orange-500' : 'group-hover:text-neutral-300'}`} />
+										<span className="flex-1 truncate tracking-wide">{item.label}</span>
+										{item.badge !== undefined && item.badge > 0 && (
+											<span className={`shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-sm transition-colors ${
+												isActive ? 'bg-orange-500 text-white' : 'bg-neutral-800 text-neutral-400 group-hover:bg-neutral-700 group-hover:text-white'
+											}`}>
+												{item.badge > 99 ? '99+' : item.badge}
+											</span>
+										)}
+									</>
+								)}
+							</NavLink>
 						))}
 						</div>
 					</div>
@@ -177,7 +170,27 @@ const visibleMenuGroups = useMemo(() => menuGroups
 						{t('menu.system')}
 					</div>
 					<div className="space-y-1.5">
-						{renderLink('/app/settings', t('menu.settings'), Settings)}
+						<NavLink
+							to="/app/settings"
+							end
+							className={({ isActive }) =>
+								`relative flex items-center gap-3.5 rounded-2xl px-4 py-3 text-sm transition-all duration-300 group overflow-hidden ${
+									isActive 
+										? 'text-white bg-white/5 font-medium shadow-[0_0_20px_-10px_rgba(255,255,255,0.1)] border border-white/5' 
+										: 'text-neutral-500 hover:text-neutral-200 hover:bg-white/5'
+								}`
+							}
+						>
+							{({ isActive }) => (
+								<>
+									{isActive && (
+										<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-500/80 rounded-r-full blur-[2px]" />
+									)}
+									<Settings size={20} className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-orange-500' : 'group-hover:text-neutral-300'}`} />
+									<span className="flex-1 truncate tracking-wide">{t('menu.settings')}</span>
+								</>
+							)}
+						</NavLink>
 					</div>
 				</div>
 			</nav>
