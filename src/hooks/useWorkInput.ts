@@ -183,7 +183,7 @@ export function useWorkInput(): UseWorkInputReturn {
 			workEntryId: newEntry.id,
 			action: 'created',
 			changedBy: 'Current User',
-			department: 'Engineering',
+			changedByDepartment: 'Engineering',
 			timestamp: new Date(),
 		})
 
