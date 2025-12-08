@@ -7,7 +7,7 @@
  * - 8개 재사용 컴포넌트로 UI 구성
  */
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../components/common/PageHeader'
 import { Button } from '../components/ui/Button'
@@ -44,9 +44,7 @@ export default function InputPage() {
 	const aiDraft = useAIDraft()
 
 	// Auto-save
-	const autoSaveStatus = useAutoSave(workInput.formData, () => {
-		workInput.saveDraft()
-	})
+	const { status: autoSaveStatus } = useAutoSave(workInput.formData, workInput.saveDraft)
 
 	// Apply AI draft
 	const handleApplyAIDraft = (content?: { title: string; description: string; category: string; tags: string[] }) => {
@@ -66,13 +64,6 @@ export default function InputPage() {
 	// Handle submit
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		
-		const entryData = {
-			...workInput.formData,
-			tags: tags.tags,
-			files: fileUpload.files,
-			links: links.links,
-		}
 
 		try {
 			await workInput.handleSubmit(e)
@@ -122,18 +113,18 @@ export default function InputPage() {
 			{/* Main Form (Free & Task Mode) */}
 			{(mode === 'free' || mode === 'task') && (
 				<div className="space-y-6">
-					{/* Status Indicator */}
-					{autoSaveStatus !== 'idle' && (
-						<div className="text-sm text-neutral-400">
-							{autoSaveStatus === 'saving' && '💾 Saving...'}
-							{autoSaveStatus === 'saved' && '✅ Saved'}
-							{autoSaveStatus === 'error' && '❌ Save failed'}
-						</div>
-					)}
+				{/* Status Indicator */}
+				{autoSaveStatus && autoSaveStatus !== 'idle' && (
+					<div className="text-sm text-neutral-400">
+						{autoSaveStatus === 'saving' && '💾 Saving...'}
+						{autoSaveStatus === 'saved' && '✅ Saved'}
+						{autoSaveStatus === 'error' && '❌ Save failed'}
+					</div>
+				)}
 
 					<WorkInputForm
 						formData={workInput.formData}
-						onChange={workInput.setFormData}
+						setFormData={workInput.setFormData}
 						onSubmit={handleSubmit}
 						projects={workInput.projects}
 						categories={workInput.categories}
@@ -143,6 +134,8 @@ export default function InputPage() {
 
 					<TagInput
 						tags={tags.tags}
+						tagInput={tags.tagInput}
+						onTagInputChange={tags.setTagInput}
 						onAddTag={tags.addTag}
 						onRemoveTag={tags.removeTag}
 						suggestions={tags.suggestions}
@@ -165,12 +158,14 @@ export default function InputPage() {
 					/>
 
 					{workInput.formData.reviewerId && (
-						<ReviewerSelector
-							reviewers={workInput.reviewers}
-							selectedReviewer={workInput.formData.reviewerId}
-							onReviewerSelect={(id) => workInput.setFormData({ reviewerId: id })}
-							disabled={workInput.isSubmitting}
-						/>
+					<ReviewerSelector
+						reviewers={workInput.reviewers}
+						selectedReviewerId={workInput.formData.reviewerId || null}
+						comment=""
+						onReviewerSelect={(id) => workInput.setFormData({ reviewerId: id || undefined })}
+						onCommentChange={() => {}}
+						disabled={workInput.isSubmitting}
+					/>
 					)}
 				</div>
 			)}
@@ -178,14 +173,14 @@ export default function InputPage() {
 			{/* Task Progress (Task Mode) */}
 			{mode === 'task' && (
 				<TaskProgressInput
-					tasks={[]}
-					selectedTask=""
-					progress={0}
-					comment=""
-					onTaskSelect={() => {}}
-					onProgressChange={() => {}}
-					onCommentChange={() => {}}
-					onSubmit={async () => {}}
+					taskProgress={{
+						totalItems: 0,
+						completedItems: 0,
+						milestone: '',
+						nextSteps: '',
+						blockers: '',
+					}}
+					onTaskProgressChange={() => {}}
 					disabled={workInput.isSubmitting}
 				/>
 			)}

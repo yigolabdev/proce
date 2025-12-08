@@ -3,7 +3,6 @@
  * 메시지 상세 내용 표시
  */
 
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Button } from '../ui/Button'
 import {

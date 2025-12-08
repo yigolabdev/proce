@@ -3,7 +3,6 @@
  * OKR 진행률 시각화 및 통계
  */
 
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { TrendingUp, Target, CheckCircle2, AlertTriangle, Clock } from 'lucide-react'
 import type { OKRStats } from '../../types/okr.types'

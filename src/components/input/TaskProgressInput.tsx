@@ -3,7 +3,6 @@
  * 작업 진행률 입력 (Task 모드용)
  */
 
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import Input from '../ui/Input'
 import Textarea from '../ui/Textarea'

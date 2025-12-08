@@ -3,7 +3,12 @@
  * InputPage 관련 타입 정의
  */
 
-import type { LinkResource, Project, WorkCategory } from './common.types'
+import type { LinkResource, Project as ProjectType, WorkCategory as WorkCategoryType, WorkEntryStatus } from './common.types'
+
+// Re-export types
+export type Project = ProjectType
+export type WorkCategory = WorkCategoryType
+export type { WorkEntryStatus }
 
 // Export FileAttachment
 export interface FileAttachment {

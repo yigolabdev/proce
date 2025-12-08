@@ -3,7 +3,6 @@
  * 개별 핵심 결과 아이템 표시
  */
 
-import React from 'react'
 import { Button } from '../ui/Button'
 import { Edit, Trash2, User, TrendingUp, AlertCircle } from 'lucide-react'
 import type { KeyResult } from '../../types/okr.types'

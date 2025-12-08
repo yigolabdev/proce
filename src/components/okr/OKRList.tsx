@@ -3,7 +3,6 @@
  * OKR 목표 목록 표시
  */
 
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Target, Edit, Trash2, Users, Calendar, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react'

@@ -3,7 +3,6 @@
  * 입력 모드 선택 (Free, Task, AI Draft)
  */
 
-import React from 'react'
 import { Tabs } from '../ui/Tabs'
 import { FileText, Target, Sparkles } from 'lucide-react'
 import type { InputMode } from '../../types/workInput.types'

@@ -3,7 +3,6 @@
  * 업무 이력 카드 표시
  */
 
-import React from 'react'
 import { Card, CardContent } from '../ui/Card'
 import { Button } from '../ui/Button'
 import {

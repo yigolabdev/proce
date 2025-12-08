@@ -3,7 +3,6 @@
  * 메시지 목록 표시
  */
 
-import React from 'react'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import {

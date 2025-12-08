@@ -3,7 +3,6 @@
  * 언어 설정
  */
 
-import React from 'react'
 import { Card, CardContent } from '../ui/Card'
 import { Globe, Check } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'

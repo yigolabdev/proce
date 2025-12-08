@@ -3,7 +3,6 @@
  * 검토자 선택 및 코멘트 입력
  */
 
-import React from 'react'
 import { UserCheck, MessageSquare } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import Textarea from '../ui/Textarea'
