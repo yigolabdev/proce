@@ -67,8 +67,8 @@ export function useAIRecommendations(): UseAIRecommendationsReturn {
 
 			// AI 분석 수행
 			const result = await aiRecommendationService.generateRecommendations(
-				workEntries,
-				projects
+				workEntries || [],
+				projects || []
 			)
 
 			// 상태 업데이트

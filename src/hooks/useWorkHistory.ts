@@ -74,13 +74,13 @@ export function useWorkHistory(currentUserId?: string): UseWorkHistoryReturn {
 			try {
 				setIsLoading(true)
 
-				// Load projects
-				const projectsData = storage.get<any[]>('projects', [])
-				setProjects(projectsData)
+			// Load projects
+			const projectsData = storage.get<any[]>('projects', [])
+			setProjects(projectsData || [])
 
-				// Load work entries
-				const saved = storage.get<any[]>('workEntries', [])
-				const entriesWithDates = parseWorkEntriesFromStorage(saved)
+			// Load work entries
+			const saved = storage.get<any[]>('workEntries', [])
+			const entriesWithDates = parseWorkEntriesFromStorage(saved || [])
 				setEntries(entriesWithDates)
 
 				// Extract departments

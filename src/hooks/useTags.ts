@@ -19,7 +19,7 @@ export function useTags(initialTags: string[] = []): UseTagsReturn {
 			const allWorkEntries = storage.get<any[]>('workEntries', [])
 			const allTags = new Set<string>()
 
-			allWorkEntries.forEach(entry => {
+			(allWorkEntries || []).forEach(entry => {
 				if (entry.tags && Array.isArray(entry.tags)) {
 					entry.tags.forEach((tag: string) => allTags.add(tag))
 				}

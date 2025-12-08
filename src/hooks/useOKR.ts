@@ -27,7 +27,7 @@ export function useOKR(): UseOKRReturn {
 	useEffect(() => {
 		try {
 			const saved = storage.get<Objective[]>(STORAGE_KEY, [])
-			setObjectives(saved)
+			setObjectives(saved || [])
 		} catch (err) {
 			setError(err as Error)
 			toast.error('Failed to load OKRs')

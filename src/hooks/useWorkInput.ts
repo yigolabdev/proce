@@ -183,8 +183,9 @@ export function useWorkInput(): UseWorkInputReturn {
 			workEntryId: newEntry.id,
 			action: 'created',
 			changedBy: 'Current User',
+			changedById: 'current-user-id',
+			changedAt: new Date(),
 			changedByDepartment: 'Engineering',
-			timestamp: new Date(),
 		})
 
 		// Create review request if reviewer is selected
