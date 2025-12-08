@@ -4,7 +4,7 @@
  * 리듬 기반 상태를 전역으로 관리하는 Context
  */
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
 import { rhythmService } from '../services/rhythm/rhythmService'
 import type { TodayStatus, LoopItem, TeamRhythmView, OptionalNextActions } from '../services/rhythm/types'
 import { useAuth } from './AuthContext'
@@ -95,7 +95,8 @@ export function RhythmProvider({ children }: { children: ReactNode }) {
 		return () => clearInterval(interval)
 	}, [refreshRhythm])
 	
-	const value: RhythmContextValue = {
+	// Memoize context value to prevent unnecessary re-renders
+	const value: RhythmContextValue = useMemo(() => ({
 		todayStatus,
 		inProgress,
 		needsReview,
@@ -106,7 +107,17 @@ export function RhythmProvider({ children }: { children: ReactNode }) {
 		requestNextActions,
 		showingNextActions,
 		setShowingNextActions,
-	}
+	}), [
+		todayStatus,
+		inProgress,
+		needsReview,
+		completed,
+		teamRhythm,
+		loading,
+		refreshRhythm,
+		requestNextActions,
+		showingNextActions,
+	])
 	
 	return (
 		<RhythmContext.Provider value={value}>

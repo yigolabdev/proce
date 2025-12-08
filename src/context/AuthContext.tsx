@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useMemo, useCallback, type ReactNode } from 'react'
 import type { User, AuthState } from '../types/auth.types'
 
 interface AuthContextValue extends AuthState {
@@ -23,25 +23,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		isAuthenticated: true,
 	})
 
-	const login = (user: User) => {
+	const login = useCallback((user: User) => {
 		setAuthState({ user, isAuthenticated: true })
-	}
+	}, [])
 
-	const logout = () => {
+	const logout = useCallback(() => {
 		setAuthState({ user: null, isAuthenticated: false })
-	}
+	}, [])
 
-	const updateUser = (updates: Partial<User>) => {
-		if (authState.user) {
-			setAuthState({
-				...authState,
-				user: { ...authState.user, ...updates },
-			})
-		}
-	}
+	const updateUser = useCallback((updates: Partial<User>) => {
+		setAuthState((prevState) => {
+			if (!prevState.user) return prevState
+			return {
+				...prevState,
+				user: { ...prevState.user, ...updates },
+			}
+		})
+	}, [])
+
+	// Memoize context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => ({ ...authState, login, logout, updateUser }),
+		[authState, login, logout, updateUser]
+	)
 
 	return (
-		<AuthContext.Provider value={{ ...authState, login, logout, updateUser }}>
+		<AuthContext.Provider value={value}>
 			{children}
 		</AuthContext.Provider>
 	)
