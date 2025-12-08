@@ -50,7 +50,7 @@ export function StatCard({
 	loading = false,
 }: StatCardProps) {
 	const isPositiveChange = change !== undefined && change >= 0
-	const changeColor = isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+	const changeColor = isPositiveChange ? 'text-green-400' : 'text-red-400'
 
 	return (
 		<Card
@@ -64,9 +64,9 @@ export function StatCard({
 			<CardContent className="p-4 sm:p-6">
 				{loading ? (
 					<div className="space-y-3">
-						<div className="h-4 w-20 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-						<div className="h-8 w-16 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-						<div className="h-3 w-24 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
+						<div className="h-4 w-20 bg-neutral-800 rounded animate-pulse" />
+						<div className="h-8 w-16 bg-neutral-800 rounded animate-pulse" />
+						<div className="h-3 w-24 bg-neutral-800 rounded animate-pulse" />
 					</div>
 				) : (
 					<>
@@ -74,11 +74,11 @@ export function StatCard({
 						<div className="flex items-start justify-between mb-3">
 							<div className="flex items-center gap-2">
 								{Icon && (
-									<div className={`p-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg ${iconColor}`}>
+									<div className={`p-2 bg-neutral-800 rounded-lg ${iconColor}`}>
 						<Icon className="h-4 w-4 sm:h-5 sm:w-5" />
 									</div>
 								)}
-								<p className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400">
+								<p className="text-xs sm:text-sm font-medium text-neutral-400">
 									{title}
 								</p>
 							</div>
@@ -95,7 +95,7 @@ export function StatCard({
 						{/* Description & Change */}
 						<div className="flex items-center justify-between flex-wrap gap-2">
 							{description && (
-								<p className="text-xs text-neutral-600 dark:text-neutral-400">
+								<p className="text-xs text-neutral-400">
 									{description}
 								</p>
 							)}
@@ -105,7 +105,7 @@ export function StatCard({
 										{isPositiveChange ? '+' : ''}{change}%
 									</span>
 									{changeLabel && (
-										<span className="text-xs text-neutral-500 dark:text-neutral-400">
+										<span className="text-xs text-neutral-400">
 											{changeLabel}
 										</span>
 									)}

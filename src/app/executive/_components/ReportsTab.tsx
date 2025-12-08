@@ -338,7 +338,7 @@ export default function ReportsTab({
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
-					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-[#1a1a1a]">
+					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-surface-elevated">
 						<div>
 							<h4 className="font-semibold mb-1 text-white">Complete Analytics Report</h4>
 							<p className="text-sm text-neutral-400">
@@ -368,7 +368,7 @@ export default function ReportsTab({
 					</p>
 				</CardHeader>
 				<CardContent className="p-6">
-					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-[#1a1a1a]">
+					<div className="flex items-center justify-between p-4 rounded-lg border border-border-dark bg-surface-elevated">
 						<div>
 							<h4 className="font-semibold mb-1 text-white">Executive Report</h4>
 							<p className="text-sm text-neutral-400">

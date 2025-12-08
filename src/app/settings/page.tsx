@@ -375,7 +375,7 @@ export default function SettingsPage() {
 	const isProfileChanged = JSON.stringify(profile) !== JSON.stringify(originalProfile)
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+		<div className="min-h-screen bg-background-dark text-neutral-100">
 			<Toaster />
 			
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
@@ -408,7 +408,7 @@ export default function SettingsPage() {
 										<div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold">
 											{profile.name[0] || 'U'}
 										</div>
-										<button className="absolute bottom-0 right-0 p-2 bg-[#1a1a1a] rounded-full shadow-lg border border-border-dark hover:bg-neutral-800 transition-colors text-white">
+										<button className="absolute bottom-0 right-0 p-2 bg-surface-elevated rounded-full shadow-lg border border-border-dark hover:bg-neutral-800 transition-colors text-white">
 											<Camera className="h-4 w-4" />
 										</button>
 									</div>
@@ -447,7 +447,7 @@ export default function SettingsPage() {
 											value={profile.name}
 											onChange={(e) => handleProfileChange('name', e.target.value)}
 											placeholder="Enter your full name"
-											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
@@ -460,7 +460,7 @@ export default function SettingsPage() {
 											value={profile.email}
 											onChange={(e) => handleProfileChange('email', e.target.value)}
 											placeholder="your.email@company.com"
-											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
@@ -473,7 +473,7 @@ export default function SettingsPage() {
 											value={profile.phone}
 											onChange={(e) => handleProfileChange('phone', e.target.value)}
 											placeholder="+1 (555) 123-4567"
-											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
@@ -485,7 +485,7 @@ export default function SettingsPage() {
 											type="date"
 											value={profile.birthDate}
 											onChange={(e) => handleProfileChange('birthDate', e.target.value)}
-											className="bg-[#1a1a1a] border-border-dark text-white"
+											className="bg-surface-elevated border-border-dark text-white"
 										/>
 									</div>
 								</div>
@@ -507,7 +507,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.department}
 											onChange={(e) => handleProfileChange('department', e.target.value)}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="">Select department</option>
 											{departments.map((dept) => (
@@ -525,7 +525,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.position}
 											onChange={(e) => handleProfileChange('position', e.target.value)}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="">Select position</option>
 											{positions.map((pos) => (
@@ -549,7 +549,7 @@ export default function SettingsPage() {
 											<select
 												value={customJobInput}
 												onChange={(e) => setCustomJobInput(e.target.value)}
-												className="flex-1 px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+												className="flex-1 px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 											>
 												<option value="">-- {t('settingsPage.profile.selectJob')} --</option>
 												{availableJobs
@@ -574,7 +574,7 @@ export default function SettingsPage() {
 
 									{/* Selected Roles Display */}
 									{profile.jobs.length > 0 ? (
-										<div className="p-4 border border-border-dark rounded-2xl bg-[#1a1a1a]/50">
+										<div className="p-4 border border-border-dark rounded-2xl bg-surface-elevated/50">
 											<p className="text-xs font-medium text-neutral-400 mb-3">
 												{t('settingsPage.profile.selectedRoles')} ({profile.jobs.length})
 											</p>
@@ -597,7 +597,7 @@ export default function SettingsPage() {
 												</div>
 											</div>
 									) : (
-										<div className="p-4 border border-dashed border-border-dark rounded-2xl bg-[#1a1a1a]/50 text-center">
+										<div className="p-4 border border-dashed border-border-dark rounded-2xl bg-surface-elevated/50 text-center">
 											<p className="text-sm text-neutral-400">
 												{t('settingsPage.profile.noRoles')}
 											</p>
@@ -617,7 +617,7 @@ export default function SettingsPage() {
 											readOnly
 											disabled
 											placeholder="EMP-2023-001"
-											className="bg-[#1a1a1a] border-border-dark text-neutral-400 cursor-not-allowed"
+											className="bg-surface-elevated border-border-dark text-neutral-400 cursor-not-allowed"
 										/>
 										<p className="text-xs text-neutral-500 mt-1">
 											🔒 {t('settingsPage.profile.uniqueId')}
@@ -629,7 +629,7 @@ export default function SettingsPage() {
 											type="date"
 											value={profile.joinDate}
 											onChange={(e) => handleProfileChange('joinDate', e.target.value)}
-											className="bg-[#1a1a1a] border-border-dark text-white"
+											className="bg-surface-elevated border-border-dark text-white"
 										/>
 									</div>
 								</div>
@@ -649,7 +649,7 @@ export default function SettingsPage() {
 											value={profile.address}
 											onChange={(e) => handleProfileChange('address', e.target.value)}
 											placeholder="123 Main Street"
-											className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -659,7 +659,7 @@ export default function SettingsPage() {
 												value={profile.city}
 												onChange={(e) => handleProfileChange('city', e.target.value)}
 												placeholder="New York"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 										</div>
 										<div>
@@ -668,7 +668,7 @@ export default function SettingsPage() {
 												value={profile.country}
 												onChange={(e) => handleProfileChange('country', e.target.value)}
 												placeholder="United States"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 										</div>
 										<div>
@@ -677,7 +677,7 @@ export default function SettingsPage() {
 												value={profile.postalCode}
 												onChange={(e) => handleProfileChange('postalCode', e.target.value)}
 												placeholder="10001"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 										</div>
 									</div>
@@ -699,7 +699,7 @@ export default function SettingsPage() {
 											onChange={(e) => handleProfileChange('bio', e.target.value)}
 											placeholder={t('settingsPage.profile.bioPlaceholder')}
 											rows={4}
-											className="resize-none bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+											className="resize-none bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 										/>
 									</div>
 									<div>
@@ -710,7 +710,7 @@ export default function SettingsPage() {
 												onChange={(e) => setSkillInput(e.target.value)}
 												onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
 												placeholder={t('settingsPage.profile.addSkill')}
-												className="flex-1 bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="flex-1 bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 											<Button onClick={handleAddSkill} size="sm" variant="primary">
 												{t('common.add')}
@@ -751,7 +751,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.timezone}
 											onChange={(e) => handleProfileChange('timezone', e.target.value)}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="UTC">UTC</option>
 											<option value="America/New_York">Eastern Time (ET)</option>
@@ -771,7 +771,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.language}
 											onChange={(e) => handleProfileChange('language', e.target.value)}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="en">English</option>
 											<option value="ko">한국어</option>
@@ -784,7 +784,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.dateFormat}
 											onChange={(e) => handleProfileChange('dateFormat', e.target.value)}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="MM/DD/YYYY">MM/DD/YYYY</option>
 											<option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -799,7 +799,7 @@ export default function SettingsPage() {
 										<select
 											value={profile.timeFormat}
 											onChange={(e) => handleProfileChange('timeFormat', e.target.value as '12h' | '24h')}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-primary"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="12h">12-hour (2:30 PM)</option>
 											<option value="24h">24-hour (14:30)</option>
@@ -810,7 +810,7 @@ export default function SettingsPage() {
 						</Card>
 
 						{/* Actions */}
-						<div className="flex items-center gap-3 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+						<div className="flex items-center gap-3 pt-6 border-t border-neutral-800">
 							<Button 
 								onClick={handleSaveProfile} 
 								variant="primary"
@@ -855,7 +855,7 @@ export default function SettingsPage() {
 												value={currentPassword}
 												onChange={(e) => setCurrentPassword(e.target.value)}
 												placeholder="Enter current password"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 											<button
 												type="button"
@@ -874,7 +874,7 @@ export default function SettingsPage() {
 												value={newPassword}
 												onChange={(e) => setNewPassword(e.target.value)}
 												placeholder="Enter new password"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 											<button
 												type="button"
@@ -894,7 +894,7 @@ export default function SettingsPage() {
 												value={confirmPassword}
 												onChange={(e) => setConfirmPassword(e.target.value)}
 												placeholder="Confirm new password"
-												className="bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+												className="bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 											/>
 											<button
 												type="button"
@@ -963,7 +963,7 @@ export default function SettingsPage() {
 								</p>
 							</CardHeader>
 							<CardContent className="p-6">
-								<div className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+								<div className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-surface-elevated">
 									<div className="flex-1">
 										<h3 className="font-medium mb-1 text-white">{t('settingsPage.account.authenticatorApp')}</h3>
 										<p className="text-sm text-neutral-400">
@@ -987,7 +987,7 @@ export default function SettingsPage() {
 							</CardHeader>
 							<CardContent className="p-6">
 								<div className="space-y-3">
-									<div className="flex items-center justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+									<div className="flex items-center justify-between p-4 border border-border-dark rounded-xl bg-surface-elevated">
 										<div>
 											<h3 className="font-medium text-white">{t('settingsPage.account.currentSession')}</h3>
 											<p className="text-sm text-neutral-400">
@@ -1052,7 +1052,7 @@ export default function SettingsPage() {
 										{ key: 'desktop', label: t('settingsPage.notifications.desktop'), desc: t('settingsPage.notifications.desktopDesc') },
 										{ key: 'sms', label: t('settingsPage.notifications.sms'), desc: t('settingsPage.notifications.smsDesc') },
 									].map((item) => (
-										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-surface-elevated">
 											<div className="flex-1">
 												<h3 className="font-medium mb-1 text-white">{item.label}</h3>
 												<p className="text-sm text-neutral-400">{item.desc}</p>
@@ -1064,7 +1064,7 @@ export default function SettingsPage() {
 													onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
 													className="sr-only peer"
 												/>
-												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
+												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:border-neutral-600 peer-checked:bg-primary"></div>
 											</label>
 										</div>
 									))}
@@ -1084,7 +1084,7 @@ export default function SettingsPage() {
 										{ key: 'mentions', label: t('settingsPage.notifications.mentions'), desc: t('settingsPage.notifications.mentionsDesc') },
 										{ key: 'comments', label: t('settingsPage.notifications.comments'), desc: t('settingsPage.notifications.commentsDesc') },
 									].map((item) => (
-										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-[#1a1a1a]">
+										<div key={item.key} className="flex items-start justify-between p-4 border border-border-dark rounded-xl bg-surface-elevated">
 											<div className="flex-1">
 												<h3 className="font-medium mb-1 text-white">{item.label}</h3>
 												<p className="text-sm text-neutral-400">{item.desc}</p>
@@ -1096,7 +1096,7 @@ export default function SettingsPage() {
 													onChange={(e) => setNotifications((prev) => ({ ...prev, [item.key]: e.target.checked }))}
 													className="sr-only peer"
 												/>
-												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-primary"></div>
+												<div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:border-neutral-600 peer-checked:bg-primary"></div>
 											</label>
 										</div>
 									))}

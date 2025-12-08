@@ -55,7 +55,7 @@ export function NeedsReviewSection() {
 						<div className="text-2xl font-bold text-orange-600">
 							{needsReview.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.needsAttention')}
 						</p>
 					</CardContent>
@@ -74,7 +74,7 @@ export function NeedsReviewSection() {
 								item.originalData?.reviewType === 'approved'
 							).length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.needsReviewSection.positiveFeedback')}
 						</p>
 					</CardContent>
@@ -93,7 +93,7 @@ export function NeedsReviewSection() {
 								item.originalData?.reviewType === 'rejected'
 							).length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.needsReviewSection.needsAction')}
 						</p>
 					</CardContent>
@@ -122,33 +122,33 @@ export function NeedsReviewSection() {
 										<div className="flex-1">
 											<div className="flex items-center gap-2 mb-2">
 												{isApproved && (
-													<span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium flex items-center gap-1">
+													<span className="text-xs px-2 py-1 rounded-full bg-green-900/30 text-green-300 font-medium flex items-center gap-1">
 														<CheckCircle2 className="h-3 w-3" />
 														{t('review.approved')}
 													</span>
 												)}
 												{isRejected && (
-													<span className="text-xs px-2 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-medium flex items-center gap-1">
+													<span className="text-xs px-2 py-1 rounded-full bg-red-900/30 text-red-300 font-medium flex items-center gap-1">
 														<XCircle className="h-3 w-3" />
 														{t('review.changes')}
 													</span>
 												)}
 												{!isApproved && !isRejected && (
-													<span className="text-xs px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
+													<span className="text-xs px-2 py-1 rounded-full bg-orange-900/30 text-orange-300 font-medium">
 														{t('rhythm.needsReviewSection.comment')}
 													</span>
 												)}
 											</div>
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 											{item.description && (
-												<div className="p-3 bg-neutral-100 dark:bg-neutral-900 rounded-lg mb-3">
-													<p className="text-sm text-neutral-700 dark:text-neutral-300">
+												<div className="p-3 bg-neutral-900 rounded-lg mb-3">
+													<p className="text-sm text-neutral-300">
 														"{item.description}"
 													</p>
 												</div>
 											)}
 											
-											<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+											<div className="flex items-center gap-4 text-sm text-neutral-400">
 												{item.originalData?.reviewedByName && (
 													<div className="flex items-center gap-1">
 														<User className="h-4 w-4" />

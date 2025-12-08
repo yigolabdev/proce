@@ -49,7 +49,7 @@ export function PageHeader({
 	title,
 	description,
 	icon: Icon,
-	iconColor = 'text-neutral-900 dark:text-white',
+	iconColor = 'text-white',
 	actions,
 	tabs,
 	children,
@@ -57,22 +57,22 @@ export function PageHeader({
 	className = '',
 }: PageHeaderProps) {
 	return (
-		<div className={`${sticky ? 'sticky top-0 z-10 bg-neutral-50 dark:bg-background-dark pt-4 pb-4 border-b border-neutral-200 dark:border-border-dark' : ''} ${className}`}>
+		<div className={`${sticky ? 'sticky top-0 z-10 bg-background-dark pt-4 pb-4 border-b border-border-dark' : ''} ${className}`}>
 				{/* Title & Actions */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div className="flex items-center gap-3 min-w-0">
 					{/* Icon is optional */}
 					{Icon && (
-						<div className="p-2 rounded-xl bg-neutral-100 dark:bg-surface-dark border border-neutral-200 dark:border-border-dark shrink-0">
+						<div className="p-2 rounded-xl bg-surface-dark border border-border-dark shrink-0">
 							<Icon className={`h-6 w-6 ${iconColor}`} />
 						</div>
 					)}
 					<div className="min-w-0">
-						<h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 truncate">
+						<h1 className="text-3xl font-bold tracking-tight text-neutral-100 truncate">
 							{title}
 						</h1>
 						{description && (
-							<div className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 truncate">
+							<div className="text-sm text-neutral-400 mt-1 truncate">
 								{description}
 							</div>
 						)}
@@ -88,7 +88,7 @@ export function PageHeader({
 
 				{/* Tabs */}
 				{tabs && (
-				<div className="mt-8 border-b border-neutral-200 dark:border-border-dark overflow-x-auto pb-px no-scrollbar">
+				<div className="mt-8 border-b border-border-dark overflow-x-auto pb-px no-scrollbar">
 					<div className="flex items-center gap-6">
 						{tabs.items.map((tab) => {
 							const TabIcon = tab.icon
@@ -107,8 +107,8 @@ export function PageHeader({
 									}}
 									className={`flex items-center gap-2 pb-3 text-sm font-medium transition-all relative whitespace-nowrap ${
 										isActive
-											? 'text-neutral-900 dark:text-white'
-											: 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+											? 'text-white'
+											: 'text-neutral-500 hover:hover:text-neutral-300'
 									}`}
 								>
 									{TabIcon && <TabIcon className={`h-4 w-4 ${isActive ? 'text-orange-500' : 'text-neutral-500'}`} />}
@@ -119,7 +119,7 @@ export function PageHeader({
 										<span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
 											isActive 
 												? 'bg-orange-500/10 text-orange-500' 
-												: 'bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-500'
+												: 'bg-surface-elevated text-neutral-500'
 										}`}>
 											{tab.count}
 										</span>

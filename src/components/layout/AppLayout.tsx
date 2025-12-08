@@ -5,9 +5,7 @@ import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 import { useState, useEffect, Fragment } from 'react'
 import { storage } from '../../utils/storage'
-import { Clock } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
-import { LanguageSwitcher } from '../common/LanguageSwitcher'
 
 interface MenuItem {
 	to: string
@@ -88,7 +86,6 @@ export default function AppLayout() {
 		roles: ['user', 'admin', 'executive'] as UserRole[],
 		items: [
 			{ to: '/app/dashboard', label: t('menu.dashboard'), icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/rhythm', label: t('menu.workRhythm'), icon: Clock, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/input', label: t('menu.workInput'), icon: FileText, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/messages', label: t('menu.messages'), icon: Mail, roles: ['user', 'admin', 'executive'], badge: unreadMessages },
 			{ to: '/app/ai-recommendations', label: t('menu.aiSuggestions'), icon: Sparkles, roles: ['user', 'admin', 'executive'] },
@@ -143,11 +140,6 @@ const visibleMenuGroups = menuGroups
 					<div className="text-base font-bold text-white tracking-tight leading-none mb-1">Proce</div>
 					<div className="text-[10px] text-neutral-500 font-medium tracking-widest uppercase">{t('menu.workspace')}</div>
 				</div>
-				
-				{/* Desktop Language Switcher (in sidebar header) */}
-				<div className="hidden lg:block ml-auto scale-75 origin-right">
-					<LanguageSwitcher />
-				</div>
 
 				{/* Mobile close button */}
 				<button
@@ -194,7 +186,7 @@ const visibleMenuGroups = menuGroups
                         <div className="flex items-center gap-3 mb-3">
                             <div className="relative shrink-0">
                                 <div className="size-10 rounded-full bg-linear-to-br from-orange-500 to-amber-500 p-[1px]">
-                                    <div className="size-full rounded-full bg-[#1a1a1a] flex items-center justify-center text-white font-medium text-sm">
+                                    <div className="size-full rounded-full bg-surface-elevated flex items-center justify-center text-white font-medium text-sm">
                                         {user.name.charAt(0)}
                                     </div>
                                 </div>
@@ -207,7 +199,7 @@ const visibleMenuGroups = menuGroups
                         </div>
                         <Link
                             to="/"
-                            className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 text-xs font-medium bg-[#1a1a1a] text-neutral-400 hover:text-white hover:bg-[#252525] transition-all border border-transparent hover:border-[#333]"
+                            className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 text-xs font-medium bg-surface-elevated text-neutral-400 hover:text-white hover:bg-[#252525] transition-all border border-transparent hover:border-[#333]"
                         >
                             <LogOut size={14} />
                             <span>{t('menu.signOut')}</span>
@@ -241,7 +233,7 @@ const visibleMenuGroups = menuGroups
 			{/* Main Content Area - Adjusted margin for wider sidebar */}
 			<main className="flex-1 lg:ml-[280px] min-h-screen bg-[#050505] text-neutral-200">
 				{/* Mobile Header */}
-				<div className="lg:hidden sticky top-0 z-30 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-[#1a1a1a] px-4 py-3 flex items-center justify-between">
+				<div className="lg:hidden sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-[#1a1a1a] px-4 py-3 flex items-center justify-between">
 					<div className="flex items-center gap-3">
 					<button
 						onClick={() => setIsMobileSidebarOpen(true)}

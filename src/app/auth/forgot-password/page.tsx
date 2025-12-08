@@ -124,13 +124,13 @@ export default function ForgotPasswordPage() {
 	}
 
 	return (
-		<div className="mx-auto min-h-dvh w-full bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center px-4 py-12">
+		<div className="mx-auto min-h-dvh w-full bg-neutral-950 flex items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
 				{/* Top Navigation */}
 				<div className="flex items-center justify-between mb-6">
 					<button
 						onClick={() => navigate('/')}
-						className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-colors"
+						className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-primary transition-colors"
 					>
 						<Home className="h-4 w-4" />
 						<span>Back to Home</span>
@@ -138,7 +138,7 @@ export default function ForgotPasswordPage() {
 					{step > 1 && step < 4 && (
 						<button
 							onClick={() => setStep(step - 1)}
-							className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+							className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-neutral-100 transition-colors"
 						>
 							<ArrowLeft className="h-4 w-4" />
 							<span>Back</span>
@@ -157,7 +157,7 @@ export default function ForgotPasswordPage() {
 						{step === 3 && 'Reset Password'}
 						{step === 4 && 'Password Reset Complete'}
 					</h1>
-					<p className="text-neutral-600 dark:text-neutral-400">
+					<p className="text-neutral-400">
 						{step === 1 && "Enter your email and we'll send you a verification code"}
 						{step === 2 && 'Enter the 6-digit code sent to your email'}
 						{step === 3 && 'Create a new password for your account'}
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
 											? 'w-12 bg-primary'
 											: s < step
 												? 'w-8 bg-green-600'
-												: 'w-8 bg-neutral-200 dark:bg-neutral-800'
+												: 'w-8 bg-neutral-800'
 									}`}
 								/>
 							))}
@@ -239,7 +239,7 @@ export default function ForgotPasswordPage() {
 										maxLength={6}
 									/>
 									<div className="flex items-center justify-between mt-2">
-										<p className="text-xs text-neutral-600 dark:text-neutral-400">
+										<p className="text-xs text-neutral-400">
 											Code sent to: <span className="font-medium">{email}</span>
 										</p>
 										{countdown > 0 && (
@@ -294,7 +294,7 @@ export default function ForgotPasswordPage() {
 											disabled={isLoading}
 										/>
 									</div>
-									<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+									<p className="text-xs text-neutral-400 mt-1">
 										Must be at least 8 characters
 									</p>
 								</div>
@@ -333,11 +333,11 @@ export default function ForgotPasswordPage() {
 						{/* Step 4: Complete */}
 						{step === 4 && (
 							<div className="text-center py-8">
-								<div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-									<Check className="h-10 w-10 text-green-600 dark:text-green-400" />
+								<div className="w-20 h-20 rounded-full bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+									<Check className="h-10 w-10 text-green-400" />
 								</div>
 								<h3 className="text-2xl font-bold mb-2">Success!</h3>
-								<p className="text-neutral-600 dark:text-neutral-400 mb-8">
+								<p className="text-neutral-400 mb-8">
 									Your password has been reset successfully.
 									<br />
 									Redirecting to sign in page...
@@ -353,7 +353,7 @@ export default function ForgotPasswordPage() {
 				{/* Footer */}
 				{step < 4 && (
 					<div className="text-center mt-6">
-						<p className="text-sm text-neutral-600 dark:text-neutral-400">
+						<p className="text-sm text-neutral-400">
 							Remember your password?{' '}
 							<button
 								onClick={() => navigate('/')}

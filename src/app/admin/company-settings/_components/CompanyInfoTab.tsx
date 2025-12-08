@@ -203,7 +203,7 @@ export default function CompanyInfoTab({
 
 					{/* Office Location */}
 					<div>
-						<h3 className="font-semibold text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex items-center gap-2">
+						<h3 className="font-semibold text-sm text-neutral-300 mb-4 flex items-center gap-2">
 							<MapPin className="h-4 w-4" />
 							Office Location
 						</h3>
@@ -247,7 +247,7 @@ export default function CompanyInfoTab({
 
 					{/* Contact Channels */}
 					<div>
-						<h3 className="font-semibold text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex items-center gap-2">
+						<h3 className="font-semibold text-sm text-neutral-300 mb-4 flex items-center gap-2">
 							<Phone className="h-4 w-4" />
 							Contact Channels
 						</h3>

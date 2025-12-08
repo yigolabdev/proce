@@ -50,10 +50,10 @@ export function TodaySection() {
 
 	const getPriorityColor = (priority: string) => {
 		switch (priority) {
-			case 'high': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
-			case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
-			case 'low': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-			default: return 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-900/20'
+			case 'high': return 'text-red-400 bg-red-900/20'
+			case 'medium': return 'text-yellow-400 bg-yellow-900/20'
+			case 'low': return 'text-blue-400 bg-blue-900/20'
+			default: return 'text-neutral-400 bg-neutral-900/20'
 		}
 	}
 
@@ -73,7 +73,7 @@ export function TodaySection() {
 		<div className="space-y-8">
 			{/* Summary Stats */}
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-				<Card className={isLoopComplete ? 'border-green-500 dark:border-green-600' : ''}>
+				<Card className={isLoopComplete ? 'border-green-600' : ''}>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							{isLoopComplete ? (
@@ -92,13 +92,13 @@ export function TodaySection() {
 								<span>{summary.pending} {t('rhythm.pending')}</span>
 							)}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{summary.completed} {t('rhythm.completedToday')}
 						</p>
 					</CardContent>
 				</Card>
 
-				<Card className={urgent.length > 0 ? 'border-red-500 dark:border-red-600' : ''}>
+				<Card className={urgent.length > 0 ? 'border-red-600' : ''}>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
 							<AlertCircle className="h-4 w-4 text-red-600" />
@@ -109,7 +109,7 @@ export function TodaySection() {
 						<div className="text-2xl font-bold text-red-600">
 							{urgent.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.needsAttention')}
 						</p>
 					</CardContent>
@@ -126,7 +126,7 @@ export function TodaySection() {
 						<div className="text-2xl font-bold text-blue-600">
 							{scheduled.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.dueToday')}
 						</p>
 					</CardContent>
@@ -143,7 +143,7 @@ export function TodaySection() {
 						<div className="text-2xl font-bold text-orange-600">
 							{needsReview.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.needsYourAttention')}
 						</p>
 					</CardContent>
@@ -152,15 +152,15 @@ export function TodaySection() {
 
 			{/* Loop Complete State */}
 			{isLoopComplete && (
-				<Card className="bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800">
+				<Card className="bg-green-900/10 border-green-800">
 					<CardContent className="p-6">
 						<div className="flex items-start gap-4">
-							<CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400 shrink-0" />
+							<CheckCircle2 className="h-8 w-8 text-green-400 shrink-0" />
 							<div className="flex-1">
-								<h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-1">
+								<h3 className="text-lg font-semibold text-green-100 mb-1">
 									{t('rhythm.loopComplete')}
 								</h3>
-								<p className="text-sm text-green-700 dark:text-green-300 mb-4">
+								<p className="text-sm text-green-300 mb-4">
 									{t('rhythm.loopCompleteDesc')}
 								</p>
 								
@@ -168,7 +168,7 @@ export function TodaySection() {
 									<Button
 										onClick={handleShowNextActions}
 										variant="outline"
-										className="border-green-300 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
+										className="border-green-700 hover:hover:bg-green-900/20"
 									>
 										<Sparkles className="h-4 w-4 mr-2" />
 										{t('rhythm.showNextActions')} ({t('common.optional')})
@@ -186,7 +186,7 @@ export function TodaySection() {
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="h-5 w-5 text-red-600" />
 						<h2 className="text-xl font-semibold">{t('rhythm.urgentTasks')}</h2>
-						<span className="text-sm text-neutral-600 dark:text-neutral-400">
+						<span className="text-sm text-neutral-400">
 							({urgent.length})
 						</span>
 					</div>
@@ -204,18 +204,18 @@ export function TodaySection() {
 													{t(`common.priorities.${item.priority}`)}
 												</span>
 												{item.type === 'task' && (
-													<span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+													<span className="text-xs px-2 py-1 rounded-full bg-blue-900/30 text-blue-300">
 														{t('rhythm.task')}
 													</span>
 												)}
 											</div>
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 											{item.description && (
-												<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+												<p className="text-sm text-neutral-400 mb-3">
 													{item.description}
 												</p>
 											)}
-											<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+											<div className="flex items-center gap-4 text-sm text-neutral-400">
 												{item.projectName && (
 													<div className="flex items-center gap-1">
 														<FolderKanban className="h-4 w-4" />
@@ -257,7 +257,7 @@ export function TodaySection() {
 					<div className="flex items-center gap-2 mb-4">
 						<Calendar className="h-5 w-5 text-blue-600" />
 						<h2 className="text-xl font-semibold">{t('rhythm.scheduledTasks')}</h2>
-						<span className="text-sm text-neutral-600 dark:text-neutral-400">
+						<span className="text-sm text-neutral-400">
 							({scheduled.length})
 						</span>
 					</div>
@@ -277,11 +277,11 @@ export function TodaySection() {
 											</div>
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 											{item.description && (
-												<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+												<p className="text-sm text-neutral-400 mb-3">
 													{item.description}
 												</p>
 											)}
-											<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+											<div className="flex items-center gap-4 text-sm text-neutral-400">
 												{item.projectName && (
 													<div className="flex items-center gap-1">
 														<FolderKanban className="h-4 w-4" />
@@ -317,7 +317,7 @@ export function TodaySection() {
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="h-5 w-5 text-orange-600" />
 						<h2 className="text-xl font-semibold">{t('rhythm.reviewTasks')}</h2>
-						<span className="text-sm text-neutral-600 dark:text-neutral-400">
+						<span className="text-sm text-neutral-400">
 							({needsReview.length})
 						</span>
 					</div>
@@ -332,7 +332,7 @@ export function TodaySection() {
 										<div className="flex-1">
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 											{item.description && (
-												<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+												<p className="text-sm text-neutral-400 mb-3">
 													{item.description}
 												</p>
 											)}
@@ -358,7 +358,7 @@ export function TodaySection() {
 					<div className="flex items-center gap-2 mb-4">
 						<TrendingUp className="h-5 w-5 text-purple-600" />
 						<h2 className="text-xl font-semibold">{t('rhythm.nextUp')} ({t('common.optional')})</h2>
-						<span className="text-sm text-neutral-600 dark:text-neutral-400">
+						<span className="text-sm text-neutral-400">
 							({nextActions.nextUp.length})
 						</span>
 					</div>
@@ -373,7 +373,7 @@ export function TodaySection() {
 										<div className="flex-1">
 											<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 											{item.description && (
-												<p className="text-sm text-neutral-600 dark:text-neutral-400">
+												<p className="text-sm text-neutral-400">
 													{item.description}
 												</p>
 											)}

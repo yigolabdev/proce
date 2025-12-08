@@ -86,7 +86,7 @@ export function WorkHistoryFilters({
 
 				{/* Advanced Filters */}
 				{showFilters && (
-					<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+					<div className="space-y-4 pt-4 border-t border-neutral-800">
 						{/* Category Filter */}
 						<div>
 							<label className="block text-sm font-medium mb-2">Category</label>
@@ -113,7 +113,7 @@ export function WorkHistoryFilters({
 							<select
 								value={selectedProject}
 								onChange={(e) => onProjectChange(e.target.value)}
-								className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm"
+								className="w-full px-3 py-2 rounded-lg border border-neutral-700 bg-neutral-900 text-sm"
 							>
 								<option value="all">All Projects</option>
 								{projects.map((project) => (
@@ -130,7 +130,7 @@ export function WorkHistoryFilters({
 							<select
 								value={selectedObjective}
 								onChange={(e) => onObjectiveChange(e.target.value)}
-								className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm"
+								className="w-full px-3 py-2 rounded-lg border border-neutral-700 bg-neutral-900 text-sm"
 							>
 								<option value="all">All Goals</option>
 								{objectives.map((obj) => (
@@ -150,7 +150,7 @@ export function WorkHistoryFilters({
 									className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
 										sortBy === 'date'
 											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+											: 'bg-neutral-800 text-neutral-400'
 									}`}
 								>
 									Date
@@ -160,7 +160,7 @@ export function WorkHistoryFilters({
 									className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
 										sortBy === 'title'
 											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+											: 'bg-neutral-800 text-neutral-400'
 									}`}
 								>
 									Title

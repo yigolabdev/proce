@@ -4,10 +4,9 @@ import { Card, CardContent } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { toast } from 'sonner'
-import { Sun, Moon, Languages, Loader2 } from 'lucide-react'
+import { Languages, Loader2 } from 'lucide-react'
 import { authI18n } from '../_i18n/auth.i18n'
 import { useI18n } from '../../../i18n/I18nProvider'
-import { useTheme } from '../../../theme/ThemeProvider'
 import { track } from '../../../lib/analytics'
 import { signInWithPassword } from '../_mocks/authApi'
 
@@ -21,7 +20,6 @@ export default function SignInForm() {
 	const navigate = useNavigate()
 	const { locale, setLocale } = useI18n()
 	const tt = useMemo(() => authI18n[locale as keyof typeof authI18n], [locale])
-	const { theme, toggle } = useTheme()
 
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
@@ -77,26 +75,19 @@ export default function SignInForm() {
 
 	return (
 		<div className="w-full" id="signin">
-			{/* Theme/Language toggles - Fixed top right */}
-			<div className="fixed right-4 top-4 z-50 flex items-center gap-2">
+			{/* Language toggle - Fixed top right */}
+			<div className="fixed right-4 top-4 z-50">
 				<button
-					className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur px-3 py-1.5 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm"
+					className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900/80 backdrop-blur px-3 py-1.5 text-xs hover:bg-neutral-900 transition-colors shadow-sm"
 					onClick={() => setLocale(locale === 'en' ? 'ko' : 'en')}
 					aria-label="toggle language"
 				>
 					<Languages size={12} />
 					<span>{locale.toUpperCase()}</span>
 				</button>
-				<button
-					className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur px-3 py-1.5 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm"
-					onClick={() => toggle()}
-					aria-label="toggle theme"
-				>
-					{theme === 'dark' ? <Sun size={12} /> : <Moon size={12} />}
-				</button>
 			</div>
 
-			<Card className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl">
+			<Card className="rounded-2xl border border-neutral-800 bg-neutral-900 shadow-xl">
 				<CardContent className="p-8">
 					{/* Email/Password Form */}
 					<form
@@ -132,12 +123,12 @@ export default function SignInForm() {
 						</div>
 
 						<div className="flex items-center justify-between text-sm pt-2">
-							<label className="inline-flex items-center gap-2 text-neutral-600 dark:text-neutral-400 cursor-pointer">
+							<label className="inline-flex items-center gap-2 text-neutral-400 cursor-pointer">
 								<input
 									type="checkbox"
 									checked={remember}
 									onChange={(e) => setRemember(e.target.checked)}
-									className="rounded border-neutral-300 dark:border-neutral-700"
+									className="rounded border-neutral-700"
 								/>
 								Remember me
 							</label>
@@ -157,7 +148,7 @@ export default function SignInForm() {
 					</form>
 
 					{/* Footer */}
-					<div className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+					<div className="mt-6 text-center text-sm text-neutral-400">
 						Don't have an account?{' '}
 						<a href="/auth/sign-up" className="text-primary font-medium hover:underline">
 							Sign Up

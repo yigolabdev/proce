@@ -9,24 +9,23 @@
 	/* Dark Mode Backgrounds - Deep & Sleek */
 	--color-background-dark: #050505; /* Almost Black */
 	--color-surface-dark: #0f0f0f; /* Slightly lighter for cards */
+	--color-surface-elevated: #1a1a1a; /* 카드 내부 또는 elevated 요소 */
 	--color-border-dark: #262626; /* Neutral-800 */
 	
 	--font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", "Pretendard Variable", Pretendard, "Noto Sans", "Noto Sans CJK KR", "Malgun Gothic", "맑은 고딕", sans-serif;
 }
 
-:root { color-scheme: light dark; }
-
-html, body, #root { height: 100%; }
-
-body {
-	@apply bg-neutral-50 text-neutral-900 antialiased;
+:root { 
+	color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-	body { 
-		background-color: var(--color-background-dark);
-		@apply text-neutral-100; 
-	}
+html, body, #root { 
+	height: 100%; 
+}
+
+body {
+	background-color: var(--color-background-dark);
+	@apply text-neutral-100 antialiased;
 }
 
 /* Scrollbar Styles for professional look */
@@ -38,17 +37,31 @@ body {
 	@apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-	@apply bg-neutral-300 dark:bg-neutral-800 rounded-full;
+	@apply bg-neutral-800 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-	@apply bg-neutral-400 dark:bg-neutral-700;
+	@apply bg-neutral-700;
 }
 
-/* Utility Classes for the Image Look */
+/* Hide scrollbar for specific elements */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+/* Utility Classes for Dark Theme */
 .card-gradient {
 	@apply bg-linear-to-br from-neutral-900 to-neutral-950;
 }
 
 .glass-panel {
 	@apply bg-white/5 backdrop-blur-lg border-white/10;
+}
+
+/* Focus visible styles */
+*:focus-visible {
+	@apply outline-none ring-2 ring-orange-500 ring-offset-2 ring-offset-background-dark;
 }

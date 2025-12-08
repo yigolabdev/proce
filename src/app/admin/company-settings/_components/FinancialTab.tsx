@@ -208,7 +208,7 @@ export default function FinancialTab({
 											{newFinancialYear.documents.map((doc: any) => (
 												<div
 													key={doc.id}
-													className="flex items-center justify-between p-3 rounded-xl bg-[#1a1a1a] border border-border-dark"
+													className="flex items-center justify-between p-3 rounded-xl bg-surface-elevated border border-border-dark"
 												>
 													<div className="flex items-center gap-3 flex-1 min-w-0">
 														<File className="h-5 w-5 text-orange-500 shrink-0" />
@@ -344,7 +344,7 @@ export default function FinancialTab({
 											{data.documents.map((doc) => (
 												<div
 													key={doc.id}
-													className="flex items-center justify-between p-3 rounded-xl bg-[#1a1a1a] hover:bg-neutral-800 transition-colors border border-border-dark"
+													className="flex items-center justify-between p-3 rounded-xl bg-surface-elevated hover:bg-neutral-800 transition-colors border border-border-dark"
 												>
 													<div className="flex items-center gap-3 flex-1 min-w-0">
 														<File className="h-5 w-5 text-orange-500 shrink-0" />

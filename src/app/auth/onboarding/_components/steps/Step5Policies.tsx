@@ -38,7 +38,7 @@ export default function Step5Policies({ data, onNext, onBack }: Step5Props) {
 	return (
 		<Card className="p-6">
 			<h2 className="text-2xl font-bold">{t.title}</h2>
-			<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+			<p className="mt-2 text-sm text-neutral-300">{t.subtitle}</p>
 
 			<form onSubmit={handleSubmit} className="mt-6 space-y-6">
 				<div>
@@ -50,7 +50,7 @@ export default function Step5Policies({ data, onNext, onBack }: Step5Props) {
 								className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${
 									form.template === template
 										? 'border-primary bg-primary/5 font-medium'
-										: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+										: 'border-neutral-800 hover:border-primary/50'
 								}`}
 							>
 								<input
@@ -71,7 +71,7 @@ export default function Step5Policies({ data, onNext, onBack }: Step5Props) {
 
 				<div>
 					<label className="block text-sm font-medium mb-2">{t.exampleRule}</label>
-					<pre className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4 text-xs overflow-x-auto">
+					<pre className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-xs overflow-x-auto">
 						<code>{POLICY_DSL_EXAMPLE}</code>
 					</pre>
 				</div>

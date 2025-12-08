@@ -63,7 +63,7 @@ export default function Step1CompanyProfile({ data, onNext }: Step1Props) {
 	return (
 		<Card className="p-6">
 			<h2 className="text-2xl font-bold">{t.title}</h2>
-			<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+			<p className="mt-2 text-sm text-neutral-300">{t.subtitle}</p>
 
 			<form onSubmit={handleSubmit} className="mt-6 space-y-4">
 				<div>
@@ -125,7 +125,7 @@ export default function Step1CompanyProfile({ data, onNext }: Step1Props) {
 						id="industry"
 						value={form.industry || ''}
 						onChange={(e) => updateField('industry', e.target.value)}
-						className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+						className="w-full rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 						aria-invalid={!!errors.industry}
 						aria-describedby={errors.industry ? 'industry-error' : undefined}
 					>
@@ -154,7 +154,7 @@ export default function Step1CompanyProfile({ data, onNext }: Step1Props) {
 								className={`cursor-pointer rounded-2xl border px-4 py-2.5 text-center text-sm transition ${
 									form.size === size
 										? 'border-primary bg-primary/5 font-medium'
-										: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+										: 'border-neutral-800 hover:border-primary/50'
 								}`}
 							>
 								<input

@@ -101,7 +101,7 @@ export default function ExecutiveChat() {
 			isExpanded ? 'w-[600px] h-[800px] max-w-[calc(100vw-48px)] max-h-[calc(100vh-48px)]' : 'w-[400px] h-[600px]'
 		}`}>
 			{/* Header */}
-			<div className="flex items-center justify-between p-4 border-b border-border-dark bg-[#1a1a1a] rounded-t-2xl">
+			<div className="flex items-center justify-between p-4 border-b border-border-dark bg-surface-elevated rounded-t-2xl">
 				<div className="flex items-center gap-2">
 					<div className="p-2 bg-orange-500/10 rounded-lg">
 						<Bot className="h-5 w-5 text-orange-500" />
@@ -171,7 +171,7 @@ export default function ExecutiveChat() {
 						value={input}
 						onChange={(e) => setInput(e.target.value)}
 						placeholder="Ask about performance, risks, or strategy..."
-						className="flex-1 px-4 py-2 text-sm bg-[#1a1a1a] border border-border-dark rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all text-white placeholder-neutral-500"
+						className="flex-1 px-4 py-2 text-sm bg-surface-elevated border border-border-dark rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all text-white placeholder-neutral-500"
 					/>
 					<Button type="submit" size="icon" disabled={!input.trim() || isTyping} className="bg-orange-500 hover:bg-orange-600 text-white border-none">
 						<Send className="h-4 w-4" />

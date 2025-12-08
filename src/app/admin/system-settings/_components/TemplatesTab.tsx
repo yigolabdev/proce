@@ -36,7 +36,7 @@ export default function TemplatesTab({
 		<>
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Manage work entry templates for quick input
 					</p>
 					<Button onClick={() => onSetShowAddTemplate(true)}>
@@ -74,7 +74,7 @@ export default function TemplatesTab({
 											onChange={(e) =>
 												onSetEditingTemplate({ ...editingTemplate, category: e.target.value })
 											}
-											className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+											className="w-full px-3 py-2 border border-neutral-700 rounded-xl bg-neutral-900"
 										>
 											<option value="">Select category</option>
 											{categories.map((cat) => (
@@ -105,23 +105,23 @@ export default function TemplatesTab({
 											<div className="flex items-center gap-1">
 												<button
 													onClick={() => onSetEditingTemplate(template)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:hover:bg-neutral-800 rounded"
 												>
 													<Edit2 className="h-4 w-4 text-neutral-600" />
 												</button>
 												<button
 													onClick={() => onDelete(template.id)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:hover:bg-neutral-800 rounded"
 												>
 													<Trash2 className="h-4 w-4 text-red-500" />
 												</button>
 											</div>
 										</div>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap mb-3">
+										<p className="text-sm text-neutral-400 whitespace-pre-wrap mb-3">
 											{template.description}
 										</p>
 										{template.category && (
-											<span className="inline-block text-xs px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800">
+											<span className="inline-block text-xs px-2 py-1 rounded-full bg-neutral-800">
 												{categories.find((c) => c.id === template.category)?.name ||
 													template.category}
 											</span>
@@ -137,7 +137,7 @@ export default function TemplatesTab({
 			{/* Add Template Dialog */}
 			{showAddTemplate && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl">
+					<div className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-2xl">
 						<div className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function TemplatesTab({
 								</h3>
 								<button
 									onClick={() => onSetShowAddTemplate(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>
@@ -183,7 +183,7 @@ export default function TemplatesTab({
 									<select
 										value={newTemplate.category}
 										onChange={(e) => onSetNewTemplate({ ...newTemplate, category: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900"
 									>
 										<option value="">Select category</option>
 										{categories.map((cat) => (

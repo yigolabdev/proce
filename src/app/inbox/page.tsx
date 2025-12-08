@@ -410,11 +410,11 @@ export default function InboxPage() {
 	const getPriorityColor = (priority: TaskRecommendation['priority']) => {
 		switch (priority) {
 			case 'high':
-				return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+				return 'bg-red-100 bg-red-900/text-red-400'
 			case 'medium':
-				return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+				return 'bg-yellow-100 bg-yellow-900/text-yellow-400'
 			case 'low':
-				return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+				return 'bg-green-100 bg-green-900/text-green-400'
 		}
 	}
 
@@ -442,7 +442,7 @@ export default function InboxPage() {
 	const acceptedCount = recommendations.filter((r) => r.status === 'accepted').length
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-950">
 			<Toaster />
 			
 			{/* Header */}
@@ -453,7 +453,7 @@ export default function InboxPage() {
 				actions={
 					<>
 						{activeTab === 'messages' && (
-							<span className="text-sm text-neutral-600 dark:text-neutral-400">
+							<span className="text-sm text-neutral-400">
 								Unread: <span className="font-bold text-primary">{unreadCount}</span>
 							</span>
 						)}
@@ -492,7 +492,7 @@ export default function InboxPage() {
 							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 								filter === 'all'
 									? 'bg-primary text-white'
-									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+									: 'bg-neutral-800 hover:hover:bg-neutral-700'
 							}`}
 						>
 							All ({messages.length})
@@ -502,7 +502,7 @@ export default function InboxPage() {
 							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 								filter === 'unread'
 									? 'bg-primary text-white'
-									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+									: 'bg-neutral-800 hover:hover:bg-neutral-700'
 							}`}
 						>
 							Unread ({unreadCount})
@@ -512,7 +512,7 @@ export default function InboxPage() {
 							className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
 								filter === 'starred'
 									? 'bg-primary text-white'
-									: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+									: 'bg-neutral-800 hover:hover:bg-neutral-700'
 							}`}
 						>
 							Starred ({messages.filter((m) => m.isStarred).length})
@@ -540,7 +540,7 @@ export default function InboxPage() {
 								<Card
 									key={message.id}
 									className={`transition-all hover:shadow-md cursor-pointer ${
-										!message.isRead ? 'border-l-4 border-l-primary bg-blue-50/30 dark:bg-blue-900/10' : ''
+										!message.isRead ? 'border-l-4 border-l-primary bg-blue-50/bg-blue-900/10' : ''
 									}`}
 									onClick={() => handleOpenMessage(message)}
 								>
@@ -551,7 +551,7 @@ export default function InboxPage() {
 												<div className="flex items-start justify-between gap-4 mb-2">
 													<div className="flex-1 min-w-0">
 														<div className="flex items-center gap-2 mb-1">
-															<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">
+															<span className="text-xs font-medium text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
 																{getTypeLabel(message.type)}
 															</span>
 															<span className={`text-sm ${!message.isRead ? 'font-bold' : 'font-medium'}`}>
@@ -560,16 +560,16 @@ export default function InboxPage() {
 														</div>
 														<h3
 															className={`text-base mb-1 truncate ${
-																!message.isRead ? 'font-bold text-neutral-900 dark:text-neutral-100' : 'font-medium'
+																!message.isRead ? 'font-bold text-neutral-100' : 'font-medium'
 															}`}
 														>
 															{message.subject}
 														</h3>
-														<p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+														<p className="text-sm text-neutral-400 line-clamp-2">
 															{message.preview}
 														</p>
 													</div>
-													<span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
+													<span className="text-xs text-neutral-400 flex-shrink-0">
 														{formatTimestamp(message.timestamp)}
 													</span>
 												</div>
@@ -637,19 +637,19 @@ export default function InboxPage() {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<Card>
 						<CardContent className="p-4">
-							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Pending Tasks</div>
+							<div className="text-sm text-neutral-400 mb-1">Pending Tasks</div>
 							<div className="text-2xl font-bold">{pendingRecommendations.length}</div>
 						</CardContent>
 					</Card>
 					<Card>
 						<CardContent className="p-4">
-							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Accepted</div>
+							<div className="text-sm text-neutral-400 mb-1">Accepted</div>
 							<div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
 						</CardContent>
 					</Card>
 					<Card>
 						<CardContent className="p-4">
-							<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Last Updated</div>
+							<div className="text-sm text-neutral-400 mb-1">Last Updated</div>
 							<div className="text-sm font-medium">
 								{lastUpdated ? formatTimestamp(lastUpdated) : 'Never'}
 							</div>
@@ -664,11 +664,11 @@ export default function InboxPage() {
 							const getStatusColor = (status: string) => {
 								switch (status) {
 									case 'urgent':
-										return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10'
+										return 'border-l-red-500 bg-red-50/bg-red-900/10'
 									case 'warning':
-										return 'border-l-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10'
+										return 'border-l-yellow-500 bg-yellow-50/bg-yellow-900/10'
 									default:
-										return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10'
+										return 'border-l-blue-500 bg-blue-50/bg-blue-900/10'
 								}
 							}
 							
@@ -692,7 +692,7 @@ export default function InboxPage() {
 											<div className="flex-shrink-0 mt-0.5">{getIcon(insight.type)}</div>
 											<div className="flex-1 min-w-0">
 												<h3 className="font-bold text-sm mb-1">{insight.metric}</h3>
-												<p className="text-xs text-neutral-600 dark:text-neutral-400">
+												<p className="text-xs text-neutral-400">
 													{insight.value}
 												</p>
 											</div>
@@ -710,7 +710,7 @@ export default function InboxPage() {
 							<Card>
 								<CardContent className="p-12 text-center">
 									<RefreshCw className="h-12 w-12 mx-auto mb-4 text-primary animate-spin" />
-									<p className="text-neutral-600 dark:text-neutral-400">
+									<p className="text-neutral-400">
 										Loading recommendations...
 									</p>
 								</CardContent>
@@ -718,9 +718,9 @@ export default function InboxPage() {
 						) : pendingRecommendations.length === 0 ? (
 							<Card>
 								<CardContent className="p-12 text-center">
-									<Sparkles className="h-16 w-16 mx-auto mb-4 text-neutral-300 dark:text-neutral-700" />
+									<Sparkles className="h-16 w-16 mx-auto mb-4 text-neutral-700" />
 									<h3 className="text-lg font-bold mb-2">All Caught Up!</h3>
-									<p className="text-neutral-600 dark:text-neutral-400 mb-4">
+									<p className="text-neutral-400 mb-4">
 										No new recommendations at the moment. Check back later!
 									</p>
 									<Button onClick={handleRefreshRecommendations}>
@@ -732,7 +732,7 @@ export default function InboxPage() {
 						) : (
 							pendingRecommendations.map((task) => (
 								<Card key={task.id} className="hover:shadow-lg transition-shadow">
-									<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+									<CardHeader className="border-b border-neutral-800">
 										<div className="flex items-start justify-between gap-4">
 											<div className="flex-1 min-w-0">
 												<div className="flex items-center gap-2 mb-2">
@@ -743,12 +743,12 @@ export default function InboxPage() {
 													>
 														{task.priority.toUpperCase()}
 													</span>
-													<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+													<span className="text-xs text-neutral-400 bg-neutral-800 px-2 py-1 rounded">
 														{task.category}
 													</span>
 												</div>
 												<h3 className="text-lg font-bold mb-1">{task.title}</h3>
-												<p className="text-sm text-neutral-600 dark:text-neutral-400">
+												<p className="text-sm text-neutral-400">
 													{task.description}
 												</p>
 											</div>
@@ -760,21 +760,21 @@ export default function InboxPage() {
 											{task.deadline && (
 												<div className="flex items-center gap-2 text-sm">
 													<Calendar className="h-4 w-4 text-neutral-500" />
-													<span className="text-neutral-600 dark:text-neutral-400">
+													<span className="text-neutral-400">
 														Deadline: {new Date(task.deadline).toLocaleDateString()}
 													</span>
 												</div>
 											)}
 
 											{/* Data Source */}
-											<div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+											<div className="p-3 bg-blue-900/20 border border-blue-800 rounded-xl">
 												<div className="flex items-start gap-2">
-													<Brain className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+													<Brain className="h-4 w-4 text-blue-400 flex-shrink-0 mt-0.5" />
 													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">
+														<p className="text-xs font-medium text-blue-100 mb-1">
 															Data Source
 														</p>
-														<p className="text-xs text-blue-700 dark:text-blue-300">
+														<p className="text-xs text-blue-300">
 															{task.dataSource}
 														</p>
 													</div>
@@ -782,7 +782,7 @@ export default function InboxPage() {
 											</div>
 
 											{/* Actions */}
-											<div className="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+											<div className="flex items-center gap-2 pt-2 border-t border-neutral-800">
 												<Button
 													onClick={() => handleAcceptTask(task.id)}
 													className="flex-1 flex items-center justify-center gap-2"
@@ -811,28 +811,28 @@ export default function InboxPage() {
 			{/* Message Detail Modal */}
 			{selectedMessage && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+					<div className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
 						{/* Header */}
-						<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+						<div className="p-6 border-b border-neutral-800">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center gap-2 mb-2">
 										{getTypeIcon(selectedMessage.type)}
-										<span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">
+										<span className="text-xs font-medium text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded">
 											{getTypeLabel(selectedMessage.type)}
 										</span>
-										<span className="text-sm text-neutral-600 dark:text-neutral-400">
+										<span className="text-sm text-neutral-400">
 											{selectedMessage.from}
 										</span>
 									</div>
 									<h2 className="text-2xl font-bold mb-2">{selectedMessage.subject}</h2>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400">
+									<p className="text-sm text-neutral-400">
 										{formatTimestamp(selectedMessage.timestamp)}
 									</p>
 								</div>
 								<button
 									onClick={handleCloseMessage}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 flex-shrink-0"
+									className="text-neutral-500 hover:hover:text-neutral-300 flex-shrink-0"
 								>
 									<X className="h-6 w-6" />
 								</button>
@@ -842,14 +842,14 @@ export default function InboxPage() {
 						{/* Content */}
 						<div className="flex-1 overflow-y-auto p-6 space-y-6">
 							{/* AI Summary */}
-							<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
+							<div className="p-4 bg-blue-900/20 border border-blue-800 rounded-2xl">
 								<div className="flex items-start gap-3">
-									<Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+									<Sparkles className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
 									<div className="flex-1">
-										<h3 className="font-bold text-blue-900 dark:text-blue-100 mb-2">
+										<h3 className="font-bold text-blue-100 mb-2">
 											AI Summary
 										</h3>
-										<p className="text-sm text-blue-700 dark:text-blue-300">
+										<p className="text-sm text-blue-300">
 											{selectedMessage.aiSummary}
 										</p>
 									</div>
@@ -862,7 +862,7 @@ export default function InboxPage() {
 									<Mail className="h-5 w-5 text-primary" />
 									Original Content
 								</h3>
-								<div className="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 whitespace-pre-wrap text-sm">
+								<div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 whitespace-pre-wrap text-sm">
 									{selectedMessage.content}
 								</div>
 							</div>
@@ -878,10 +878,10 @@ export default function InboxPage() {
 										{selectedMessage.aiInsights.map((insight, index) => (
 											<div
 												key={index}
-												className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl"
+												className="flex items-start gap-3 p-3 bg-purple-900/20 border border-purple-800 rounded-xl"
 											>
-												<CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-												<p className="text-sm text-purple-700 dark:text-purple-300">
+												<CheckCircle2 className="h-4 w-4 text-purple-400 flex-shrink-0 mt-0.5" />
+												<p className="text-sm text-purple-300">
 													{insight}
 												</p>
 											</div>
@@ -901,10 +901,10 @@ export default function InboxPage() {
 										{selectedMessage.suggestedActions.map((action, index) => (
 											<div
 												key={index}
-												className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl"
+												className="flex items-center gap-3 p-3 bg-green-900/20 border border-green-800 rounded-xl"
 											>
-												<div className="h-2 w-2 rounded-full bg-green-600 dark:bg-green-400 flex-shrink-0" />
-												<p className="text-sm text-green-700 dark:text-green-300">
+												<div className="h-2 w-2 rounded-full bg-green-400 flex-shrink-0" />
+												<p className="text-sm text-green-300">
 													{action}
 												</p>
 											</div>
@@ -925,7 +925,7 @@ export default function InboxPage() {
 											<a
 												key={index}
 												href={link.url}
-												className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+												className="flex items-center gap-3 p-3 bg-neutral-900 border border-neutral-800 rounded-xl hover:hover:bg-neutral-800 transition-colors"
 											>
 												<FileText className="h-4 w-4 text-primary flex-shrink-0" />
 												<span className="text-sm font-medium flex-1">{link.title}</span>
@@ -938,7 +938,7 @@ export default function InboxPage() {
 						</div>
 
 						{/* Footer Actions */}
-						<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+						<div className="p-6 border-t border-neutral-800 bg-neutral-900/50">
 							<div className="flex items-center justify-between gap-4">
 								<div className="flex items-center gap-2">
 									<button
@@ -948,8 +948,8 @@ export default function InboxPage() {
 										}}
 										className={`p-2 rounded-lg transition-colors ${
 											selectedMessage.isStarred
-												? 'text-yellow-500 hover:text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
-												: 'text-neutral-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+												? 'text-yellow-500 hover:text-yellow-600 bg-yellow-900/20'
+												: 'text-neutral-400 hover:text-yellow-500 hover:hover:bg-yellow-900/20'
 										}`}
 									>
 										<Star className={`h-5 w-5 ${selectedMessage.isStarred ? 'fill-current' : ''}`} />
@@ -960,7 +960,7 @@ export default function InboxPage() {
 											handleArchive(selectedMessage.id)
 											handleCloseMessage()
 										}}
-										className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+										className="p-2 rounded-lg text-neutral-400 hover:text-blue-500 hover:hover:bg-blue-900/20 transition-colors"
 									>
 										<Archive className="h-5 w-5" />
 									</button>
@@ -970,7 +970,7 @@ export default function InboxPage() {
 											handleDeleteMessage(selectedMessage.id)
 											handleCloseMessage()
 										}}
-										className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+										className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:hover:bg-red-900/20 transition-colors"
 									>
 										<Trash2 className="h-5 w-5" />
 									</button>

@@ -378,16 +378,16 @@ export default function EmployeeSignUpPage() {
 			<div className="mb-8">
 			<button
 				onClick={() => step === 1 ? navigate('/auth/sign-up') : setStep(1)}
-				className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors mb-4"
+				className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-neutral-100 transition-colors mb-4"
 			>
 				<ArrowLeft className="h-4 w-4" />
 				Back
 			</button>
 			<h1 className="text-3xl font-bold flex items-center gap-3">
-				<Users className="h-8 w-8 text-green-600 dark:text-green-400" />
+				<Users className="h-8 w-8 text-green-400" />
 				Employee Sign Up
 			</h1>
-			<p className="mt-2 text-neutral-600 dark:text-neutral-300">
+			<p className="mt-2 text-neutral-300">
 				Join your company using the invite code from your administrator
 			</p>
 		</div>
@@ -404,10 +404,10 @@ export default function EmployeeSignUpPage() {
 			{step === 1 && (
 				<div className="space-y-6">
 					<div className="text-center py-8">
-						<div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-							<Key className="h-10 w-10 text-green-600 dark:text-green-400" />
+						<div className="w-20 h-20 rounded-full bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+							<Key className="h-10 w-10 text-green-400" />
 						</div>
-						<p className="text-neutral-600 dark:text-neutral-400 mb-6">
+						<p className="text-neutral-400 mb-6">
 							Verify your email and enter the invite code from your administrator
 						</p>
 					</div>
@@ -424,7 +424,7 @@ export default function EmployeeSignUpPage() {
 								value={data.email}
 								onChange={(e) => handleChange('email', e.target.value)}
 								disabled={isEmailVerified}
-								className={isEmailVerified ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : ''}
+								className={isEmailVerified ? 'bg-green-900/20 border-green-500' : ''}
 							/>
 							{!isEmailVerified && (
 								<Button
@@ -437,18 +437,18 @@ export default function EmployeeSignUpPage() {
 								</Button>
 							)}
 							{isEmailVerified && (
-								<Button variant="outline" disabled className="bg-green-50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-400">
+								<Button variant="outline" disabled className="bg-green-900/20 border-green-500 text-green-400">
 									✓ Verified
 								</Button>
 							)}
 						</div>
 						{!isEmailVerified && (
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+							<p className="text-xs text-neutral-400 mt-2">
 								💡 Use your company email address
 							</p>
 						)}
 						{isEmailVerified && (
-							<p className="text-xs text-green-600 dark:text-green-400 mt-2">
+							<p className="text-xs text-green-400 mt-2">
 								✓ Email verified successfully
 							</p>
 						)}
@@ -456,7 +456,7 @@ export default function EmployeeSignUpPage() {
 
 					{/* Email Verification Code Input */}
 					{isCodeSent && !isEmailVerified && (
-						<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+						<div className="space-y-4 pt-4 border-t border-neutral-800">
 							<div>
 								<label className="block text-sm font-medium mb-2">
 									Verification Code <span className="text-red-500">*</span>
@@ -470,17 +470,17 @@ export default function EmployeeSignUpPage() {
 									maxLength={6}
 								/>
 								<div className="flex items-center justify-between mt-2">
-									<p className="text-xs text-neutral-500 dark:text-neutral-400">
+									<p className="text-xs text-neutral-400">
 										Code sent to {data.email}
 									</p>
 									{timeLeft > 0 ? (
-										<p className="text-xs text-orange-600 dark:text-orange-400 font-mono">
+										<p className="text-xs text-orange-400 font-mono">
 											{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
 										</p>
 									) : (
 										<button
 											onClick={handleResendCode}
-											className="text-xs text-green-600 dark:text-green-400 hover:underline"
+											className="text-xs text-green-400 hover:underline"
 										>
 											Resend code
 										</button>
@@ -495,7 +495,7 @@ export default function EmployeeSignUpPage() {
 
 					{/* Invite Code Input - Only show after email verification */}
 					{isEmailVerified && (
-						<div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
+						<div className="pt-4 border-t border-neutral-800">
 							<label className="block text-sm font-medium mb-2">
 								Invite Code <span className="text-red-500">*</span>
 							</label>
@@ -506,7 +506,7 @@ export default function EmployeeSignUpPage() {
 								onChange={(e) => handleChange('inviteCode', e.target.value.toUpperCase())}
 								className="text-center text-lg font-mono tracking-wider"
 							/>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+							<p className="text-xs text-neutral-400 mt-2">
 								Enter the invite code from your administrator
 							</p>
 						</div>
@@ -520,7 +520,7 @@ export default function EmployeeSignUpPage() {
 
 					{/* Development: Skip to Step 2 */}
 					{isDevelopment && (
-						<div className="pt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+						<div className="pt-4 border-t border-dashed border-neutral-700">
 							<p className="text-xs text-neutral-500 mb-2 text-center">
 								🔧 Development Mode
 							</p>
@@ -550,14 +550,14 @@ export default function EmployeeSignUpPage() {
 					<div className="space-y-6">
 						{/* Company Info Display */}
 						{companyInfo && (
-							<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl">
+							<div className="p-4 bg-green-900/20 border border-green-800 rounded-2xl">
 								<div className="flex items-center gap-3 mb-2">
-									<Building2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-									<span className="font-bold text-green-900 dark:text-green-100">
+									<Building2 className="h-5 w-5 text-green-400" />
+									<span className="font-bold text-green-100">
 										{companyInfo.name}
 									</span>
 								</div>
-								<p className="text-sm text-green-700 dark:text-green-300">
+								<p className="text-sm text-green-300">
 									{companyInfo.industry}
 								</p>
 							</div>
@@ -577,7 +577,7 @@ export default function EmployeeSignUpPage() {
 								onChange={(e) => handleChange('username', e.target.value.toLowerCase().replace(/\s/g, ''))}
 								className="font-mono"
 							/>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+							<p className="text-xs text-neutral-400 mt-1">
 								💡 This will be your unique ID for login
 							</p>
 						</div>
@@ -598,16 +598,16 @@ export default function EmployeeSignUpPage() {
 						<div>
 							<label className="block text-sm font-medium mb-2">
 								<Mail className="inline h-4 w-4 mr-1" />
-								Email <span className="text-green-600 dark:text-green-400 text-xs">(Verified)</span>
+								Email <span className="text-green-400 text-xs">(Verified)</span>
 							</label>
 							<Input
 								type="email"
 								placeholder="your.email@company.com"
 								value={data.email}
 								disabled
-								className="bg-green-50 dark:bg-green-900/20 border-green-500"
+								className="bg-green-900/20 border-green-500"
 							/>
-							<p className="text-xs text-green-600 dark:text-green-400 mt-1">
+							<p className="text-xs text-green-400 mt-1">
 								✓ This email has been verified
 							</p>
 						</div>
@@ -647,7 +647,7 @@ export default function EmployeeSignUpPage() {
 									<select
 										value={data.countryCode}
 										onChange={(e) => handleChange('countryCode', e.target.value)}
-										className="w-32 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+										className="w-32 px-3 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
 									>
 										{countryCodes.map((country) => (
 											<option key={country.code} value={country.code}>
@@ -677,7 +677,7 @@ export default function EmployeeSignUpPage() {
 									<select
 										value={showCustomDepartment ? 'custom' : data.department}
 										onChange={(e) => handleDepartmentChange(e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
 									>
 										<option value="">-- Select Department --</option>
 										{departments.map((dept) => (
@@ -706,7 +706,7 @@ export default function EmployeeSignUpPage() {
 									<select
 										value={showCustomPosition ? 'custom' : data.position}
 										onChange={(e) => handlePositionChange(e.target.value)}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
 									>
 										<option value="">-- Select Position --</option>
 										{positions.map((pos) => (
@@ -739,7 +739,7 @@ export default function EmployeeSignUpPage() {
 										<select
 											value={selectedJobId}
 											onChange={(e) => setSelectedJobId(e.target.value)}
-											className="flex-1 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+											className="flex-1 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
 										>
 											<option value="">-- Select a job to add --</option>
 											{availableJobs
@@ -764,8 +764,8 @@ export default function EmployeeSignUpPage() {
 
 								{/* Selected Roles Display */}
 								{data.jobs.length > 0 ? (
-									<div className="p-4 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50">
-										<p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">
+									<div className="p-4 border border-neutral-700 rounded-2xl bg-neutral-900/50">
+										<p className="text-xs font-medium text-neutral-400 mb-3">
 											Selected Roles ({data.jobs.length})
 										</p>
 											<div className="flex flex-wrap gap-2">
@@ -787,15 +787,15 @@ export default function EmployeeSignUpPage() {
 											</div>
 										</div>
 								) : (
-									<div className="p-4 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 text-center">
-										<p className="text-sm text-neutral-500 dark:text-neutral-400">
+									<div className="p-4 border border-dashed border-neutral-700 rounded-2xl bg-neutral-900/50 text-center">
+										<p className="text-sm text-neutral-400">
 											No roles added yet. Select from the dropdown above.
 										</p>
 									</div>
 								)}
 
 								{availableJobs.length === 0 && (
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+									<p className="text-xs text-neutral-400 mt-2">
 										💡 No roles available yet. Contact your administrator.
 									</p>
 								)}
@@ -809,7 +809,7 @@ export default function EmployeeSignUpPage() {
 
 						{/* Development: Skip to Login */}
 						{isDevelopment && (
-							<div className="pt-4 mt-4 border-t border-dashed border-neutral-300 dark:border-neutral-700">
+							<div className="pt-4 mt-4 border-t border-dashed border-neutral-700">
 								<p className="text-xs text-neutral-500 mb-2 text-center">
 									🔧 Development Mode
 								</p>

@@ -30,13 +30,13 @@ export function InProgressSection({ onItemClick }: InProgressSectionProps) {
 			{/* 헤더 */}
 			<button
 				onClick={() => setExpanded(!expanded)}
-				className="w-full flex items-center justify-between px-4 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-lg transition-colors group"
+				className="w-full flex items-center justify-between px-4 py-2 hover:hover:bg-neutral-900 rounded-lg transition-colors group"
 			>
 				<div className="flex items-center gap-2 flex-1">
-					<PlayCircle size={16} className="text-blue-600 dark:text-blue-400" />
+					<PlayCircle size={16} className="text-blue-400" />
 					<span className="text-sm font-medium">In Progress</span>
 					{inProgress.length > 0 && (
-						<span className="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium">
+						<span className="text-xs px-1.5 py-0.5 bg-blue-900/30 text-blue-300 rounded-full font-medium">
 							{inProgress.length}
 						</span>
 					)}
@@ -59,26 +59,26 @@ export function InProgressSection({ onItemClick }: InProgressSectionProps) {
 					{inProgress.map(item => (
 						<div
 							key={item.id}
-							className="px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors mb-1"
+							className="px-3 py-2 rounded-lg hover:hover:bg-blue-900/10 cursor-pointer transition-colors mb-1"
 							onClick={() => onItemClick?.(item)}
 						>
-							<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+							<p className="text-sm font-medium text-neutral-100">
 								{item.title}
 							</p>
 							{item.projectName && (
-								<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+								<p className="text-xs text-neutral-400 mt-0.5">
 									{item.projectName}
 								</p>
 							)}
 							{item.progress !== undefined && (
 								<div className="mt-1.5">
-									<div className="h-1 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+									<div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
 										<div
-											className="h-full bg-blue-600 dark:bg-blue-400 transition-all"
+											className="h-full bg-blue-400 transition-all"
 											style={{ width: `${item.progress}%` }}
 										/>
 									</div>
-									<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+									<p className="text-xs text-neutral-400 mt-0.5">
 										{item.progress}%
 									</p>
 								</div>

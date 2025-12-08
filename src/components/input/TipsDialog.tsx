@@ -26,7 +26,7 @@ export function TipsDialog({ isOpen, onClose }: TipsDialogProps) {
 
 				<div className="grid gap-6 md:grid-cols-2 mt-4">
 					{/* AI Suggestion */}
-					<Card className="bg-[#1a1a1a] border-border-dark">
+					<Card className="bg-surface-elevated border-border-dark">
 						<div className="p-4 border-b border-border-dark flex items-center gap-2">
 							<div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500">
 								<Sparkles className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function TipsDialog({ isOpen, onClose }: TipsDialogProps) {
 					</Card>
 
 					{/* Tips */}
-					<Card className="bg-[#1a1a1a] border-border-dark">
+					<Card className="bg-surface-elevated border-border-dark">
 						<div className="p-4 border-b border-border-dark flex items-center gap-2">
 							<div className="p-1.5 rounded-lg bg-orange-500/10 text-orange-500">
 								<Info className="h-4 w-4" />

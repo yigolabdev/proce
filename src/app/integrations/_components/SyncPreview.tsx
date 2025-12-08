@@ -34,8 +34,8 @@ export default function SyncPreview({ items, isLoading, piiMask }: SyncPreviewPr
 			<div className="space-y-3">
 				{[...Array(5)].map((_, i) => (
 					<div key={i} className="animate-pulse">
-						<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4 mb-2" />
-						<div className="h-3 bg-neutral-100 dark:bg-neutral-900 rounded w-1/2" />
+						<div className="h-4 bg-neutral-800 rounded w-3/4 mb-2" />
+						<div className="h-3 bg-neutral-900 rounded w-1/2" />
 					</div>
 				))}
 			</div>
@@ -44,7 +44,7 @@ export default function SyncPreview({ items, isLoading, piiMask }: SyncPreviewPr
 
 	if (items.length === 0) {
 		return (
-			<div className="text-center py-8 text-neutral-500 dark:text-neutral-400 text-sm">
+			<div className="text-center py-8 text-neutral-400 text-sm">
 				{tt.test.noData}
 			</div>
 		);
@@ -55,12 +55,12 @@ export default function SyncPreview({ items, isLoading, piiMask }: SyncPreviewPr
 			{items.map((item) => (
 				<div
 					key={item.id}
-					className="rounded-2xl border border-neutral-100 dark:border-neutral-900 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors"
+					className="rounded-2xl border border-neutral-900 p-3 hover:hover:bg-neutral-900/50 transition-colors"
 				>
 					<div className="flex items-start justify-between gap-3">
 						<div className="flex-1 min-w-0">
 							<h5 className="font-medium text-sm truncate">{maskTitle(item.title, piiMask)}</h5>
-							<div className="flex items-center gap-2 mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+							<div className="flex items-center gap-2 mt-1 text-xs text-neutral-400">
 								<span>{item.source}</span>
 								<span>•</span>
 								<span>{formatDistanceToNow(new Date(item.date), { addSuffix: true, locale: dateLocale })}</span>
@@ -70,7 +70,7 @@ export default function SyncPreview({ items, isLoading, piiMask }: SyncPreviewPr
 							<span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
 								{item.mapped}
 							</span>
-							<span className="inline-block rounded-full bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+							<span className="inline-block rounded-full bg-neutral-800 px-2 py-0.5 text-xs text-neutral-400">
 								{Math.round(item.confidence * 100)}%
 							</span>
 						</div>

@@ -72,7 +72,7 @@ export default function OnboardingWizard() {
 		<div className="mx-auto min-h-dvh w-full max-w-3xl px-4 py-8">
 			<div className="mb-8">
 				<h1 className="text-3xl font-bold">{t.title}</h1>
-				<p className="mt-2 text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+				<p className="mt-2 text-neutral-300">{t.subtitle}</p>
 			</div>
 
 			{/* Progress bar */}
@@ -85,7 +85,7 @@ export default function OnboardingWizard() {
 								index === currentStep
 									? 'text-primary'
 									: index < currentStep
-									? 'text-green-600 dark:text-green-400'
+									? 'text-green-400'
 									: 'text-neutral-400'
 							}`}
 						>
@@ -93,7 +93,7 @@ export default function OnboardingWizard() {
 						</div>
 					))}
 				</div>
-				<div className="h-2 w-full rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
+				<div className="h-2 w-full rounded-full bg-neutral-800 overflow-hidden">
 					<div
 						className="h-full bg-primary transition-all duration-300"
 						style={{ width: `${progress}%` }}

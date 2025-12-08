@@ -82,7 +82,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 		setTimeoutId(newTimeoutId)
 	}
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// eslint-disable-next-line
 	return useCallback(debouncedCallback, deps)
 }
 

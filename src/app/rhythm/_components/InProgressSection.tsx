@@ -34,10 +34,10 @@ export function InProgressSection() {
 
 	const getPriorityColor = (priority: string) => {
 		switch (priority) {
-			case 'high': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
-			case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
-			case 'low': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-			default: return 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-900/20'
+			case 'high': return 'text-red-400 bg-red-900/20'
+			case 'medium': return 'text-yellow-400 bg-yellow-900/20'
+			case 'low': return 'text-blue-400 bg-blue-900/20'
+			default: return 'text-neutral-400 bg-neutral-900/20'
 		}
 	}
 
@@ -56,7 +56,7 @@ export function InProgressSection() {
 						<div className="text-2xl font-bold text-blue-600">
 							{inProgress.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.inProgressSection.currentlyInProgress')}
 						</p>
 					</CardContent>
@@ -73,7 +73,7 @@ export function InProgressSection() {
 						<div className="text-2xl font-bold text-green-600">
 							{inProgress.filter(item => item.priority === 'high').length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.inProgressSection.needsFocus')}
 						</p>
 					</CardContent>
@@ -94,7 +94,7 @@ export function InProgressSection() {
 								return hoursUntil <= 24
 							}).length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							{t('rhythm.inProgressSection.within24Hours')}
 						</p>
 					</CardContent>
@@ -117,14 +117,14 @@ export function InProgressSection() {
 												{t(`common.priorities.${item.priority}`)}
 											</span>
 											{item.type === 'task' && (
-												<span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+												<span className="text-xs px-2 py-1 rounded-full bg-blue-900/30 text-blue-300">
 													{t('rhythm.task')}
 												</span>
 											)}
 										</div>
 										<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 										{item.description && (
-											<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+											<p className="text-sm text-neutral-400 mb-3">
 												{item.description}
 											</p>
 										)}
@@ -132,19 +132,19 @@ export function InProgressSection() {
 										{item.progress !== undefined && (
 											<div className="mb-3">
 												<div className="flex items-center justify-between text-sm mb-1">
-													<span className="text-neutral-600 dark:text-neutral-400">{t('rhythm.inProgressSection.progress')}</span>
+													<span className="text-neutral-400">{t('rhythm.inProgressSection.progress')}</span>
 													<span className="font-medium">{item.progress}%</span>
 												</div>
-												<div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+												<div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
 													<div
-														className="h-full bg-blue-600 dark:bg-blue-400 transition-all"
+														className="h-full bg-blue-400 transition-all"
 														style={{ width: `${item.progress}%` }}
 													/>
 												</div>
 											</div>
 										)}
 										
-										<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+										<div className="flex items-center gap-4 text-sm text-neutral-400">
 											{item.projectName && (
 												<div className="flex items-center gap-1">
 													<FolderKanban className="h-4 w-4" />

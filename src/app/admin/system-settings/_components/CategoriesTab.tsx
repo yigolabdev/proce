@@ -35,7 +35,7 @@ export default function CategoriesTab({
 		<>
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Manage work status used in Work Input
 					</p>
 					<Button onClick={() => onSetShowAddCategory(true)}>
@@ -75,7 +75,7 @@ export default function CategoriesTab({
 												onChange={(e) =>
 													onSetEditingCategory({ ...editingCategory, color: e.target.value })
 												}
-												className="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+												className="flex-1 px-3 py-2 border border-neutral-700 rounded-xl bg-neutral-900"
 											>
 												{COLOR_OPTIONS.map((opt) => (
 													<option key={opt.value} value={opt.value}>
@@ -112,19 +112,19 @@ export default function CategoriesTab({
 											<div className="flex items-center gap-1">
 												<button
 													onClick={() => onSetEditingCategory(category)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:hover:bg-neutral-800 rounded"
 												>
 													<Edit2 className="h-4 w-4 text-neutral-600" />
 												</button>
 												<button
 													onClick={() => onDelete(category.id)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
+													className="p-1 hover:hover:bg-neutral-800 rounded"
 												>
 													<Trash2 className="h-4 w-4 text-red-500" />
 												</button>
 											</div>
 										</div>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm text-neutral-400">
 											{category.description}
 										</p>
 									</>
@@ -138,7 +138,7 @@ export default function CategoriesTab({
 		{/* Add Status Dialog */}
 		{showAddCategory && (
 			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-				<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-md">
+				<div className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-md">
 					<div className="p-6">
 						<div className="flex items-center justify-between mb-4">
 							<h3 className="text-xl font-bold flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function CategoriesTab({
 							</h3>
 								<button
 									onClick={() => onSetShowAddCategory(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>
@@ -182,7 +182,7 @@ export default function CategoriesTab({
 									<select
 										value={newCategory.color}
 										onChange={(e) => onSetNewCategory({ ...newCategory, color: e.target.value })}
-										className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+										className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900"
 									>
 										{COLOR_OPTIONS.map((opt) => (
 											<option key={opt.value} value={opt.value}>

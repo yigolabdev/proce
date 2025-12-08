@@ -25,7 +25,7 @@ export default function IntegrationGrid({ onConfigure, onDisconnect }: Integrati
 			<div className="max-w-md mx-auto text-center py-12">
 				<div className="text-6xl mb-4">🔌</div>
 				<h3 className="text-xl font-semibold mb-2">{tt.emptyTitle}</h3>
-				<p className="text-neutral-600 dark:text-neutral-300 mb-6">{tt.emptyDescription}</p>
+				<p className="text-neutral-300 mb-6">{tt.emptyDescription}</p>
 				<Button onClick={() => onConfigure('slack')}>{tt.emptyAction}</Button>
 			</div>
 		);

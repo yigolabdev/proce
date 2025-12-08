@@ -186,11 +186,11 @@ export default function ProjectFormDialog({
 					title: new URL(linkInput.trim()).hostname,
 					addedAt: new Date().toISOString(),
 				}
-				setLinks([...links, newLink])
-				setLinkInput('')
-			} catch (error) {
-				// Invalid URL, but still add it
-				const newLink: LinkResource = {
+			setLinks([...links, newLink])
+			setLinkInput('')
+		} catch {
+			// Invalid URL, but still add it
+			const newLink: LinkResource = {
 					id: Date.now().toString(),
 					url: linkInput.trim(),
 					title: linkInput.trim(),
@@ -224,8 +224,8 @@ export default function ProjectFormDialog({
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-			<div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-3xl my-8">
-				<div className="sticky top-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 p-6 rounded-t-3xl z-10">
+			<div className="bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-800 w-full max-w-3xl my-8">
+				<div className="sticky top-0 bg-neutral-900 border-b border-neutral-800 p-6 rounded-t-3xl z-10">
 					<div className="flex items-center justify-between">
 						<h2 className="text-2xl font-bold">{title || t('projects.createProject')}</h2>
 						<button
@@ -233,7 +233,7 @@ export default function ProjectFormDialog({
 								resetForm()
 								onClose()
 							}}
-							className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+							className="text-neutral-500 hover:hover:text-neutral-300"
 						>
 							<X className="h-6 w-6" />
 						</button>
@@ -275,7 +275,7 @@ export default function ProjectFormDialog({
 							<select
 								value={selectedDept}
 								onChange={(e) => setSelectedDept(e.target.value)}
-								className="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+								className="flex-1 px-3 py-2 border border-neutral-700 rounded-2xl bg-neutral-900"
 							>
 								<option value="">{t('aiRecommendations.selectDepartment')}</option>
 								{availableDepartments.map((dept) => (
@@ -334,7 +334,7 @@ export default function ProjectFormDialog({
 								{projectObjectives.map((obj, index) => (
 									<li
 										key={index}
-										className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl"
+										className="flex items-center justify-between p-3 border border-neutral-800 rounded-xl"
 									>
 										<span className="text-sm">{obj}</span>
 										<button
@@ -360,7 +360,7 @@ export default function ProjectFormDialog({
 								type="date"
 								value={startDate}
 								onChange={(e) => setStartDate(e.target.value)}
-								className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+								className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900"
 								min={new Date().toISOString().split('T')[0]}
 							/>
 						</div>
@@ -373,7 +373,7 @@ export default function ProjectFormDialog({
 								type="date"
 								value={endDate}
 								onChange={(e) => setEndDate(e.target.value)}
-								className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900"
+								className="w-full px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900"
 								min={startDate || new Date().toISOString().split('T')[0]}
 							/>
 						</div>
@@ -390,7 +390,7 @@ export default function ProjectFormDialog({
 							className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${
 								isDragging
 									? 'border-primary bg-primary/5'
-									: 'border-neutral-300 dark:border-neutral-700'
+									: 'border-neutral-700'
 							}`}
 							onDragOver={handleDragOver}
 							onDragLeave={handleDragLeave}
@@ -404,7 +404,7 @@ export default function ProjectFormDialog({
 								className="hidden"
 							/>
 							<Upload className="h-12 w-12 mx-auto mb-3 text-neutral-400" />
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+							<p className="text-sm text-neutral-400 mb-2">
 								{t('input.dragDropInfo')}
 							</p>
 							<Button
@@ -421,7 +421,7 @@ export default function ProjectFormDialog({
 								{files.map((file) => (
 									<div
 										key={file.id}
-										className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl"
+										className="flex items-center justify-between p-3 border border-neutral-800 rounded-xl"
 									>
 										<div className="flex items-center gap-3 flex-1">
 											{getFileIcon(file.type)}
@@ -469,7 +469,7 @@ export default function ProjectFormDialog({
 								{links.map((link) => (
 									<div
 										key={link.id}
-										className="flex items-center justify-between p-3 border border-neutral-200 dark:border-neutral-800 rounded-xl"
+										className="flex items-center justify-between p-3 border border-neutral-800 rounded-xl"
 									>
 										<div className="flex items-center gap-3 flex-1 min-w-0">
 											<Link2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
@@ -477,7 +477,7 @@ export default function ProjectFormDialog({
 												href={link.url}
 												target="_blank"
 												rel="noopener noreferrer"
-												className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
+												className="text-sm text-blue-400 hover:underline truncate"
 											>
 												{link.url}
 											</a>
@@ -495,7 +495,7 @@ export default function ProjectFormDialog({
 					</div>
 				</div>
 
-				<div className="sticky bottom-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 p-6 rounded-b-3xl">
+				<div className="sticky bottom-0 bg-neutral-900 border-t border-neutral-800 p-6 rounded-b-3xl">
 					<div className="flex gap-3">
 						<Button
 							onClick={() => {

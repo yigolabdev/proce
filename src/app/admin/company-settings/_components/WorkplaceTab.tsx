@@ -44,7 +44,7 @@ export default function WorkplaceTab({ settings, onChange, onSave }: WorkplaceTa
 								<Clock className="h-5 w-5 text-primary" />
 								Working Hours & Schedule
 							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							<p className="text-sm text-neutral-400 mt-1">
 								Configure working days, hours, and company holidays
 							</p>
 						</div>
@@ -63,7 +63,7 @@ export default function WorkplaceTab({ settings, onChange, onSave }: WorkplaceTa
 								<select
 									value={settings.language}
 									onChange={(e) => onChange({ ...settings, language: e.target.value as 'en' | 'ko' })}
-									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									className="w-full px-4 py-2 border border-neutral-700 rounded-xl bg-neutral-900"
 								>
 									<option value="ko">한국어 (Korean)</option>
 									<option value="en">English</option>
@@ -75,7 +75,7 @@ export default function WorkplaceTab({ settings, onChange, onSave }: WorkplaceTa
 								<select
 									value={settings.timezone}
 									onChange={(e) => onChange({ ...settings, timezone: e.target.value })}
-									className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900"
+									className="w-full px-4 py-2 border border-neutral-700 rounded-xl bg-neutral-900"
 								>
 									<option value="Asia/Seoul">Asia/Seoul (KST)</option>
 									<option value="America/New_York">America/New_York (EST)</option>
@@ -98,7 +98,7 @@ export default function WorkplaceTab({ settings, onChange, onSave }: WorkplaceTa
 										className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
 											settings.workingDays.includes(day)
 												? 'bg-primary text-white'
-												: 'border border-neutral-200 dark:border-neutral-800 hover:border-primary'
+												: 'border border-neutral-800 hover:border-primary'
 										}`}
 									>
 										{dayNames[index]}

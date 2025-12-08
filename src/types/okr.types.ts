@@ -1,0 +1,223 @@
+/**
+ * OKR (Objectives and Key Results) Types
+ * OKR 관리를 위한 타입 정의
+ */
+
+/**
+ * Key Result (핵심 결과)
+ */
+export interface KeyResult {
+	id: string
+	description: string
+	target: number
+	current: number
+	unit: string
+	owner: string
+	ownerId: string
+	
+	// AI 분석 (선택적)
+	aiAnalysis?: {
+		onTrack: boolean
+		predictedFinalValue: number
+		confidence: number  // 0-1
+		recommendations: string[]
+	}
+}
+
+/**
+ * Objective (목표)
+ */
+export interface Objective {
+	id: string
+	title: string
+	description: string
+	period: string  // Quarter (Q1-Q4) or Month (Jan-Dec)
+	periodType: 'quarter' | 'month'
+	owner: string
+	ownerId: string
+	team: string
+	teamId: string
+	status: 'on-track' | 'at-risk' | 'behind' | 'completed'
+	keyResults: KeyResult[]
+	startDate: string
+	endDate: string
+	
+	// 달성 가능성 및 리소스 (선택적)
+	feasibility?: {
+		achievabilityScore: number  // 0-1
+		basedOn: 'historical-data' | 'expert-estimate' | 'ai-prediction'
+		similarObjectives: string[]
+		successRate?: number  // 0-1
+		confidence: number  // 0-1
+	}
+	
+	resourceRequirements?: {
+		estimatedEffort: string
+		requiredSkills: string[]
+		budgetNeeded?: number
+		teamSize?: number
+	}
+	
+	// 역사적 성과 데이터 (선택적)
+	historicalData?: {
+		previousAttempts: number
+		previousBestResult?: number
+		averageProgress?: number
+		typicalBottlenecks: string[]
+		lessonsLearned: string[]
+	}
+	
+	// AI 추천 및 분석 (선택적)
+	aiRecommendations?: {
+		isRealistic: boolean
+		confidenceLevel: number  // 0-1
+		recommendationReason: string
+		suggestedAdjustments: string[]
+		successFactors: string[]
+		risksAndMitigation: Array<{
+			risk: string
+			probability: number  // 0-1
+			impact: 'low' | 'medium' | 'high'
+			mitigation: string
+		}>
+	}
+}
+
+/**
+ * OKR 통계
+ */
+export interface OKRStats {
+	totalObjectives: number
+	completedObjectives: number
+	onTrackObjectives: number
+	atRiskObjectives: number
+	behindObjectives: number
+	averageProgress: number
+	totalKeyResults: number
+	completedKeyResults: number
+}
+
+/**
+ * OKR 필터
+ */
+export interface OKRFilter {
+	period?: string
+	team?: string
+	owner?: string
+	status?: Objective['status'][]
+}
+
+/**
+ * OKR 폼 데이터
+ */
+export interface ObjectiveFormData {
+	title: string
+	description: string
+	period: string
+	periodType: 'quarter' | 'month'
+	owner: string
+	team: string
+	startDate: string
+	endDate: string
+}
+
+export interface KeyResultFormData {
+	description: string
+	target: number
+	current: number
+	unit: string
+	owner: string
+}
+
+/**
+ * OKR 차트 데이터
+ */
+export interface OKRChartData {
+	name: string
+	value: number
+	color?: string
+}
+
+/**
+ * Props 타입
+ */
+export interface OKRListProps {
+	objectives: Objective[]
+	onSelect: (objective: Objective) => void
+	onEdit: (objective: Objective) => void
+	onDelete: (id: string) => void
+	filter?: OKRFilter
+}
+
+export interface OKRFormProps {
+	objective?: Objective
+	onSubmit: (data: ObjectiveFormData) => void
+	onCancel: () => void
+	teams: Array<{ id: string; name: string }>
+	users: Array<{ id: string; name: string }>
+}
+
+export interface OKRDetailProps {
+	objective: Objective
+	onClose: () => void
+	onEdit: () => void
+	onDelete: () => void
+	onAddKeyResult: () => void
+}
+
+export interface KeyResultFormProps {
+	keyResult?: KeyResult
+	onSubmit: (data: KeyResultFormData) => void
+	onCancel: () => void
+	users: Array<{ id: string; name: string }>
+}
+
+export interface OKRChartsProps {
+	objectives: Objective[]
+	stats: OKRStats
+}
+
+export interface OKRAIAnalysisProps {
+	objective: Objective
+	onApplyRecommendation: (recommendation: string) => void
+}
+
+/**
+ * 훅 반환 타입
+ */
+export interface UseOKRReturn {
+	// Data
+	objectives: Objective[]
+	selectedObjective: Objective | null
+	stats: OKRStats
+	
+	// Actions
+	createObjective: (data: ObjectiveFormData) => Promise<void>
+	updateObjective: (id: string, data: Partial<Objective>) => Promise<void>
+	deleteObjective: (id: string) => Promise<void>
+	selectObjective: (objective: Objective | null) => void
+	
+	// Key Results
+	addKeyResult: (objectiveId: string, data: KeyResultFormData) => Promise<void>
+	updateKeyResult: (objectiveId: string, keyResultId: string, data: Partial<KeyResult>) => Promise<void>
+	deleteKeyResult: (objectiveId: string, keyResultId: string) => Promise<void>
+	
+	// Status
+	isLoading: boolean
+	error: Error | null
+}
+
+export interface UseOKRChartsReturn {
+	progressData: OKRChartData[]
+	statusData: OKRChartData[]
+	teamData: OKRChartData[]
+	calculateProgress: (objective: Objective) => number
+}
+
+export interface UseOKRAIReturn {
+	analyzeObjective: (objective: Objective) => Promise<Objective['aiRecommendations']>
+	analyzeKeyResult: (keyResult: KeyResult) => Promise<KeyResult['aiAnalysis']>
+	generateRecommendations: (objectives: Objective[]) => Promise<string[]>
+	isAnalyzing: boolean
+}
+

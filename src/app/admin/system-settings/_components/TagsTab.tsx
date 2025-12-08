@@ -27,7 +27,7 @@ export default function TagsTab({
 		<>
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Manage predefined tags for quick selection
 					</p>
 					<Button onClick={() => onSetShowAddTag(true)}>
@@ -42,7 +42,7 @@ export default function TagsTab({
 							{tags.map((tag) => (
 								<div
 									key={tag.id}
-									className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+									className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-neutral-800 text-neutral-300"
 								>
 									<span className="text-sm font-medium">{tag.name}</span>
 									{tag.category && (
@@ -54,7 +54,7 @@ export default function TagsTab({
 								</div>
 							))}
 							{tags.length === 0 && (
-								<p className="text-sm text-neutral-600 dark:text-neutral-400">
+								<p className="text-sm text-neutral-400">
 									No tags yet. Add your first tag!
 								</p>
 							)}
@@ -66,7 +66,7 @@ export default function TagsTab({
 			{/* Add Tag Dialog */}
 			{showAddTag && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-md">
+					<div className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-md">
 						<div className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
@@ -75,7 +75,7 @@ export default function TagsTab({
 								</h3>
 								<button
 									onClick={() => onSetShowAddTag(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>

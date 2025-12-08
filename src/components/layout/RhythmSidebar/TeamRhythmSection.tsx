@@ -31,15 +31,15 @@ export function TeamRhythmSection() {
 			{/* 헤더 */}
 			<button
 				onClick={() => setExpanded(!expanded)}
-				className="w-full flex items-center justify-between px-4 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-lg transition-colors group"
+				className="w-full flex items-center justify-between px-4 py-2 hover:hover:bg-neutral-900 rounded-lg transition-colors group"
 			>
 				<div className="flex items-center gap-2 flex-1">
-					<Users size={16} className="text-purple-600 dark:text-purple-400" />
+					<Users size={16} className="text-purple-400" />
 					<span className="text-sm font-medium">
 						{isUser ? 'My Team' : 'Team Rhythm'}
 					</span>
 					{myTeam.length > 0 && (
-						<span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full font-medium">
+						<span className="text-xs px-1.5 py-0.5 bg-purple-900/30 text-purple-300 rounded-full font-medium">
 							{myTeam.length}
 						</span>
 					)}
@@ -61,20 +61,20 @@ export function TeamRhythmSection() {
 				<div className="mt-1 px-2">
 					{isUser && myTeam.length > 0 && (
 						<div>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 px-2 mb-2">
+							<p className="text-xs text-neutral-400 px-2 mb-2">
 								함께 일하는 팀원
 							</p>
 							{myTeam.map(member => (
 								<div
 									key={member.userId}
-									className="px-3 py-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors mb-1"
+									className="px-3 py-2 rounded-lg hover:hover:bg-purple-900/10 transition-colors mb-1"
 								>
 									<div className="flex items-center justify-between">
 										<div>
-											<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+											<p className="text-sm font-medium text-neutral-100">
 												{member.name}
 											</p>
-											<p className="text-xs text-neutral-600 dark:text-neutral-400">
+											<p className="text-xs text-neutral-400">
 												{member.department}
 											</p>
 										</div>
@@ -92,7 +92,7 @@ export function TeamRhythmSection() {
 					)}
 					
 					{!isUser && (
-						<p className="text-xs text-neutral-500 dark:text-neutral-400 px-2">
+						<p className="text-xs text-neutral-400 px-2">
 							관리자용 팀 리듬 뷰는 추후 구현 예정
 						</p>
 					)}

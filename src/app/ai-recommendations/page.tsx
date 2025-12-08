@@ -585,7 +585,7 @@ export default function AIRecommendationsPage() {
 	const aiGeneratedCount = recommendations.filter((r) => r.id.startsWith('ai-')).length
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+		<div className="min-h-screen bg-background-dark text-neutral-100">
 			{/* Header */}
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 			<PageHeader
@@ -897,24 +897,24 @@ export default function AIRecommendationsPage() {
 					onClick={() => setShowManualTaskModal(false)}
 				>
 					<div 
-						className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+						className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* Modal Header */}
-						<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+						<div className="p-6 border-b border-neutral-800">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1">
 									<div className="flex items-center gap-2 mb-2">
 										<Plus className="h-6 w-6 text-primary" />
 										<h2 className="text-2xl font-bold">{t('aiRec.createManual')}</h2>
 									</div>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400">
+									<p className="text-sm text-neutral-400">
 										{t('aiRec.addManualDesc')}
 									</p>
 								</div>
 								<button
 									onClick={() => setShowManualTaskModal(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+									className="text-neutral-500 hover:hover:text-neutral-300 transition-colors"
 								>
 									<X className="h-6 w-6" />
 								</button>
@@ -933,7 +933,7 @@ export default function AIRecommendationsPage() {
 									value={manualTaskForm.title}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, title: e.target.value }))}
 									placeholder={t('aiRec.taskTitlePlaceholder')}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								/>
 							</div>
 
@@ -947,7 +947,7 @@ export default function AIRecommendationsPage() {
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, description: e.target.value }))}
 									placeholder={t('aiRec.descriptionPlaceholder')}
 									rows={4}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 								/>
 							</div>
 
@@ -959,7 +959,7 @@ export default function AIRecommendationsPage() {
 								<select
 									value={manualTaskForm.priority}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, priority: e.target.value as 'high' | 'medium' | 'low' }))}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								>
 									<option value="low">{t('aiRec.low')}</option>
 									<option value="medium">{t('aiRec.medium')}</option>
@@ -977,7 +977,7 @@ export default function AIRecommendationsPage() {
 									value={manualTaskForm.category}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, category: e.target.value }))}
 									placeholder={t('aiRec.categoryPlaceholder')}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								/>
 							</div>
 
@@ -989,7 +989,7 @@ export default function AIRecommendationsPage() {
 								<select
 									value={manualTaskForm.projectId}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, projectId: e.target.value }))}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								>
 									<option value="">{t('aiRec.noProject')}</option>
 									{projects.map((project) => (
@@ -1009,7 +1009,7 @@ export default function AIRecommendationsPage() {
 									type="date"
 									value={manualTaskForm.deadline}
 									onChange={(e) => setManualTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
-									className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+									className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 								/>
 							</div>
 
@@ -1021,7 +1021,7 @@ export default function AIRecommendationsPage() {
 								
 								{/* Step 1: Department Selection */}
 								<div>
-									<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+									<label className="block text-xs font-medium text-neutral-400 mb-2">
 										{t('aiRec.selectDepartment')}
 									</label>
 									<select
@@ -1031,7 +1031,7 @@ export default function AIRecommendationsPage() {
 											selectedDepartment: e.target.value,
 											assignedToId: '' // Reset assignee when department changes
 										}))}
-										className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
+										className="w-full px-3 py-2 border border-neutral-700 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary"
 									>
 										<option value="">{t('aiRec.chooseDepartment')}</option>
 										{Array.from(new Set(users.map(u => u.department).filter(Boolean))).sort().map((dept) => {
@@ -1048,13 +1048,13 @@ export default function AIRecommendationsPage() {
 								{/* Step 2: Person Selection */}
 								{manualTaskForm.selectedDepartment && (
 									<div className="animate-fadeIn">
-										<label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+										<label className="block text-xs font-medium text-neutral-400 mb-2">
 											{t('aiRec.selectPerson')}
 										</label>
 										<select
 											value={manualTaskForm.assignedToId}
 											onChange={(e) => setManualTaskForm(prev => ({ ...prev, assignedToId: e.target.value }))}
-											className="w-full px-3 py-2 border-2 border-primary/50 dark:border-primary/30 rounded-lg bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+											className="w-full px-3 py-2 border-2 border-primary/border-primary/30 rounded-lg bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
 											required
 										>
 											<option value="">
@@ -1073,14 +1073,14 @@ export default function AIRecommendationsPage() {
 										
 										{/* Selected User Info */}
 										{manualTaskForm.assignedToId && (
-											<div className="mt-3 p-3 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-lg">
+											<div className="mt-3 p-3 bg-primary/bg-primary/10 border border-primary/20 rounded-lg">
 												<div className="flex items-center gap-2">
 													<Users className="h-4 w-4 text-primary" />
 													<div className="flex-1">
 														<p className="text-sm font-medium">
 															{users.find(u => u.id === manualTaskForm.assignedToId)?.name}
 														</p>
-														<p className="text-xs text-neutral-600 dark:text-neutral-400">
+														<p className="text-xs text-neutral-400">
 															{t('aiRec.selectedUserInfo')}
 														</p>
 													</div>
@@ -1093,14 +1093,14 @@ export default function AIRecommendationsPage() {
 									</div>
 								)}
 								
-								<p className="text-xs text-neutral-500 dark:text-neutral-400">
+								<p className="text-xs text-neutral-400">
 									💡 {t('aiRec.notificationSent')}
 								</p>
 							</div>
 						</div>
 
 						{/* Modal Footer */}
-						<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+						<div className="p-6 border-t border-neutral-800 bg-neutral-800/50">
 							<div className="flex items-center gap-3">
 								<Button
 									onClick={handleCreateManualTask}
@@ -1129,11 +1129,11 @@ export default function AIRecommendationsPage() {
 					onClick={() => setSelectedTask(null)}
 				>
 					<div 
-						className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+						className="bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-800 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* Modal Header */}
-						<div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+						<div className="p-6 border-b border-neutral-800">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1">
 									<div className="flex items-center gap-2 mb-3">
@@ -1148,18 +1148,18 @@ export default function AIRecommendationsPage() {
 										>
 											{selectedTask.priority.toUpperCase()} {t('aiRec.priority')}
 										</span>
-										<span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+										<span className="text-xs text-neutral-400 bg-neutral-800 px-2 py-1 rounded">
 											{selectedTask.category}
 										</span>
 									</div>
 									<h3 className="text-xl font-bold mb-2">{selectedTask.title}</h3>
-									<p className="text-sm text-neutral-600 dark:text-neutral-400">
+									<p className="text-sm text-neutral-400">
 										{selectedTask.description}
 									</p>
 								</div>
 								<button
 									onClick={() => setSelectedTask(null)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+									className="text-neutral-500 hover:hover:text-neutral-300 transition-colors"
 								>
 									<X className="h-6 w-6" />
 								</button>
@@ -1169,14 +1169,14 @@ export default function AIRecommendationsPage() {
 						{/* Modal Content */}
 						<div className="flex-1 overflow-y-auto p-6 space-y-6">
 							{/* Project Info */}
-							<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+							<div className="p-4 bg-blue-900/20 border border-blue-800 rounded-xl">
 								<div className="flex items-start gap-3">
-									<Target className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+									<Target className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
 									<div className="flex-1">
-										<h4 className="font-bold text-blue-900 dark:text-blue-100 mb-1">
+										<h4 className="font-bold text-blue-100 mb-1">
 											{t('aiRec.project')}: {selectedTask.aiAnalysis.projectName}
 										</h4>
-										<p className="text-sm text-blue-700 dark:text-blue-300">
+										<p className="text-sm text-blue-300">
 											{t('aiRec.analysisDate')}: {new Date(selectedTask.aiAnalysis.analysisDate).toLocaleString()}
 										</p>
 									</div>
@@ -1189,7 +1189,7 @@ export default function AIRecommendationsPage() {
 									<Brain className="h-5 w-5 text-primary" />
 									<h4 className="font-bold text-lg">{t('aiRec.whyAiRecommends')}</h4>
 								</div>
-								<div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
+								<div className="p-4 bg-neutral-800/50 rounded-xl border border-neutral-700">
 									<p className="text-sm leading-relaxed">{selectedTask.aiAnalysis.analysisReason}</p>
 								</div>
 							</div>
@@ -1206,7 +1206,7 @@ export default function AIRecommendationsPage() {
 								<div className="mb-4">
 									<div className="flex items-center gap-2 mb-2">
 										<div className="w-2 h-2 rounded-full bg-green-500"></div>
-										<h5 className="text-sm font-semibold text-green-700 dark:text-green-400">
+										<h5 className="text-sm font-semibold text-green-400">
 											{t('aiRec.activeParticipants')} ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'active').length})
 										</h5>
 									</div>
@@ -1216,7 +1216,7 @@ export default function AIRecommendationsPage() {
 											.map((member, index) => (
 												<div
 													key={`active-${index}`}
-													className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-200 dark:border-green-800"
+													className="p-3 bg-green-900/20 rounded-xl border-2 border-green-800"
 												>
 													<div className="flex items-center gap-3">
 														<div className="w-10 h-10 rounded-full bg-linear-to-br from-green-600 to-green-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -1224,10 +1224,10 @@ export default function AIRecommendationsPage() {
 														</div>
 														<div className="flex-1 min-w-0">
 															<p className="font-medium text-sm truncate">{member.name}</p>
-															<p className="text-xs text-green-700 dark:text-green-400 truncate font-medium">
+															<p className="text-xs text-green-400 truncate font-medium">
 																{member.role}
 															</p>
-															<p className="text-xs text-green-600 dark:text-green-500 truncate">
+															<p className="text-xs text-green-500 truncate">
 																{member.department}
 															</p>
 														</div>
@@ -1243,7 +1243,7 @@ export default function AIRecommendationsPage() {
 								<div>
 									<div className="flex items-center gap-2 mb-2">
 										<div className="w-2 h-2 rounded-full bg-blue-500"></div>
-										<h5 className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+										<h5 className="text-sm font-semibold text-blue-400">
 											{t('aiRec.relatedMembers')} ({selectedTask.aiAnalysis.relatedMembers.filter(m => m.memberType === 'related').length})
 										</h5>
 									</div>
@@ -1253,7 +1253,7 @@ export default function AIRecommendationsPage() {
 											.map((member, index) => (
 												<div
 													key={`related-${index}`}
-													className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
+													className="p-3 bg-blue-900/20 rounded-xl border border-blue-800"
 												>
 													<div className="flex items-center gap-3">
 														<div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -1261,10 +1261,10 @@ export default function AIRecommendationsPage() {
 														</div>
 														<div className="flex-1 min-w-0">
 															<p className="font-medium text-sm truncate">{member.name}</p>
-															<p className="text-xs text-blue-700 dark:text-blue-400 truncate font-medium">
+															<p className="text-xs text-blue-400 truncate font-medium">
 																{member.role}
 															</p>
-															<p className="text-xs text-blue-600 dark:text-blue-500 truncate">
+															<p className="text-xs text-blue-500 truncate">
 																{member.department}
 															</p>
 														</div>
@@ -1286,7 +1286,7 @@ export default function AIRecommendationsPage() {
 									{selectedTask.aiAnalysis.detailedInstructions.map((instruction, index) => (
 										<div
 											key={index}
-											className="flex items-start gap-3 p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700"
+											className="flex items-start gap-3 p-3 bg-neutral-800/50 rounded-xl border border-neutral-700"
 										>
 											<div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
 												{index + 1}
@@ -1303,8 +1303,8 @@ export default function AIRecommendationsPage() {
 									<Target className="h-5 w-5 text-primary" />
 									<h4 className="font-bold text-lg">{t('aiRec.expectedOutcome')}</h4>
 								</div>
-								<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
-									<p className="text-sm leading-relaxed text-green-900 dark:text-green-100">
+								<div className="p-4 bg-green-900/20 border border-green-800 rounded-xl">
+									<p className="text-sm leading-relaxed text-green-100">
 										{selectedTask.aiAnalysis.expectedOutcome}
 									</p>
 								</div>
@@ -1320,10 +1320,10 @@ export default function AIRecommendationsPage() {
 									{selectedTask.aiAnalysis.recommendations.map((rec, index) => (
 										<div
 											key={index}
-											className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl"
+											className="flex items-start gap-3 p-3 bg-yellow-900/20 border border-yellow-800 rounded-xl"
 										>
-											<Lightbulb className="h-4 w-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-											<p className="text-sm flex-1 text-yellow-900 dark:text-yellow-100">{rec}</p>
+											<Lightbulb className="h-4 w-4 text-yellow-400 shrink-0 mt-0.5" />
+											<p className="text-sm flex-1 text-yellow-100">{rec}</p>
 										</div>
 									))}
 								</div>
@@ -1339,10 +1339,10 @@ export default function AIRecommendationsPage() {
 									{selectedTask.aiAnalysis.riskFactors.map((risk, index) => (
 										<div
 											key={index}
-											className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+											className="flex items-start gap-3 p-3 bg-red-900/20 border border-red-800 rounded-xl"
 										>
-											<AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-											<p className="text-sm flex-1 text-red-900 dark:text-red-100">{risk}</p>
+											<AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+											<p className="text-sm flex-1 text-red-100">{risk}</p>
 										</div>
 									))}
 								</div>
@@ -1350,7 +1350,7 @@ export default function AIRecommendationsPage() {
 						</div>
 
 						{/* Modal Footer */}
-						<div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+						<div className="p-6 border-t border-neutral-800 bg-neutral-800/50">
 							<div className="flex items-center gap-3">
 								<Button
 									onClick={(e) => {

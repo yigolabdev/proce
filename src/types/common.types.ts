@@ -505,6 +505,10 @@ export const STORAGE_KEYS = {
 	// Messages
 	MESSAGES: 'messages',
 	
+	// AI & Tasks
+	AI_RECOMMENDATIONS: 'aiRecommendations',
+	MANUAL_TASKS: 'manualTasks',
+	
 	// Company
 	COMPANY_INFO: 'companyInfo',
 	LEADERSHIP: 'leadership',

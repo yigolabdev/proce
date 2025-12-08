@@ -163,13 +163,13 @@ export default function CompanySignUpPage() {
 	}
 
 	return (
-		<div className="mx-auto min-h-dvh w-full bg-neutral-50 dark:bg-neutral-950">
+		<div className="mx-auto min-h-dvh w-full bg-neutral-950">
 			<div className="mx-auto max-w-4xl px-4 py-8">
 		{/* Top Navigation */}
 		<div className="flex items-center justify-between mb-8">
 			<button
 				onClick={() => navigate('/')}
-				className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-colors"
+				className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-primary transition-colors"
 			>
 				<Home className="h-4 w-4" />
 				<span>Back to Home</span>
@@ -203,7 +203,7 @@ export default function CompanySignUpPage() {
 					}}
 					size="sm"
 					variant="outline"
-					className="text-orange-600 dark:text-orange-400 border-orange-300 dark:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+					className="text-orange-400 border-orange-700 hover:hover:bg-orange-900/20"
 				>
 					⚡ Skip All Steps
 				</Button>
@@ -212,7 +212,7 @@ export default function CompanySignUpPage() {
 				{step > 1 && step < 4 && (
 					<button
 						onClick={() => setStep(step - 1)}
-						className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+						className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-neutral-100 transition-colors"
 					>
 						<ArrowLeft className="h-4 w-4" />
 						<span>Previous</span>
@@ -227,7 +227,7 @@ export default function CompanySignUpPage() {
 					<Building2 className="h-8 w-8 text-primary" />
 				</div>
 				<h1 className="text-3xl font-bold mb-2">Company Registration</h1>
-				<p className="text-neutral-600 dark:text-neutral-400">
+				<p className="text-neutral-400">
 					Register your company and create an admin account
 				</p>
 			</div>
@@ -250,7 +250,7 @@ export default function CompanySignUpPage() {
 											? 'bg-green-600 text-white'
 											: s.num === step
 												? 'bg-primary text-white shadow-lg scale-110'
-												: 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'
+												: 'bg-neutral-800 text-neutral-500'
 									}`}
 								>
 									{s.num < step ? <Check className="h-6 w-6" /> : s.num}
@@ -258,7 +258,7 @@ export default function CompanySignUpPage() {
 								<span
 									className={`mt-2 text-xs font-medium text-center ${
 										s.num <= step
-											? 'text-neutral-900 dark:text-neutral-100'
+											? 'text-neutral-100'
 											: 'text-neutral-500'
 									}`}
 								>
@@ -281,14 +281,14 @@ export default function CompanySignUpPage() {
 
 			{/* Form Card */}
 			<Card className="max-w-2xl mx-auto shadow-xl">
-				<CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+				<CardHeader className="border-b border-neutral-800">
 					<h2 className="text-2xl font-bold">
 						{step === 1 && 'Email Verification'}
 						{step === 2 && 'Company Information'}
 						{step === 3 && 'Administrator Information'}
 						{step === 4 && 'Registration Complete'}
 					</h2>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+					<p className="text-sm text-neutral-400 mt-1">
 						{step === 1 && 'Verify your email to prevent unauthorized signups'}
 						{step === 2 && 'Enter your company details'}
 						{step === 3 && 'Create your admin account'}
@@ -304,7 +304,7 @@ export default function CompanySignUpPage() {
 									<Mail className="h-8 w-8 text-primary" />
 								</div>
 								<h3 className="text-lg font-semibold mb-2">Verify Your Business Email</h3>
-								<p className="text-sm text-neutral-600 dark:text-neutral-400">
+								<p className="text-sm text-neutral-400">
 									We'll send a verification code to ensure your email is valid
 								</p>
 							</div>
@@ -341,7 +341,7 @@ export default function CompanySignUpPage() {
 
 				{/* Dev Mode: Skip Email Verification */}
 				{!isEmailVerified && (
-					<div className="pt-4 border-t border-orange-200 dark:border-orange-800">
+					<div className="pt-4 border-t border-orange-800">
 						<Button
 							onClick={() => {
 								setData(prev => ({ ...prev, email: 'test@company.com', verificationCode: '123456' }))
@@ -351,7 +351,7 @@ export default function CompanySignUpPage() {
 								toast.success('⚡ Dev Mode: Email verification skipped')
 							}}
 							variant="outline"
-							className="w-full h-10 text-sm text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+							className="w-full h-10 text-sm text-orange-400 border-orange-800 hover:hover:bg-orange-900/20"
 						>
 							⚡ Skip Email Verification (Dev Only)
 						</Button>
@@ -359,7 +359,7 @@ export default function CompanySignUpPage() {
 				)}
 
 							{isCodeSent && !isEmailVerified && (
-								<div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+								<div className="space-y-4 pt-4 border-t border-neutral-800">
 									<div>
 										<label className="block text-sm font-medium mb-2">
 											Verification Code <span className="text-red-500">*</span>
@@ -400,11 +400,11 @@ export default function CompanySignUpPage() {
 							)}
 
 							{isEmailVerified && (
-								<div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center gap-3">
-									<CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+								<div className="bg-green-900/20 border border-green-800 rounded-lg p-4 flex items-center gap-3">
+									<CheckCircle2 className="h-6 w-6 text-green-400" />
 									<div>
-										<p className="font-medium text-green-900 dark:text-green-100">Email Verified!</p>
-										<p className="text-sm text-green-700 dark:text-green-300">
+										<p className="font-medium text-green-100">Email Verified!</p>
+										<p className="text-sm text-green-300">
 											You can now proceed to company registration
 										</p>
 									</div>
@@ -454,7 +454,7 @@ export default function CompanySignUpPage() {
 							<select
 								value={data.industry}
 								onChange={(e) => handleChange('industry', e.target.value)}
-								className="w-full h-12 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+								className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
 							>
 								<option value="">Select industry</option>
 								<option value="IT/SaaS/Software">IT / SaaS / Software</option>
@@ -493,7 +493,7 @@ export default function CompanySignUpPage() {
 									<select
 										value={data.employeeCount}
 										onChange={(e) => handleEmployeeCountSelect(e.target.value)}
-										className="w-full h-12 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-2xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+										className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
 									>
 										<option value="">Select range</option>
 										<option value="1-10">1-10</option>
@@ -522,7 +522,7 @@ export default function CompanySignUpPage() {
 									)}
 								</div>
 							</div>
-							<p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+							<p className="text-xs text-neutral-400 mt-2">
 								Select a range or enter the exact number
 							</p>
 						</div>
@@ -547,7 +547,7 @@ export default function CompanySignUpPage() {
 									setTimeout(() => setStep(3), 300)
 								}} 
 								variant="outline" 
-								className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+								className="w-full h-12 text-base text-orange-400 border-orange-800 hover:hover:bg-orange-900/20"
 							>
 								⚡ Auto-fill & Next (Dev Only)
 							</Button>
@@ -578,7 +578,7 @@ export default function CompanySignUpPage() {
 								type="email"
 								value={data.email}
 								disabled
-								className="h-12 bg-neutral-50 dark:bg-neutral-800 cursor-not-allowed"
+								className="h-12 bg-neutral-800 cursor-not-allowed"
 							/>
 							<p className="text-xs text-neutral-500 mt-1">
 								Using your verified business email
@@ -639,7 +639,7 @@ export default function CompanySignUpPage() {
 									setTimeout(() => setStep(4), 300)
 								}} 
 								variant="outline" 
-								className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+								className="w-full h-12 text-base text-orange-400 border-orange-800 hover:hover:bg-orange-900/20"
 							>
 								⚡ Auto-fill & Next (Dev Only)
 							</Button>
@@ -650,37 +650,37 @@ export default function CompanySignUpPage() {
 				{/* Step 4: Complete */}
 				{step === 4 && (
 						<div className="text-center py-8">
-							<div className="w-24 h-24 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-								<Check className="h-12 w-12 text-green-600 dark:text-green-400" />
+							<div className="w-24 h-24 rounded-full bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+								<Check className="h-12 w-12 text-green-400" />
 							</div>
 							<h3 className="text-2xl font-bold mb-2">Review Your Information</h3>
-							<p className="text-neutral-600 dark:text-neutral-400 mb-8">
+							<p className="text-neutral-400 mb-8">
 								Please confirm your registration details
 							</p>
 
 							<div className="max-w-md mx-auto space-y-4 mb-10">
-								<div className="p-5 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-left">
-									<div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2">
+								<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
+									<div className="text-sm font-medium text-neutral-400 mb-2">
 										Company Information
 									</div>
 									<div className="space-y-2">
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-600 dark:text-neutral-400">Name:</span>
+											<span className="text-sm text-neutral-400">Name:</span>
 											<span className="font-medium">{data.companyName}</span>
 										</div>
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-600 dark:text-neutral-400">Business #:</span>
+											<span className="text-sm text-neutral-400">Business #:</span>
 											<span className="font-medium">{data.businessNumber}</span>
 										</div>
 										{data.industry && (
 											<div className="flex justify-between">
-												<span className="text-sm text-neutral-600 dark:text-neutral-400">Industry:</span>
+												<span className="text-sm text-neutral-400">Industry:</span>
 												<span className="font-medium">{data.industry}</span>
 											</div>
 										)}
 									{(data.employeeCount || data.employeeCountExact) && (
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-600 dark:text-neutral-400">Employees:</span>
+											<span className="text-sm text-neutral-400">Employees:</span>
 											<span className="font-medium">
 												{data.employeeCountExact 
 													? `${data.employeeCountExact} employees` 
@@ -691,22 +691,22 @@ export default function CompanySignUpPage() {
 									</div>
 								</div>
 
-								<div className="p-5 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-left">
-									<div className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2">
+								<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
+									<div className="text-sm font-medium text-neutral-400 mb-2">
 										Administrator
 									</div>
 									<div className="space-y-2">
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-600 dark:text-neutral-400">Name:</span>
+											<span className="text-sm text-neutral-400">Name:</span>
 											<span className="font-medium">{data.adminName}</span>
 										</div>
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-600 dark:text-neutral-400">Email:</span>
+											<span className="text-sm text-neutral-400">Email:</span>
 											<span className="font-medium">{data.adminEmail}</span>
 										</div>
 										{data.adminPhone && (
 											<div className="flex justify-between">
-												<span className="text-sm text-neutral-600 dark:text-neutral-400">Phone:</span>
+												<span className="text-sm text-neutral-400">Phone:</span>
 												<span className="font-medium">{data.adminPhone}</span>
 											</div>
 										)}
@@ -722,7 +722,7 @@ export default function CompanySignUpPage() {
 								<Button 
 									onClick={handleSubmit} 
 									variant="outline" 
-									className="w-full h-12 text-base text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+									className="w-full h-12 text-base text-orange-400 border-orange-800 hover:hover:bg-orange-900/20"
 								>
 									Complete (Skip Validation)
 								</Button>
@@ -734,7 +734,7 @@ export default function CompanySignUpPage() {
 
 			{/* Footer */}
 			<div className="text-center mt-8">
-				<p className="text-sm text-neutral-600 dark:text-neutral-400">
+				<p className="text-sm text-neutral-400">
 					Already have an account?{' '}
 					<button
 						onClick={() => navigate('/')}

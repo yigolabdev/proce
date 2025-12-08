@@ -16,11 +16,11 @@ export function Select({ children, className = '', ...props }: SelectProps) {
 		<select
 			className={`
 				w-full px-3 py-2 
-				bg-white dark:bg-neutral-900 
-				border border-neutral-300 dark:border-border-dark 
+				bg-neutral-900 
+				border border-border-dark 
 				rounded-lg 
 				text-sm 
-				text-neutral-900 dark:text-neutral-100
+				text-neutral-100
 				focus:outline-none 
 				focus:ring-2 
 				focus:ring-primary 

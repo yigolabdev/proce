@@ -39,7 +39,7 @@ export default function IntegrationsPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-950">
 			<Toaster />
 			
 			{/* Header */}
@@ -58,7 +58,7 @@ export default function IntegrationsPage() {
 			<Dialog open={!!disconnectingConnector} onOpenChange={(open) => !open && setDisconnectingConnector(null)}>
 				<DialogContent>
 					<h3 className="text-lg font-semibold mb-2">{tt.connection.confirmDisconnect}</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-300 mb-6">{tt.connection.confirmDisconnectDesc}</p>
+					<p className="text-sm text-neutral-300 mb-6">{tt.connection.confirmDisconnectDesc}</p>
 					<div className="flex gap-2">
 						<Button onClick={confirmDisconnect} variant="primary" className="flex-1">
 							{tt.actions.disconnect}

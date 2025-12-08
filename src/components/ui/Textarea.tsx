@@ -11,16 +11,16 @@ export default function Textarea({ className, label, error, id, ...props }: Prop
 	return (
 		<div className={clsx('w-full', className)}>
 			{label && (
-				<label htmlFor={inputId} className="mb-1 block text-sm text-neutral-700 dark:text-neutral-300">
+				<label htmlFor={inputId} className="mb-1 block text-sm text-neutral-300">
 					{label}
 				</label>
 			)}
 			<textarea
 				id={inputId}
 				className={clsx(
-					'w-full rounded-2xl border bg-white dark:bg-neutral-900 px-4 py-2.5 outline-none ring-primary/30 transition focus:ring-4',
+					'w-full rounded-2xl border bg-neutral-900 px-4 py-2.5 outline-none ring-primary/30 transition focus:ring-4 text-neutral-100',
 					{
-						'border-neutral-300 dark:border-border-dark': !error,
+						'border-border-dark': !error,
 						'border-red-500': Boolean(error),
 					},
 				)}

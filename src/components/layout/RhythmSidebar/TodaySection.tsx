@@ -24,8 +24,8 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 		return (
 			<div className="px-4 py-2">
 				<div className="animate-pulse">
-					<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-20 mb-2"></div>
-					<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded w-full"></div>
+					<div className="h-4 bg-neutral-800 rounded w-20 mb-2"></div>
+					<div className="h-3 bg-neutral-800 rounded w-full"></div>
 				</div>
 			</div>
 		)
@@ -44,7 +44,7 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 			{/* 헤더 */}
 			<button
 				onClick={() => setExpanded(!expanded)}
-				className="w-full flex items-center justify-between px-4 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-lg transition-colors group"
+				className="w-full flex items-center justify-between px-4 py-2 hover:hover:bg-neutral-900 rounded-lg transition-colors group"
 			>
 				<div className="flex items-center gap-2 flex-1">
 					<Clock size={16} className="text-primary" />
@@ -55,7 +55,7 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 						</span>
 					)}
 					{isLoopComplete && (
-						<CheckCircle size={14} className="text-green-600 dark:text-green-400" />
+						<CheckCircle size={14} className="text-green-400" />
 					)}
 					<button
 						onClick={(e) => {
@@ -75,14 +75,14 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 				<div className="mt-1 px-2">
 					{/* 루프 완료 상태 */}
 					{isLoopComplete ? (
-						<div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
+						<div className="p-3 bg-green-900/10 rounded-lg border border-green-800">
 							<div className="flex items-start gap-2 mb-2">
-								<CheckCircle size={18} className="text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+								<CheckCircle size={18} className="text-green-400 shrink-0 mt-0.5" />
 								<div className="flex-1">
-									<p className="text-sm font-medium text-green-900 dark:text-green-100">
+									<p className="text-sm font-medium text-green-100">
 										오늘의 루프는 모두 완료되었습니다
 									</p>
-									<p className="text-xs text-green-700 dark:text-green-300 mt-1">
+									<p className="text-xs text-green-300 mt-1">
 										수고하셨습니다! 편히 쉬셔도 됩니다.
 									</p>
 								</div>
@@ -93,7 +93,7 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 								<Button
 									onClick={handleShowNext}
 									variant="outline"
-									className="w-full mt-2 text-xs border-green-300 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
+									className="w-full mt-2 text-xs border-green-700 hover:hover:bg-green-900/20"
 								>
 									다음 할 수 있는 작업 보기 (선택 사항)
 								</Button>
@@ -101,14 +101,14 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 							
 							{/* 다음 작업 표시 */}
 							{showingNext && nextActions && nextActions.nextUp.length > 0 && (
-								<div className="mt-2 pt-2 border-t border-green-200 dark:border-green-800">
-									<p className="text-xs text-green-700 dark:text-green-300 mb-1">
+								<div className="mt-2 pt-2 border-t border-green-800">
+									<p className="text-xs text-green-300 mb-1">
 										다음 예정된 작업:
 									</p>
 									{nextActions.nextUp.slice(0, 3).map((item: LoopItem) => (
 										<div
 											key={item.id}
-											className="text-xs py-1 px-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded cursor-pointer"
+											className="text-xs py-1 px-2 hover:hover:bg-green-900/30 rounded cursor-pointer"
 											onClick={() => onItemClick?.(item)}
 										>
 											• {item.title}
@@ -124,21 +124,21 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 								<div className="mb-2">
 									<div className="flex items-center gap-1.5 px-2 py-1">
 										<AlertCircle size={12} className="text-red-500" />
-										<span className="text-xs font-medium text-red-700 dark:text-red-400">
+										<span className="text-xs font-medium text-red-400">
 											긴급 ({urgent.length})
 										</span>
 									</div>
 									{urgent.map(item => (
 										<div
 											key={item.id}
-											className="px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 cursor-pointer transition-colors border-l-2 border-red-500 ml-2"
+											className="px-3 py-2 rounded-lg hover:hover:bg-red-900/10 cursor-pointer transition-colors border-l-2 border-red-500 ml-2"
 											onClick={() => onItemClick?.(item)}
 										>
-											<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+											<p className="text-sm font-medium text-neutral-100">
 												{item.title}
 											</p>
 											{item.projectName && (
-												<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+												<p className="text-xs text-neutral-400 mt-0.5">
 													{item.projectName}
 												</p>
 											)}
@@ -152,21 +152,21 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 								<div className="mb-2">
 									<div className="flex items-center gap-1.5 px-2 py-1">
 										<Clock size={12} className="text-blue-500" />
-										<span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+										<span className="text-xs font-medium text-blue-400">
 											예정됨 ({scheduled.length})
 										</span>
 									</div>
 									{scheduled.map(item => (
 										<div
 											key={item.id}
-											className="px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors border-l-2 border-blue-500 ml-2"
+											className="px-3 py-2 rounded-lg hover:hover:bg-blue-900/10 cursor-pointer transition-colors border-l-2 border-blue-500 ml-2"
 											onClick={() => onItemClick?.(item)}
 										>
-											<p className="text-sm text-neutral-900 dark:text-neutral-100">
+											<p className="text-sm text-neutral-100">
 												{item.title}
 											</p>
 											{item.projectName && (
-												<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+												<p className="text-xs text-neutral-400 mt-0.5">
 													{item.projectName}
 												</p>
 											)}
@@ -180,21 +180,21 @@ export function TodaySection({ onItemClick }: TodaySectionProps) {
 								<div className="mb-2">
 									<div className="flex items-center gap-1.5 px-2 py-1">
 										<AlertCircle size={12} className="text-orange-500" />
-										<span className="text-xs font-medium text-orange-700 dark:text-orange-400">
+										<span className="text-xs font-medium text-orange-400">
 											검토 필요 ({needsReview.length})
 										</span>
 									</div>
 									{needsReview.map(item => (
 										<div
 											key={item.id}
-											className="px-3 py-2 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/10 cursor-pointer transition-colors border-l-2 border-orange-500 ml-2"
+											className="px-3 py-2 rounded-lg hover:hover:bg-orange-900/10 cursor-pointer transition-colors border-l-2 border-orange-500 ml-2"
 											onClick={() => onItemClick?.(item)}
 										>
-											<p className="text-sm text-neutral-900 dark:text-neutral-100">
+											<p className="text-sm text-neutral-100">
 												{item.title}
 											</p>
 											{item.description && (
-												<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 line-clamp-1">
+												<p className="text-xs text-neutral-400 mt-0.5 line-clamp-1">
 													{item.description}
 												</p>
 											)}

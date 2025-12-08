@@ -206,7 +206,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 														<h4 className="font-medium text-sm truncate" title={project.name}>
 															{project.name}
 														</h4>
-														<div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+														<div className="flex items-center gap-2 text-xs text-neutral-400">
 															<span className={`px-2 py-0.5 rounded-full text-white ${getStatusColor(project.status)}`}>
 																{project.status}
 															</span>
@@ -264,7 +264,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 																className="absolute top-0 w-0.5 h-12 bg-orange-500 z-20 group/milestone"
 																style={{ left: `${milestoneLeftPercent}%` }}
 															>
-																<div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-orange-500 border-2 border-white dark:border-neutral-900" />
+																<div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-orange-500 border-2 border-neutral-900" />
 																<div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 opacity-0 group-hover/milestone:opacity-100 transition-opacity pointer-events-none">
 																	<div className="bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
 																		{milestone.name}
@@ -276,7 +276,7 @@ export default function TimelineView({ projects, onProjectClick }: TimelineViewP
 												</div>
 
 												{/* Team size */}
-												<div className="w-20 shrink-0 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
+												<div className="w-20 shrink-0 text-xs text-neutral-400 flex items-center gap-1">
 													<Users className="h-3 w-3" />
 													{project.members.length}
 												</div>

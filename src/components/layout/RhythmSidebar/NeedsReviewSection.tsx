@@ -30,13 +30,13 @@ export function NeedsReviewSection({ onItemClick }: NeedsReviewSectionProps) {
 			{/* 헤더 */}
 			<button
 				onClick={() => setExpanded(!expanded)}
-				className="w-full flex items-center justify-between px-4 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-lg transition-colors group"
+				className="w-full flex items-center justify-between px-4 py-2 hover:hover:bg-neutral-900 rounded-lg transition-colors group"
 			>
 				<div className="flex items-center gap-2 flex-1">
-					<AlertTriangle size={16} className="text-orange-600 dark:text-orange-400" />
+					<AlertTriangle size={16} className="text-orange-400" />
 					<span className="text-sm font-medium">Needs Review</span>
 					{needsReview.length > 0 && (
-						<span className="text-xs px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full font-medium">
+						<span className="text-xs px-1.5 py-0.5 bg-orange-900/30 text-orange-300 rounded-full font-medium">
 							{needsReview.length}
 						</span>
 					)}
@@ -59,14 +59,14 @@ export function NeedsReviewSection({ onItemClick }: NeedsReviewSectionProps) {
 					{needsReview.map(item => (
 						<div
 							key={item.id}
-							className="px-3 py-2 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/10 cursor-pointer transition-colors mb-1 border-l-2 border-orange-500"
+							className="px-3 py-2 rounded-lg hover:hover:bg-orange-900/10 cursor-pointer transition-colors mb-1 border-l-2 border-orange-500"
 							onClick={() => onItemClick?.(item)}
 						>
-							<p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+							<p className="text-sm font-medium text-neutral-100">
 								{item.title}
 							</p>
 							{item.description && (
-								<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 line-clamp-2">
+								<p className="text-xs text-neutral-400 mt-0.5 line-clamp-2">
 									{item.description}
 								</p>
 							)}

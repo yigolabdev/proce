@@ -48,7 +48,7 @@ export default function WorkRhythmPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+		<div className="min-h-screen bg-background-dark text-neutral-100">
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
 				{/* Header */}
 				<PageHeader

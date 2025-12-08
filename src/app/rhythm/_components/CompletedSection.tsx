@@ -24,10 +24,10 @@ export function CompletedSection() {
 
 	const getPriorityColor = (priority: string) => {
 		switch (priority) {
-			case 'high': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
-			case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
-			case 'low': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-			default: return 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-900/20'
+			case 'high': return 'text-red-400 bg-red-900/20'
+			case 'medium': return 'text-yellow-400 bg-yellow-900/20'
+			case 'low': return 'text-blue-400 bg-blue-900/20'
+			default: return 'text-neutral-400 bg-neutral-900/20'
 		}
 	}
 
@@ -86,7 +86,7 @@ export function CompletedSection() {
 						<div className="text-2xl font-bold text-green-600">
 							{filteredCompleted.length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							In selected period
 						</p>
 					</CardContent>
@@ -103,7 +103,7 @@ export function CompletedSection() {
 						<div className="text-2xl font-bold text-yellow-600">
 							{filteredCompleted.filter(item => item.priority === 'high').length}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							Important tasks done
 						</p>
 					</CardContent>
@@ -120,7 +120,7 @@ export function CompletedSection() {
 						<div className="text-2xl font-bold text-blue-600">
 							{new Set(filteredCompleted.map(item => item.projectId).filter(Boolean)).size}
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							Projects contributed to
 						</p>
 					</CardContent>
@@ -137,7 +137,7 @@ export function CompletedSection() {
 						<div className="text-2xl font-bold text-purple-600">
 							{filteredCompleted.length > 0 ? Math.round(filteredCompleted.length / 7) : 0}/day
 						</div>
-						<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-xs text-neutral-400 mt-1">
 							Average completion rate
 						</p>
 					</CardContent>
@@ -161,7 +161,7 @@ export function CompletedSection() {
 												{item.priority.toUpperCase()}
 											</span>
 											{item.type === 'task' && (
-												<span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+												<span className="text-xs px-2 py-1 rounded-full bg-green-900/30 text-green-300">
 													Completed
 												</span>
 											)}
@@ -170,12 +170,12 @@ export function CompletedSection() {
 											{item.title}
 										</h3>
 										{item.description && (
-											<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
+											<p className="text-sm text-neutral-400 mb-3">
 												{item.description}
 											</p>
 										)}
 										
-										<div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+										<div className="flex items-center gap-4 text-sm text-neutral-400">
 											{item.projectName && (
 												<div className="flex items-center gap-1">
 													<FolderKanban className="h-4 w-4" />

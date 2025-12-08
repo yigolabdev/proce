@@ -14,6 +14,12 @@ export const authI18n = {
 		privacy: 'Proce uses alias by default; real names are hidden inside the workspace.',
 		terms: 'Terms',
 		privacyLink: 'Privacy',
+		landingPage: {
+			enterEmail: 'Enter your email',
+			forgotPassword: 'Forgot Password?',
+			noAccount: "Don't have an account yet?",
+			orContinueWith: 'or continue with',
+		},
 		errors: {
 			invalidEmail: 'Enter a valid work email',
 			disposable: 'Disposable emails are not supported',
@@ -21,6 +27,9 @@ export const authI18n = {
 			expired: 'Your code has expired — request a new one',
 			rate: 'Too many attempts. Please try again later.',
 			invalidCredentials: 'Email or password is incorrect',
+			enterValidEmail: 'Please enter a valid email address.',
+			enterPassword: 'Please enter your password.',
+			signInError: 'An error occurred during sign in.',
 		},
 	},
 	ko: {
@@ -38,6 +47,12 @@ export const authI18n = {
 		privacy: 'Proce는 기본적으로 별칭을 사용하며 실명은 내부에서 숨깁니다.',
 		terms: '이용약관',
 		privacyLink: '개인정보 처리',
+		landingPage: {
+			enterEmail: '이메일을 입력하세요',
+			forgotPassword: '비밀번호를 잊으셨나요?',
+			noAccount: '계정이 없으신가요?',
+			orContinueWith: '또는 다음으로 계속',
+		},
 		errors: {
 			invalidEmail: '올바른 회사 이메일을 입력하세요',
 			disposable: '임시 이메일은 지원하지 않습니다',
@@ -45,6 +60,9 @@ export const authI18n = {
 			expired: '코드가 만료되었습니다. 새 코드를 요청하세요',
 			rate: '시도 횟수가 많습니다. 잠시 후 다시 시도하세요',
 			invalidCredentials: '이메일 또는 비밀번호가 올바르지 않습니다',
+			enterValidEmail: '유효한 이메일 주소를 입력하세요.',
+			enterPassword: '비밀번호를 입력하세요.',
+			signInError: '로그인 중 오류가 발생했습니다.',
 		},
 	},
 } as const

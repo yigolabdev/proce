@@ -204,7 +204,7 @@ export default function ExecutivePage() {
 
 	if (!analyticsData) {
 		return (
-			<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+			<div className="min-h-screen bg-neutral-950">
 				<PageHeader
 					title="Executive Insights"
 					description="Strategic overview and performance analytics"
@@ -221,7 +221,7 @@ export default function ExecutivePage() {
 						<div className="text-center">
 							<BarChart3 className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
 							<h2 className="text-xl font-semibold mb-2">Analytics Error</h2>
-							<p className="text-neutral-600 dark:text-neutral-400">
+							<p className="text-neutral-400">
 								Failed to load analytics data. Please try again.
 							</p>
 							<Button onClick={handleRefresh} variant="primary" className="mt-4">
@@ -236,7 +236,7 @@ export default function ExecutivePage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100 pb-20">
+		<div className="min-h-screen bg-background-dark text-neutral-100 pb-20">
 			<Toaster />
 			<ExecutiveChat />
 			

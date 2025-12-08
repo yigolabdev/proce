@@ -184,7 +184,7 @@ export default function TeamPerformanceTab({ departments, projects }: TeamPerfor
 						<Target className="h-5 w-5 text-primary" />
 						OKR Performance
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Team objectives and key results tracking
 					</p>
 				</CardHeader>
@@ -193,12 +193,12 @@ export default function TeamPerformanceTab({ departments, projects }: TeamPerfor
 						{okrs.slice(0, 10).map((okr) => (
 							<div
 								key={okr.objectiveId}
-								className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800"
+								className="p-4 rounded-lg border border-neutral-800"
 							>
 								<div className="flex items-start justify-between mb-2">
 									<div className="flex-1">
 										<h4 className="font-semibold">{okr.title}</h4>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm text-neutral-400">
 											{okr.owner} • {okr.team}
 										</p>
 									</div>
@@ -206,14 +206,14 @@ export default function TeamPerformanceTab({ departments, projects }: TeamPerfor
 								</div>
 								<div className="flex items-center gap-4 text-sm mb-2">
 									<span>{okr.progress}% progress</span>
-									<span className="text-neutral-600 dark:text-neutral-400">
+									<span className="text-neutral-400">
 										{okr.keyResultsCompleted}/{okr.keyResultsTotal} KRs completed
 									</span>
-									<span className="text-neutral-600 dark:text-neutral-400">
+									<span className="text-neutral-400">
 										{okr.daysRemaining} days left
 									</span>
 								</div>
-								<div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-2">
+								<div className="w-full bg-neutral-800 rounded-full h-2">
 									<div
 										className={`h-2 rounded-full ${
 											okr.status === 'completed' ? 'bg-blue-600' :

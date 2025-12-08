@@ -83,7 +83,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 	return (
 		<Card className="p-6">
 			<h2 className="text-2xl font-bold">{t.title}</h2>
-			<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+			<p className="mt-2 text-sm text-neutral-300">{t.subtitle}</p>
 
 			<form onSubmit={handleSubmit} className="mt-6 space-y-6">
 				<div>
@@ -99,7 +99,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 								className={`rounded-full px-4 py-1.5 text-sm transition ${
 									form.jobCategories?.includes(job)
 										? 'bg-primary text-white'
-										: 'border border-neutral-200 dark:border-neutral-800 hover:border-primary'
+										: 'border border-neutral-800 hover:border-primary'
 								}`}
 							>
 								{job}
@@ -127,7 +127,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 								className={`rounded-full px-4 py-1.5 text-sm transition ${
 									form.kpis?.includes(kpi)
 										? 'bg-primary text-white'
-										: 'border border-neutral-200 dark:border-neutral-800 hover:border-primary'
+										: 'border border-neutral-800 hover:border-primary'
 								}`}
 							>
 								{kpi}
@@ -168,7 +168,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 								}
 							}}
 							placeholder="Add custom KPI..."
-							className="flex-1 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+							className="flex-1 rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 						/>
 						<Button type="button" variant="secondary" onClick={addCustomKpi}>
 							Add
@@ -194,7 +194,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 								className={`rounded-full px-4 py-1.5 text-sm transition ${
 									form.outputTypes?.includes(type)
 										? 'bg-primary text-white'
-										: 'border border-neutral-200 dark:border-neutral-800 hover:border-primary'
+										: 'border border-neutral-800 hover:border-primary'
 								}`}
 							>
 								{type}
@@ -217,7 +217,7 @@ export default function Step3JobKpi({ data, industry, onNext, onBack }: Step3Pro
 								className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${
 									form.decisionMode === mode
 										? 'border-primary bg-primary/5 font-medium'
-										: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+										: 'border-neutral-800 hover:border-primary/50'
 								}`}
 							>
 								<input

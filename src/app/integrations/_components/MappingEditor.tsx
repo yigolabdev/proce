@@ -14,7 +14,7 @@ export default function MappingEditor({ mappings }: MappingEditorProps) {
 
 	return (
 		<div className="space-y-2">
-			<div className="grid grid-cols-3 gap-4 text-sm font-medium text-neutral-600 dark:text-neutral-400 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+			<div className="grid grid-cols-3 gap-4 text-sm font-medium text-neutral-400 pb-2 border-b border-neutral-800">
 				<div>{tt.mapping.source}</div>
 				<div>{tt.mapping.target}</div>
 				<div>{tt.mapping.signal}</div>
@@ -22,11 +22,11 @@ export default function MappingEditor({ mappings }: MappingEditorProps) {
 			{mappings.map((mapping, index) => (
 				<div
 					key={index}
-					className="grid grid-cols-3 gap-4 text-sm py-2 border-b border-neutral-100 dark:border-neutral-900"
+					className="grid grid-cols-3 gap-4 text-sm py-2 border-b border-neutral-900"
 				>
 					<div className="font-medium">{mapping.source}</div>
 					<div className="text-primary">{mapping.target}</div>
-					<div className="text-neutral-600 dark:text-neutral-400">{mapping.signal || '—'}</div>
+					<div className="text-neutral-400">{mapping.signal || '—'}</div>
 				</div>
 			))}
 		</div>

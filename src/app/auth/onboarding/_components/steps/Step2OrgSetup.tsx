@@ -86,7 +86,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 	return (
 		<Card className="p-6">
 			<h2 className="text-2xl font-bold">{t.title}</h2>
-			<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+			<p className="mt-2 text-sm text-neutral-300">{t.subtitle}</p>
 
 			<form onSubmit={handleSubmit} className="mt-6 space-y-6">
 				<div>
@@ -102,7 +102,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 								className={`rounded-full px-4 py-1.5 text-sm transition ${
 									form.departments?.includes(dept)
 										? 'bg-primary text-white'
-										: 'border border-neutral-200 dark:border-neutral-800 hover:border-primary'
+										: 'border border-neutral-800 hover:border-primary'
 								}`}
 							>
 								{dept}
@@ -123,7 +123,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 							className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${
 								form.roleModel === 'role'
 									? 'border-primary bg-primary/5 font-medium'
-									: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+									: 'border-neutral-800 hover:border-primary/50'
 							}`}
 						>
 							<input
@@ -140,7 +140,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 							className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${
 								form.roleModel === 'title'
 									? 'border-primary bg-primary/5 font-medium'
-									: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+									: 'border-neutral-800 hover:border-primary/50'
 							}`}
 						>
 							<input
@@ -192,7 +192,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 									<select
 										value={lead.dept || ''}
 										onChange={(e) => updateLead(index, 'dept', e.target.value)}
-										className="flex-1 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+										className="flex-1 rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 									>
 										<option value="">{t.leadDept}</option>
 										{form.departments?.map((dept) => (
@@ -204,7 +204,7 @@ export default function Step2OrgSetup({ data, industry, onNext, onBack }: Step2P
 									<button
 										type="button"
 										onClick={() => removeLead(index)}
-										className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-2.5 hover:bg-red-50 hover:border-red-300 dark:hover:bg-red-950/20"
+										className="rounded-2xl border border-neutral-800 p-2.5 hover:bg-red-50 hover:hover:bg-red-950/20"
 										aria-label="Remove lead"
 									>
 										<X className="h-4 w-4" />

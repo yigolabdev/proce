@@ -593,7 +593,7 @@ export default function UsersManagementPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-background-dark text-neutral-900 dark:text-neutral-100">
+		<div className="min-h-screen bg-background-dark text-neutral-100">
 			<Toaster />
 			
 			<div className="max-w-[1600px] mx-auto px-6 py-6 space-y-8">
@@ -673,7 +673,7 @@ export default function UsersManagementPage() {
 
 						{/* Gmail-style Email Input */}
 						<div className="space-y-4">
-							<div className="border border-border-dark rounded-2xl p-3 bg-[#1a1a1a] min-h-[100px]">
+							<div className="border border-border-dark rounded-2xl p-3 bg-surface-elevated min-h-[100px]">
 								<div className="flex flex-wrap gap-2 mb-2">
 									{inviteEmails.map((email) => (
 										<div
@@ -940,7 +940,7 @@ export default function UsersManagementPage() {
 									<select
 										value={editForm.role || 'user'}
 										onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole })}
-										className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+										className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
 									>
 										<option value="user">User</option>
 										<option value="admin">Admin</option>
@@ -952,7 +952,7 @@ export default function UsersManagementPage() {
 										<select
 											value={editForm.status || 'active'}
 											onChange={(e) => setEditForm({ ...editForm, status: e.target.value as TeamMember['status'] })}
-											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-[#1a1a1a] text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+											className="w-full px-4 py-2 border border-border-dark rounded-2xl bg-surface-elevated text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
 										>
 											<option value="active">Active</option>
 											<option value="inactive">Inactive</option>
@@ -988,7 +988,7 @@ export default function UsersManagementPage() {
 								setSearchQuery(e.target.value)
 								setCurrentPage(1) // Reset to first page on search
 							}}
-							className="pl-10 bg-[#1a1a1a] border-border-dark text-white placeholder-neutral-500"
+							className="pl-10 bg-surface-elevated border-border-dark text-white placeholder-neutral-500"
 						/>
 					</div>
 				</CardContent>
@@ -1009,7 +1009,7 @@ export default function UsersManagementPage() {
 						{currentMembers.map((member) => (
 							<div
 								key={member.id}
-								className="flex items-center justify-between p-3 border border-border-dark rounded-xl hover:bg-neutral-800/50 transition-colors bg-[#1a1a1a]"
+								className="flex items-center justify-between p-3 border border-border-dark rounded-xl hover:bg-neutral-800/50 transition-colors bg-surface-elevated"
 							>
 							<div className="flex items-center flex-1">
 								<div className="flex-1 min-w-0">

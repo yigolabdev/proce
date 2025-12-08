@@ -24,7 +24,7 @@ export function Skeleton({
 	return (
 		<div
 			className={cn(
-				'bg-neutral-200 dark:bg-neutral-800',
+				'bg-neutral-800',
 				animation === 'pulse' && 'animate-pulse',
 				animation === 'wave' && 'animate-shimmer',
 				variant === 'text' && 'rounded h-4',
@@ -43,7 +43,7 @@ export function Skeleton({
  */
 export function CardSkeleton() {
 	return (
-		<div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800">
+		<div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800">
 			<div className="flex items-center gap-4 mb-4">
 				<Skeleton variant="circular" className="h-12 w-12" />
 				<div className="flex-1">
@@ -65,7 +65,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 	return (
 		<div className="space-y-3">
 			{/* Header */}
-			<div className="flex gap-4 p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+			<div className="flex gap-4 p-4 bg-neutral-900 rounded-lg">
 				<Skeleton className="h-4 w-[150px]" />
 				<Skeleton className="h-4 w-[200px]" />
 				<Skeleton className="h-4 w-[100px]" />
@@ -74,7 +74,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 
 			{/* Rows */}
 			{Array.from({ length: rows }).map((_, i) => (
-				<div key={i} className="flex gap-4 p-4 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800">
+				<div key={i} className="flex gap-4 p-4 bg-neutral-900 rounded-lg border border-neutral-800">
 					<Skeleton className="h-4 w-[150px]" />
 					<Skeleton className="h-4 w-[200px]" />
 					<Skeleton className="h-4 w-[100px]" />
@@ -93,7 +93,7 @@ export function ListSkeleton({ items = 5 }: { items?: number }) {
 	return (
 		<div className="space-y-3">
 			{Array.from({ length: items }).map((_, i) => (
-				<div key={i} className="flex items-center gap-4 p-4 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
+				<div key={i} className="flex items-center gap-4 p-4 bg-neutral-900 rounded-xl border border-neutral-800">
 					<Skeleton variant="circular" className="h-10 w-10" />
 					<div className="flex-1">
 						<Skeleton className="h-4 w-[60%] mb-2" />
@@ -130,7 +130,7 @@ export function PageSkeleton() {
 			</div>
 
 			{/* Content */}
-			<div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6">
+			<div className="bg-neutral-900 rounded-2xl border border-neutral-800 p-6">
 				<Skeleton className="h-6 w-[200px] mb-4" />
 				<TableSkeleton rows={6} />
 			</div>

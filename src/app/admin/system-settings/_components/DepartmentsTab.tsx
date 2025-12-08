@@ -34,7 +34,7 @@ export default function DepartmentsTab({
 		<>
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
-					<p className="text-sm text-neutral-600 dark:text-neutral-400">
+					<p className="text-sm text-neutral-400">
 						Manage company departments and organizational structure
 					</p>
 					<Button onClick={() => onSetShowAddDepartment(true)}>
@@ -92,19 +92,19 @@ export default function DepartmentsTab({
 											<div className="flex items-center gap-1">
 												<button
 													onClick={() => onSetEditingDepartment(department)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-surface-dark rounded"
+													className="p-1 hover:hover:bg-surface-dark rounded"
 												>
-													<Edit2 className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+													<Edit2 className="h-4 w-4 text-neutral-400" />
 												</button>
 												<button
 													onClick={() => onDelete(department.id)}
-													className="p-1 hover:bg-neutral-100 dark:hover:bg-surface-dark rounded"
+													className="p-1 hover:hover:bg-surface-dark rounded"
 												>
 													<Trash2 className="h-4 w-4 text-red-500" />
 												</button>
 											</div>
 										</div>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm text-neutral-400">
 											{department.description || 'No description provided'}
 										</p>
 									</div>
@@ -118,7 +118,7 @@ export default function DepartmentsTab({
 			{/* Add Department Dialog */}
 			{showAddDepartment && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-neutral-200 dark:border-border-dark w-full max-w-2xl">
+					<div className="bg-surface-dark rounded-2xl shadow-2xl border border-border-dark w-full max-w-2xl">
 						<div className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
@@ -127,7 +127,7 @@ export default function DepartmentsTab({
 								</h3>
 								<button
 									onClick={() => onSetShowAddDepartment(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>

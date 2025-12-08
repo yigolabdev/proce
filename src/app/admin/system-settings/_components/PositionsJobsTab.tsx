@@ -60,7 +60,7 @@ export default function PositionsJobsTab({
 							<Briefcase className="h-5 w-5 text-orange-500" />
 							Positions
 						</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+						<p className="text-sm text-neutral-400 mt-1">
 							Manage job positions and hierarchy levels
 						</p>
 					</div>
@@ -113,10 +113,10 @@ export default function PositionsJobsTab({
 								) : (
 									<div className="space-y-3">
 										<h4 className="font-bold text-lg">{position.name}</h4>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400 min-h-12">
+										<p className="text-sm text-neutral-400 min-h-12">
 											{position.description || 'No description provided'}
 										</p>
-										<div className="flex gap-2 pt-2 border-t border-neutral-200 dark:border-border-dark">
+										<div className="flex gap-2 pt-2 border-t border-border-dark">
 											<Button
 												onClick={() => onSetEditingPosition(position)}
 												variant="outline"
@@ -147,7 +147,7 @@ export default function PositionsJobsTab({
 		{/* Add Position Dialog */}
 			{showAddPosition && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-					<div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-neutral-200 dark:border-border-dark w-full max-w-lg">
+					<div className="bg-surface-dark rounded-2xl shadow-2xl border border-border-dark w-full max-w-lg">
 						<div className="p-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-xl font-bold flex items-center gap-2">
@@ -156,7 +156,7 @@ export default function PositionsJobsTab({
 								</h3>
 								<button
 									onClick={() => onSetShowAddPosition(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>
@@ -205,14 +205,14 @@ export default function PositionsJobsTab({
 			)}
 
 		{/* Roles & Responsibilities Section */}
-		<div className="space-y-4 pt-8 border-t-2 border-neutral-200 dark:border-border-dark">
+		<div className="space-y-4 pt-8 border-t-2 border-border-dark">
 			<div className="flex items-center justify-between">
 				<div>
 					<h3 className="text-lg font-bold flex items-center gap-2">
 						<Briefcase className="h-5 w-5 text-orange-500" />
 						Roles & Responsibilities
 					</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+					<p className="text-sm text-neutral-400 mt-1">
 						Define specific roles and their responsibilities
 					</p>
 				</div>
@@ -268,7 +268,7 @@ export default function PositionsJobsTab({
 								) : (
 									<div className="space-y-3">
 										<h4 className="font-bold text-lg">{job.title}</h4>
-										<p className="text-sm text-neutral-600 dark:text-neutral-400">
+										<p className="text-sm text-neutral-400">
 											{job.description || 'No description provided'}
 										</p>
 										<div>
@@ -276,7 +276,7 @@ export default function PositionsJobsTab({
 												Responsibilities:
 											</div>
 											{job.responsibilities ? (
-												<ul className="text-xs text-neutral-600 dark:text-neutral-400 space-y-1">
+												<ul className="text-xs text-neutral-400 space-y-1">
 													{job.responsibilities.split('\n').filter(item => item.trim()).map((item, idx) => (
 														<li key={idx} className="flex items-start gap-2">
 															<span className="text-orange-500 mt-1">•</span>
@@ -288,7 +288,7 @@ export default function PositionsJobsTab({
 												<p className="text-xs text-neutral-400 italic">No responsibilities specified</p>
 											)}
 										</div>
-										<div className="flex gap-2 pt-2 border-t border-neutral-200 dark:border-border-dark">
+										<div className="flex gap-2 pt-2 border-t border-border-dark">
 											<Button
 												onClick={() => onSetEditingJob(job)}
 												variant="outline"
@@ -319,7 +319,7 @@ export default function PositionsJobsTab({
 		{/* Add Role & Responsibilities Dialog */}
 		{showAddJob && (
 			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-				<div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl border border-neutral-200 dark:border-border-dark w-full max-w-lg">
+				<div className="bg-surface-dark rounded-2xl shadow-2xl border border-border-dark w-full max-w-lg">
 					<div className="p-6">
 						<div className="flex items-center justify-between mb-4">
 							<h3 className="text-xl font-bold flex items-center gap-2">
@@ -328,7 +328,7 @@ export default function PositionsJobsTab({
 							</h3>
 								<button
 									onClick={() => onSetShowAddJob(false)}
-									className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+									className="text-neutral-500 hover:hover:text-neutral-300"
 								>
 									<X className="h-5 w-5" />
 								</button>

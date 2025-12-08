@@ -60,11 +60,11 @@ export default function JoinWorkspacePage() {
 		return (
 			<div className="mx-auto min-h-dvh w-full max-w-md px-4 py-12">
 				<Card className="p-8 text-center">
-					<div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-						<CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
+					<div className="mx-auto w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center mb-4">
+						<CheckCircle2 className="h-8 w-8 text-green-400" />
 					</div>
 					<h2 className="text-2xl font-bold">환영합니다!</h2>
-					<p className="mt-2 text-neutral-600 dark:text-neutral-300">
+					<p className="mt-2 text-neutral-300">
 						<span className="font-medium text-primary">{workspaceName}</span> 워크스페이스에 참여했습니다
 					</p>
 
@@ -87,7 +87,7 @@ export default function JoinWorkspacePage() {
 						</div>
 						<div>
 							<h2 className="text-xl font-bold">프로필 생성</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-300">
+							<p className="text-sm text-neutral-300">
 								{workspaceName}에 참여합니다
 							</p>
 						</div>
@@ -156,7 +156,7 @@ export default function JoinWorkspacePage() {
 					</div>
 					<div>
 						<h2 className="text-xl font-bold">워크스페이스 참여</h2>
-						<p className="text-sm text-neutral-600 dark:text-neutral-300">초대 코드를 입력하세요</p>
+						<p className="text-sm text-neutral-300">초대 코드를 입력하세요</p>
 					</div>
 				</div>
 
@@ -188,8 +188,8 @@ export default function JoinWorkspacePage() {
 					</div>
 				</form>
 
-				<div className="mt-6 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900">
-					<p className="text-xs text-neutral-600 dark:text-neutral-400">
+				<div className="mt-6 p-4 rounded-2xl bg-neutral-900">
+					<p className="text-xs text-neutral-400">
 						<strong>초대 코드가 없나요?</strong>
 						<br />
 						워크스페이스 관리자에게 초대 코드를 요청하세요. 관리자는 워크스페이스 설정에서 초대 코드를 생성할 수 있습니다.

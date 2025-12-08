@@ -19,7 +19,7 @@ const links = [
 export default function QuickNav() {
 	const { pathname } = useLocation()
 	return (
-		<nav className="fixed right-3 top-3 z-50 hidden md:flex items-center gap-1 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/80 backdrop-blur px-2 py-1 shadow-sm">
+		<nav className="fixed right-3 top-3 z-50 hidden md:flex items-center gap-1 rounded-2xl border border-neutral-800 bg-white/bg-neutral-950/80 backdrop-blur px-2 py-1 shadow-sm">
 			{links.map(({ to, label, Icon }) => {
 				const active = pathname === to
 				return (
@@ -27,8 +27,8 @@ export default function QuickNav() {
 						key={to}
 						to={to}
 						className={clsx(
-							'inline-flex items-center gap-1.5 rounded-2xl px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-900',
-							active && 'bg-neutral-100 dark:bg-neutral-900 font-medium',
+							'inline-flex items-center gap-1.5 rounded-2xl px-2 py-1 text-sm hover:hover:bg-neutral-900',
+							active && 'bg-neutral-900 font-medium',
 						)}
 						title={label}
 					>

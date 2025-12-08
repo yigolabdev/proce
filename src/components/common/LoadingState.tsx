@@ -11,12 +11,12 @@ export function LoadingState({ type = 'page', count = 3, className = '' }: Loadi
 		return (
 			<div className={`space-y-4 animate-pulse ${className}`}>
 				{/* Header skeleton */}
-				<div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded w-1/4" />
-				<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
+				<div className="h-8 bg-neutral-800 rounded w-1/4" />
+				<div className="h-4 bg-neutral-800 rounded w-1/3" />
 				
 				{/* Content skeletons */}
 				{Array.from({ length: count }).map((_, i) => (
-					<div key={i} className="h-32 bg-neutral-200 dark:bg-neutral-800 rounded" />
+					<div key={i} className="h-32 bg-neutral-800 rounded" />
 				))}
 			</div>
 		)
@@ -28,12 +28,12 @@ export function LoadingState({ type = 'page', count = 3, className = '' }: Loadi
 				{Array.from({ length: count }).map((_, i) => (
 					<Card key={i} className="animate-pulse">
 						<CardHeader>
-							<div className="h-6 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
+							<div className="h-6 bg-neutral-800 rounded w-3/4" />
 						</CardHeader>
 						<CardContent>
 							<div className="space-y-2">
-								<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
-								<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-5/6" />
+								<div className="h-4 bg-neutral-800 rounded" />
+								<div className="h-4 bg-neutral-800 rounded w-5/6" />
 							</div>
 						</CardContent>
 					</Card>
@@ -46,11 +46,11 @@ export function LoadingState({ type = 'page', count = 3, className = '' }: Loadi
 		return (
 			<div className={`space-y-3 ${className}`}>
 				{Array.from({ length: count }).map((_, i) => (
-					<div key={i} className="animate-pulse flex items-center space-x-4 p-4 rounded-lg bg-neutral-50 dark:bg-neutral-900">
-						<div className="h-12 w-12 bg-neutral-200 dark:bg-neutral-800 rounded-full" />
+					<div key={i} className="animate-pulse flex items-center space-x-4 p-4 rounded-lg bg-neutral-900">
+						<div className="h-12 w-12 bg-neutral-800 rounded-full" />
 						<div className="flex-1 space-y-2">
-							<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
-							<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded w-1/2" />
+							<div className="h-4 bg-neutral-800 rounded w-3/4" />
+							<div className="h-3 bg-neutral-800 rounded w-1/2" />
 						</div>
 					</div>
 				))}
@@ -62,20 +62,20 @@ export function LoadingState({ type = 'page', count = 3, className = '' }: Loadi
 		return (
 			<div className={`space-y-2 ${className}`}>
 				{/* Table header */}
-				<div className="animate-pulse grid grid-cols-4 gap-4 p-4 bg-neutral-100 dark:bg-neutral-900 rounded">
-					<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
-					<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
-					<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
-					<div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
+				<div className="animate-pulse grid grid-cols-4 gap-4 p-4 bg-neutral-900 rounded">
+					<div className="h-4 bg-neutral-800 rounded" />
+					<div className="h-4 bg-neutral-800 rounded" />
+					<div className="h-4 bg-neutral-800 rounded" />
+					<div className="h-4 bg-neutral-800 rounded" />
 				</div>
 				
 				{/* Table rows */}
 				{Array.from({ length: count }).map((_, i) => (
 					<div key={i} className="animate-pulse grid grid-cols-4 gap-4 p-4 rounded">
-						<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded" />
-						<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded" />
-						<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded" />
-						<div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded" />
+						<div className="h-3 bg-neutral-800 rounded" />
+						<div className="h-3 bg-neutral-800 rounded" />
+						<div className="h-3 bg-neutral-800 rounded" />
+						<div className="h-3 bg-neutral-800 rounded" />
 					</div>
 				))}
 			</div>

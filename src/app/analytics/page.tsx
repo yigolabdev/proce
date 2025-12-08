@@ -139,9 +139,9 @@ export default function AnalyticsPage() {
 	// Helper Functions
 	const getPerformanceBadge = (performance: string) => {
 		const styles = {
-			excellent: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-			good: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-			average: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+			excellent: 'bg-green-100 bg-green-900/text-green-400',
+			good: 'bg-blue-100 bg-blue-900/text-blue-400',
+			average: 'bg-yellow-100 bg-yellow-900/text-yellow-400',
 		}
 		const labels = {
 			excellent: '우수',
@@ -156,10 +156,10 @@ export default function AnalyticsPage() {
 	}
 
 	const getPerformanceColor = (value: number) => {
-		if (value >= 90) return 'text-green-600 dark:text-green-400'
-		if (value >= 70) return 'text-blue-600 dark:text-blue-400'
-		if (value >= 50) return 'text-yellow-600 dark:text-yellow-400'
-		return 'text-red-600 dark:text-red-400'
+		if (value >= 90) return 'text-green-400'
+		if (value >= 70) return 'text-blue-400'
+		if (value >= 50) return 'text-yellow-400'
+		return 'text-red-400'
 	}
 
 	const getPerformanceBarColor = (value: number) => {
@@ -184,7 +184,7 @@ export default function AnalyticsPage() {
 	const totalOverdue = employees.reduce((sum, e) => sum + e.tasks.overdue, 0)
 
 	return (
-		<div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen bg-neutral-950">
 			{/* Header */}
 			<PageHeader
 				title="성과 분석"
@@ -203,7 +203,7 @@ export default function AnalyticsPage() {
 							className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
 								viewMode === 'overview'
 									? 'bg-primary text-white shadow-lg'
-									: 'bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+									: 'bg-transparent hover:hover:bg-neutral-800'
 							}`}
 						>
 							<Target className="h-5 w-5" />
@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
 							className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
 								viewMode === 'departments'
 									? 'bg-primary text-white shadow-lg'
-									: 'bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+									: 'bg-transparent hover:hover:bg-neutral-800'
 							}`}
 						>
 							<Building2 className="h-5 w-5" />
@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
 							className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
 								viewMode === 'individuals'
 									? 'bg-primary text-white shadow-lg'
-									: 'bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+									: 'bg-transparent hover:hover:bg-neutral-800'
 							}`}
 						>
 							<UserCircle2 className="h-5 w-5" />
@@ -258,7 +258,7 @@ export default function AnalyticsPage() {
 											<span>{kpi.change}</span>
 										</div>
 									</div>
-									<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+									<div className="text-sm text-neutral-400 mb-1">
 										{kpi.label}
 									</div>
 									<div className="text-3xl font-bold">{kpi.value}</div>
@@ -275,7 +275,7 @@ export default function AnalyticsPage() {
 									<Award className="h-6 w-6 text-primary" />
 									우수 직원
 								</h2>
-								<p className="text-sm text-neutral-600 dark:text-neutral-400">
+								<p className="text-sm text-neutral-400">
 									이번 달 성과가 우수한 직원들입니다
 								</p>
 							</CardHeader>
@@ -284,30 +284,30 @@ export default function AnalyticsPage() {
 									{topPerformers.map((performer) => (
 										<div
 											key={performer.rank}
-											className="flex items-center gap-4 p-3 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+											className="flex items-center gap-4 p-3 border border-neutral-800 rounded-2xl hover:hover:bg-neutral-900 transition-colors"
 										>
 											<div
 												className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
 													performer.rank === 1
-														? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+														? 'bg-yellow-100 bg-yellow-900/text-yellow-400'
 														: performer.rank === 2
-														? 'bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400'
+														? 'bg-neutral-200 bg-neutral-800 dark:text-neutral-400'
 														: performer.rank === 3
-														? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-														: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-500'
+														? 'bg-orange-100 bg-orange-900/text-orange-400'
+														: 'bg-neutral-100 bg-neutral-900 dark:text-neutral-500'
 												}`}
 											>
 												{performer.rank}
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="font-bold truncate">{performer.name}</div>
-												<div className="text-sm text-neutral-600 dark:text-neutral-400">
+												<div className="text-sm text-neutral-400">
 													{performer.department}
 												</div>
 											</div>
 											<div className="text-right">
 												<div className="font-bold text-primary">{performer.score}점</div>
-												<div className="text-sm text-neutral-600 dark:text-neutral-400">
+												<div className="text-sm text-neutral-400">
 													{performer.tasks}개 완료
 												</div>
 											</div>
@@ -324,48 +324,48 @@ export default function AnalyticsPage() {
 									<AlertCircle className="h-6 w-6 text-primary" />
 									AI 인사이트
 								</h2>
-								<p className="text-sm text-neutral-600 dark:text-neutral-400">
+								<p className="text-sm text-neutral-400">
 									AI가 분석한 주요 인사이트입니다
 								</p>
 							</CardHeader>
 							<CardContent>
 								<div className="space-y-4">
-									<div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl">
+									<div className="p-4 bg-green-900/20 border border-green-800 rounded-2xl">
 										<div className="flex items-start gap-3">
-											<TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+											<TrendingUp className="h-5 w-5 text-green-400 shrink-0 mt-0.5" />
 											<div>
-												<h4 className="font-bold text-green-900 dark:text-green-100 mb-1">
+												<h4 className="font-bold text-green-100 mb-1">
 													생산성 증가
 												</h4>
-												<p className="text-sm text-green-700 dark:text-green-300">
+												<p className="text-sm text-green-300">
 													지난 달 대비 전체 생산성이 5% 증가했습니다. 특히 개발팀의 성과가 두드러집니다.
 												</p>
 											</div>
 										</div>
 									</div>
 
-									<div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
+									<div className="p-4 bg-blue-900/20 border border-blue-800 rounded-2xl">
 										<div className="flex items-start gap-3">
-											<Users className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+											<Users className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
 											<div>
-												<h4 className="font-bold text-blue-900 dark:text-blue-100 mb-1">
+												<h4 className="font-bold text-blue-100 mb-1">
 													팀 협업 개선
 												</h4>
-												<p className="text-sm text-blue-700 dark:text-blue-300">
+												<p className="text-sm text-blue-300">
 													부서 간 협업 프로젝트가 증가하면서 전체적인 업무 효율이 향상되었습니다.
 												</p>
 											</div>
 										</div>
 									</div>
 
-									<div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-2xl">
+									<div className="p-4 bg-orange-900/20 border border-orange-800 rounded-2xl">
 										<div className="flex items-start gap-3">
-											<AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+											<AlertCircle className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
 											<div>
-												<h4 className="font-bold text-orange-900 dark:text-orange-100 mb-1">
+												<h4 className="font-bold text-orange-100 mb-1">
 													주의 필요
 												</h4>
-												<p className="text-sm text-orange-700 dark:text-orange-300">
+												<p className="text-sm text-orange-300">
 													경영지원팀의 평균 작업 시간이 감소하고 있습니다. 업무 분배를 재검토해보세요.
 												</p>
 											</div>
@@ -388,7 +388,7 @@ export default function AnalyticsPage() {
 								<div className="flex items-center justify-between mb-4">
 									<Building2 className="h-8 w-8 text-primary" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									전체 부서 수
 								</div>
 								<div className="text-3xl font-bold">{departments.length}</div>
@@ -400,7 +400,7 @@ export default function AnalyticsPage() {
 									<Target className="h-8 w-8 text-primary" />
 									<TrendingUp className="h-5 w-5 text-green-600" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									최고 생산성
 								</div>
 								<div className="text-3xl font-bold">{Math.max(...departments.map(d => d.productivity))}%</div>
@@ -411,7 +411,7 @@ export default function AnalyticsPage() {
 								<div className="flex items-center justify-between mb-4">
 									<Users className="h-8 w-8 text-primary" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									평균 팀 규모
 								</div>
 								<div className="text-3xl font-bold">
@@ -424,7 +424,7 @@ export default function AnalyticsPage() {
 								<div className="flex items-center justify-between mb-4">
 									<Clock className="h-8 w-8 text-primary" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									평균 작업시간
 								</div>
 								<div className="text-3xl font-bold">
@@ -438,7 +438,7 @@ export default function AnalyticsPage() {
 					<Card>
 						<CardHeader>
 							<h2 className="text-xl font-bold">부서별 성과 상세</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400">
+							<p className="text-sm text-neutral-400">
 								각 부서의 생산성과 작업 현황을 확인하세요
 							</p>
 						</CardHeader>
@@ -447,7 +447,7 @@ export default function AnalyticsPage() {
 								{departments.map((dept) => (
 									<div
 										key={dept.name}
-										className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-primary transition-colors"
+										className="p-4 border border-neutral-800 rounded-2xl hover:border-primary transition-colors"
 									>
 										<div className="flex items-center justify-between mb-3">
 											<div className="flex items-center gap-3">
@@ -458,7 +458,7 @@ export default function AnalyticsPage() {
 													<h3 className="font-bold text-lg">{dept.name}</h3>
 													<div className="flex items-center gap-2">
 														{getPerformanceBadge(dept.performance)}
-														<span className="text-sm text-neutral-600 dark:text-neutral-400">
+														<span className="text-sm text-neutral-400">
 															{dept.members}명
 														</span>
 													</div>
@@ -467,11 +467,11 @@ export default function AnalyticsPage() {
 										</div>
 										<div className="grid grid-cols-3 gap-4">
 											<div>
-												<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+												<div className="text-sm text-neutral-400 mb-1">
 													생산성
 												</div>
 												<div className="flex items-center gap-2">
-													<div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+													<div className="flex-1 h-2 bg-neutral-800 rounded-full overflow-hidden">
 														<div
 															className="h-full bg-primary rounded-full"
 															style={{ width: `${dept.productivity}%` }}
@@ -481,13 +481,13 @@ export default function AnalyticsPage() {
 												</div>
 											</div>
 											<div>
-												<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+												<div className="text-sm text-neutral-400 mb-1">
 													평균 작업시간
 												</div>
 												<div className="text-lg font-bold">{dept.avgHours}시간</div>
 											</div>
 											<div>
-												<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+												<div className="text-sm text-neutral-400 mb-1">
 													효율성 지수
 												</div>
 												<div className="text-lg font-bold">
@@ -514,7 +514,7 @@ export default function AnalyticsPage() {
 									<Target className="h-8 w-8 text-primary" />
 									<TrendingUp className="h-5 w-5 text-green-600" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									평균 생산성
 								</div>
 								<div className="text-3xl font-bold">{avgProductivity}%</div>
@@ -526,7 +526,7 @@ export default function AnalyticsPage() {
 									<Star className="h-8 w-8 text-primary" />
 									<TrendingUp className="h-5 w-5 text-green-600" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									평균 품질
 								</div>
 								<div className="text-3xl font-bold">{avgQuality}%</div>
@@ -537,7 +537,7 @@ export default function AnalyticsPage() {
 								<div className="flex items-center justify-between mb-4">
 									<CheckCircle2 className="h-8 w-8 text-primary" />
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									완료된 작업
 								</div>
 								<div className="text-3xl font-bold">{totalCompleted}</div>
@@ -553,7 +553,7 @@ export default function AnalyticsPage() {
 										<CheckCircle2 className="h-5 w-5 text-green-600" />
 									)}
 								</div>
-								<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
+								<div className="text-sm text-neutral-400 mb-1">
 									지연된 작업
 								</div>
 								<div className={`text-3xl font-bold ${totalOverdue > 0 ? 'text-red-600' : 'text-green-600'}`}>
@@ -573,7 +573,7 @@ export default function AnalyticsPage() {
 									className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
 										sortBy === 'productivity'
 											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											: 'bg-neutral-800 hover:hover:bg-neutral-700'
 									}`}
 								>
 									생산성
@@ -583,7 +583,7 @@ export default function AnalyticsPage() {
 									className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
 										sortBy === 'quality'
 											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											: 'bg-neutral-800 hover:hover:bg-neutral-700'
 									}`}
 								>
 									품질
@@ -593,7 +593,7 @@ export default function AnalyticsPage() {
 									className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
 										sortBy === 'rating'
 											? 'bg-primary text-white'
-											: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+											: 'bg-neutral-800 hover:hover:bg-neutral-700'
 									}`}
 								>
 									평점
@@ -614,7 +614,7 @@ export default function AnalyticsPage() {
 											</div>
 											<div>
 												<h3 className="font-bold text-lg">{employee.name}</h3>
-												<p className="text-sm text-neutral-600 dark:text-neutral-400">
+												<p className="text-sm text-neutral-400">
 													{employee.department} • {employee.position}
 												</p>
 											</div>
@@ -627,11 +627,11 @@ export default function AnalyticsPage() {
 
 									<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
 										<div>
-											<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+											<div className="text-sm text-neutral-400 mb-2">
 												생산성
 											</div>
 											<div className="flex items-center gap-2">
-												<div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+												<div className="flex-1 h-2 bg-neutral-800 rounded-full overflow-hidden">
 													<div
 														className={`h-full ${getPerformanceBarColor(employee.performance.productivity)}`}
 														style={{ width: `${employee.performance.productivity}%` }}
@@ -643,11 +643,11 @@ export default function AnalyticsPage() {
 											</div>
 										</div>
 										<div>
-											<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+											<div className="text-sm text-neutral-400 mb-2">
 												품질
 											</div>
 											<div className="flex items-center gap-2">
-												<div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+												<div className="flex-1 h-2 bg-neutral-800 rounded-full overflow-hidden">
 													<div
 														className={`h-full ${getPerformanceBarColor(employee.performance.quality)}`}
 														style={{ width: `${employee.performance.quality}%` }}
@@ -659,11 +659,11 @@ export default function AnalyticsPage() {
 											</div>
 										</div>
 										<div>
-											<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+											<div className="text-sm text-neutral-400 mb-2">
 												정시성
 											</div>
 											<div className="flex items-center gap-2">
-												<div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+												<div className="flex-1 h-2 bg-neutral-800 rounded-full overflow-hidden">
 													<div
 														className={`h-full ${getPerformanceBarColor(employee.performance.punctuality)}`}
 														style={{ width: `${employee.performance.punctuality}%` }}
@@ -675,11 +675,11 @@ export default function AnalyticsPage() {
 											</div>
 										</div>
 										<div>
-											<div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+											<div className="text-sm text-neutral-400 mb-2">
 												협업
 											</div>
 											<div className="flex items-center gap-2">
-												<div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+												<div className="flex-1 h-2 bg-neutral-800 rounded-full overflow-hidden">
 													<div
 														className={`h-full ${getPerformanceBarColor(employee.performance.collaboration)}`}
 														style={{ width: `${employee.performance.collaboration}%` }}
@@ -706,7 +706,7 @@ export default function AnalyticsPage() {
 											<span>지연: <span className="font-bold">{employee.tasks.overdue}</span></span>
 										</div>
 										<div className="flex items-center gap-2 ml-auto">
-											<Clock className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+											<Clock className="h-4 w-4 text-neutral-400" />
 											<span>평균: <span className="font-bold">{employee.avgWorkHours}시간</span></span>
 										</div>
 									</div>

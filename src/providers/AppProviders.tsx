@@ -15,7 +15,7 @@ function PageLoader() {
 		<div className="flex items-center justify-center min-h-[60vh]">
 			<div className="flex flex-col items-center gap-4">
 				<div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-				<p className="text-sm text-neutral-600 dark:text-neutral-400">Loading...</p>
+				<p className="text-sm text-neutral-400">Loading...</p>
 			</div>
 		</div>
 	)
@@ -24,10 +24,10 @@ function PageLoader() {
 // Error Boundary Component
 function RouteError() {
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen flex items-center justify-center bg-neutral-950">
 			<div className="text-center p-6">
-				<h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Something went wrong</h2>
-				<p className="text-neutral-600 dark:text-neutral-400 mb-6">Failed to load this page. Please try refreshing.</p>
+				<h2 className="text-2xl font-bold text-neutral-100 mb-2">Something went wrong</h2>
+				<p className="text-neutral-400 mb-6">Failed to load this page. Please try refreshing.</p>
 				<button
 					onClick={() => window.location.reload()}
 					className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
@@ -76,16 +76,13 @@ const PerformancePage = lazy(() => import('../app/performance/page'))
 const IntegrationsPage = lazy(() => import('../app/integrations/page'))
 const SettingsPage = lazy(() => import('../app/settings/page'))
 
-// Rhythm Pages
-const WorkRhythmPage = lazy(() => import('../app/rhythm/page'))
-
 // 404 Not Found Page Component
 function NotFoundPage() {
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+		<div className="min-h-screen flex items-center justify-center bg-neutral-950">
 			<div className="text-center">
-				<h1 className="text-6xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">404</h1>
-				<p className="text-xl text-neutral-600 dark:text-neutral-400 mb-8">Page not found</p>
+				<h1 className="text-6xl font-bold text-neutral-100 mb-4">404</h1>
+				<p className="text-xl text-neutral-400 mb-8">Page not found</p>
 				<a
 					href="/"
 					className="inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-colors"
@@ -146,8 +143,9 @@ const appRoutes = [
 		{ path: '/app/workflow', element: <Navigate to="/app/dashboard" replace /> },
 		{ path: '/app/settings', element: withSuspense(SettingsPage) },
 		
-	// Work Rhythm Page
-	{ path: '/app/rhythm', element: withSuspense(WorkRhythmPage) },
+	// Work Rhythm - Redirect to dashboard (준비 중)
+	{ path: '/app/rhythm', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: '/app/rhythm/*', element: <Navigate to="/app/dashboard" replace /> },
 ]
 
 // 라우터 설정

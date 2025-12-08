@@ -96,7 +96,7 @@ export default function Step4Integrations({ data, onNext, onBack, onSkip }: Step
 	return (
 		<Card className="p-6">
 			<h2 className="text-2xl font-bold">{t.title}</h2>
-			<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.subtitle}</p>
+			<p className="mt-2 text-sm text-neutral-300">{t.subtitle}</p>
 
 			<form onSubmit={handleSubmit} className="mt-6 space-y-6">
 				<div>
@@ -108,19 +108,19 @@ export default function Step4Integrations({ data, onNext, onBack, onSkip }: Step
 							return (
 								<div
 									key={provider.id}
-									className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-4 flex items-center justify-between"
+									className="rounded-2xl border border-neutral-800 p-4 flex items-center justify-between"
 								>
 									<div className="flex items-center gap-3">
 										<span className="text-2xl">{provider.icon}</span>
 										<div>
 											<p className="font-medium">{provider.name}</p>
 											{status === 'connected' && (
-												<span className="inline-block mt-1 rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs text-green-700 dark:text-green-300">
+												<span className="inline-block mt-1 rounded-full bg-green-900/30 px-2 py-0.5 text-xs text-green-300">
 													{t.connected}
 												</span>
 											)}
 											{status === 'error' && (
-												<span className="inline-block mt-1 rounded-full bg-red-100 dark:bg-red-900/30 px-2 py-0.5 text-xs text-red-700 dark:text-red-300">
+												<span className="inline-block mt-1 rounded-full bg-red-900/30 px-2 py-0.5 text-xs text-red-300">
 													{t.error}
 												</span>
 											)}
@@ -168,7 +168,7 @@ export default function Step4Integrations({ data, onNext, onBack, onSkip }: Step
 								className={`cursor-pointer rounded-2xl border px-4 py-3 text-center transition ${
 									form.importWindowDays === days
 										? 'border-primary bg-primary/5 font-medium'
-										: 'border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+										: 'border-neutral-800 hover:border-primary/50'
 								}`}
 							>
 								<input

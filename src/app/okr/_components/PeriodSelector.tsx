@@ -31,7 +31,7 @@ export function PeriodSelector({ periods, selectedPeriod, onPeriodChange }: Peri
 						className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 							currentPeriodType === 'quarter'
 								? 'bg-primary text-white'
-								: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+								: 'bg-neutral-800 text-neutral-400 hover:hover:bg-neutral-700'
 						}`}
 					>
 						🗓️ Quarter
@@ -41,7 +41,7 @@ export function PeriodSelector({ periods, selectedPeriod, onPeriodChange }: Peri
 						className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 							currentPeriodType === 'month'
 								? 'bg-primary text-white'
-								: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+								: 'bg-neutral-800 text-neutral-400 hover:hover:bg-neutral-700'
 						}`}
 					>
 						📅 Month
@@ -59,7 +59,7 @@ export function PeriodSelector({ periods, selectedPeriod, onPeriodChange }: Peri
 								className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 									selectedPeriod === period.value
 										? 'bg-primary text-white shadow-sm'
-										: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+										: 'bg-neutral-800 text-neutral-400 hover:hover:bg-neutral-700'
 								}`}
 							>
 								{period.value}

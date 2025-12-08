@@ -120,7 +120,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 							</div>
 							<div>
 								<h4 className="text-sm font-medium mb-2">{tt.overview.dataCollected}</h4>
-								<ul className="list-disc list-inside text-sm text-neutral-600 dark:text-neutral-300 space-y-1">
+								<ul className="list-disc list-inside text-sm text-neutral-300 space-y-1">
 									{connectorInfo.dataCollected.map((item) => (
 										<li key={item}>{item}</li>
 									))}
@@ -128,7 +128,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 							</div>
 							<div>
 								<h4 className="text-sm font-medium mb-2">{tt.overview.usedFor}</h4>
-								<ul className="list-disc list-inside text-sm text-neutral-600 dark:text-neutral-300 space-y-1">
+								<ul className="list-disc list-inside text-sm text-neutral-300 space-y-1">
 									{connectorInfo.usedFor.map((item) => (
 										<li key={item}>{item}</li>
 									))}
@@ -146,16 +146,16 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 							<div className="flex items-center gap-3">
 								<span className="text-sm font-medium">{tt.connection.status}:</span>
 								{isConnected ? (
-									<div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+									<div className="flex items-center gap-2 text-green-400">
 										<CheckCircle2 size={16} />
 										<span className="text-sm">{tt.statuses.connected}</span>
 									</div>
 								) : (
-									<span className="text-sm text-neutral-600 dark:text-neutral-400">{tt.statuses.disconnected}</span>
+									<span className="text-sm text-neutral-400">{tt.statuses.disconnected}</span>
 								)}
 							</div>
 							{settings.lastTested && (
-								<div className="text-sm text-neutral-600 dark:text-neutral-300">
+								<div className="text-sm text-neutral-300">
 									{tt.connection.lastTested}:{' '}
 									{formatDistanceToNow(new Date(settings.lastTested), { addSuffix: true, locale: dateLocale })}
 								</div>
@@ -194,7 +194,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 								<select
 									value={settings.windowDays}
 									onChange={(e) => updateSettings({ windowDays: e.target.value as '30' | '60' | '90' })}
-									className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-2 text-sm"
+									className="w-full rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm"
 								>
 									<option value="30">30 {tt.sync.days}</option>
 									<option value="60">60 {tt.sync.days}</option>
@@ -212,7 +212,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 									/>
 									<span className="font-medium">{tt.sync.autoSync}</span>
 								</label>
-								<p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{tt.sync.autoSyncDesc}</p>
+								<p className="text-xs text-neutral-400 mt-1">{tt.sync.autoSyncDesc}</p>
 							</div>
 
 							{settings.autoSync && (
@@ -221,7 +221,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 									<select
 										value={settings.frequency || '1h'}
 										onChange={(e) => updateSettings({ frequency: e.target.value as any })}
-										className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-2 text-sm"
+										className="w-full rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm"
 									>
 										<option value="15m">15 minutes</option>
 										<option value="1h">1 hour</option>
@@ -338,7 +338,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 					)}
 
 					{/* Save Button */}
-					<div className="sticky bottom-0 bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 -mx-6 px-6 py-4 flex gap-2">
+					<div className="sticky bottom-0 bg-neutral-950 border-t border-neutral-800 -mx-6 px-6 py-4 flex gap-2">
 						<Button onClick={handleSave} disabled={!hasChanges || isSaving} className="flex-1">
 							{isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 							{tt.actions.save}
@@ -354,7 +354,7 @@ export default function ConnectorDetails({ connector, onClose }: ConnectorDetail
 			<Dialog open={showDisconnectDialog} onOpenChange={setShowDisconnectDialog}>
 				<DialogContent>
 					<h3 className="text-lg font-semibold mb-2">{tt.connection.confirmDisconnect}</h3>
-					<p className="text-sm text-neutral-600 dark:text-neutral-300 mb-6">{tt.connection.confirmDisconnectDesc}</p>
+					<p className="text-sm text-neutral-300 mb-6">{tt.connection.confirmDisconnectDesc}</p>
 					<div className="flex gap-2">
 						<Button onClick={handleDisconnect} variant="primary" className="flex-1">
 							{tt.actions.disconnect}

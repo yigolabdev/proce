@@ -17,13 +17,26 @@ const I18nContext = createContext<I18nContextValue | null>(null)
 
 const LOCALE_KEY = 'proce:locale'
 
-export function I18nProvider({ children }: PropsWithChildren) {
-	const [locale, setLocaleState] = useState<Locale>('ko')
-
-	useEffect(() => {
+// 초기 언어 설정: localStorage에서 즉시 읽어오기
+function getInitialLocale(): Locale {
+	if (typeof window === 'undefined') return 'ko' // SSR 대비
+	
+	try {
 		const saved = window.localStorage.getItem(LOCALE_KEY) as Locale | null
-		if (saved === 'en' || saved === 'ko') setLocaleState(saved)
-	}, [])
+		if (saved === 'en' || saved === 'ko') {
+			return saved
+		}
+	} catch {
+		// localStorage 접근 실패 시 무시
+	}
+	
+	// 기본값: 한국어
+	return 'ko'
+}
+
+export function I18nProvider({ children }: PropsWithChildren) {
+	// localStorage에서 즉시 읽어온 값으로 초기화
+	const [locale, setLocaleState] = useState<Locale>(getInitialLocale)
 
 	const setLocale = useCallback((next: Locale) => {
 		setLocaleState(next)

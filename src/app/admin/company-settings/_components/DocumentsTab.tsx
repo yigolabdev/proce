@@ -29,7 +29,7 @@ export default function DocumentsTab({
 								<FileText className="h-5 w-5 text-primary" />
 								Company Documents
 							</h2>
-							<p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+							<p className="text-sm text-neutral-400 mt-1">
 								Upload and manage various company documents and files
 							</p>
 						</div>
@@ -43,7 +43,7 @@ export default function DocumentsTab({
 					<div className="text-center">
 						<Upload className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
 						<h3 className="font-semibold text-lg mb-2">Upload Documents</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+						<p className="text-sm text-neutral-400 mb-4">
 							Upload contracts, certificates, reports, and other important documents
 						</p>
 
@@ -94,7 +94,7 @@ export default function DocumentsTab({
 											<FileText className="h-5 w-5" />
 											{category}
 										</h3>
-										<span className="text-sm text-neutral-600 dark:text-neutral-400">
+										<span className="text-sm text-neutral-400">
 											{categoryDocs.length} file(s)
 										</span>
 									</div>
@@ -104,7 +104,7 @@ export default function DocumentsTab({
 										{categoryDocs.map((doc) => (
 											<div
 												key={doc.id}
-												className="flex items-start justify-between p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors border border-neutral-200 dark:border-neutral-800"
+												className="flex items-start justify-between p-4 rounded-xl bg-neutral-900 hover:hover:bg-neutral-800 transition-colors border border-neutral-800"
 											>
 												<div className="flex items-start gap-3 flex-1 min-w-0">
 													<div className="p-2 rounded-lg bg-primary/10 shrink-0">
@@ -154,7 +154,7 @@ export default function DocumentsTab({
 					<CardContent className="p-12 text-center">
 						<FileText className="h-12 w-12 mx-auto text-neutral-400 mb-4" />
 						<h3 className="font-semibold text-lg mb-2">No Documents Yet</h3>
-						<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+						<p className="text-sm text-neutral-400 mb-4">
 							Start by uploading your first document using the buttons above
 						</p>
 					</CardContent>

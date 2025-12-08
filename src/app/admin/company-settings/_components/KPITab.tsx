@@ -121,11 +121,11 @@ export default function KPITab({
 	const [selectedIndustry, setSelectedIndustry] = useState<string>(getInitialIndustry())
 	const getStatusColor = (status: string) => {
 		switch (status) {
-			case 'achieved': return 'text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30'
-			case 'on-track': return 'text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30'
-			case 'at-risk': return 'text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30'
-			case 'behind': return 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
-			default: return 'text-neutral-700 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-900/30'
+			case 'achieved': return 'text-green-400 bg-green-900/30'
+			case 'on-track': return 'text-blue-400 bg-blue-900/30'
+			case 'at-risk': return 'text-yellow-400 bg-yellow-900/30'
+			case 'behind': return 'text-red-400 bg-red-900/30'
+			default: return 'text-neutral-400 bg-neutral-900/30'
 		}
 	}
 
@@ -338,7 +338,7 @@ export default function KPITab({
 									<select
 										value={newKPI.unit}
 										onChange={(e) => setNewKPI({ ...newKPI, unit: e.target.value })}
-										className="w-full px-4 py-2 border border-border-dark rounded-xl bg-[#1a1a1a] text-white focus:outline-none focus:border-orange-500"
+										className="w-full px-4 py-2 border border-border-dark rounded-xl bg-surface-elevated text-white focus:outline-none focus:border-orange-500"
 									>
 										{kpiUnits.map(unit => (
 											<option key={unit.value} value={unit.value}>{unit.label}</option>
@@ -505,7 +505,7 @@ export default function KPITab({
 										return (
 											<div
 												key={kpi.id}
-												className="p-4 rounded-xl border border-border-dark hover:border-orange-500/50 transition-all bg-[#1a1a1a]"
+												className="p-4 rounded-xl border border-border-dark hover:border-orange-500/50 transition-all bg-surface-elevated"
 											>
 												{isEditing ? (
 													// Edit Mode

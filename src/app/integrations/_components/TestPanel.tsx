@@ -80,7 +80,7 @@ export default function TestPanel({ connector, windowDays, piiMask }: TestPanelP
 				</div>
 			</div>
 
-			<div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-4">
+			<div className="rounded-2xl border border-neutral-800 p-4">
 				<h4 className="font-medium mb-3">{tt.test.preview}</h4>
 				<SyncPreview items={preview} isLoading={isLoadingPreview} piiMask={piiMask} />
 			</div>

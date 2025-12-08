@@ -36,12 +36,12 @@ export function StatusBadge({
 	className,
 }: StatusBadgeProps) {
 	const variantStyles = {
-		success: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-		warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-		error: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-		info: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-		pending: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400',
-		default: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300',
+		success: 'bg-green-100 bg-green-900/text-green-400',
+		warning: 'bg-yellow-100 bg-yellow-900/text-yellow-400',
+		error: 'bg-red-100 bg-red-900/text-red-400',
+		info: 'bg-blue-100 bg-blue-900/text-blue-400',
+		pending: 'bg-neutral-100 bg-neutral-800 dark:text-neutral-400',
+		default: 'bg-neutral-100 bg-neutral-800 dark:text-neutral-300',
 	}
 
 	const sizeStyles = {
