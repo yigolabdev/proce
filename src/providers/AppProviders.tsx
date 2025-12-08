@@ -139,16 +139,16 @@ const appRoutes = [
 	// 기타
 	{ path: '/app/org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 	{ path: '/app/integrations', element: withSuspense(IntegrationsPage) },
-		{ path: '/app/guide', element: <Navigate to="/app/dashboard" replace /> },
-		{ path: '/app/workflow', element: <Navigate to="/app/dashboard" replace /> },
-		{ path: '/app/settings', element: withSuspense(SettingsPage) },
+	{ path: '/app/guide', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: '/app/workflow', element: <Navigate to="/app/dashboard" replace /> },
+	{ path: '/app/settings', element: withSuspense(SettingsPage) },
 		
 	// Work Rhythm - Redirect to dashboard (준비 중)
 	{ path: '/app/rhythm', element: <Navigate to="/app/dashboard" replace /> },
 	{ path: '/app/rhythm/*', element: <Navigate to="/app/dashboard" replace /> },
 ]
 
-// 라우터 설정
+// 라우터 설정 - 컴포넌트 외부에서 한 번만 생성
 const router = createBrowserRouter([
 	{ path: '/', element: withSuspense(LandingPage) },
 	{ path: '/auth/sign-up', element: withSuspense(SignUpPage) },

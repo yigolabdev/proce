@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment, useCallback, useMemo } from 'react'
 import { storage } from '../../utils/storage'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -49,8 +49,10 @@ export default function AppLayout() {
 		setIsMobileSidebarOpen(false)
 	}, [location.pathname])
 
-	const link = (to: string, label: string, Icon: any, badge?: number) => (
+	// Memoize link component to prevent recreation on every render
+	const link = useCallback((to: string, label: string, Icon: any, badge?: number) => (
 		<NavLink
+			key={to}
 			to={to}
 			end
 			className={({ isActive }) =>
@@ -78,10 +80,10 @@ export default function AppLayout() {
 				</>
 			)}
 		</NavLink>
-	)
+	), [])
 
-	// Menu definition by role
-	const menuGroups = [
+	// Menu definition by role - memoized to prevent recreation
+	const menuGroups = useMemo(() => [
 	{
 		title: t('menu.work'),
 		roles: ['user', 'admin', 'executive'] as UserRole[],
@@ -111,16 +113,16 @@ export default function AppLayout() {
 			{ to: '/app/admin/company-settings', label: t('menu.companySettings'), icon: Building2, roles: ['executive', 'admin'] },
 		] as MenuItem[],
 	},
-]
+], [t, unreadMessages, unreadReviews])
 
-// 현재 사용자 권한에 따라 메뉴 필터링
-const visibleMenuGroups = menuGroups
+// 현재 사용자 권한에 따라 메뉴 필터링 - memoized
+const visibleMenuGroups = useMemo(() => menuGroups
 		.filter((group) => user && group.roles.includes(user.role))
 		.map((group) => ({
 			...group,
 			items: group.items.filter((item) => user && item.roles.includes(user.role)),
 		}))
-		.filter((group) => group.items.length > 0)
+		.filter((group) => group.items.length > 0), [menuGroups, user])
 
 	// Sidebar Component
 	const SidebarContent = () => (
