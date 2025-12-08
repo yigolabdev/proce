@@ -180,7 +180,7 @@ export function useWorkInput(): UseWorkInputReturn {
 
 		// Track history
 		HistoryTracker.addHistory({
-			entryId: newEntry.id,
+			workEntryId: newEntry.id,
 			action: 'created',
 			changedBy: 'Current User',
 			department: 'Engineering',

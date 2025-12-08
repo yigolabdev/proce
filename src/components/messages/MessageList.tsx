@@ -7,7 +7,6 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import {
 	Mail,
-	MailOpen,
 	Star,
 	Clock,
 	Sparkles,
