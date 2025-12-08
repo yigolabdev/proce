@@ -261,24 +261,31 @@ export class AIRecommendationService {
 		const now = new Date()
 
 		projects
-			.filter(p => p.status === 'active' && p.deadline)
+			.filter(p => p.status === 'active' && p.endDate)
 			.forEach(project => {
-				const deadline = new Date(project.deadline!)
-				const daysUntilDeadline = differenceInDays(deadline, now)
+				const endDate = project.endDate instanceof Date ? project.endDate : new Date(project.endDate)
+				const daysUntilDeadline = differenceInDays(endDate, now)
 
 				// 마감 7일 이내
 				if (daysUntilDeadline <= 7 && daysUntilDeadline >= 0) {
+					const endDateStr = project.endDate instanceof Date 
+						? project.endDate.toISOString() 
+						: project.endDate.toString()
+					const endDateObj = project.endDate instanceof Date 
+						? project.endDate 
+						: new Date(project.endDate)
+					
 					recommendations.push({
 						id: `rec-deadline-${project.id}`,
 						title: `Upcoming Deadline: "${project.name}"`,
-						description: `Project "${project.name}" deadline is in ${daysUntilDeadline} days (${deadline.toLocaleDateString()}). Ensure all tasks are completed.`,
+						description: `Project "${project.name}" deadline is in ${daysUntilDeadline} days (${endDateObj.toLocaleDateString()}). Ensure all tasks are completed.`,
 						priority: daysUntilDeadline <= 3 ? 'high' : 'medium',
 						category: 'Deadline',
 						dataSource: 'Deadline analysis',
 						status: 'pending',
 						projectId: project.id,
 						projectName: project.name,
-						deadline: project.deadline,
+						deadline: endDateStr,
 						createdAt: new Date(),
 						confidence: 1.0,
 						reasoning: [

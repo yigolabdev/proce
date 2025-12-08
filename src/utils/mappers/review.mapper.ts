@@ -16,7 +16,8 @@ export function parsePendingReviewFromStorage(storageData: any): PendingReview {
 		tags: storageData.tags || [],
 		files: storageData.files || [],
 		links: storageData.links || [],
-	})
+		status: storageData.status || 'pending',
+	}) as PendingReview
 }
 
 /**
@@ -35,7 +36,10 @@ export function parseReceivedReviewFromStorage(storageData: any): ReceivedReview
 		tags: storageData.tags || [],
 		files: storageData.files || [],
 		links: storageData.links || [],
-	})
+		isRead: storageData.isRead || false,
+		reviewType: storageData.reviewType || 'approved',
+		reviewComments: storageData.reviewComments || '',
+	}) as ReceivedReview
 }
 
 /**

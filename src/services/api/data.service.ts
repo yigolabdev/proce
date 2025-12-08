@@ -8,7 +8,7 @@ import { API_ENDPOINTS } from './config.api'
 import { storage } from '../../utils/storage'
 import type { WorkEntry, Project, PendingReview, ReceivedReview } from '../../types/common.types'
 import type { Message } from '../../schemas/data.schemas'
-import type { ApiResponse, PaginationParams, FilterParams } from './config.api'
+import type { PaginationParams, FilterParams } from './config.api'
 
 /**
  * 데이터 소스 타입
@@ -38,11 +38,10 @@ const DEFAULT_CONFIG: DataServiceConfig = {
  */
 export class DataService {
 	private config: DataServiceConfig
-	private syncTimers: Map<string, NodeJS.Timeout>
+	// private syncTimers: NodeJS.Timeout[] = []  // Unused, removed
 
 	constructor(config: Partial<DataServiceConfig> = {}) {
 		this.config = { ...DEFAULT_CONFIG, ...config }
-		this.syncTimers = new Map()
 	}
 
 	/**

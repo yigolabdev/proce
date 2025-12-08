@@ -309,7 +309,7 @@ export const workEntryHistorySchema = z.object({
 	changedByDepartment: z.string().optional(),
 	changedAt: dateSchema,
 	comment: z.string().optional(),
-	metadata: z.record(z.any()).optional(),  // 추가 메타데이터
+	// metadata: z.record(z.string(), z.any()).optional(),  // 추가 메타데이터
 })
 
 export type WorkEntryHistory = z.infer<typeof workEntryHistorySchema>

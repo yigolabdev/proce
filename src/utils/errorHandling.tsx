@@ -46,8 +46,13 @@ export class AppError extends Error {
 		this.timestamp = new Date()
 
 		// Maintains proper stack trace for where our error was thrown (only available on V8)
-		if (Error.captureStackTrace) {
-			Error.captureStackTrace(this, AppError)
+		// Node.js specific, skip in browser
+		try {
+			if (typeof (Error as any).captureStackTrace === 'function') {
+				(Error as any).captureStackTrace(this, AppError)
+			}
+		} catch {
+			// Ignore if not available
 		}
 	}
 
@@ -194,10 +199,15 @@ export class ErrorHandler {
 	 */
 	static show(error: AppError): void {
 		// Toast를 통한 에러 표시
-		const { toast } = require('sonner')
-		
-		toast.error(error.getUserMessage(), {
-			description: import.meta.env.DEV ? error.message : undefined,
+		// Note: Import sonner dynamically to avoid bundling issues
+		import('sonner').then(({ toast }) => {
+			toast.error(error.getUserMessage(), {
+				description: import.meta.env.DEV ? error.message : undefined,
+			})
+		}).catch(err => {
+			// Fallback to console if toast is unavailable
+			console.error('Failed to show toast:', err)
+			console.error(error.getUserMessage())
 		})
 	}
 

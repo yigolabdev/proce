@@ -14,7 +14,7 @@ import { parseWorkEntryDates, toISOString } from '../dateUtils'
  * 백엔드 API로부터 받은 데이터를 클라이언트 도메인 모델로 변환
  */
 export function mapWorkEntryFromApi(apiData: any): WorkEntry {
-	return parseWorkEntryDates({
+	const parsed = parseWorkEntryDates({
 		id: apiData.id,
 		title: apiData.title,
 		category: apiData.category,
@@ -50,11 +50,11 @@ export function mapWorkEntryFromApi(apiData: any): WorkEntry {
 		
 		// User & Department
 		submittedBy: apiData.submittedBy || apiData.userId,
+		submittedById: apiData.submittedById || apiData.userId,
 		submittedByName: apiData.submittedByName || apiData.userName,
 		department: apiData.department,
 		
-		// Status & Review
-		status: (apiData.status as WorkEntryStatus) || 'draft',
+		// Status & Review - status는 Date로 파싱되지 않도록 별도 처리
 		reviewedBy: apiData.reviewedBy,
 		reviewedByName: apiData.reviewedByName,
 		reviewedAt: apiData.reviewedAt,
@@ -73,6 +73,12 @@ export function mapWorkEntryFromApi(apiData: any): WorkEntry {
 		collaborators: apiData.collaborators,
 		blockers: apiData.blockers,
 	})
+	
+	// status는 수동으로 설정 (WorkEntryStatus 타입)
+	return {
+		...parsed,
+		status: (apiData.status as WorkEntryStatus) || 'draft',
+	} as WorkEntry
 }
 
 /**
@@ -125,7 +131,7 @@ export function mapWorkEntriesFromApi(apiData: any[]): WorkEntry[] {
  * localStorage에 저장된 데이터를 도메인 모델로 변환
  */
 export function parseWorkEntryFromStorage(storageData: any): WorkEntry {
-	return parseWorkEntryDates({
+	const parsed = parseWorkEntryDates({
 		...storageData,
 		files: storageData.files?.map((f: any) => ({
 			...f,
@@ -136,8 +142,14 @@ export function parseWorkEntryFromStorage(storageData: any): WorkEntry {
 			addedAt: l.addedAt || new Date().toISOString(),
 		})) || [],
 		tags: storageData.tags || [],
-		status: storageData.status || 'draft',
+		submittedById: storageData.submittedById || storageData.submittedBy || '',
 	})
+	
+	// status는 수동으로 설정 (WorkEntryStatus 타입)
+	return {
+		...parsed,
+		status: storageData.status || 'draft',
+	} as WorkEntry
 }
 
 /**

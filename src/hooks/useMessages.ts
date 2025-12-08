@@ -183,11 +183,12 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
 		const parentMessage = messages.find((m) => m.id === messageId)
 		if (!parentMessage) return
 
-		const replyMessage = MessageUtils.createReplyMessage(
+		const replyMessage = MessageUtils.createReply(
 			parentMessage,
 			content,
 			'Current User', // Replace with actual user
-			'user-current-id'
+			'user-current-id',
+			undefined // fromDepartment
 		)
 
 		setMessages((prev) => {
