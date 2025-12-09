@@ -25,6 +25,7 @@ import { useAutoSave } from '../hooks/useAutoSave'
 // UI Components
 import { InputModeSelector } from '../components/input/InputModeSelector'
 import { WorkInputForm } from '../components/input/WorkInputForm'
+import { LinksConnectionsCard } from '../components/input/LinksConnectionsCard'
 import { TagInput } from '../components/input/TagInput'
 import { FileUploadZone } from '../components/input/FileUploadZone'
 import { LinkInput } from '../components/input/LinkInput'
@@ -125,15 +126,23 @@ export default function InputPage() {
 					</div>
 				)}
 
-					<WorkInputForm
-						formData={workInput.formData}
-						setFormData={workInput.setFormData}
-						onSubmit={handleSubmit}
-						projects={workInput.projects}
-						categories={workInput.categories}
-						reviewers={workInput.reviewers}
-						disabled={workInput.isSubmitting}
-					/>
+				{/* Basic Information */}
+				<WorkInputForm
+					formData={workInput.formData}
+					setFormData={workInput.setFormData}
+					onSubmit={handleSubmit}
+					categories={workInput.categories}
+					disabled={workInput.isSubmitting}
+				/>
+
+				{/* Links & Connections */}
+				<LinksConnectionsCard
+					formData={workInput.formData}
+					setFormData={workInput.setFormData}
+					projects={workInput.projects}
+					objectives={workInput.objectives}
+					disabled={workInput.isSubmitting}
+				/>
 
 					<TagInput
 						tags={tags.tags}

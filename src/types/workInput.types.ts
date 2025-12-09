@@ -64,6 +64,14 @@ export interface WorkInputFormData {
 	links: LinkResource[]
 	isConfidential: boolean
 	reviewerId?: string
+	// Date & Time fields
+	date?: Date | string
+	duration: string // 소요 시간 (예: "2h 30m")
+	timeSpent?: number // 분 단위 시간 (예: 150분)
+	// OKR 연결
+	objectiveId?: string
+	keyResultId?: string
+	taskId?: string
 }
 
 /**
@@ -245,6 +253,7 @@ export interface UseWorkInputReturn {
 	projects: Project[]
 	categories: WorkCategory[]
 	reviewers: Reviewer[]
+	objectives: import('./common.types').Objective[]
 	
 	// Actions
 	handleSubmit: (e: React.FormEvent) => Promise<void>

@@ -14,7 +14,7 @@ import type {
 	WorkDraft,
 	UseWorkInputReturn 
 } from '../types/workInput.types'
-import type { WorkEntry, Project, WorkCategory } from '../types/common.types'
+import type { WorkEntry, Project, WorkCategory, Objective } from '../types/common.types'
 
 const DRAFT_KEY = 'work-input-draft'
 
@@ -33,6 +33,9 @@ export function useWorkInput(): UseWorkInputReturn {
 		files: [],
 		links: [],
 		isConfidential: false,
+		date: new Date(),
+		duration: '',
+		timeSpent: 0,
 	})
 
 	// Mode state
@@ -42,6 +45,7 @@ export function useWorkInput(): UseWorkInputReturn {
 	const [projects, setProjects] = useState<Project[]>([])
 	const [categories, setCategories] = useState<WorkCategory[]>([])
 	const [reviewers, setReviewers] = useState<any[]>([])
+	const [objectives, setObjectives] = useState<Objective[]>([])
 
 	// Status state
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -54,17 +58,20 @@ export function useWorkInput(): UseWorkInputReturn {
 	}, [])
 
 	/**
-	 * Load projects, categories, reviewers
+	 * Load projects, categories, reviewers, objectives
 	 */
 	const loadInitialData = useCallback(() => {
 		try {
 			const savedProjects = storage.get<Project[]>('projects', [])
-			const savedCategories = storage.get<WorkCategory[]>('workCategories', [])
+			// Try both keys for backward compatibility
+			const savedCategories = storage.get<WorkCategory[]>('workStatuses', []) || storage.get<WorkCategory[]>('workCategories', [])
 			const savedUsers = storage.get<any[]>('users', [])
+			const savedObjectives = storage.get<Objective[]>('objectives', [])
 
 			setProjects(savedProjects || [])
 			setCategories(savedCategories || [])
 			setReviewers((savedUsers || []).filter(u => u.role !== 'user'))
+			setObjectives(savedObjectives || [])
 		} catch (error) {
 			console.error('Failed to load initial data:', error)
 			toast.error('Failed to load data')
@@ -108,6 +115,12 @@ export function useWorkInput(): UseWorkInputReturn {
 			links: [],
 			isConfidential: false,
 			reviewerId: undefined,
+			date: new Date(),
+			duration: '',
+			timeSpent: 0,
+			objectiveId: undefined,
+			keyResultId: undefined,
+			taskId: undefined,
 		})
 		storage.remove(DRAFT_KEY)
 		setAutoSaveStatus('idle')
@@ -162,16 +175,17 @@ export function useWorkInput(): UseWorkInputReturn {
 				projectId: formData.projectId,
 				projectName: projects.find(p => p.id === formData.projectId)?.name || '',
 				tags: formData.tags,
-			date: new Date(),
-			duration: '0h', // TODO: Calculate actual duration
-			status: 'completed' as const,
-			// timeSpent: 0, // Not in WorkEntry type
-			// userId: 'current-user', // Not in WorkEntry type
-			submittedBy: 'Current User', // TODO: Get from auth context
-				department: 'Engineering', // TODO: Get from auth context
+				date: formData.date || new Date(),
+				duration: formData.duration || '0h',
+				status: 'completed' as const,
+				submittedBy: 'Current User',
+				department: 'Engineering',
 				files: formData.files,
 				links: formData.links,
 				isConfidential: formData.isConfidential,
+				objectiveId: formData.objectiveId,
+				keyResultId: formData.keyResultId,
+				taskId: formData.taskId,
 			}
 
 		// Save to storage
@@ -294,6 +308,7 @@ export function useWorkInput(): UseWorkInputReturn {
 		projects,
 		categories,
 		reviewers,
+		objectives,
 
 		// Actions
 		handleSubmit,
