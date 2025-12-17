@@ -5,6 +5,7 @@
  * - Zod 스키마 기반 타입 검증
  * - 데이터 정합성 보장
  * - Cascade Delete 지원
+ * - 구조화된 에러 처리 및 로깅
  */
 
 import { STORAGE_KEYS } from '../types/common.types'
@@ -25,6 +26,8 @@ import {
 	type WorkEntryHistory,
 	type ProjectMember,
 } from '../schemas/data.schemas'
+import { logger } from './logger'
+import { errorHandler } from './errorHandler'
 
 // STORAGE_KEYS를 재export
 export { STORAGE_KEYS }
@@ -94,10 +97,19 @@ class StorageManager {
 			localStorage.setItem(key, serialized)
 			return true
 		} catch (error) {
-			console.error(`Failed to save to localStorage (key: ${key}):`, error)
-			if (error instanceof DataValidationError && import.meta.env.DEV) {
-				console.error('Validation errors:', error.validationErrors?.format())
+			logger.error(
+				`Failed to save to localStorage (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'set', key }
+			)
+			
+			if (error instanceof DataValidationError) {
+				logger.error('Validation errors', undefined, {
+					component: 'StorageManager',
+					validationErrors: error.validationErrors?.format()
+				})
 			}
+			
 			return false
 		}
 	}
@@ -118,12 +130,19 @@ class StorageManager {
 				try {
 					return schema.parse(parsed) as T
 				} catch (error) {
-					if (import.meta.env.DEV) {
-						console.warn(`Data validation failed for key: ${key}, returning raw data`)
-						if (error instanceof z.ZodError) {
-							console.warn('Validation errors:', error.format())
-						}
+					logger.warn(`Data validation failed for key: ${key}, returning raw data`, {
+						component: 'StorageManager',
+						function: 'get',
+						key
+					})
+					
+					if (error instanceof z.ZodError) {
+						logger.debug('Validation errors', {
+							component: 'StorageManager',
+							errors: error.format()
+						})
 					}
+					
 					// 검증 실패 시 원본 데이터 반환 (하위 호환성)
 					return parsed as T
 				}
@@ -131,9 +150,11 @@ class StorageManager {
 			
 			return parsed as T
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to read from localStorage (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to read from localStorage (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'get', key }
+			)
 			return defaultValue ?? null
 		}
 	}
@@ -144,11 +165,18 @@ class StorageManager {
 	remove(key: string): boolean {
 		try {
 			localStorage.removeItem(key)
+			logger.debug(`Removed from localStorage`, {
+				component: 'StorageManager',
+				function: 'remove',
+				key
+			})
 			return true
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to remove from localStorage (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to remove from localStorage (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'remove', key }
+			)
 			return false
 		}
 	}
@@ -159,11 +187,17 @@ class StorageManager {
 	clear(): boolean {
 		try {
 			localStorage.clear()
+			logger.info('Cleared all localStorage data', {
+				component: 'StorageManager',
+				function: 'clear'
+			})
 			return true
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error('Failed to clear localStorage:', error)
-			}
+			logger.error(
+				'Failed to clear localStorage',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'clear' }
+			)
 			return false
 		}
 	}
@@ -187,7 +221,11 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			console.error(`Failed to push to array (key: ${key}):`, error)
+			logger.error(
+				`Failed to push to array (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'pushToArray', key }
+			)
 			return false
 		}
 	}
@@ -204,9 +242,11 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to remove from array (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to remove from array (key: ${key}, id: ${id})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'removeFromArray', key, id }
+			)
 			return false
 		}
 	}
@@ -225,9 +265,11 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to update in array (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to update in array (key: ${key}, id: ${id})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'updateInArray', key, id }
+			)
 			return false
 		}
 	}
@@ -248,9 +290,11 @@ class StorageManager {
 			}
 			return false
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to update field (key: ${key}, field: ${String(field)}):`, error)
-			}
+			logger.error(
+				`Failed to update field (key: ${key}, field: ${String(field)})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'updateField', key, field: String(field) }
+			)
 			return false
 		}
 	}
@@ -285,9 +329,11 @@ class StorageManager {
 			}
 			return this.set(key, item)
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to save with expiry (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to save with expiry (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'setWithExpiry', key, ttlInSeconds }
+			)
 			return false
 		}
 	}
@@ -305,14 +351,21 @@ class StorageManager {
 			
 			if (now.getTime() > item.expiry) {
 				localStorage.removeItem(key)
+				logger.debug('Expired data removed', {
+					component: 'StorageManager',
+					function: 'getWithExpiry',
+					key
+				})
 				return null
 			}
 			
 			return item.value as T
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(`Failed to get with expiry (key: ${key}):`, error)
-			}
+			logger.error(
+				`Failed to get with expiry (key: ${key})`,
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'getWithExpiry', key }
+			)
 			return null
 		}
 	}
@@ -350,11 +403,18 @@ class StorageManager {
 			for (const [key, value] of Object.entries(data)) {
 				this.set(key, value)
 			}
+			logger.debug('Multiple items saved', {
+				component: 'StorageManager',
+				function: 'setMultiple',
+				count: Object.keys(data).length
+			})
 			return true
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error('Failed to set multiple:', error)
-			}
+			logger.error(
+				'Failed to set multiple',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'StorageManager', function: 'setMultiple' }
+			)
 			return false
 		}
 	}
@@ -621,13 +681,13 @@ export class CascadeDelete {
 			deletedCount.reviews += receivedReviews.length - updatedReceivedReviews.length
 			storage.set(STORAGE_KEYS.RECEIVED_REVIEWS, updatedReceivedReviews)
 			
-			if (import.meta.env.DEV) {
-				console.log('Project deleted with cascade:', {
-					projectId,
-					deletedCount,
-					options,
-				})
-			}
+			logger.info('Project deleted with cascade', {
+				component: 'CascadeDelete',
+				function: 'deleteProject',
+				projectId,
+				deletedCount,
+				options
+			})
 			
 			return { success: true, deletedCount, errors }
 		} catch (error) {
@@ -699,9 +759,12 @@ export class CascadeDelete {
 			
 			storage.set(STORAGE_KEYS.MESSAGES, updatedMessages)
 			
-			if (import.meta.env.DEV) {
-				console.log(`Archived ${archivedCount} old messages (older than ${daysOld} days)`)
-			}
+			logger.info(`Archived old messages`, {
+				component: 'CascadeDelete',
+				function: 'cleanupOldData',
+				archivedCount,
+				daysOld
+			})
 			
 			return { success: true, archivedCount, errors }
 		} catch (error) {
@@ -775,7 +838,11 @@ export class HistoryTracker {
 			
 			return storage.set(this.HISTORY_KEY, trimmed)
 		} catch (error) {
-			console.error('Failed to add history:', error)
+			logger.error(
+				'Failed to add history',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'HistoryTracker', function: 'addHistory' }
+			)
 			return false
 		}
 	}
@@ -840,7 +907,11 @@ export class HistoryTracker {
 			const histories = storage.get<WorkEntryHistory[]>(this.HISTORY_KEY, []) || []
 			return histories.filter(h => h.workEntryId === workEntryId)
 		} catch (error) {
-			console.error('Failed to get history:', error)
+			logger.error(
+				'Failed to get history',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'HistoryTracker', function: 'getHistoryForWorkEntry', workEntryId }
+			)
 			return []
 		}
 	}
@@ -853,7 +924,11 @@ export class HistoryTracker {
 			const histories = storage.get<WorkEntryHistory[]>(this.HISTORY_KEY, []) || []
 			return histories.slice(0, limit)
 		} catch (error) {
-			console.error('Failed to get recent history:', error)
+			logger.error(
+				'Failed to get recent history',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'HistoryTracker', function: 'getRecentHistory', limit }
+			)
 			return []
 		}
 	}
@@ -875,9 +950,20 @@ export class HistoryTracker {
 			const removedCount = histories.length - filtered.length
 			storage.set(this.HISTORY_KEY, filtered)
 			
+			logger.info('History cleanup completed', {
+				component: 'HistoryTracker',
+				function: 'cleanupOldHistory',
+				removedCount,
+				daysOld
+			})
+			
 			return removedCount
 		} catch (error) {
-			console.error('Failed to cleanup history:', error)
+			logger.error(
+				'Failed to cleanup history',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'HistoryTracker', function: 'cleanupOldHistory', daysOld }
+			)
 			return 0
 		}
 	}
@@ -941,7 +1027,11 @@ export class MessageUtils {
 					return aTime - bTime  // 오래된 것부터
 				})
 		} catch (error) {
-			console.error('Failed to get thread messages:', error)
+			logger.error(
+				'Failed to get thread messages',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'MessageUtils', function: 'getThreadMessages', threadId }
+			)
 			return []
 		}
 	}
@@ -968,7 +1058,11 @@ export class MessageUtils {
 			
 			return storage.set(STORAGE_KEYS.MESSAGES, updatedMessages)
 		} catch (error) {
-			console.error('Failed to update reply count:', error)
+			logger.error(
+				'Failed to update reply count',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'MessageUtils', function: 'updateReplyCount', messageId }
+			)
 			return false
 		}
 	}
@@ -1054,7 +1148,11 @@ export class MessageUtils {
 			
 			return storage.set(STORAGE_KEYS.MESSAGES, updatedMessages)
 		} catch (error) {
-			console.error('Failed to add read receipt:', error)
+			logger.error(
+				'Failed to add read receipt',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'MessageUtils', function: 'addReadReceipt', messageId, userId }
+			)
 			return false
 		}
 	}
@@ -1082,7 +1180,11 @@ export class ProjectMemberManager {
 			const key = this.getMembersKey(projectId)
 			return storage.get<ProjectMember[]>(key, []) || []
 		} catch (error) {
-			console.error('Failed to get project members:', error)
+			logger.error(
+				'Failed to get project members',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'ProjectMemberManager', function: 'getMembers', projectId }
+			)
 			return []
 		}
 	}
@@ -1100,7 +1202,12 @@ export class ProjectMemberManager {
 			
 			// 이미 존재하는지 확인
 			if (members.some(m => m.userId === member.userId)) {
-				console.warn('Member already exists in project')
+				logger.warn('Member already exists in project', {
+					component: 'ProjectMemberManager',
+					function: 'addMember',
+					projectId,
+					userId: member.userId
+				})
 				return false
 			}
 			
@@ -1114,9 +1221,24 @@ export class ProjectMemberManager {
 			members.push(newMember)
 			
 			const key = this.getMembersKey(projectId)
-			return storage.set(key, members)
+			const success = storage.set(key, members)
+			
+			if (success) {
+				logger.info('Project member added', {
+					component: 'ProjectMemberManager',
+					function: 'addMember',
+					projectId,
+					userId: member.userId
+				})
+			}
+			
+			return success
 		} catch (error) {
-			console.error('Failed to add project member:', error)
+			logger.error(
+				'Failed to add project member',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'ProjectMemberManager', function: 'addMember', projectId }
+			)
 			return false
 		}
 	}
@@ -1130,9 +1252,24 @@ export class ProjectMemberManager {
 			const filtered = members.filter(m => m.userId !== userId)
 			
 			const key = this.getMembersKey(projectId)
-			return storage.set(key, filtered)
+			const success = storage.set(key, filtered)
+			
+			if (success) {
+				logger.info('Project member removed', {
+					component: 'ProjectMemberManager',
+					function: 'removeMember',
+					projectId,
+					userId
+				})
+			}
+			
+			return success
 		} catch (error) {
-			console.error('Failed to remove project member:', error)
+			logger.error(
+				'Failed to remove project member',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'ProjectMemberManager', function: 'removeMember', projectId, userId }
+			)
 			return false
 		}
 	}
@@ -1152,9 +1289,25 @@ export class ProjectMemberManager {
 			)
 			
 			const key = this.getMembersKey(projectId)
-			return storage.set(key, updated)
+			const success = storage.set(key, updated)
+			
+			if (success) {
+				logger.info('Member role updated', {
+					component: 'ProjectMemberManager',
+					function: 'updateMemberRole',
+					projectId,
+					userId,
+					role
+				})
+			}
+			
+			return success
 		} catch (error) {
-			console.error('Failed to update member role:', error)
+			logger.error(
+				'Failed to update member role',
+				error instanceof Error ? error : new Error(String(error)),
+				{ component: 'ProjectMemberManager', function: 'updateMemberRole', projectId, userId }
+			)
 			return false
 		}
 	}
