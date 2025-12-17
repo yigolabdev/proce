@@ -31,8 +31,10 @@ import {
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import type { Project, WorkEntry } from '../../../types/common.types'
+import type { Objective } from '../../../types/okr.types'
 import type { ProjectMember } from '../../../schemas/data.schemas'
 import { parseProjectsFromStorage, parseWorkEntriesFromStorage } from '../../../utils/mappers'
+import { ProjectOKRProgressChart } from '../../../components/okr/ProjectOKRProgressChart'
 
 export default function ProjectDetailPage() {
 	const { id } = useParams<{ id: string }>()
@@ -40,6 +42,7 @@ export default function ProjectDetailPage() {
 	const { user } = useAuth()
 	const [project, setProject] = useState<Project | null>(null)
 	const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
+	const [relatedOKRs, setRelatedOKRs] = useState<Objective[]>([])
 	const [loading, setLoading] = useState(true)
 	
 	// Member management state
@@ -76,6 +79,11 @@ export default function ProjectDetailPage() {
 				.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 			
 			setWorkEntries(projectWorkEntries)
+			
+			// Load related OKRs
+			const objectives = storage.get<Objective[]>('objectives', []) || []
+			const projectOKRs = objectives.filter(okr => okr.projectId === id)
+			setRelatedOKRs(projectOKRs)
 			
 			// Load project members
 			if (id) {
@@ -796,6 +804,108 @@ export default function ProjectDetailPage() {
 										{Math.max(0, Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days
 									</p>
 								</div>
+							</CardContent>
+						</Card>
+
+						{/* Progress Comparison Chart */}
+						{relatedOKRs.length > 0 && (
+							<ProjectOKRProgressChart
+								project={project}
+								relatedOKRs={relatedOKRs}
+							/>
+						)}
+
+						{/* Related OKRs */}
+						<Card className="bg-surface-dark border-border-dark">
+							<CardHeader>
+								<div className="flex items-center justify-between">
+									<h2 className="text-lg font-bold flex items-center gap-2 text-white">
+										<Target className="h-5 w-5 text-orange-400" />
+										Related OKRs
+									</h2>
+									{relatedOKRs.length > 0 && (
+										<span className="text-sm text-neutral-400">
+											{relatedOKRs.length} {relatedOKRs.length === 1 ? 'OKR' : 'OKRs'}
+										</span>
+									)}
+								</div>
+							</CardHeader>
+							<CardContent>
+								{relatedOKRs.length === 0 ? (
+									<div className="text-center py-6">
+										<Target className="h-12 w-12 text-neutral-600 mx-auto mb-3" />
+										<p className="text-sm text-neutral-400 mb-2">No OKRs linked to this project</p>
+										<Button
+											onClick={() => navigate('/app/okr')}
+											variant="outline"
+											size="sm"
+											className="mt-2"
+										>
+											Create OKR
+										</Button>
+									</div>
+								) : (
+									<div className="space-y-3">
+										{relatedOKRs.map((okr) => {
+											const progress = okr.keyResults.length > 0
+												? okr.keyResults.reduce((sum, kr) => sum + (kr.current / kr.target * 100), 0) / okr.keyResults.length
+												: 0
+
+											const statusColors = {
+												'on-track': 'text-green-400 bg-green-900/30',
+												'at-risk': 'text-yellow-400 bg-yellow-900/30',
+												'behind': 'text-red-400 bg-red-900/30',
+												'completed': 'text-blue-400 bg-blue-900/30'
+											}
+
+											return (
+												<div
+													key={okr.id}
+													onClick={() => navigate('/app/okr')}
+													className="p-3 bg-neutral-900 rounded-lg hover:bg-neutral-800 cursor-pointer transition-colors group"
+												>
+													<div className="flex items-start justify-between mb-2">
+														<h3 className="text-sm font-semibold text-white group-hover:text-orange-400 transition-colors">
+															{okr.title}
+														</h3>
+														<span className={`text-xs px-2 py-1 rounded-full ${statusColors[okr.status]}`}>
+															{okr.status}
+														</span>
+													</div>
+													
+													{okr.description && (
+														<p className="text-xs text-neutral-400 mb-3 line-clamp-2">
+															{okr.description}
+														</p>
+													)}
+
+													<div className="space-y-2">
+														<div className="flex items-center justify-between text-xs">
+															<span className="text-neutral-500">Progress</span>
+															<span className="text-white font-semibold">{Math.round(progress)}%</span>
+														</div>
+														<div className="w-full bg-neutral-800 rounded-full h-2">
+															<div
+																className="bg-gradient-to-r from-orange-500 to-orange-400 h-2 rounded-full transition-all"
+																style={{ width: `${Math.min(100, progress)}%` }}
+															/>
+														</div>
+													</div>
+
+													<div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-800">
+														<div className="flex items-center gap-2 text-xs text-neutral-500">
+															<User className="h-3 w-3" />
+															<span>{okr.owner}</span>
+														</div>
+														<div className="text-xs text-neutral-500">
+															{okr.keyResults.length} KR{okr.keyResults.length !== 1 ? 's' : ''}
+														</div>
+													</div>
+												</div>
+											)
+										})}
+									</div>
+								)}
 							</CardContent>
 						</Card>
 

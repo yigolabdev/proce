@@ -8,11 +8,11 @@
  * - AI 추천 기능 추가
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { PageHeader } from '../../components/common/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { Tabs } from '../../components/ui/Tabs'
-import { Plus, Target, BarChart3, Sparkles, RefreshCw, CheckCircle2, X, TrendingUp } from 'lucide-react'
+import { Plus, Target, BarChart3, Sparkles, RefreshCw, CheckCircle2, X, TrendingUp, FolderKanban, Filter } from 'lucide-react'
 import { toast } from 'sonner'
 import { storage } from '../../utils/storage'
 
@@ -46,6 +46,7 @@ export default function OKRPage() {
 	const [activeTab, setActiveTab] = useState<'list' | 'analytics' | 'ai'>('list')
 	const [showObjectiveForm, setShowObjectiveForm] = useState(false)
 	const [editingObjective, setEditingObjective] = useState<Objective | undefined>()
+	const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>('all')
 
 	// AI Recommendations State
 	const [recommendations, setRecommendations] = useState<OKRRecommendation[]>([])
@@ -67,6 +68,22 @@ export default function OKRPage() {
 		name: 'John Doe',
 		department: 'Engineering'
 	}
+
+	// Load projects for filtering
+	const projects = useMemo(() => {
+		return storage.get<Project[]>('projects', []) || []
+	}, [])
+
+	// Filter objectives by project
+	const filteredObjectives = useMemo(() => {
+		if (selectedProjectFilter === 'all') {
+			return okr.objectives
+		}
+		if (selectedProjectFilter === 'none') {
+			return okr.objectives.filter(obj => !obj.projectId)
+		}
+		return okr.objectives.filter(obj => obj.projectId === selectedProjectFilter)
+	}, [okr.objectives, selectedProjectFilter])
 
 	// Load AI recommendations from localStorage
 	useEffect(() => {
@@ -295,6 +312,47 @@ export default function OKRPage() {
 					variant="underline"
 				/>
 
+				{/* Project Filter */}
+				{activeTab === 'list' && (
+					<Card className="bg-surface-dark border-border-dark">
+						<CardContent className="py-4">
+							<div className="flex items-center gap-4">
+								<div className="flex items-center gap-2 text-sm text-neutral-400">
+									<Filter className="h-4 w-4" />
+									<span className="font-medium">Filter by Project:</span>
+								</div>
+								<select
+									value={selectedProjectFilter}
+									onChange={(e) => setSelectedProjectFilter(e.target.value)}
+									className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+								>
+									<option value="all">All OKRs</option>
+									<option value="none">Individual OKRs (No Project)</option>
+									{projects.map(project => (
+										<option key={project.id} value={project.id}>
+											📁 {project.name}
+										</option>
+									))}
+								</select>
+								{selectedProjectFilter !== 'all' && (
+									<Button
+										onClick={() => setSelectedProjectFilter('all')}
+										variant="ghost"
+										size="sm"
+										className="text-neutral-400 hover:text-white"
+									>
+										<X className="h-4 w-4 mr-1" />
+										Clear
+									</Button>
+								)}
+								<div className="ml-auto text-sm text-neutral-500">
+									Showing {filteredObjectives.length} of {okr.objectives.length} OKRs
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				)}
+
 				{/* Content */}
 				{activeTab === 'list' && (
 					<div className="space-y-6">
@@ -366,7 +424,7 @@ export default function OKRPage() {
 						{/* OKR List */}
 						{!okr.selectedObjective && !showObjectiveForm && (
 							<OKRList
-								objectives={okr.objectives}
+								objectives={filteredObjectives}
 								onSelect={okr.selectObjective}
 								onEdit={handleEditObjective}
 								onDelete={(id, e) => handleDeleteObjective(id, e?.shiftKey || false)}
