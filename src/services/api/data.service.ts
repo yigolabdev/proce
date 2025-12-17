@@ -9,6 +9,7 @@ import { storage } from '../../utils/storage'
 import type { WorkEntry, Project, PendingReview, ReceivedReview } from '../../types/common.types'
 import type { Message } from '../../schemas/data.schemas'
 import type { PaginationParams, FilterParams } from './config.api'
+import { logger } from '../../utils/logger'
 
 /**
  * 데이터 소스 타입
@@ -81,7 +82,9 @@ export class DataService {
 				const response = await apiClient.get<WorkEntry[]>(API_ENDPOINTS.workEntries.list, { params })
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch work entries from API:', error)
+				logger.error('Failed to fetch work entries from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getWorkEntries'
+				})
 				// Fallback to local storage
 				return storage.get<WorkEntry[]>('workEntries') || []
 			}
@@ -99,7 +102,9 @@ export class DataService {
 				const response = await apiClient.get<WorkEntry>(API_ENDPOINTS.workEntries.get(id))
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch work entry from API:', error)
+				logger.error('Failed to fetch work entry from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getWorkEntry', id
+				})
 				const entries = storage.get<WorkEntry[]>('workEntries') || []
 				return entries.find(e => e.id === id) || null
 			}
@@ -125,7 +130,9 @@ export class DataService {
 				apiClient.invalidateCache('work-entries')
 				return response.data
 			} catch (error) {
-				console.error('Failed to create work entry via API:', error)
+				logger.error('Failed to create work entry via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'createWorkEntry'
+				})
 				throw error
 			}
 		}
@@ -162,7 +169,9 @@ export class DataService {
 				apiClient.invalidateCache('work-entries')
 				return response.data
 			} catch (error) {
-				console.error('Failed to update work entry via API:', error)
+				logger.error('Failed to update work entry via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'updateWorkEntry', id
+				})
 				throw error
 			}
 		}
@@ -197,7 +206,9 @@ export class DataService {
 				apiClient.invalidateCache('work-entries')
 				return true
 			} catch (error) {
-				console.error('Failed to delete work entry via API:', error)
+				logger.error('Failed to delete work entry via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'deleteWorkEntry', id
+				})
 				throw error
 			}
 		}
@@ -221,7 +232,9 @@ export class DataService {
 				const response = await apiClient.get<Project[]>(API_ENDPOINTS.projects.list, { params })
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch projects from API:', error)
+				logger.error('Failed to fetch projects from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getProjects'
+				})
 				return storage.get<Project[]>('projects') || []
 			}
 		}
@@ -244,7 +257,9 @@ export class DataService {
 				apiClient.invalidateCache('projects')
 				return response.data
 			} catch (error) {
-				console.error('Failed to create project via API:', error)
+				logger.error('Failed to create project via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'createProject'
+				})
 				throw error
 			}
 		}
@@ -279,7 +294,9 @@ export class DataService {
 				apiClient.invalidateCache('projects')
 				return response.data
 			} catch (error) {
-				console.error('Failed to update project via API:', error)
+				logger.error('Failed to update project via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'updateProject', id
+				})
 				throw error
 			}
 		}
@@ -312,7 +329,9 @@ export class DataService {
 				apiClient.invalidateCache('projects')
 				return true
 			} catch (error) {
-				console.error('Failed to delete project via API:', error)
+				logger.error('Failed to delete project via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'deleteProject', id
+				})
 				throw error
 			}
 		}
@@ -335,7 +354,9 @@ export class DataService {
 				const response = await apiClient.get<Message[]>(API_ENDPOINTS.messages.list, { params })
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch messages from API:', error)
+				logger.error('Failed to fetch messages from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getMessages'
+				})
 				return storage.get<Message[]>('messages') || []
 			}
 		}
@@ -358,7 +379,9 @@ export class DataService {
 				apiClient.invalidateCache('messages')
 				return response.data
 			} catch (error) {
-				console.error('Failed to create message via API:', error)
+				logger.error('Failed to create message via API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'createMessage'
+				})
 				throw error
 			}
 		}
@@ -386,7 +409,9 @@ export class DataService {
 				const response = await apiClient.get<PendingReview[]>(API_ENDPOINTS.reviews.pending)
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch pending reviews from API:', error)
+				logger.error('Failed to fetch pending reviews from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getPendingReviews'
+				})
 				return storage.get<PendingReview[]>('pending_reviews') || []
 			}
 		}
@@ -403,7 +428,9 @@ export class DataService {
 				const response = await apiClient.get<ReceivedReview[]>(API_ENDPOINTS.reviews.received)
 				return response.data
 			} catch (error) {
-				console.error('Failed to fetch received reviews from API:', error)
+				logger.error('Failed to fetch received reviews from API', error instanceof Error ? error : new Error(String(error)), {
+					component: 'DataService', function: 'getReceivedReviews'
+				})
 				return storage.get<ReceivedReview[]>('received_reviews') || []
 			}
 		}

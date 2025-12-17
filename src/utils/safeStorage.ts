@@ -7,6 +7,7 @@
 
 import { toast } from 'sonner'
 import type { StorageTypeMap } from '../types/common.types'
+import { logger } from './logger'
 
 export interface StorageResult<T> {
 	success: boolean
@@ -27,7 +28,11 @@ export function safeGetItem<T>(key: string, defaultValue?: T): T | null {
 		const parsed = JSON.parse(item) as T
 		return parsed
 	} catch (error) {
-		console.error(`Failed to get item "${key}" from localStorage:`, error)
+		logger.error(
+			`Failed to get item from localStorage`,
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeGetItem', key }
+		)
 		return defaultValue || null
 	}
 }
@@ -41,7 +46,11 @@ export function safeSetItem<T>(key: string, value: T, showToast = false): boolea
 		localStorage.setItem(key, serialized)
 		return true
 	} catch (error) {
-		console.error(`Failed to set item "${key}" in localStorage:`, error)
+		logger.error(
+			`Failed to set item in localStorage`,
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeSetItem', key }
+		)
 		if (showToast) {
 			toast.error('Failed to save data')
 		}
@@ -57,7 +66,11 @@ export function safeRemoveItem(key: string): boolean {
 		localStorage.removeItem(key)
 		return true
 	} catch (error) {
-		console.error(`Failed to remove item "${key}" from localStorage:`, error)
+		logger.error(
+			`Failed to remove item from localStorage`,
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeRemoveItem', key }
+		)
 		return false
 	}
 }
@@ -70,7 +83,11 @@ export function safeClearStorage(): boolean {
 		localStorage.clear()
 		return true
 	} catch (error) {
-		console.error('Failed to clear localStorage:', error)
+		logger.error(
+			'Failed to clear localStorage',
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeClearStorage' }
+		)
 		return false
 	}
 }
@@ -100,14 +117,22 @@ export function safeUpdateItem<T extends object>(
 	try {
 		const existing = safeGetItem<T>(key)
 		if (!existing) {
-			console.warn(`Item "${key}" not found, cannot update`)
+			logger.warn('Item not found, cannot update', {
+				component: 'safeStorage',
+				function: 'safeUpdateItem',
+				key
+			})
 			return false
 		}
 		
 		const updated = { ...existing, ...updates }
 		return safeSetItem(key, updated, showToast)
 	} catch (error) {
-		console.error(`Failed to update item "${key}":`, error)
+		logger.error(
+			'Failed to update item',
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeUpdateItem', key }
+		)
 		if (showToast) {
 			toast.error('Failed to update data')
 		}
@@ -136,7 +161,11 @@ export function safeAppendToArray<T>(
 		const updated = [...existing, item]
 		return safeSetItem(key, updated, showToast)
 	} catch (error) {
-		console.error(`Failed to append to array "${key}":`, error)
+		logger.error(
+			'Failed to append to array',
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeAppendToArray', key }
+		)
 		if (showToast) {
 			toast.error('Failed to add item')
 		}
@@ -157,7 +186,11 @@ export function safeRemoveFromArray<T>(
 		const updated = existing.filter(item => !predicate(item))
 		return safeSetItem(key, updated, showToast)
 	} catch (error) {
-		console.error(`Failed to remove from array "${key}":`, error)
+		logger.error(
+			'Failed to remove from array',
+			error instanceof Error ? error : new Error(String(error)),
+			{ component: 'safeStorage', function: 'safeRemoveFromArray', key }
+		)
 		if (showToast) {
 			toast.error('Failed to remove item')
 		}
