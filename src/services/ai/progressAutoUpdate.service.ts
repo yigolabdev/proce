@@ -102,7 +102,7 @@ export class ProgressAutoUpdateService {
 			if (krIndex !== -1) {
 				// Key Result의 current 값 증가
 				// Work Entry의 duration 또는 고정 증가량 사용
-				const increment = workEntry.duration ? Math.ceil(workEntry.duration / 60) : 1
+				const increment = workEntry.duration ? Math.ceil(Number(workEntry.duration) / 60) : 1
 				objective.keyResults[krIndex].current += increment
 				
 				// Target을 초과하지 않도록

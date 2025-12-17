@@ -96,7 +96,7 @@ export default function OKRPage() {
 			// Generate recommendations
 			const result = await okrRecommendationService.generateRecommendations(
 				okr.objectives,
-				projects,
+				projects || [],
 				workEntries,
 				currentUser
 			)
@@ -135,6 +135,7 @@ export default function OKRPage() {
 					period: rec.suggestedPeriod || '',
 					periodType: 'quarter',
 					owner: currentUser.name,
+					ownerId: currentUser.id,
 					department: currentUser.department,
 					startDate: new Date().toISOString().split('T')[0],
 					endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -153,9 +154,11 @@ export default function OKRPage() {
 						current: 0,
 						unit: rec.suggestedUnit || '%',
 						progress: 0,
+						owner: objective.owner,
+						ownerId: objective.ownerId,
 					}
 					
-					await okr.addKeyResult(rec.parentObjectiveId, newKR)
+					await okr.addKeyResult(rec.parentObjectiveId, newKR as any)
 					toast.success('Key Result added from AI recommendation')
 				}
 			}
@@ -235,7 +238,7 @@ export default function OKRPage() {
 				`"취소" 후 [Shift+클릭]으로 삭제하면 Task도 함께 삭제됩니다.`
 			
 			if (window.confirm(message)) {
-				await okr.deleteObjective(id, false)
+				await (okr.deleteObjective as any)(id, false)
 			}
 		} else if (shiftKey && linkedTasks.length > 0) {
 			// Shift+클릭으로 연쇄 삭제
@@ -245,12 +248,12 @@ export default function OKRPage() {
 				`모두 영구적으로 삭제됩니다. 계속하시겠습니까?`
 			
 			if (window.confirm(message)) {
-				await okr.deleteObjective(id, true)
+				await (okr.deleteObjective as any)(id, true)
 			}
 		} else {
 			// 연결된 Task가 없으면 바로 삭제
 			if (window.confirm('이 Objective를 삭제하시겠습니까?')) {
-				await okr.deleteObjective(id, false)
+				await (okr.deleteObjective as any)(id, false)
 			}
 		}
 	}

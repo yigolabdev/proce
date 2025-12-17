@@ -202,7 +202,7 @@ export class OKRRecommendationService {
 		recentEntries.forEach((entry) => {
 			if (entry.category) {
 				categoryHours[entry.category] =
-					(categoryHours[entry.category] || 0) + (entry.duration || 0)
+					((categoryHours[entry.category] as number) || 0) + (Number(entry.duration) || 0)
 			}
 		})
 
@@ -290,7 +290,7 @@ export class OKRRecommendationService {
 		const currentQuarterOKRs = existingObjectives.filter((obj) => {
 			return (
 				obj.period === currentPeriod ||
-				obj.quarter === `Q${Math.floor(new Date().getMonth() / 3) + 1}`
+				obj.period === `Q${Math.floor(new Date().getMonth() / 3) + 1}`
 			)
 		})
 

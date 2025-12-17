@@ -19,8 +19,6 @@ import {
 	Search,
 	Filter,
 	Calendar,
-	AlertCircle,
-	ArrowUpDown,
 	Target,
 	BarChart3,
 	FileText,

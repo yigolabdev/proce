@@ -210,7 +210,7 @@ export interface UseKPIReturn {
 	// Actions
 	createKPI: (data: KPIFormData) => Promise<void>
 	updateKPI: (id: string, data: Partial<KPI>) => Promise<void>
-	deleteKPI: (id: string) => Promise<void>
+	deleteKPI: (id: string, cascadeDelete?: boolean) => Promise<any>
 	selectKPI: (kpi: KPI | null) => void
 	
 	// Status

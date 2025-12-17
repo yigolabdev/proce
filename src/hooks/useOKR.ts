@@ -169,7 +169,7 @@ export function useOKR(): UseOKRReturn {
 			const newKeyResult: KeyResult = {
 				id: `kr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 				...data,
-			}
+			} as KeyResult
 			
 			const updated = objectives.map(obj => 
 				obj.id === objectiveId

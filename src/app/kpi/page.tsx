@@ -38,7 +38,7 @@ export default function KPIPage() {
 
 	// Load KPIs
 	useEffect(() => {
-		const loadedKPIs = storage.get<CompanyKPI[]>('companyKPIs', [])
+		const loadedKPIs = storage.get<CompanyKPI[]>('companyKPIs', []) || []
 		setKPIs(loadedKPIs)
 	}, [])
 

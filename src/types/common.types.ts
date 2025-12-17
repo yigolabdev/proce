@@ -194,8 +194,8 @@ export interface Project {
 	name: string
 	description: string
 	
-	// 프로젝트 범위 및 소유권 (필수)
-	ownership: ProjectOwnership
+	// 프로젝트 범위 및 소유권 (선택적 - 레거시 데이터 호환)
+	ownership?: ProjectOwnership
 	
 	status: ProjectStatus
 	progress: number
@@ -365,6 +365,12 @@ export interface TaskRecommendation {
 	status: 'pending' | 'accepted' | 'rejected' | 'completed'
 	projectId?: string // 프로젝트 ID
 	projectName?: string // 프로젝트 이름
+	objectiveId?: string // OKR Objective ID
+	objectiveName?: string // OKR Objective 이름
+	keyResultId?: string // OKR Key Result ID
+	keyResultName?: string // OKR Key Result 이름
+	kpiId?: string // KPI ID
+	kpiName?: string // KPI 이름
 	source?: 'ai' | 'manual' // AI 생성 또는 수동 생성
 	isManual?: boolean // 수동 생성 여부
 	createdAt?: string // 생성 시간

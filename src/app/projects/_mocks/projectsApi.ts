@@ -18,6 +18,13 @@ export const mockProjects: Project[] = [
 		startDate: new Date('2024-01-15'),
 		endDate: new Date('2024-06-30'),
 		status: 'active',
+		ownership: {
+			scope: 'department',
+			ownerId: 'm1',
+			ownerName: '김민수',
+			departmentId: 'engineering',
+			departmentName: 'Engineering',
+		},
 		members: [
 			{
 				id: 'm1',

@@ -123,7 +123,7 @@ export function OKRList({ objectives, onSelect, onEdit, onDelete }: OKRListProps
 								</div>
 								<div className="flex items-center gap-1">
 									<Users className="h-4 w-4" />
-									{objective.team}
+									{objective.department || objective.owner}
 								</div>
 								<div className="flex items-center gap-1">
 									{getStatusIcon(objective.status)}

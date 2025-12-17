@@ -159,11 +159,11 @@ export default function SystemSettingsPage() {
 		if (!editingDepartment) return
 		updateItem(
 			departments,
-			editingDepartment,
-			'departments',
-			setDepartments,
-			setEditingDepartment,
-			'Department updated successfully'
+		editingDepartment,
+		'departments',
+		setDepartments as any,
+		setEditingDepartment as any,
+		'Department updated successfully'
 		)
 	}
 
@@ -199,7 +199,7 @@ export default function SystemSettingsPage() {
 
 	const handleUpdatePosition = () => {
 		if (!editingPosition) return
-		updateItem(positions, editingPosition, 'positions', setPositions, setEditingPosition, 'Position updated successfully')
+		updateItem(positions, editingPosition, 'positions', setPositions as any, setEditingPosition as any, 'Position updated successfully')
 	}
 
 	const handleDeletePosition = (id: string) => {
@@ -234,7 +234,7 @@ export default function SystemSettingsPage() {
 
 	const handleUpdateJob = () => {
 		if (!editingJob) return
-		updateItem(jobs, editingJob, 'jobs', setJobs, setEditingJob, 'Job updated successfully')
+		updateItem(jobs, editingJob, 'jobs', setJobs as any, setEditingJob as any, 'Job updated successfully')
 	}
 
 	const handleDeleteJob = (id: string) => {

@@ -9,8 +9,7 @@ import { PageHeader } from '../components/common/PageHeader'
 import { 
 	FileText,
 	Sparkles,
-	AlertTriangle,
-	Clock
+	AlertTriangle
 } from 'lucide-react'
 import { useDashboardData } from '../hooks/useDashboardData'
 import { PerformanceChart } from '../components/dashboard/PerformanceChart'
@@ -35,7 +34,7 @@ export default function DashboardPage() {
 	
 	useEffect(() => {
 		const loadKPIs = () => {
-			const kpis = storage.get<CompanyKPI[]>('companyKPIs', [])
+			const kpis = storage.get<CompanyKPI[]>('companyKPIs', []) || []
 			setCompanyKPIs(kpis)
 		}
 		

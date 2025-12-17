@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X, Target, ListTodo } from 'lucide-react'
+import { LayoutDashboard, FileText, Mail, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X, Target, ListTodo } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 import { useState, useEffect, useMemo } from 'react'
