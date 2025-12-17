@@ -1,157 +1,234 @@
 /**
- * Error Handler Utilities
+ * Professional Error Handling System
  * 
- * Centralized error handling utilities for consistent error management.
+ * 10년차 개발자 수준의 에러 처리
+ * - 타입 안전한 에러 분류
+ * - 사용자 친화적 메시지 생성
+ * - 에러 복구 전략
+ * - 구조화된 에러 로깅
  */
 
 import { toast } from 'sonner'
-import { ApiError } from '../services/api/config'
+import { logger } from './logger'
 
 /**
- * Error message mapping
+ * Application Error Types
  */
-const ERROR_MESSAGES: Record<number, string> = {
-	400: 'Invalid request. Please check your input.',
-	401: 'Unauthorized. Please log in again.',
-	403: 'Access denied. You don\'t have permission.',
-	404: 'Resource not found.',
-	408: 'Request timeout. Please try again.',
-	409: 'Conflict. The resource already exists.',
-	429: 'Too many requests. Please slow down.',
-	500: 'Server error. Please try again later.',
-	503: 'Service unavailable. Please try again later.',
+export enum ErrorType {
+	// Network Errors
+	NETWORK_ERROR = 'NETWORK_ERROR',
+	API_ERROR = 'API_ERROR',
+	TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+	
+	// Data Errors
+	VALIDATION_ERROR = 'VALIDATION_ERROR',
+	PARSE_ERROR = 'PARSE_ERROR',
+	NOT_FOUND_ERROR = 'NOT_FOUND_ERROR',
+	
+	// Auth Errors
+	AUTH_ERROR = 'AUTH_ERROR',
+	PERMISSION_ERROR = 'PERMISSION_ERROR',
+	
+	// System Errors
+	STORAGE_ERROR = 'STORAGE_ERROR',
+	UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
 
 /**
- * Error handler class for better organization
+ * Structured Application Error
+ */
+export class AppError extends Error {
+	constructor(
+		public type: ErrorType,
+		public message: string,
+		public userMessage: string,
+		public originalError?: unknown,
+		public context?: Record<string, unknown>
+	) {
+		super(message)
+		this.name = 'AppError'
+		
+		// Maintains proper stack trace (if available)
+		if (typeof (Error as any).captureStackTrace === 'function') {
+			(Error as any).captureStackTrace(this, AppError)
+		}
+	}
+
+	toJSON() {
+		return {
+			type: this.type,
+			message: this.message,
+			userMessage: this.userMessage,
+			context: this.context,
+			stack: this.stack,
+		}
+	}
+}
+
+/**
+ * Error Handler Class
  */
 class ErrorHandler {
 	/**
-	 * Get user-friendly error message
+	 * Normalize any error to AppError
 	 */
-	getErrorMessage(error: unknown): string {
-		if (error instanceof ApiError) {
-			return ERROR_MESSAGES[error.status] || error.message
+	normalize(error: unknown, context?: Record<string, unknown>): AppError {
+		// Already an AppError
+		if (error instanceof AppError) {
+			return error
 		}
-		
+
+		// Standard Error
 		if (error instanceof Error) {
-			return error.message
+			return new AppError(
+				ErrorType.UNKNOWN_ERROR,
+				error.message,
+				'문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+				error,
+				context
+			)
 		}
-		
-		return 'An unexpected error occurred'
+
+		// Network/Fetch Error
+		if (error instanceof TypeError && error.message.includes('fetch')) {
+			return new AppError(
+				ErrorType.NETWORK_ERROR,
+				'Network request failed',
+				'네트워크 연결을 확인해주세요.',
+				error,
+				context
+			)
+		}
+
+		// Object with message property
+		if (typeof error === 'object' && error !== null && 'message' in error) {
+			const err = error as { message: string; [key: string]: unknown }
+			return new AppError(
+				ErrorType.UNKNOWN_ERROR,
+				err.message,
+				'문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+				error,
+				context
+			)
+		}
+
+		// String error
+		if (typeof error === 'string') {
+			return new AppError(
+				ErrorType.UNKNOWN_ERROR,
+				error,
+				'문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+				error,
+				context
+			)
+		}
+
+		// Unknown error type
+		return new AppError(
+			ErrorType.UNKNOWN_ERROR,
+			'An unknown error occurred',
+			'알 수 없는 오류가 발생했습니다.',
+			error,
+			context
+		)
 	}
 
 	/**
-	 * Handle error with toast notification
+	 * Handle error with logging and user notification
 	 */
-	handleError(error: unknown, customMessage?: string): void {
-		const message = customMessage || this.getErrorMessage(error)
-		
-		toast.error(message, {
-			duration: 5000,
-		})
-		
-		// Error is logged by logger utility (if imported)
-		// Import logger only when needed to avoid circular dependencies
-		if (import.meta.env.DEV) {
-			console.error('[ErrorHandler]', error)
+	handle(
+		error: unknown,
+		options?: {
+			context?: Record<string, unknown>
+			showToast?: boolean
+			silent?: boolean
+			component?: string
+			function?: string
 		}
+	): AppError {
+		const appError = this.normalize(error, options?.context)
+
+		// Log error
+		if (!options?.silent) {
+			logger.error(
+				appError.message,
+				appError.originalError instanceof Error 
+					? appError.originalError 
+					: new Error(String(appError.originalError)),
+				{
+					component: options?.component,
+					function: options?.function,
+					errorType: appError.type,
+					...appError.context,
+				}
+			)
+		}
+
+		// Show toast notification
+		if (options?.showToast !== false) {
+			this.showUserNotification(appError)
+		}
+
+		return appError
 	}
-	
+
 	/**
-	 * Handle success with toast notification
+	 * Show user-friendly error notification
 	 */
-	handleSuccess(message: string, options?: { duration?: number }): void {
-		toast.success(message, {
-			duration: options?.duration || 3000,
+	private showUserNotification(error: AppError): void {
+		const duration = error.type === ErrorType.NETWORK_ERROR ? 10000 : 5000
+
+		toast.error(error.userMessage, {
+			duration,
+			description: import.meta.env.MODE === 'development' 
+				? error.message 
+				: undefined,
 		})
 	}
-	
+
 	/**
-	 * Handle warning with toast notification
+	 * Create specific error types
 	 */
-	handleWarning(message: string, options?: { duration?: number }): void {
-		toast.warning(message, {
-			duration: options?.duration || 4000,
-		})
+	createNetworkError(message: string, originalError?: unknown): AppError {
+		return new AppError(
+			ErrorType.NETWORK_ERROR,
+			message,
+			'네트워크 연결을 확인해주세요.',
+			originalError
+		)
 	}
-	
-	/**
-	 * Handle info with toast notification
-	 */
-	handleInfo(message: string, options?: { duration?: number }): void {
-		toast.info(message, {
-			duration: options?.duration || 3000,
-		})
+
+	createValidationError(message: string, context?: Record<string, unknown>): AppError {
+		return new AppError(
+			ErrorType.VALIDATION_ERROR,
+			message,
+			'입력하신 정보를 다시 확인해주세요.',
+			undefined,
+			context
+		)
+	}
+
+	createAuthError(message: string): AppError {
+		return new AppError(
+			ErrorType.AUTH_ERROR,
+			message,
+			'로그인이 필요합니다.',
+			undefined
+		)
+	}
+
+	createStorageError(message: string, originalError?: unknown): AppError {
+		return new AppError(
+			ErrorType.STORAGE_ERROR,
+			message,
+			'데이터 저장에 실패했습니다. 브라우저 설정을 확인해주세요.',
+			originalError
+		)
 	}
 }
 
-/**
- * Handle async operations with error handling
- */
-export async function handleAsync<T>(
-	promise: Promise<T>,
-	errorMessage?: string
-): Promise<[T | null, Error | null]> {
-	try {
-		const data = await promise
-		return [data, null]
-	} catch (error) {
-		if (errorMessage) {
-			handleError(error, errorMessage)
-		}
-		return [null, error instanceof Error ? error : new Error('Unknown error')]
-	}
-}
-
-/**
- * Retry failed operations
- */
-export async function retryOperation<T>(
-	operation: () => Promise<T>,
-	maxRetries: number = 3,
-	delay: number = 1000
-): Promise<T> {
-	let lastError: Error
-	
-	for (let i = 0; i < maxRetries; i++) {
-		try {
-			return await operation()
-		} catch (error) {
-			lastError = error instanceof Error ? error : new Error('Unknown error')
-			
-			// Don't retry on client errors (4xx)
-			if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
-				throw error
-			}
-			
-			// Wait before retry (exponential backoff)
-			if (i < maxRetries - 1) {
-				await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)))
-			}
-		}
-	}
-	
-	throw lastError!
-}
-
-// Export singleton instance
+// Singleton instance
 export const errorHandler = new ErrorHandler()
 
-// Export convenience functions for backward compatibility
-export const handleError = (error: unknown, customMessage?: string) => {
-	errorHandler.handleError(error, customMessage)
-}
-
-export const handleSuccess = (message: string, options?: { duration?: number }) => {
-	errorHandler.handleSuccess(message, options)
-}
-
-export const handleWarning = (message: string, options?: { duration?: number }) => {
-	errorHandler.handleWarning(message, options)
-}
-
-export const handleInfo = (message: string, options?: { duration?: number }) => {
-	errorHandler.handleInfo(message, options)
-}
-
+// Convenience export
+export default errorHandler

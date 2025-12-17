@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { workApi } from '../services/api/work.api'
-import { handleError } from '../utils/errorHandler'
+import { errorHandler } from '../utils/errorHandler'
 import type { WorkEntry } from '../types/common.types'
 import type { WorkEntryFilters, PaginationParams } from '../types/api.types'
 
@@ -58,7 +58,7 @@ export function useWorkEntries(options: UseWorkEntriesOptions = {}): UseWorkEntr
 		} catch (err) {
 			const error = err instanceof Error ? err : new Error('Failed to load work entries')
 			setError(error)
-			handleError(error)
+			errorHandler.handle(error, { component: 'useWorkEntries' })
 		} finally {
 			setLoading(false)
 		}
@@ -71,7 +71,7 @@ export function useWorkEntries(options: UseWorkEntriesOptions = {}): UseWorkEntr
 			return newEntry
 		} catch (err) {
 			const error = err instanceof Error ? err : new Error('Failed to create work entry')
-			handleError(error)
+			errorHandler.handle(error, { component: 'useWorkEntries' })
 			throw error
 		}
 	}, [])
@@ -85,7 +85,7 @@ export function useWorkEntries(options: UseWorkEntriesOptions = {}): UseWorkEntr
 			return updatedEntry
 		} catch (err) {
 			const error = err instanceof Error ? err : new Error('Failed to update work entry')
-			handleError(error)
+			errorHandler.handle(error, { component: 'useWorkEntries' })
 			throw error
 		}
 	}, [])
@@ -96,7 +96,7 @@ export function useWorkEntries(options: UseWorkEntriesOptions = {}): UseWorkEntr
 			setWorkEntries(prev => prev.filter(entry => entry.id !== id))
 		} catch (err) {
 			const error = err instanceof Error ? err : new Error('Failed to delete work entry')
-			handleError(error)
+			errorHandler.handle(error, { component: 'useWorkEntries' })
 			throw error
 		}
 	}, [])
@@ -146,7 +146,7 @@ export function useMyWorkEntries(options: Omit<UseWorkEntriesOptions, 'filters'>
 		} catch (err) {
 			const error = err instanceof Error ? err : new Error('Failed to load my work entries')
 			setError(error)
-			handleError(error)
+			errorHandler.handle(error, { component: 'useWorkEntries' })
 		} finally {
 			setLoading(false)
 		}

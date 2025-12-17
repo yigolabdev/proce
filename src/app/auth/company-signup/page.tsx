@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2, Upload, FileText, X, Sparkles } from 'lucide-react'
+import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { signupService } from '../../../services/api/signup.service'
-import { companyDocumentParser, type ParsedCompanyInfo } from '../../../services/ai/companyDocumentParser.service'
 
 interface CompanyData {
 	// 이메일 인증
@@ -49,12 +48,6 @@ export default function CompanySignUpPage() {
 	const [countdown, setCountdown] = useState(0)
 	const [isLoading, setIsLoading] = useState(false)
 	const timerRef = useRef<number | null>(null)
-	
-	// 회사 소개서 업로드 관련
-	const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-	const [isParsingFile, setIsParsingFile] = useState(false)
-	const [parsedInfo, setParsedInfo] = useState<ParsedCompanyInfo | null>(null)
-	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const handleChange = (field: keyof CompanyData, value: string) => {
 		setData((prev) => ({ ...prev, [field]: value }))
@@ -66,85 +59,6 @@ export default function CompanySignUpPage() {
 
 	const handleEmployeeCountExact = (value: string) => {
 		setData((prev) => ({ ...prev, employeeCountExact: value, employeeCount: '' }))
-	}
-
-	// 파일 업로드 핸들러
-	const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0]
-		if (!file) return
-
-		// 파일 크기 체크 (10MB 제한)
-		if (file.size > 10 * 1024 * 1024) {
-			toast.error('파일 크기는 10MB 이하여야 합니다')
-			return
-		}
-
-		// 파일 형식 체크
-		const allowedTypes = [
-			'application/pdf',
-			'text/plain',
-			'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-		]
-		const allowedExtensions = ['.pdf', '.txt', '.docx']
-		const hasValidType = allowedTypes.includes(file.type)
-		const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
-
-		if (!hasValidType && !hasValidExtension) {
-			toast.error('PDF, DOCX, TXT 파일만 업로드 가능합니다')
-			return
-		}
-
-		setUploadedFile(file)
-		setIsParsingFile(true)
-
-		try {
-			toast.info('회사 소개서를 분석하는 중...')
-			
-			// 파일 파싱
-			const parsed = await companyDocumentParser.parseCompanyDocument(file)
-			setParsedInfo(parsed)
-
-			if (parsed.extractedFields.length > 0) {
-				// 추출된 정보를 폼 데이터에 자동 입력
-				setData((prev) => ({
-					...prev,
-					companyName: parsed.companyName || prev.companyName,
-					businessNumber: parsed.businessNumber || prev.businessNumber,
-					industry: parsed.industry || prev.industry,
-					employeeCount: parsed.employeeCount || prev.employeeCount,
-					employeeCountExact: parsed.employeeCountExact || prev.employeeCountExact,
-				}))
-
-				toast.success(
-					`${parsed.extractedFields.length}개 항목이 자동으로 입력되었습니다`,
-					{
-						description: `신뢰도: ${parsed.confidence}%`,
-						duration: 5000,
-					}
-				)
-			} else {
-				toast.warning('문서에서 정보를 추출할 수 없었습니다', {
-					description: '수동으로 입력해주세요',
-				})
-			}
-		} catch (error) {
-			console.error('파일 파싱 실패:', error)
-			toast.error('파일 분석에 실패했습니다', {
-				description: error instanceof Error ? error.message : '다시 시도해주세요',
-			})
-		} finally {
-			setIsParsingFile(false)
-		}
-	}
-
-	// 업로드된 파일 제거
-	const handleRemoveFile = () => {
-		setUploadedFile(null)
-		setParsedInfo(null)
-		if (fileInputRef.current) {
-			fileInputRef.current.value = ''
-		}
-		toast.info('파일이 제거되었습니다')
 	}
 
 	// Email verification countdown
@@ -611,117 +525,6 @@ export default function CompanySignUpPage() {
 				{/* Step 2: Company Info */}
 				{step === 2 && (
 					<div className="space-y-6">
-						{/* 회사 소개서 업로드 섹션 */}
-						<div className="bg-gradient-to-br from-orange-900/20 to-purple-900/20 border border-orange-800/50 rounded-2xl p-6">
-							<div className="flex items-start gap-3 mb-4">
-								<div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-									<Sparkles className="h-5 w-5 text-orange-400" />
-								</div>
-								<div className="flex-1">
-									<h3 className="text-base font-semibold text-white mb-1">
-										🚀 빠른 입력: 회사 소개서 업로드
-									</h3>
-									<p className="text-sm text-neutral-400">
-										회사 소개서를 업로드하면 AI가 자동으로 정보를 추출하여 입력해드립니다
-									</p>
-								</div>
-							</div>
-
-							{!uploadedFile ? (
-								<div>
-									<input
-										ref={fileInputRef}
-										type="file"
-										accept=".pdf,.docx,.txt,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-										onChange={handleFileUpload}
-										className="hidden"
-										disabled={isParsingFile}
-									/>
-									<Button
-										onClick={() => fileInputRef.current?.click()}
-										variant="outline"
-										className="w-full h-12 border-orange-700 hover:bg-orange-900/30 hover:border-orange-600 transition-all"
-										disabled={isParsingFile}
-									>
-										<Upload className="h-5 w-5 mr-2" />
-										{isParsingFile ? '분석 중...' : '파일 선택 (PDF, DOCX, TXT)'}
-									</Button>
-									<p className="text-xs text-neutral-500 mt-2 text-center">
-										파일 크기: 최대 10MB | 회사 소개서, IR 자료 등
-									</p>
-								</div>
-							) : (
-								<div className="space-y-3">
-									{/* 업로드된 파일 정보 */}
-									<div className="bg-neutral-900/50 border border-neutral-700 rounded-xl p-4">
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-3 flex-1 min-w-0">
-												<FileText className="h-5 w-5 text-orange-400 flex-shrink-0" />
-												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-white truncate">
-														{uploadedFile.name}
-													</p>
-													<p className="text-xs text-neutral-400">
-														{(uploadedFile.size / 1024).toFixed(1)} KB
-													</p>
-												</div>
-											</div>
-											<button
-												onClick={handleRemoveFile}
-												className="ml-2 p-1.5 hover:bg-neutral-800 rounded-lg transition-colors"
-												disabled={isParsingFile}
-											>
-												<X className="h-4 w-4 text-neutral-400" />
-											</button>
-										</div>
-									</div>
-
-									{/* 파싱 결과 */}
-									{parsedInfo && parsedInfo.extractedFields.length > 0 && (
-										<div className="bg-green-900/20 border border-green-800/50 rounded-xl p-4">
-											<div className="flex items-start gap-2 mb-3">
-												<CheckCircle2 className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-												<div className="flex-1">
-													<p className="text-sm font-medium text-green-100 mb-1">
-														정보 추출 완료
-													</p>
-													<p className="text-xs text-green-300">
-														{parsedInfo.extractedFields.length}개 항목 자동 입력됨 · 신뢰도 {parsedInfo.confidence}%
-													</p>
-												</div>
-											</div>
-											<div className="flex flex-wrap gap-2">
-												{parsedInfo.extractedFields.map((field) => (
-													<span
-														key={field}
-														className="inline-flex items-center px-2.5 py-1 rounded-lg bg-green-800/30 text-xs text-green-300 font-medium"
-													>
-														{field === 'companyName' && '회사명'}
-														{field === 'businessNumber' && '사업자번호'}
-														{field === 'industry' && '업종'}
-														{field === 'employeeCount' && '직원 수'}
-														{field === 'address' && '주소'}
-													</span>
-												))}
-											</div>
-										</div>
-									)}
-								</div>
-							)}
-						</div>
-
-						{/* 구분선 */}
-						<div className="relative">
-							<div className="absolute inset-0 flex items-center">
-								<div className="w-full border-t border-neutral-800"></div>
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-neutral-950 px-4 text-neutral-500 font-medium">
-									회사 정보 입력
-								</span>
-							</div>
-						</div>
-
 						<div>
 							<label className="block text-sm font-medium mb-2">
 								회사명 <span className="text-red-500">*</span>
