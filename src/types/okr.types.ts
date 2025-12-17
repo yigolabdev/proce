@@ -42,6 +42,10 @@ export interface Objective {
 	// 부서 정보 (선택적 - 소속 표시용)
 	department?: string
 	
+	// 프로젝트 연결 (선택적)
+	projectId?: string
+	projectName?: string
+	
 	status: 'on-track' | 'at-risk' | 'behind' | 'completed'
 	keyResults: KeyResult[]
 	startDate: string
@@ -129,6 +133,8 @@ export interface ObjectiveFormData {
 	owner: string
 	ownerId: string
 	department?: string  // 선택적
+	projectId?: string   // 선택적
+	projectName?: string // 선택적
 	startDate: string
 	endDate: string
 }

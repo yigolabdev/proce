@@ -4,14 +4,16 @@
  * OKR은 개인 목표로 정의됨 (team 필드 제거)
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Button } from '../ui/Button'
 import Input from '../ui/Input'
 import Textarea from '../ui/Textarea'
-import { Target, X, Save } from 'lucide-react'
+import { Target, X, Save, FolderKanban } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Objective, ObjectiveFormData } from '../../types/okr.types'
+import type { Project } from '../../types/common.types'
+import { storage } from '../../utils/storage'
 
 export interface OKRFormProps {
 	objective?: Objective
@@ -38,9 +40,18 @@ export function OKRForm({
 		owner: objective?.owner || currentUser?.name || '',
 		ownerId: objective?.ownerId || currentUser?.id || '',
 		department: objective?.department || currentUser?.department || '',
+		projectId: objective?.projectId || '',
+		projectName: objective?.projectName || '',
 		startDate: objective?.startDate || '',
 		endDate: objective?.endDate || '',
 	})
+
+	// 진행 중인 프로젝트 목록 가져오기
+	const projects = useMemo(() => {
+		const allProjects = storage.get<Project[]>('projects', []) || []
+		// 진행 중인 프로젝트만 필터링 (completed가 아닌 것들)
+		return allProjects.filter(p => p.status !== 'completed')
+	}, [])
 
 	// 소유자가 변경될 때 부서 정보도 업데이트
 	useEffect(() => {
@@ -55,6 +66,24 @@ export function OKRForm({
 			}
 		}
 	}, [formData.ownerId, users])
+
+	// 프로젝트가 변경될 때 프로젝트 이름도 업데이트
+	useEffect(() => {
+		if (formData.projectId) {
+			const selectedProject = projects.find(p => p.id === formData.projectId)
+			if (selectedProject) {
+				setFormData(prev => ({
+					...prev,
+					projectName: selectedProject.name
+				}))
+			}
+		} else {
+			setFormData(prev => ({
+				...prev,
+				projectName: ''
+			}))
+		}
+	}, [formData.projectId, projects])
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -232,6 +261,35 @@ export function OKRForm({
 						</select>
 						<p className="mt-1 text-xs text-neutral-500">
 							OKRs are personal objectives. Select yourself as the owner.
+						</p>
+					</div>
+
+					{/* Project (선택적) */}
+					<div>
+						<label className="block text-sm font-medium text-neutral-300 mb-2 flex items-center gap-2">
+							<FolderKanban className="h-4 w-4 text-orange-400" />
+							Related Project (Optional)
+						</label>
+						<select
+							value={formData.projectId || ''}
+							onChange={(e) => setFormData({ ...formData, projectId: e.target.value || undefined })}
+							disabled={isSubmitting}
+							className="w-full px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+						>
+							<option value="">No project (Individual OKR)</option>
+							{projects.length === 0 ? (
+								<option value="" disabled>No active projects available</option>
+							) : (
+								projects.map((project) => (
+									<option key={project.id} value={project.id}>
+										{project.name}
+										{project.status && ` • ${project.status}`}
+									</option>
+								))
+							)}
+						</select>
+						<p className="mt-1 text-xs text-neutral-500">
+							Link this OKR to a specific project to track progress together.
 						</p>
 					</div>
 
