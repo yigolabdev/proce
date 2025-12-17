@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2, Upload, FileText, X, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
+import { signupService } from '../../../services/api/signup.service'
+import { companyDocumentParser, type ParsedCompanyInfo } from '../../../services/ai/companyDocumentParser.service'
 
 interface CompanyData {
 	// 이메일 인증
@@ -44,8 +46,15 @@ export default function CompanySignUpPage() {
 	})
 	const [isCodeSent, setIsCodeSent] = useState(false)
 	const [isEmailVerified, setIsEmailVerified] = useState(false)
-	const [sentCode, setSentCode] = useState('')
 	const [countdown, setCountdown] = useState(0)
+	const [isLoading, setIsLoading] = useState(false)
+	const timerRef = useRef<number | null>(null)
+	
+	// 회사 소개서 업로드 관련
+	const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+	const [isParsingFile, setIsParsingFile] = useState(false)
+	const [parsedInfo, setParsedInfo] = useState<ParsedCompanyInfo | null>(null)
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const handleChange = (field: keyof CompanyData, value: string) => {
 		setData((prev) => ({ ...prev, [field]: value }))
@@ -59,74 +68,206 @@ export default function CompanySignUpPage() {
 		setData((prev) => ({ ...prev, employeeCountExact: value, employeeCount: '' }))
 	}
 
+	// 파일 업로드 핸들러
+	const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]
+		if (!file) return
+
+		// 파일 크기 체크 (10MB 제한)
+		if (file.size > 10 * 1024 * 1024) {
+			toast.error('파일 크기는 10MB 이하여야 합니다')
+			return
+		}
+
+		// 파일 형식 체크
+		const allowedTypes = [
+			'application/pdf',
+			'text/plain',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+		]
+		const allowedExtensions = ['.pdf', '.txt', '.docx']
+		const hasValidType = allowedTypes.includes(file.type)
+		const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+
+		if (!hasValidType && !hasValidExtension) {
+			toast.error('PDF, DOCX, TXT 파일만 업로드 가능합니다')
+			return
+		}
+
+		setUploadedFile(file)
+		setIsParsingFile(true)
+
+		try {
+			toast.info('회사 소개서를 분석하는 중...')
+			
+			// 파일 파싱
+			const parsed = await companyDocumentParser.parseCompanyDocument(file)
+			setParsedInfo(parsed)
+
+			if (parsed.extractedFields.length > 0) {
+				// 추출된 정보를 폼 데이터에 자동 입력
+				setData((prev) => ({
+					...prev,
+					companyName: parsed.companyName || prev.companyName,
+					businessNumber: parsed.businessNumber || prev.businessNumber,
+					industry: parsed.industry || prev.industry,
+					employeeCount: parsed.employeeCount || prev.employeeCount,
+					employeeCountExact: parsed.employeeCountExact || prev.employeeCountExact,
+				}))
+
+				toast.success(
+					`${parsed.extractedFields.length}개 항목이 자동으로 입력되었습니다`,
+					{
+						description: `신뢰도: ${parsed.confidence}%`,
+						duration: 5000,
+					}
+				)
+			} else {
+				toast.warning('문서에서 정보를 추출할 수 없었습니다', {
+					description: '수동으로 입력해주세요',
+				})
+			}
+		} catch (error) {
+			console.error('파일 파싱 실패:', error)
+			toast.error('파일 분석에 실패했습니다', {
+				description: error instanceof Error ? error.message : '다시 시도해주세요',
+			})
+		} finally {
+			setIsParsingFile(false)
+		}
+	}
+
+	// 업로드된 파일 제거
+	const handleRemoveFile = () => {
+		setUploadedFile(null)
+		setParsedInfo(null)
+		if (fileInputRef.current) {
+			fileInputRef.current.value = ''
+		}
+		toast.info('파일이 제거되었습니다')
+	}
+
 	// Email verification countdown
 	const startCountdown = () => {
+		// 기존 타이머가 있다면 정리
+		if (timerRef.current) {
+			clearInterval(timerRef.current)
+		}
+		
 		setCountdown(180) // 3 minutes
-		const timer = setInterval(() => {
+		timerRef.current = setInterval(() => {
 			setCountdown((prev) => {
 				if (prev <= 1) {
-					clearInterval(timer)
+					if (timerRef.current) {
+						clearInterval(timerRef.current)
+						timerRef.current = null
+					}
 					return 0
 				}
 				return prev - 1
 			})
 		}, 1000)
 	}
+	
+	// Cleanup timer on unmount
+	useEffect(() => {
+		return () => {
+			if (timerRef.current) {
+				clearInterval(timerRef.current)
+			}
+		}
+	}, [])
 
-	const handleSendCode = () => {
+	const handleSendCode = async () => {
 		if (!data.email) {
-			toast.error('Please enter your email address')
+			toast.error('이메일 주소를 입력해주세요')
 			return
 		}
 		
 		// Email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 		if (!emailRegex.test(data.email)) {
-			toast.error('Please enter a valid email address')
+			toast.error('유효한 이메일 주소를 입력해주세요')
 			return
 		}
 
-		// Mock: Generate 6-digit code
-		const code = Math.floor(100000 + Math.random() * 900000).toString()
-		setSentCode(code)
-		setIsCodeSent(true)
-		startCountdown()
-		
-		toast.success('Verification code sent!', {
-			description: `Code: ${code} (Demo mode - code will be sent via email in production)`
-		})
+		setIsLoading(true)
+		try {
+			// STEP 1: 백엔드 API 호출 - 인증 코드 발송
+			const response = await signupService.sendVerificationCode(data.email)
+			
+			if (response.success) {
+				setIsCodeSent(true)
+				startCountdown()
+				toast.success('인증 코드가 발송되었습니다!', {
+					description: '이메일을 확인해주세요'
+				})
+			}
+		} catch (error) {
+			console.error('인증 코드 발송 실패:', error)
+			toast.error('인증 코드 발송에 실패했습니다', {
+				description: error instanceof Error ? error.message : '다시 시도해주세요'
+			})
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
-	const handleVerifyCode = () => {
+	const handleVerifyCode = async () => {
 		if (!data.verificationCode) {
-			toast.error('Please enter the verification code')
+			toast.error('인증 코드를 입력해주세요')
 			return
 		}
 		
-		if (data.verificationCode !== sentCode) {
-			toast.error('Invalid verification code')
+		if (data.verificationCode.length !== 6) {
+			toast.error('6자리 인증 코드를 입력해주세요')
 			return
 		}
-		
-		setIsEmailVerified(true)
-		toast.success('Email verified successfully!')
-		setTimeout(() => {
-			setStep(2)
-		}, 500)
+
+		setIsLoading(true)
+		try {
+			// STEP 2: 백엔드 API 호출 - 인증 코드 확인
+			const response = await signupService.verifyEmailCode(data.email, data.verificationCode)
+			
+			if (response.success || response.verified) {
+				setIsEmailVerified(true)
+				toast.success('이메일 인증이 완료되었습니다!')
+				setTimeout(() => {
+					setStep(2)
+				}, 500)
+			} else {
+				toast.error('유효하지 않은 인증 코드입니다')
+			}
+		} catch (error) {
+			console.error('인증 코드 확인 실패:', error)
+			toast.error('인증 코드 확인에 실패했습니다', {
+				description: error instanceof Error ? error.message : '인증 코드를 다시 확인해주세요'
+			})
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	const handleNext = () => {
 		if (step === 1) {
 			// Email verification step
 			if (!isEmailVerified) {
-				toast.error('Please verify your email first')
+				toast.error('먼저 이메일 인증을 완료해주세요')
 				return
 			}
 			setStep(2)
 		} else if (step === 2) {
 			// Company info step
 			if (!data.companyName || !data.businessNumber) {
-				toast.error('Please fill in all required fields')
+				toast.error('필수 항목을 모두 입력해주세요')
+				return
+			}
+			if (!data.industry) {
+				toast.error('업종을 선택해주세요')
+				return
+			}
+			if (!data.employeeCount && !data.employeeCountExact) {
+				toast.error('직원 수를 입력해주세요')
 				return
 			}
 			// Set admin email same as verified email
@@ -135,11 +276,19 @@ export default function CompanySignUpPage() {
 		} else if (step === 3) {
 			// Admin info step
 			if (!data.adminName || !data.adminPassword) {
-				toast.error('Please fill in all required fields')
+				toast.error('필수 항목을 모두 입력해주세요')
+				return
+			}
+			if (data.adminPassword.length < 8) {
+				toast.error('비밀번호는 최소 8자 이상이어야 합니다')
 				return
 			}
 			if (data.adminPassword !== data.adminPasswordConfirm) {
-				toast.error('Passwords do not match')
+				toast.error('비밀번호가 일치하지 않습니다')
+				return
+			}
+			if (!data.adminPhone) {
+				toast.error('전화번호를 입력해주세요')
 				return
 			}
 			setStep(4)
@@ -147,19 +296,52 @@ export default function CompanySignUpPage() {
 	}
 
 	const handleSubmit = async () => {
-		// Mock API call
-		toast.success('기업 회원가입이 완료되었습니다!')
-		
-		// 초대 코드 생성 (Mock)
-		const inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase()
-		
-		// 초대 코드 표시
-		toast.success(`직원 초대 코드: ${inviteCode}`, { duration: 10000 })
-		
-		// 대시보드로 이동
-		setTimeout(() => {
-			navigate('/dashboard')
-		}, 2000)
+		setIsLoading(true)
+		try {
+			// STEP 3: 백엔드 API 호출 - 회사 등록 완료
+			const signupData = {
+				companyName: data.companyName,
+				companyRegistrationNumber: data.businessNumber,
+				industry: data.industry,
+				numberOfEmployees: data.employeeCountExact || data.employeeCount,
+				name: data.adminName,
+				email: data.email,
+				password: data.adminPassword,
+				username: data.email, // username은 email과 동일
+				phone_number: data.adminPhone,
+			}
+
+			const response = await signupService.completeCompanySignup(signupData)
+
+			if (response.success) {
+				toast.success('기업 회원가입이 완료되었습니다!', {
+					description: '대시보드로 이동합니다...'
+				})
+
+				// 초대 코드가 있다면 표시
+				if (response.data?.inviteCode) {
+					toast.success(`직원 초대 코드: ${response.data.inviteCode}`, { 
+						duration: 10000 
+					})
+				}
+
+				// 대시보드로 이동
+				setTimeout(() => {
+					navigate('/dashboard')
+				}, 2000)
+			} else {
+				toast.error('회사 등록에 실패했습니다', {
+					description: response.message || '다시 시도해주세요'
+				})
+			}
+		} catch (error) {
+			console.error('회사 등록 실패:', error)
+			toast.error('회사 등록에 실패했습니다', {
+				description: error instanceof Error ? error.message : '다시 시도해주세요'
+			})
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	return (
@@ -172,7 +354,7 @@ export default function CompanySignUpPage() {
 				className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-primary transition-colors"
 			>
 				<Home className="h-4 w-4" />
-				<span>Back to Home</span>
+				<span>홈으로 돌아가기</span>
 			</button>
 			
 		<div className="flex items-center gap-4">
@@ -195,7 +377,6 @@ export default function CompanySignUpPage() {
 							adminPasswordConfirm: 'password123',
 							adminPhone: '010-1234-5678',
 						})
-						setSentCode('123456')
 						setIsCodeSent(true)
 						setIsEmailVerified(true)
 						setStep(4)
@@ -205,7 +386,7 @@ export default function CompanySignUpPage() {
 					variant="outline"
 					className="text-orange-400 border-orange-700 hover:hover:bg-orange-900/20"
 				>
-					⚡ Skip All Steps
+					⚡ 모든 단계 건너뛰기
 				</Button>
 			)}
 				
@@ -215,32 +396,32 @@ export default function CompanySignUpPage() {
 						className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-neutral-100 transition-colors"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span>Previous</span>
+						<span>이전</span>
 					</button>
 				)}
 			</div>
 		</div>
 
-			{/* Header */}
-			<div className="text-center mb-8">
-				<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-					<Building2 className="h-8 w-8 text-primary" />
-				</div>
-				<h1 className="text-3xl font-bold mb-2">Company Registration</h1>
-				<p className="text-neutral-400">
-					Register your company and create an admin account
-				</p>
+		{/* Header */}
+		<div className="text-center mb-8">
+			<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+				<Building2 className="h-8 w-8 text-primary" />
 			</div>
+			<h1 className="text-3xl font-bold mb-2">기업 회원가입</h1>
+			<p className="text-neutral-400">
+				회사를 등록하고 관리자 계정을 만드세요
+			</p>
+		</div>
 
-			{/* Progress Steps */}
-			<div className="mb-10">
-				<div className="flex items-center max-w-3xl mx-auto">
-					{[
-						{ num: 1, label: 'Email Verification' },
-						{ num: 2, label: 'Company Info' },
-						{ num: 3, label: 'Admin Info' },
-						{ num: 4, label: 'Complete' },
-					].map((s, index) => (
+		{/* Progress Steps */}
+		<div className="mb-10">
+			<div className="flex items-center max-w-3xl mx-auto">
+				{[
+					{ num: 1, label: '이메일 인증' },
+					{ num: 2, label: '회사 정보' },
+					{ num: 3, label: '관리자 정보' },
+					{ num: 4, label: '완료' },
+				].map((s, index) => (
 						<div key={s.num} className="flex items-center flex-1">
 							{/* Step Circle */}
 							<div className="flex flex-col items-center min-w-[120px]">
@@ -281,63 +462,65 @@ export default function CompanySignUpPage() {
 
 			{/* Form Card */}
 			<Card className="max-w-2xl mx-auto shadow-xl">
-				<CardHeader className="border-b border-neutral-800">
-					<h2 className="text-2xl font-bold">
-						{step === 1 && 'Email Verification'}
-						{step === 2 && 'Company Information'}
-						{step === 3 && 'Administrator Information'}
-						{step === 4 && 'Registration Complete'}
-					</h2>
-					<p className="text-sm text-neutral-400 mt-1">
-						{step === 1 && 'Verify your email to prevent unauthorized signups'}
-						{step === 2 && 'Enter your company details'}
-						{step === 3 && 'Create your admin account'}
-						{step === 4 && 'Review and confirm your registration'}
-					</p>
-				</CardHeader>
+			<CardHeader className="border-b border-neutral-800">
+				<h2 className="text-2xl font-bold">
+					{step === 1 && '이메일 인증'}
+					{step === 2 && '회사 정보'}
+					{step === 3 && '관리자 정보'}
+					{step === 4 && '등록 완료'}
+				</h2>
+				<p className="text-sm text-neutral-400 mt-1">
+					{step === 1 && '이메일을 인증하여 무단 가입을 방지합니다'}
+					{step === 2 && '회사 세부 정보를 입력하세요'}
+					{step === 3 && '관리자 계정을 생성하세요'}
+					{step === 4 && '등록 정보를 검토하고 확인하세요'}
+				</p>
+			</CardHeader>
 				<CardContent className="p-8">
-					{/* Step 1: Email Verification */}
-					{step === 1 && (
-						<div className="space-y-6">
-							<div className="text-center mb-6">
-								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-									<Mail className="h-8 w-8 text-primary" />
-								</div>
-								<h3 className="text-lg font-semibold mb-2">Verify Your Business Email</h3>
-								<p className="text-sm text-neutral-400">
-									We'll send a verification code to ensure your email is valid
-								</p>
+				{/* Step 1: Email Verification */}
+				{step === 1 && (
+					<div className="space-y-6">
+						<div className="text-center mb-6">
+							<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+								<Mail className="h-8 w-8 text-primary" />
 							</div>
-
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Business Email <span className="text-red-500">*</span>
-								</label>
-								<div className="flex gap-2">
-									<Input
-										type="email"
-										placeholder="company@example.com"
-										value={data.email}
-										onChange={(e) => handleChange('email', e.target.value)}
-										disabled={isCodeSent}
-										className="flex-1 h-12"
-									/>
-									<Button
-										onClick={handleSendCode}
-										disabled={isCodeSent && countdown > 0}
-										className="h-12 px-6"
-									>
-										{isCodeSent && countdown > 0 
-											? `${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}`
-											: 'Send Code'}
-									</Button>
-								</div>
-						{!isCodeSent && (
-							<p className="text-xs text-neutral-500 mt-2">
-								💡 Use your official business email address
+							<h3 className="text-lg font-semibold mb-2">비즈니스 이메일 인증</h3>
+							<p className="text-sm text-neutral-400">
+								이메일 유효성을 확인하기 위해 인증 코드를 발송합니다
 							</p>
-						)}
-					</div>
+						</div>
+
+						<div>
+							<label className="block text-sm font-medium mb-2">
+								비즈니스 이메일 <span className="text-red-500">*</span>
+							</label>
+							<div className="flex gap-2">
+								<Input
+									type="email"
+									placeholder="company@example.com"
+									value={data.email}
+									onChange={(e) => handleChange('email', e.target.value)}
+									disabled={isCodeSent}
+									className="flex-1 h-12"
+								/>
+								<Button
+									onClick={handleSendCode}
+									disabled={isCodeSent && countdown > 0 || isLoading}
+									className="h-12 px-6"
+								>
+									{isLoading 
+										? '전송 중...'
+										: isCodeSent && countdown > 0 
+											? `${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}`
+											: '코드 발송'}
+								</Button>
+							</div>
+					{!isCodeSent && (
+						<p className="text-xs text-neutral-500 mt-2">
+							💡 공식 비즈니스 이메일 주소를 사용하세요
+						</p>
+					)}
+				</div>
 
 				{/* Dev Mode: Skip Email Verification */}
 				{!isEmailVerified && (
@@ -345,7 +528,6 @@ export default function CompanySignUpPage() {
 						<Button
 							onClick={() => {
 								setData(prev => ({ ...prev, email: 'test@company.com', verificationCode: '123456' }))
-								setSentCode('123456')
 								setIsCodeSent(true)
 								setIsEmailVerified(true)
 								toast.success('⚡ Dev Mode: Email verification skipped')
@@ -358,63 +540,67 @@ export default function CompanySignUpPage() {
 					</div>
 				)}
 
-							{isCodeSent && !isEmailVerified && (
-								<div className="space-y-4 pt-4 border-t border-neutral-800">
-									<div>
-										<label className="block text-sm font-medium mb-2">
-											Verification Code <span className="text-red-500">*</span>
-										</label>
-										<Input
-											type="text"
-											placeholder="Enter 6-digit code"
-											value={data.verificationCode}
-											onChange={(e) => handleChange('verificationCode', e.target.value.replace(/\D/g, '').slice(0, 6))}
-											className="h-12 text-center text-2xl tracking-widest font-mono"
-											maxLength={6}
-										/>
-										<p className="text-xs text-neutral-500 mt-2">
-											Check your email for the verification code
-										</p>
-									</div>
+						{isCodeSent && !isEmailVerified && (
+							<div className="space-y-4 pt-4 border-t border-neutral-800">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										인증 코드 <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="text"
+										placeholder="6자리 코드를 입력하세요"
+										value={data.verificationCode}
+										onChange={(e) => handleChange('verificationCode', e.target.value.replace(/\D/g, '').slice(0, 6))}
+										className="h-12 text-center text-2xl tracking-widest font-mono"
+										maxLength={6}
+									/>
+									<p className="text-xs text-neutral-500 mt-2">
+										이메일에서 인증 코드를 확인하세요
+									</p>
+								</div>
 									
 									<div className="flex gap-2">
 										<Button
 											onClick={handleVerifyCode}
 											className="flex-1 h-12"
-											disabled={data.verificationCode.length !== 6}
+											disabled={data.verificationCode.length !== 6 || isLoading}
 										>
 											<Check className="h-5 w-5" />
-											Verify Email
+											{isLoading ? '확인 중...' : '이메일 인증'}
 										</Button>
 										<Button
 											onClick={handleSendCode}
 											variant="outline"
 											className="h-12"
-											disabled={countdown > 0}
+											disabled={countdown > 0 || isLoading}
 										>
 											<RefreshCw className="h-5 w-5" />
-											Resend
+											재전송
 										</Button>
 									</div>
 								</div>
 							)}
 
-							{isEmailVerified && (
-								<div className="bg-green-900/20 border border-green-800 rounded-lg p-4 flex items-center gap-3">
-									<CheckCircle2 className="h-6 w-6 text-green-400" />
-									<div>
-										<p className="font-medium text-green-100">Email Verified!</p>
-										<p className="text-sm text-green-300">
-											You can now proceed to company registration
-										</p>
-									</div>
+						{isEmailVerified && (
+							<div className="bg-green-900/20 border border-green-800 rounded-lg p-4 flex items-center gap-3">
+								<CheckCircle2 className="h-6 w-6 text-green-400" />
+								<div>
+									<p className="font-medium text-green-100">이메일 인증 완료!</p>
+									<p className="text-sm text-green-300">
+										이제 회사 등록을 진행할 수 있습니다
+									</p>
 								</div>
-							)}
+							</div>
+						)}
 
 							{isEmailVerified && (
 								<div className="pt-4">
-									<Button onClick={handleNext} className="w-full h-12 text-base">
-										Continue to Company Info
+									<Button 
+										onClick={handleNext} 
+										className="w-full h-12 text-base"
+										disabled={isLoading}
+									>
+										회사 정보 입력으로 계속
 										<ArrowRight className="h-5 w-5" />
 									</Button>
 								</div>
@@ -422,41 +608,152 @@ export default function CompanySignUpPage() {
 						</div>
 					)}
 
-					{/* Step 2: Company Info */}
-					{step === 2 && (
-						<div className="space-y-6">
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Company Name <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="text"
-									placeholder="Enter company name"
-									value={data.companyName}
-									onChange={(e) => handleChange('companyName', e.target.value)}
-									className="h-12"
-								/>
+				{/* Step 2: Company Info */}
+				{step === 2 && (
+					<div className="space-y-6">
+						{/* 회사 소개서 업로드 섹션 */}
+						<div className="bg-gradient-to-br from-orange-900/20 to-purple-900/20 border border-orange-800/50 rounded-2xl p-6">
+							<div className="flex items-start gap-3 mb-4">
+								<div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+									<Sparkles className="h-5 w-5 text-orange-400" />
+								</div>
+								<div className="flex-1">
+									<h3 className="text-base font-semibold text-white mb-1">
+										🚀 빠른 입력: 회사 소개서 업로드
+									</h3>
+									<p className="text-sm text-neutral-400">
+										회사 소개서를 업로드하면 AI가 자동으로 정보를 추출하여 입력해드립니다
+									</p>
+								</div>
 							</div>
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Business Registration Number <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="text"
-									placeholder="000-00-00000"
-									value={data.businessNumber}
-									onChange={(e) => handleChange('businessNumber', e.target.value)}
-									className="h-12"
-								/>
+
+							{!uploadedFile ? (
+								<div>
+									<input
+										ref={fileInputRef}
+										type="file"
+										accept=".pdf,.docx,.txt,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+										onChange={handleFileUpload}
+										className="hidden"
+										disabled={isParsingFile}
+									/>
+									<Button
+										onClick={() => fileInputRef.current?.click()}
+										variant="outline"
+										className="w-full h-12 border-orange-700 hover:bg-orange-900/30 hover:border-orange-600 transition-all"
+										disabled={isParsingFile}
+									>
+										<Upload className="h-5 w-5 mr-2" />
+										{isParsingFile ? '분석 중...' : '파일 선택 (PDF, DOCX, TXT)'}
+									</Button>
+									<p className="text-xs text-neutral-500 mt-2 text-center">
+										파일 크기: 최대 10MB | 회사 소개서, IR 자료 등
+									</p>
+								</div>
+							) : (
+								<div className="space-y-3">
+									{/* 업로드된 파일 정보 */}
+									<div className="bg-neutral-900/50 border border-neutral-700 rounded-xl p-4">
+										<div className="flex items-center justify-between">
+											<div className="flex items-center gap-3 flex-1 min-w-0">
+												<FileText className="h-5 w-5 text-orange-400 flex-shrink-0" />
+												<div className="flex-1 min-w-0">
+													<p className="text-sm font-medium text-white truncate">
+														{uploadedFile.name}
+													</p>
+													<p className="text-xs text-neutral-400">
+														{(uploadedFile.size / 1024).toFixed(1)} KB
+													</p>
+												</div>
+											</div>
+											<button
+												onClick={handleRemoveFile}
+												className="ml-2 p-1.5 hover:bg-neutral-800 rounded-lg transition-colors"
+												disabled={isParsingFile}
+											>
+												<X className="h-4 w-4 text-neutral-400" />
+											</button>
+										</div>
+									</div>
+
+									{/* 파싱 결과 */}
+									{parsedInfo && parsedInfo.extractedFields.length > 0 && (
+										<div className="bg-green-900/20 border border-green-800/50 rounded-xl p-4">
+											<div className="flex items-start gap-2 mb-3">
+												<CheckCircle2 className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+												<div className="flex-1">
+													<p className="text-sm font-medium text-green-100 mb-1">
+														정보 추출 완료
+													</p>
+													<p className="text-xs text-green-300">
+														{parsedInfo.extractedFields.length}개 항목 자동 입력됨 · 신뢰도 {parsedInfo.confidence}%
+													</p>
+												</div>
+											</div>
+											<div className="flex flex-wrap gap-2">
+												{parsedInfo.extractedFields.map((field) => (
+													<span
+														key={field}
+														className="inline-flex items-center px-2.5 py-1 rounded-lg bg-green-800/30 text-xs text-green-300 font-medium"
+													>
+														{field === 'companyName' && '회사명'}
+														{field === 'businessNumber' && '사업자번호'}
+														{field === 'industry' && '업종'}
+														{field === 'employeeCount' && '직원 수'}
+														{field === 'address' && '주소'}
+													</span>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							)}
+						</div>
+
+						{/* 구분선 */}
+						<div className="relative">
+							<div className="absolute inset-0 flex items-center">
+								<div className="w-full border-t border-neutral-800"></div>
 							</div>
+							<div className="relative flex justify-center text-xs uppercase">
+								<span className="bg-neutral-950 px-4 text-neutral-500 font-medium">
+									회사 정보 입력
+								</span>
+							</div>
+						</div>
+
 						<div>
-							<label className="block text-sm font-medium mb-2">Industry</label>
-							<select
-								value={data.industry}
-								onChange={(e) => handleChange('industry', e.target.value)}
-								className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-							>
-								<option value="">Select industry</option>
+							<label className="block text-sm font-medium mb-2">
+								회사명 <span className="text-red-500">*</span>
+							</label>
+							<Input
+								type="text"
+								placeholder="회사명을 입력하세요"
+								value={data.companyName}
+								onChange={(e) => handleChange('companyName', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+						<div>
+							<label className="block text-sm font-medium mb-2">
+								사업자 등록번호 <span className="text-red-500">*</span>
+							</label>
+							<Input
+								type="text"
+								placeholder="000-00-00000"
+								value={data.businessNumber}
+								onChange={(e) => handleChange('businessNumber', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+					<div>
+						<label className="block text-sm font-medium mb-2">업종 <span className="text-red-500">*</span></label>
+						<select
+							value={data.industry}
+							onChange={(e) => handleChange('industry', e.target.value)}
+							className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+						>
+							<option value="">업종을 선택하세요</option>
 								<option value="IT/SaaS/Software">IT / SaaS / Software</option>
 								<option value="Manufacturing/Production">Manufacturing / Production</option>
 								<option value="Finance/Insurance/Securities">Finance / Insurance / Securities</option>
@@ -484,35 +781,35 @@ export default function CompanySignUpPage() {
 								<option value="Non-profit/NGO">Non-profit / NGO</option>
 								<option value="Government/Public">Government / Public</option>
 								<option value="Other">Other</option>
-							</select>
-						</div>
-						<div>
-							<label className="block text-sm font-medium mb-2">Number of Employees</label>
-							<div className="flex items-center gap-3">
-								<div className="flex-1">
-									<select
-										value={data.employeeCount}
-										onChange={(e) => handleEmployeeCountSelect(e.target.value)}
-										className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
-									>
-										<option value="">Select range</option>
+					</select>
+				</div>
+				<div>
+					<label className="block text-sm font-medium mb-2">직원 수 <span className="text-red-500">*</span></label>
+					<div className="flex items-center gap-3">
+						<div className="flex-1">
+							<select
+								value={data.employeeCount}
+								onChange={(e) => handleEmployeeCountSelect(e.target.value)}
+								className="w-full h-12 px-4 py-2 border border-neutral-700 rounded-2xl bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary"
+							>
+								<option value="">범위 선택</option>
 										<option value="1-10">1-10</option>
 										<option value="11-50">11-50</option>
 										<option value="51-200">51-200</option>
 										<option value="201-500">201-500</option>
 										<option value="500+">500+</option>
 									</select>
-								</div>
-								<div className="flex items-center gap-2">
-									<span className="text-neutral-400">or</span>
-									<Input
-										type="number"
-										placeholder="Enter exact"
-										value={data.employeeCountExact}
-										onChange={(e) => handleEmployeeCountExact(e.target.value)}
-										className="h-12 w-32"
-										min="1"
-									/>
+						</div>
+						<div className="flex items-center gap-2">
+							<span className="text-neutral-400">또는</span>
+							<Input
+								type="number"
+								placeholder="직접 입력"
+								value={data.employeeCountExact}
+								onChange={(e) => handleEmployeeCountExact(e.target.value)}
+								className="h-12 w-32"
+								min="1"
+							/>
 									{(data.employeeCount || data.employeeCountExact) && (
 										<div className="flex items-center justify-center min-w-[100px] h-12 px-4 bg-primary/10 text-primary rounded-2xl font-medium">
 											{data.employeeCountExact 
@@ -520,15 +817,19 @@ export default function CompanySignUpPage() {
 												: data.employeeCount}
 										</div>
 									)}
-								</div>
-							</div>
-							<p className="text-xs text-neutral-400 mt-2">
-								Select a range or enter the exact number
-							</p>
 						</div>
+					</div>
+					<p className="text-xs text-neutral-400 mt-2">
+						범위를 선택하거나 정확한 숫자를 입력하세요
+					</p>
+				</div>
 						<div className="space-y-3 mt-8">
-							<Button onClick={handleNext} className="w-full h-12 text-base">
-								Next
+							<Button 
+								onClick={handleNext} 
+								className="w-full h-12 text-base"
+								disabled={isLoading}
+							>
+								다음
 								<ArrowRight className="h-5 w-5" />
 							</Button>
 						
@@ -555,72 +856,76 @@ export default function CompanySignUpPage() {
 						</div>
 				)}
 
-				{/* Step 3: Admin Info */}
-				{step === 3 && (
-						<div className="space-y-6">
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Administrator Name <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="text"
-									placeholder="Enter your name"
-									value={data.adminName}
-									onChange={(e) => handleChange('adminName', e.target.value)}
-									className="h-12"
-								/>
-							</div>
+			{/* Step 3: Admin Info */}
+			{step === 3 && (
+					<div className="space-y-6">
 						<div>
 							<label className="block text-sm font-medium mb-2">
-								Email Address <span className="text-green-600">(Verified ✓)</span>
+								관리자 이름 <span className="text-red-500">*</span>
 							</label>
 							<Input
-								type="email"
-								value={data.email}
-								disabled
-								className="h-12 bg-neutral-800 cursor-not-allowed"
+								type="text"
+								placeholder="이름을 입력하세요"
+								value={data.adminName}
+								onChange={(e) => handleChange('adminName', e.target.value)}
+								className="h-12"
 							/>
-							<p className="text-xs text-neutral-500 mt-1">
-								Using your verified business email
-							</p>
 						</div>
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Password <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="password"
-									placeholder="Minimum 8 characters"
-									value={data.adminPassword}
-									onChange={(e) => handleChange('adminPassword', e.target.value)}
-									className="h-12"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Confirm Password <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="password"
-									placeholder="Re-enter your password"
-									value={data.adminPasswordConfirm}
-									onChange={(e) => handleChange('adminPasswordConfirm', e.target.value)}
-									className="h-12"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-2">Phone Number</label>
-								<Input
-									type="tel"
-									placeholder="010-0000-0000"
-									value={data.adminPhone}
-									onChange={(e) => handleChange('adminPhone', e.target.value)}
-									className="h-12"
-								/>
-							</div>
+					<div>
+						<label className="block text-sm font-medium mb-2">
+							이메일 주소 <span className="text-green-600">(인증 완료 ✓)</span>
+						</label>
+						<Input
+							type="email"
+							value={data.email}
+							disabled
+							className="h-12 bg-neutral-800 cursor-not-allowed"
+						/>
+						<p className="text-xs text-neutral-500 mt-1">
+							인증된 비즈니스 이메일을 사용합니다
+						</p>
+					</div>
+						<div>
+							<label className="block text-sm font-medium mb-2">
+								비밀번호 <span className="text-red-500">*</span>
+							</label>
+							<Input
+								type="password"
+								placeholder="최소 8자"
+								value={data.adminPassword}
+								onChange={(e) => handleChange('adminPassword', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+						<div>
+							<label className="block text-sm font-medium mb-2">
+								비밀번호 확인 <span className="text-red-500">*</span>
+							</label>
+							<Input
+								type="password"
+								placeholder="비밀번호를 다시 입력하세요"
+								value={data.adminPasswordConfirm}
+								onChange={(e) => handleChange('adminPasswordConfirm', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+						<div>
+							<label className="block text-sm font-medium mb-2">전화번호 <span className="text-red-500">*</span></label>
+							<Input
+								type="tel"
+								placeholder="010-0000-0000"
+								value={data.adminPhone}
+								onChange={(e) => handleChange('adminPhone', e.target.value)}
+								className="h-12"
+							/>
+						</div>
 						<div className="space-y-3 mt-8">
-							<Button onClick={handleNext} className="w-full h-12 text-base">
-								Next
+							<Button 
+								onClick={handleNext} 
+								className="w-full h-12 text-base"
+								disabled={isLoading}
+							>
+								다음
 								<ArrowRight className="h-5 w-5" />
 							</Button>
 						
@@ -647,84 +952,89 @@ export default function CompanySignUpPage() {
 						</div>
 				)}
 
-				{/* Step 4: Complete */}
-				{step === 4 && (
-						<div className="text-center py-8">
-							<div className="w-24 h-24 rounded-full bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-								<Check className="h-12 w-12 text-green-400" />
-							</div>
-							<h3 className="text-2xl font-bold mb-2">Review Your Information</h3>
-							<p className="text-neutral-400 mb-8">
-								Please confirm your registration details
-							</p>
+			{/* Step 4: Complete */}
+			{step === 4 && (
+					<div className="text-center py-8">
+						<div className="w-24 h-24 rounded-full bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+							<Check className="h-12 w-12 text-green-400" />
+						</div>
+						<h3 className="text-2xl font-bold mb-2">정보 확인</h3>
+						<p className="text-neutral-400 mb-8">
+							등록 정보를 확인해주세요
+						</p>
 
-							<div className="max-w-md mx-auto space-y-4 mb-10">
-								<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
-									<div className="text-sm font-medium text-neutral-400 mb-2">
-										Company Information
+						<div className="max-w-md mx-auto space-y-4 mb-10">
+							<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
+								<div className="text-sm font-medium text-neutral-400 mb-2">
+									회사 정보
+								</div>
+								<div className="space-y-2">
+									<div className="flex justify-between">
+										<span className="text-sm text-neutral-400">회사명:</span>
+										<span className="font-medium">{data.companyName}</span>
 									</div>
-									<div className="space-y-2">
+									<div className="flex justify-between">
+										<span className="text-sm text-neutral-400">사업자번호:</span>
+										<span className="font-medium">{data.businessNumber}</span>
+									</div>
+									{data.industry && (
 										<div className="flex justify-between">
-											<span className="text-sm text-neutral-400">Name:</span>
-											<span className="font-medium">{data.companyName}</span>
-										</div>
-										<div className="flex justify-between">
-											<span className="text-sm text-neutral-400">Business #:</span>
-											<span className="font-medium">{data.businessNumber}</span>
-										</div>
-										{data.industry && (
-											<div className="flex justify-between">
-												<span className="text-sm text-neutral-400">Industry:</span>
-												<span className="font-medium">{data.industry}</span>
-											</div>
-										)}
-									{(data.employeeCount || data.employeeCountExact) && (
-										<div className="flex justify-between">
-											<span className="text-sm text-neutral-400">Employees:</span>
-											<span className="font-medium">
-												{data.employeeCountExact 
-													? `${data.employeeCountExact} employees` 
-													: data.employeeCount}
-											</span>
+											<span className="text-sm text-neutral-400">업종:</span>
+											<span className="font-medium">{data.industry}</span>
 										</div>
 									)}
+								{(data.employeeCount || data.employeeCountExact) && (
+									<div className="flex justify-between">
+										<span className="text-sm text-neutral-400">직원 수:</span>
+										<span className="font-medium">
+											{data.employeeCountExact 
+												? `${data.employeeCountExact}명` 
+												: data.employeeCount}
+										</span>
 									</div>
-								</div>
-
-								<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
-									<div className="text-sm font-medium text-neutral-400 mb-2">
-										Administrator
-									</div>
-									<div className="space-y-2">
-										<div className="flex justify-between">
-											<span className="text-sm text-neutral-400">Name:</span>
-											<span className="font-medium">{data.adminName}</span>
-										</div>
-										<div className="flex justify-between">
-											<span className="text-sm text-neutral-400">Email:</span>
-											<span className="font-medium">{data.adminEmail}</span>
-										</div>
-										{data.adminPhone && (
-											<div className="flex justify-between">
-												<span className="text-sm text-neutral-400">Phone:</span>
-												<span className="font-medium">{data.adminPhone}</span>
-											</div>
-										)}
-									</div>
+								)}
 								</div>
 							</div>
 
+							<div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 text-left">
+								<div className="text-sm font-medium text-neutral-400 mb-2">
+									관리자
+								</div>
+								<div className="space-y-2">
+									<div className="flex justify-between">
+										<span className="text-sm text-neutral-400">이름:</span>
+										<span className="font-medium">{data.adminName}</span>
+									</div>
+									<div className="flex justify-between">
+										<span className="text-sm text-neutral-400">이메일:</span>
+										<span className="font-medium">{data.adminEmail}</span>
+									</div>
+									{data.adminPhone && (
+										<div className="flex justify-between">
+											<span className="text-sm text-neutral-400">전화번호:</span>
+											<span className="font-medium">{data.adminPhone}</span>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
+
 							<div className="space-y-3 max-w-md mx-auto">
-								<Button onClick={handleSubmit} className="w-full h-12 text-base">
+								<Button 
+									onClick={handleSubmit} 
+									className="w-full h-12 text-base"
+									disabled={isLoading}
+								>
 									<Check className="h-5 w-5" />
-									Complete Registration
+									{isLoading ? '등록 중...' : '등록 완료'}
 								</Button>
 								<Button 
 									onClick={handleSubmit} 
 									variant="outline" 
 									className="w-full h-12 text-base text-orange-400 border-orange-800 hover:hover:bg-orange-900/20"
+									disabled={isLoading}
 								>
-									Complete (Skip Validation)
+									완료 (검증 건너뛰기)
 								</Button>
 							</div>
 						</div>
@@ -732,18 +1042,18 @@ export default function CompanySignUpPage() {
 				</CardContent>
 			</Card>
 
-			{/* Footer */}
-			<div className="text-center mt-8">
-				<p className="text-sm text-neutral-400">
-					Already have an account?{' '}
-					<button
-						onClick={() => navigate('/')}
-						className="text-primary hover:underline font-medium"
-					>
-						Sign In
-					</button>
-				</p>
-			</div>
+		{/* Footer */}
+		<div className="text-center mt-8">
+			<p className="text-sm text-neutral-400">
+				이미 계정이 있으신가요?{' '}
+				<button
+					onClick={() => navigate('/')}
+					className="text-primary hover:underline font-medium"
+				>
+					로그인
+				</button>
+			</p>
+		</div>
 		</div>
 
 		<Toaster />

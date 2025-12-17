@@ -1,9 +1,10 @@
 /**
  * OKRForm Component
  * OKR 목표 생성/수정 폼
+ * OKR은 개인 목표로 정의됨 (team 필드 제거)
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Button } from '../ui/Button'
 import Input from '../ui/Input'
@@ -16,8 +17,8 @@ export interface OKRFormProps {
 	objective?: Objective
 	onSubmit: (data: ObjectiveFormData) => void
 	onCancel: () => void
-	teams: Array<{ id: string; name: string }>
-	users: Array<{ id: string; name: string }>
+	users: Array<{ id: string; name: string; department?: string }>
+	currentUser?: { id: string; name: string; department?: string }
 	isSubmitting?: boolean
 }
 
@@ -25,8 +26,8 @@ export function OKRForm({
 	objective,
 	onSubmit,
 	onCancel,
-	teams,
 	users,
+	currentUser,
 	isSubmitting = false,
 }: OKRFormProps) {
 	const [formData, setFormData] = useState<ObjectiveFormData>({
@@ -34,11 +35,26 @@ export function OKRForm({
 		description: objective?.description || '',
 		period: objective?.period || '',
 		periodType: objective?.periodType || 'quarter',
-		owner: objective?.ownerId || '',
-		team: objective?.teamId || '',
+		owner: objective?.owner || currentUser?.name || '',
+		ownerId: objective?.ownerId || currentUser?.id || '',
+		department: objective?.department || currentUser?.department || '',
 		startDate: objective?.startDate || '',
 		endDate: objective?.endDate || '',
 	})
+
+	// 소유자가 변경될 때 부서 정보도 업데이트
+	useEffect(() => {
+		if (formData.ownerId) {
+			const selectedUser = users.find(u => u.id === formData.ownerId)
+			if (selectedUser) {
+				setFormData(prev => ({
+					...prev,
+					owner: selectedUser.name,
+					department: selectedUser.department || prev.department
+				}))
+			}
+		}
+	}, [formData.ownerId, users])
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -52,22 +68,23 @@ export function OKRForm({
 			toast.error('Please select a period')
 			return
 		}
-		if (!formData.owner) {
+		if (!formData.ownerId) {
 			toast.error('Please select an owner')
 			return
 		}
-		if (!formData.team) {
-			toast.error('Please select a team')
+		if (!formData.startDate || !formData.endDate) {
+			toast.error('Please select start and end dates')
 			return
 		}
 
 		onSubmit(formData)
 	}
 
-	const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
+	const quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025']
 	const months = [
-		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+		'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024', 'Jun 2024',
+		'Jul 2024', 'Aug 2024', 'Sep 2024', 'Oct 2024', 'Nov 2024', 'Dec 2024',
+		'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025', 'Jun 2025',
 	]
 
 	return (
@@ -76,7 +93,7 @@ export function OKRForm({
 				<div className="flex items-center justify-between">
 					<CardTitle className="flex items-center gap-2">
 						<Target className="h-5 w-5 text-orange-400" />
-						{objective ? 'Edit Objective' : 'Create New Objective'}
+						{objective ? 'Edit Personal Objective' : 'Create Personal Objective'}
 					</CardTitle>
 					<Button onClick={onCancel} variant="ghost" size="sm">
 						<X className="h-4 w-4" />
@@ -93,7 +110,7 @@ export function OKRForm({
 						</label>
 						<Input
 							type="text"
-							placeholder="e.g., Increase customer satisfaction"
+							placeholder="e.g., Improve code quality and reduce bugs"
 							value={formData.title}
 							onChange={(e) => setFormData({ ...formData, title: e.target.value })}
 							disabled={isSubmitting}
@@ -107,7 +124,7 @@ export function OKRForm({
 							Description
 						</label>
 						<Textarea
-							placeholder="Describe the objective in detail..."
+							placeholder="Describe your objective in detail..."
 							value={formData.description}
 							onChange={(e) => setFormData({ ...formData, description: e.target.value })}
 							disabled={isSubmitting}
@@ -193,48 +210,48 @@ export function OKRForm({
 						</div>
 					</div>
 
-					{/* Team & Owner */}
-					<div className="grid grid-cols-2 gap-4">
-						<div>
-							<label className="block text-sm font-medium text-neutral-300 mb-2">
-								Team <span className="text-red-400">*</span>
-							</label>
-							<select
-								value={formData.team}
-								onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-								disabled={isSubmitting}
-								className="w-full px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-								required
-							>
-								<option value="">Select team...</option>
-								{teams.map((team) => (
-									<option key={team.id} value={team.id}>
-										{team.name}
-									</option>
-								))}
-							</select>
-						</div>
-
-						<div>
-							<label className="block text-sm font-medium text-neutral-300 mb-2">
-								Owner <span className="text-red-400">*</span>
-							</label>
-							<select
-								value={formData.owner}
-								onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-								disabled={isSubmitting}
-								className="w-full px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-								required
-							>
-								<option value="">Select owner...</option>
-								{users.map((user) => (
-									<option key={user.id} value={user.id}>
-										{user.name}
-									</option>
-								))}
-							</select>
-						</div>
+					{/* Owner (개인 선택) */}
+					<div>
+						<label className="block text-sm font-medium text-neutral-300 mb-2">
+							Owner (You) <span className="text-red-400">*</span>
+						</label>
+						<select
+							value={formData.ownerId}
+							onChange={(e) => setFormData({ ...formData, ownerId: e.target.value })}
+							disabled={isSubmitting}
+							className="w-full px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+							required
+						>
+							<option value="">Select owner...</option>
+							{users.map((user) => (
+								<option key={user.id} value={user.id}>
+									{user.name}
+									{user.department && ` (${user.department})`}
+								</option>
+							))}
+						</select>
+						<p className="mt-1 text-xs text-neutral-500">
+							OKRs are personal objectives. Select yourself as the owner.
+						</p>
 					</div>
+
+					{/* Department (자동 표시) */}
+					{formData.department && (
+						<div>
+							<label className="block text-sm font-medium text-neutral-300 mb-2">
+								Department
+							</label>
+							<Input
+								type="text"
+								value={formData.department}
+								disabled
+								className="bg-surface-darker"
+							/>
+							<p className="mt-1 text-xs text-neutral-500">
+								Department is automatically set based on the owner.
+							</p>
+						</div>
+					)}
 
 					{/* Actions */}
 					<div className="flex items-center justify-end gap-3 pt-4 border-t border-border-dark">
@@ -269,4 +286,3 @@ export function OKRForm({
 		</Card>
 	)
 }
-

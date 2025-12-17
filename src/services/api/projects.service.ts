@@ -5,7 +5,7 @@
  */
 
 import { storage } from '../../utils/storage'
-import type { Project, ProjectStatus } from '../../types/common.types'
+import type { Project, ProjectStatus, ProjectScope } from '../../types/common.types'
 import type { ApiResponse } from './config'
 import { parseProjectsFromStorage, serializeProjectForStorage } from '../../utils/mappers'
 
@@ -14,6 +14,10 @@ import { parseProjectsFromStorage, serializeProjectForStorage } from '../../util
  */
 export interface ProjectFilters {
 	status?: ProjectStatus
+	scope?: ProjectScope  // 새로 추가
+	ownerId?: string      // 개인 프로젝트 필터
+	teamId?: string       // 팀 프로젝트 필터
+	departmentId?: string // 부서 프로젝트 필터
 	department?: string
 	departments?: string[]
 	startDate?: Date
@@ -40,6 +44,24 @@ class ProjectsService {
 		if (filters) {
 			if (filters.status) {
 				projects = projects.filter(p => p.status === filters.status)
+			}
+			if (filters.scope) {
+				projects = projects.filter(p => p.ownership?.scope === filters.scope)
+			}
+			if (filters.ownerId) {
+				projects = projects.filter(p => 
+					p.ownership?.scope === 'personal' && p.ownership?.ownerId === filters.ownerId
+				)
+			}
+			if (filters.teamId) {
+				projects = projects.filter(p => 
+					p.ownership?.scope === 'team' && p.ownership?.teamId === filters.teamId
+				)
+			}
+			if (filters.departmentId) {
+				projects = projects.filter(p => 
+					p.ownership?.scope === 'department' && p.ownership?.departmentId === filters.departmentId
+				)
 			}
 			if (filters.department) {
 				// Support both legacy single department and new departments array

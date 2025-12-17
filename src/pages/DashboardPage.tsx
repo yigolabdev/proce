@@ -17,13 +17,38 @@ import { PerformanceChart } from '../components/dashboard/PerformanceChart'
 import { SummaryCards } from '../components/dashboard/SummaryCards'
 import { RecentActivity } from '../components/dashboard/RecentActivity'
 import { QuickActions } from '../components/dashboard/QuickActions'
+import { WeeklyTasksWidget } from '../components/dashboard/WeeklyTasksWidget'
+import { CompanyKPIWidget } from '../components/dashboard/CompanyKPIWidget'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatLocalDate } from '../utils/dateUtils'
+import { storage } from '../utils/storage'
+import { useState, useEffect } from 'react'
+import type { CompanyKPI } from '../app/admin/company-settings/_types/types'
 
 export default function DashboardPage() {
 	const navigate = useNavigate()
 	const { t, locale } = useI18n()
 	const { loading, personalStats, myRecentWork, performanceData } = useDashboardData()
+
+	// Load Company KPIs
+	const [companyKPIs, setCompanyKPIs] = useState<CompanyKPI[]>([])
+	
+	useEffect(() => {
+		const loadKPIs = () => {
+			const kpis = storage.get<CompanyKPI[]>('companyKPIs', [])
+			setCompanyKPIs(kpis)
+		}
+		
+		loadKPIs()
+		
+		// Listen for KPI updates
+		const handleKPIUpdate = () => {
+			loadKPIs()
+		}
+		
+		window.addEventListener('companyKPIsUpdated', handleKPIUpdate)
+		return () => window.removeEventListener('companyKPIsUpdated', handleKPIUpdate)
+	}, [])
 
 	// Keyboard shortcuts
 	useKeyboardShortcuts({
@@ -58,6 +83,20 @@ export default function DashboardPage() {
 					</div>
 				}
 			/>
+
+			{/* Company KPIs - Always Visible to Everyone */}
+			{companyKPIs.length > 0 && (
+				<div>
+					<SectionHeader 
+						title="Company Goals"
+						description="Shared objectives for everyone to align with"
+						size="md"
+					/>
+					<div className="mt-4">
+						<CompanyKPIWidget kpis={companyKPIs} compact />
+					</div>
+				</div>
+			)}
 
 			{/* Today's Summary - 4 Cards */}
 			<div>
@@ -102,23 +141,9 @@ export default function DashboardPage() {
 			{/* Bottom Section: Activity & Chart */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<RecentActivity activities={myRecentWork} />
-
-				{/* Upcoming Deadlines (Placeholder as in image) */}
-				<Card className="bg-surface-dark border-border-dark h-full flex flex-col justify-center items-center text-center p-8">
-					<div className="mb-4 relative">
-						<div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full" />
-						<Clock className="h-12 w-12 text-orange-500 relative z-10" />
-					</div>
-					<h3 className="text-lg font-bold text-white mb-2">{t('dashboard.upcomingDeadlines')}</h3>
-					<p className="text-neutral-400 text-sm mb-6 max-w-xs">
-						{t('dashboard.noDeadlines')}
-					</p>
-					<div className="flex gap-2">
-						<span className="w-2 h-2 rounded-full bg-neutral-700" />
-						<span className="w-2 h-2 rounded-full bg-neutral-700" />
-						<span className="w-2 h-2 rounded-full bg-border-dark" />
-					</div>
-				</Card>
+				
+				{/* Weekly Tasks Widget */}
+				<WeeklyTasksWidget />
 			</div>
 
 			{/* Performance Chart */}

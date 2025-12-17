@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Proce Logo - Recreated from PNG -->
+  <defs>
+    <clipPath id="circle-clip">
+      <circle cx="256" cy="256" r="240"/>
+    </clipPath>
+  </defs>
+  
+  <g clip-path="url(#circle-clip)">
+    <!-- Background -->
+    <circle cx="256" cy="256" r="240" fill="#1a1a1a"/>
+    
+    <!-- Three curved spiral segments -->
+    <!-- Top-left to bottom-right curve -->
+    <path d="M 100 150 Q 150 100, 250 100 Q 350 100, 400 150 Q 450 200, 420 280 Q 390 360, 290 380 Q 190 400, 130 350 Q 70 300, 100 220" 
+          fill="white" 
+          opacity="0.95"/>
+    
+    <!-- Top-right to bottom-left curve -->
+    <path d="M 400 150 Q 450 200, 450 280 Q 450 360, 380 400 Q 310 440, 230 410 Q 150 380, 120 300 Q 90 220, 140 160" 
+          fill="white" 
+          opacity="0.95"/>
+    
+    <!-- Bottom curve -->
+    <path d="M 150 380 Q 200 420, 280 420 Q 360 420, 400 380 Q 440 340, 420 280 Q 400 220, 340 200" 
+          fill="white" 
+          opacity="0.95"/>
+    
+    <!-- Center void (dark) -->
+    <circle cx="256" cy="256" r="80" fill="#1a1a1a"/>
+    
+    <!-- Bottom accent arc -->
+    <path d="M 100 400 Q 256 470, 412 400" 
+          stroke="white" 
+          stroke-width="35" 
+          fill="none" 
+          stroke-linecap="round"
+          opacity="0.9"/>
+  </g>
+</svg>
+

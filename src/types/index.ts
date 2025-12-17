@@ -17,6 +17,8 @@ export type {
 	// Project
 	Project,
 	ProjectStatus,
+	ProjectScope,
+	ProjectOwnership,
 	ProjectMember,
 	ProjectSchedule,
 	ProjectResources,
@@ -83,6 +85,19 @@ export type {
 	WebSocketMessage,
 	RealtimeNotification,
 } from './api.types'
+
+// KPI types
+export type {
+	KPI,
+	KPICategory,
+	KPIFormData,
+	KPIStats,
+	KPIFilter,
+	KPIListProps,
+	KPIFormProps,
+	KPICardProps,
+	UseKPIReturn,
+} from './kpi.types'
 
 // Constants
 export { STORAGE_KEYS } from './common.types'

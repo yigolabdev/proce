@@ -5,7 +5,6 @@ import { PageHeader } from '../../../components/common/PageHeader'
 import {
 	Building2,
 	DollarSign,
-	Target,
 	Users,
 	Briefcase,
 	CheckCircle2,
@@ -16,7 +15,6 @@ import {
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { storage } from '../../../utils/storage'
-import KPITab from './_components/KPITab'
 import WorkplaceTab from './_components/WorkplaceTab'
 import BusinessTab from './_components/BusinessTab'
 import CompanyInfoTab from './_components/CompanyInfoTab'
@@ -27,7 +25,6 @@ import HistoryTab from './_components/HistoryTab'
 import type {
 	CompanyInfo,
 	LeadershipMember,
-	CompanyKPI,
 	FinancialData,
 	UploadedDocument,
 	WorkplaceSettings,
@@ -37,48 +34,64 @@ import type {
 // Company Settings Page
 export default function CompanySettingsPage() {
 	const { t } = useI18n()
-	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'goals' | 'financial' | 'documents' | 'workplace' | 'history'>('company')
+	const [activeTab, setActiveTab] = useState<'company' | 'leadership' | 'business' | 'financial' | 'documents' | 'workplace' | 'history'>('company')
+	
+	// Helper function to get initial company info
+	const getInitialCompanyInfo = (): CompanyInfo => {
+		// Try to load from localStorage
+		const saved = localStorage.getItem('companyInfo') || localStorage.getItem('company_settings')
+		if (saved) {
+			try {
+				return JSON.parse(saved)
+			} catch (error) {
+				console.error('Failed to parse company info:', error)
+			}
+		}
+		
+		// Default values
+		return {
+			// Basic Info
+			name: 'Proce Inc.',
+			legalName: 'Proce Incorporated',
+			businessNumber: '123-45-67890',
+			industry: 'IT / SaaS / Software',
+			companySize: 'Medium (100-500)',
+			foundedYear: '2020',
+			foundedDate: '2020-03-15',
+			
+			// Contact
+			address: '서울특별시 강남구 테헤란로 123',
+			city: '서울',
+			postalCode: '06234',
+			country: '대한민국',
+			phone: '+82-2-1234-5678',
+			email: 'contact@proce.com',
+			website: 'https://proce.com',
+			socialLinks: [
+				{ platform: 'LinkedIn', url: 'https://linkedin.com/company/proce' },
+				{ platform: 'Twitter', url: 'https://twitter.com/proce' },
+				{ platform: 'Facebook', url: 'https://facebook.com/proce' },
+			],
+			
+			// Business
+			description: 'Proce는 조직의 실행 리듬을 최적화하는 AI 기반 워크플로우 플랫폼입니다. 팀의 업무 흐름을 자동화하고, 프로젝트 관리를 효율화하며, 데이터 기반 의사결정을 지원합니다.',
+			vision: '모든 조직이 자신만의 실행 리듬을 찾아 지속 가능한 성장을 이루도록 돕는다',
+			mission: 'AI와 인간의 협업을 통해 조직의 생산성과 효율성을 극대화하고, 직원들의 워크라이프 밸런스를 개선한다',
+			mainProducts: 'Proce Workflow Platform, Proce Analytics, Proce AI Assistant',
+			mainServices: '워크플로우 자동화, 프로젝트 관리, 데이터 분석 및 인사이트, AI 기반 작업 추천',
+			targetMarket: '중소기업부터 대기업까지, 프로젝트 기반 업무를 수행하는 모든 조직',
+			targetCustomers: '프로젝트 매니저, 팀 리더, 임원진, HR 담당자',
+			competitiveAdvantage: 'AI 기반 자동화, 실행 리듬 기반 UX, 실시간 협업 도구, 데이터 기반 인사이트',
+			
+			// Workforce
+			employeeCount: '247',
+			fullTimeCount: '220',
+			partTimeCount: '27',
+		}
+	}
 	
 	// Company Info State
-	const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
-		// Basic Info
-		name: 'Proce Inc.',
-		legalName: 'Proce Incorporated',
-		businessNumber: '123-45-67890',
-		industry: 'IT / SaaS / Software',
-		companySize: 'Medium (100-500)',
-		foundedYear: '2020',
-		foundedDate: '2020-03-15',
-		
-		// Contact
-		address: '서울특별시 강남구 테헤란로 123',
-		city: '서울',
-		postalCode: '06234',
-		country: '대한민국',
-		phone: '+82-2-1234-5678',
-		email: 'contact@proce.com',
-		website: 'https://proce.com',
-		socialLinks: [
-			{ platform: 'LinkedIn', url: 'https://linkedin.com/company/proce' },
-			{ platform: 'Twitter', url: 'https://twitter.com/proce' },
-			{ platform: 'Facebook', url: 'https://facebook.com/proce' },
-		],
-		
-		// Business
-		description: 'Proce는 조직의 실행 리듬을 최적화하는 AI 기반 워크플로우 플랫폼입니다. 팀의 업무 흐름을 자동화하고, 프로젝트 관리를 효율화하며, 데이터 기반 의사결정을 지원합니다.',
-		vision: '모든 조직이 자신만의 실행 리듬을 찾아 지속 가능한 성장을 이루도록 돕는다',
-		mission: 'AI와 인간의 협업을 통해 조직의 생산성과 효율성을 극대화하고, 직원들의 워크라이프 밸런스를 개선한다',
-		mainProducts: 'Proce Workflow Platform, Proce Analytics, Proce AI Assistant',
-		mainServices: '워크플로우 자동화, 프로젝트 관리, 데이터 분석 및 인사이트, AI 기반 작업 추천',
-		targetMarket: '중소기업부터 대기업까지, 프로젝트 기반 업무를 수행하는 모든 조직',
-		targetCustomers: '프로젝트 매니저, 팀 리더, 임원진, HR 담당자',
-		competitiveAdvantage: 'AI 기반 자동화, 실행 리듬 기반 UX, 실시간 협업 도구, 데이터 기반 인사이트',
-		
-		// Workforce
-		employeeCount: '247',
-		fullTimeCount: '220',
-		partTimeCount: '27',
-	})
+	const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(getInitialCompanyInfo())
 
 	// Leadership State
 	const [leadership, setLeadership] = useState<LeadershipMember[]>([
@@ -542,6 +555,13 @@ export default function CompanySettingsPage() {
 	const handleSaveCompanyInfo = () => {
 		try {
 			localStorage.setItem('companyInfo', JSON.stringify(companyInfo))
+			localStorage.setItem('company_settings', JSON.stringify(companyInfo))
+			
+			// Trigger a custom event to notify other components
+			window.dispatchEvent(new CustomEvent('companySettingsChanged', { 
+				detail: { name: companyInfo.name } 
+			}))
+			
 			toast.success('Company information saved successfully')
 		} catch (error) {
 			console.error('Failed to save company info:', error)
@@ -666,6 +686,9 @@ export default function CompanySettingsPage() {
 		setCompanyKPIs(updatedKPIs)
 		localStorage.setItem('companyKPIs', JSON.stringify(updatedKPIs))
 		
+		// Dispatch event for dashboard update
+		window.dispatchEvent(new Event('companyKPIsUpdated'))
+		
 		setIsAddingKPI(false)
 		setNewKPI({
 			name: '',
@@ -712,12 +735,19 @@ export default function CompanySettingsPage() {
 		})
 		setCompanyKPIs(updatedKPIs)
 		localStorage.setItem('companyKPIs', JSON.stringify(updatedKPIs))
+		
+		// Dispatch event for dashboard update
+		window.dispatchEvent(new Event('companyKPIsUpdated'))
 	}
 
 	const handleDeleteKPI = (id: string) => {
 		const updatedKPIs = companyKPIs.filter(k => k.id !== id)
 		setCompanyKPIs(updatedKPIs)
 		localStorage.setItem('companyKPIs', JSON.stringify(updatedKPIs))
+		
+		// Dispatch event for dashboard update
+		window.dispatchEvent(new Event('companyKPIsUpdated'))
+		
 		toast.success('KPI deleted')
 	}
 
@@ -886,7 +916,6 @@ export default function CompanySettingsPage() {
 								{ id: 'company', label: t('companySettings.tabs.company'), icon: Building2 },
 								{ id: 'business', label: t('companySettings.tabs.business'), icon: Briefcase },
 								{ id: 'leadership', label: t('companySettings.tabs.leadership'), icon: Users },
-								{ id: 'goals', label: t('companySettings.tabs.goals'), icon: Target },
 								{ id: 'financial', label: t('companySettings.tabs.financial'), icon: DollarSign },
 								{ id: 'workplace', label: t('companySettings.tabs.workplace'), icon: Clock },
 							{ id: 'documents', label: t('companySettings.tabs.documents'), icon: FileText },
@@ -897,7 +926,6 @@ export default function CompanySettingsPage() {
 							mobileLabels: {
 								'company': 'Info',
 								'leadership': 'Leaders',
-								'goals': 'Goals',
 								'financial': 'Finance',
 								'workplace': 'Work',
 								'documents': 'Docs',
@@ -971,26 +999,6 @@ export default function CompanySettingsPage() {
 								settings={workplaceSettings}
 								onChange={setWorkplaceSettings}
 								onSave={handleSaveWorkplace}
-							/>
-						)}
-
-						{/* Company KPIs Tab */}
-						{activeTab === 'goals' && (
-							<KPITab
-								kpis={companyKPIs}
-								isAdding={isAddingKPI}
-								editingId={editingKPI}
-								newKPI={newKPI}
-								availableDepartments={availableDepartments}
-								leadership={leadership}
-								companyIndustry={companyInfo.industry}
-								setNewKPI={setNewKPI}
-								setIsAdding={setIsAddingKPI}
-								setEditingId={setEditingKPI}
-								onAdd={handleAddKPI}
-								onUpdate={handleUpdateKPI}
-								onDelete={handleDeleteKPI}
-								calculateProgress={calculateProgress}
 							/>
 						)}
 

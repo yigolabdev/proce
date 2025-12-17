@@ -87,22 +87,41 @@ export const workEntrySchema = z.object({
 export type WorkEntry = z.infer<typeof workEntrySchema>
 
 /**
+ * Project Ownership Schema
+ */
+export const projectOwnershipSchema = z.object({
+	scope: z.enum(['personal', 'team', 'department', 'company']),
+	// Personal project
+	ownerId: z.string().optional(),
+	ownerName: z.string().optional(),
+	// Team/Department project
+	teamId: z.string().optional(),
+	teamName: z.string().optional(),
+	departmentId: z.string().optional(),
+	departmentName: z.string().optional(),
+})
+
+export type ProjectOwnership = z.infer<typeof projectOwnershipSchema>
+
+/**
  * Project Schema
  */
 export const projectSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	description: z.string(),
-	departments: z.array(z.string()).default([]),
+	ownership: projectOwnershipSchema,
+	departments: z.array(z.string()).optional().default([]),
 	objectives: z.array(z.string()).default([]),
 	status: z.enum(['planning', 'active', 'on-hold', 'completed', 'cancelled']).default('planning'),
 	progress: z.number().min(0).max(100).default(0),
 	startDate: dateSchema,
 	endDate: dateSchema,
-	members: z.array(z.string()).default([]),
+	members: z.array(z.string()).optional().default([]),
 	tags: z.array(z.string()).default([]),
 	createdAt: dateSchema,
 	createdBy: z.string(),
+	createdById: z.string().optional(),
 	files: z.array(fileAttachmentSchema).default([]),
 	links: z.array(linkResourceSchema).default([]),
 })

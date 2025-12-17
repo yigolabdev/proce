@@ -290,6 +290,9 @@ export function useWorkInput(): UseWorkInputReturn {
 			files: [],
 			links: [],
 			isConfidential: false,
+			date: new Date(),
+			duration: '',
+			timeSpent: 0,
 		})
 		toast.success('Draft loaded')
 	}, [])

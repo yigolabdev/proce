@@ -60,7 +60,9 @@ const WorkHistoryPage = lazy(() => import('../app/work-history/page'))
 const WorkReviewPage = lazy(() => import('../app/work-review/page'))
 const MessagesPage = lazy(() => import('../app/messages/page'))
 const AIRecommendationsPage = lazy(() => import('../app/ai-recommendations/page'))
-// const OKRPage = lazy(() => import('../app/okr/page'))
+const KPIPage = lazy(() => import('../app/kpi/page'))
+const OKRPage = lazy(() => import('../app/okr/page'))
+const TasksPage = lazy(() => import('../app/tasks/page'))
 
 // Admin Pages
 const UsersManagementPage = lazy(() => import('../app/admin/users/page'))
@@ -124,9 +126,11 @@ const appRoutes = [
 	{ path: 'work-history', element: withSuspense(WorkHistoryPage) },
 	{ path: 'work-review', element: withSuspense(WorkReviewPage) },
 	{ path: 'messages', element: withSuspense(MessagesPage) },
-	{ path: 'ai-recommendations', element: withSuspense(AIRecommendationsPage) },
+	{ path: 'ai-recommendations', element: <Navigate to="/app/tasks" replace /> },
+	{ path: 'kpi', element: withSuspense(KPIPage) },
+	{ path: 'okr', element: withSuspense(OKRPage) },
+	{ path: 'tasks', element: withSuspense(TasksPage) },
 	{ path: 'inbox', element: <Navigate to="/app/messages" replace /> },
-	// { path: 'okr', element: withSuspense(OKRPage) },
 	// 관리자 메뉴
 	{ path: 'admin/users', element: withSuspense(UsersManagementPage) },
 	{ path: 'admin/system-settings', element: withSuspense(SystemSettingsPage) },
@@ -169,7 +173,9 @@ const router = createBrowserRouter([
 	{ path: '/work-history', element: <Navigate to="/app/work-history" replace /> },
 	{ path: '/inbox', element: <Navigate to="/app/messages" replace /> },
 	{ path: '/messages', element: <Navigate to="/app/messages" replace /> },
-	// { path: '/okr', element: <Navigate to="/app/okr" replace /> },
+	{ path: '/kpi', element: <Navigate to="/app/kpi" replace /> },
+	{ path: '/okr', element: <Navigate to="/app/okr" replace /> },
+	{ path: '/tasks', element: <Navigate to="/app/tasks" replace /> },
 	{ path: '/ai-recommendations', element: <Navigate to="/app/ai-recommendations" replace /> },
 	{ path: '/admin/users', element: <Navigate to="/app/admin/users" replace /> },
 	{ path: '/admin/system-settings', element: <Navigate to="/app/admin/system-settings" replace /> },

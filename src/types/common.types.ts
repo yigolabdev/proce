@@ -107,11 +107,36 @@ export interface CreateWorkEntryDto {
 
 export type ProjectStatus = 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled'
 
+/**
+ * 프로젝트 범위 타입
+ */
+export type ProjectScope = 'personal' | 'team' | 'department' | 'company'
+
+/**
+ * 프로젝트 소유권
+ */
+export interface ProjectOwnership {
+	scope: ProjectScope
+	
+	// Personal project
+	ownerId?: string        // 개인 프로젝트인 경우 소유자 ID
+	ownerName?: string      // 개인 프로젝트인 경우 소유자 이름
+	
+	// Team/Department project
+	teamId?: string         // 팀 프로젝트인 경우 팀 ID
+	teamName?: string       // 팀 프로젝트인 경우 팀 이름
+	departmentId?: string   // 부서 프로젝트인 경우 부서 ID
+	departmentName?: string // 부서 프로젝트인 경우 부서 이름
+	
+	// Company-wide project
+	// scope가 'company'인 경우 별도 ID 불필요
+}
+
 export interface ProjectMember {
 	id: string
 	name: string
 	email: string
-	role: 'leader' | 'member'
+	role: 'leader' | 'member' | 'viewer'
 	department: string
 	joinedAt?: Date | string
 }
@@ -168,17 +193,30 @@ export interface Project {
 	id: string
 	name: string
 	description: string
+	
+	// 프로젝트 범위 및 소유권 (필수)
+	ownership: ProjectOwnership
+	
 	status: ProjectStatus
 	progress: number
 	startDate: Date | string
 	endDate: Date | string
-	departments: string[] // Multiple departments (required)
+	
+	// 부서 정보 (선택적 - 관련 부서들)
+	departments?: string[]
+	
+	// 목표 및 태그
 	objectives: string[] // Project objectives/goals (required)
-	members: ProjectMember[] // Team members (required)
 	tags?: string[]
 	priority?: 'low' | 'medium' | 'high'
+	
+	// 참여자 (선택적 - scope에 따라 다름)
+	members?: ProjectMember[] // team, department, company 프로젝트인 경우
+	
+	// 생성 정보
 	createdAt: Date | string
 	createdBy: string
+	createdById?: string
 	
 	// Optional advanced features
 	schedule?: ProjectSchedule
@@ -240,10 +278,14 @@ export interface Objective {
 	period: string // e.g., "Q4 2024" or "2024"
 	quarter?: string // e.g., "Q4 2024"
 	year?: number
-	team?: string
+	
+	// 개인 소유권 (필수)
 	owner?: string
 	ownerId?: string
+	
+	// 부서 정보 (선택적)
 	department?: string
+	
 	status: OKRStatus
 	progress: number
 	keyResults: KeyResult[]

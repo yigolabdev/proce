@@ -9,6 +9,7 @@ import { storage } from '../../utils/storage'
 import type { WorkEntry } from '../../types/common.types'
 import type { ApiResponse, PaginatedResponse } from './config'
 import { parseWorkEntriesFromStorage, serializeWorkEntryForStorage } from '../../utils/mappers'
+import { progressAutoUpdateService } from '../ai/progressAutoUpdate.service'
 
 /**
  * Work Entry Filters
@@ -133,6 +134,14 @@ class WorkEntriesService {
 		const serialized = serializeWorkEntryForStorage(newEntry)
 		rawEntries.unshift(serialized)
 		storage.set(this.STORAGE_KEY, rawEntries)
+		
+		// 🚀 자동 진척도 업데이트
+		try {
+			await progressAutoUpdateService.updateProgressFromWorkEntry(newEntry)
+		} catch (error) {
+			console.error('진척도 자동 업데이트 오류:', error)
+			// 에러가 나도 Work Entry 생성은 성공으로 처리
+		}
 		
 		return {
 			data: newEntry,

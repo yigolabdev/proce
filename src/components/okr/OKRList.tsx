@@ -12,7 +12,7 @@ export interface OKRListProps {
 	objectives: Objective[]
 	onSelect: (objective: Objective) => void
 	onEdit: (objective: Objective) => void
-	onDelete: (id: string) => void
+	onDelete: (id: string, event?: React.MouseEvent) => void
 }
 
 export function OKRList({ objectives, onSelect, onEdit, onDelete }: OKRListProps) {
@@ -98,19 +98,18 @@ export function OKRList({ objectives, onSelect, onEdit, onDelete }: OKRListProps
 									>
 										<Edit className="h-4 w-4" />
 									</Button>
-									<Button
-										onClick={(e) => {
-											e.stopPropagation()
-											if (confirm('Are you sure you want to delete this objective?')) {
-												onDelete(objective.id)
-											}
-										}}
-										variant="ghost"
-										size="sm"
-										className="text-red-400 hover:text-red-300"
-									>
-										<Trash2 className="h-4 w-4" />
-									</Button>
+								<Button
+									onClick={(e) => {
+										e.stopPropagation()
+										onDelete(objective.id, e)
+									}}
+									variant="ghost"
+									size="sm"
+									className="text-red-400 hover:text-red-300"
+									title="클릭: 연결 해제 | Shift+클릭: 연쇄 삭제"
+								>
+									<Trash2 className="h-4 w-4" />
+								</Button>
 								</div>
 							</div>
 						</CardHeader>

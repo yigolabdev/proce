@@ -10,6 +10,7 @@ export interface KeyResult {
 	current: number
 	unit: string
 	owner: string
+	ownerId: string  // 소유자 ID 추가
 	
 	// AI 분석 (선택적)
 	aiAnalysis?: {
@@ -26,8 +27,14 @@ export interface Objective {
 	description: string
 	period: string  // Quarter (Q1-Q4) or Month (Jan-Dec)
 	periodType: 'quarter' | 'month'
-	owner: string
-	team: string
+	
+	// 개인 소유권 (필수)
+	owner: string      // 소유자 이름
+	ownerId: string    // 소유자 ID
+	
+	// 부서 정보 (선택적)
+	department?: string
+	
 	status: 'on-track' | 'at-risk' | 'behind' | 'completed'
 	keyResults: KeyResult[]
 	startDate: string

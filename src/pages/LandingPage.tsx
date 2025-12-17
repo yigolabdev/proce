@@ -166,15 +166,15 @@ export default function LandingPage() {
 			<div className="w-full max-w-md px-8">
 				{/* Logo and Language Switcher */}
 				<div className="flex items-center justify-between mb-12">
-					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black font-bold text-xs">
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-								<path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-								<path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-							</svg>
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg p-1.5">
+							<img 
+								src="/proce-logo.png" 
+								alt="Proce Logo" 
+								className="w-full h-full object-contain filter brightness-0 invert"
+							/>
 						</div>
-						<span className="font-bold text-xl tracking-tight">Proce</span>
+						<span className="font-bold text-2xl tracking-tight">Proce</span>
 					</div>
 					
 					{/* Language Switcher - Next to Logo */}

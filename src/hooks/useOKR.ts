@@ -15,7 +15,7 @@ import type {
 	UseOKRReturn 
 } from '../types/okr.types'
 
-const STORAGE_KEY = 'okr_objectives'
+const STORAGE_KEY = 'objectives'
 
 export function useOKR(): UseOKRReturn {
 	const [objectives, setObjectives] = useState<Objective[]>([])
@@ -74,8 +74,6 @@ export function useOKR(): UseOKRReturn {
 			const newObjective: Objective = {
 				id: `okr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 				...data,
-				ownerId: '', // TODO: Get from user context
-				teamId: '', // TODO: Get from team data
 				status: 'on-track',
 				keyResults: [],
 			}
@@ -109,8 +107,37 @@ export function useOKR(): UseOKRReturn {
 	}, [objectives, selectedObjective, saveObjectives])
 
 	// Delete objective
-	const deleteObjective = useCallback(async (id: string) => {
+	const deleteObjective = useCallback(async (id: string, cascadeDelete: boolean = false) => {
 		try {
+			// 연결된 Tasks 확인
+			const tasks = storage.get<any[]>('ai_recommendations') || []
+			const linkedTasks = tasks.filter(t => t.objectiveId === id)
+			
+			if (cascadeDelete) {
+				// 연쇄 삭제: 연결된 Task들도 삭제
+				const filteredTasks = tasks.filter(t => t.objectiveId !== id)
+				storage.set('ai_recommendations', filteredTasks)
+			} else {
+				// 연결만 해제: Task는 유지하되 objectiveId, keyResultId 제거
+				linkedTasks.forEach(task => {
+					task.objectiveId = undefined
+					task.keyResultId = undefined
+				})
+				storage.set('ai_recommendations', tasks)
+			}
+			
+			// KPI에서 연결 해제
+			const objective = objectives.find(o => o.id === id)
+			if (objective?.kpiId) {
+				const kpis = storage.get<any[]>('kpis') || []
+				const kpi = kpis.find(k => k.id === objective.kpiId)
+				if (kpi && kpi.linkedObjectives) {
+					kpi.linkedObjectives = kpi.linkedObjectives.filter((oid: string) => oid !== id)
+					storage.set('kpis', kpis)
+				}
+			}
+			
+			// Objective 삭제
 			const updated = objectives.filter(obj => obj.id !== id)
 			saveObjectives(updated)
 			
@@ -118,7 +145,13 @@ export function useOKR(): UseOKRReturn {
 				setSelectedObjective(null)
 			}
 			
-			toast.success('Objective deleted successfully')
+			const message = cascadeDelete
+				? `Objective와 연결된 ${linkedTasks.length}개 Task가 함께 삭제되었습니다`
+				: linkedTasks.length > 0
+					? `Objective가 삭제되었습니다. ${linkedTasks.length}개 Task의 연결이 해제되었습니다`
+					: 'Objective deleted successfully'
+			
+			toast.success(message)
 		} catch (err) {
 			setError(err as Error)
 			toast.error('Failed to delete objective')
@@ -136,7 +169,6 @@ export function useOKR(): UseOKRReturn {
 			const newKeyResult: KeyResult = {
 				id: `kr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 				...data,
-				ownerId: '', // TODO: Get from user context
 			}
 			
 			const updated = objectives.map(obj => 

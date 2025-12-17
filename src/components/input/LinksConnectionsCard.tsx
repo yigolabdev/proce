@@ -1,12 +1,15 @@
 /**
  * Links & Connections Card Component
- * 프로젝트 및 OKR 연결 카드
+ * 프로젝트, OKR 및 Task 연결 카드
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
-import { Target, ChevronDown } from 'lucide-react'
+import { Target, ChevronDown, ListTodo } from 'lucide-react'
 import type { WorkInputFormData, Project } from '../../types/workInput.types'
 import type { Objective } from '../../types/common.types'
+import type { TaskRecommendation } from '../../types/common.types'
+import { storage } from '../../utils/storage'
+import { useMemo } from 'react'
 
 export interface LinksConnectionsCardProps {
 	formData: WorkInputFormData
@@ -25,6 +28,27 @@ export function LinksConnectionsCard({
 }: LinksConnectionsCardProps) {
 	// Get selected objective for key results
 	const selectedObjective = objectives.find(obj => obj.id === formData.objectiveId)
+
+	// Load all tasks
+	const allTasks = useMemo(() => {
+		const tasks = storage.get<TaskRecommendation[]>('ai_recommendations') || []
+		// Filter to show only pending and accepted tasks
+		return tasks.filter(t => t.status === 'pending' || t.status === 'accepted')
+	}, [])
+
+	// Filter tasks based on selected OKR
+	const availableTasks = useMemo(() => {
+		if (!formData.objectiveId) return allTasks
+		
+		// Show tasks related to selected objective
+		return allTasks.filter(t => t.objectiveId === formData.objectiveId)
+	}, [allTasks, formData.objectiveId])
+
+	// Get selected task info
+	const selectedTask = useMemo(() => {
+		if (!formData.taskId) return null
+		return allTasks.find(t => t.id === formData.taskId)
+	}, [allTasks, formData.taskId])
 
 	return (
 		<Card className="bg-neutral-900 border-neutral-800">
@@ -83,6 +107,7 @@ export function LinksConnectionsCard({
 										setFormData({
 											objectiveId: e.target.value || undefined,
 											keyResultId: undefined, // Reset key result when objective changes
+											taskId: undefined, // Reset task when objective changes
 										})
 									}}
 									className="w-full px-4 py-2.5 border border-neutral-700 rounded-xl bg-neutral-800 text-white focus:outline-none focus:border-orange-500 appearance-none"
@@ -128,6 +153,96 @@ export function LinksConnectionsCard({
 						</div>
 					</div>
 				)}
+
+				{/* Task Connection */}
+				<div className="pt-4 border-t border-neutral-800">
+					<div className="flex items-center gap-2 text-sm font-semibold text-neutral-300 mb-4">
+						<ListTodo className="h-4 w-4 text-orange-400" />
+						<span>Link to Task</span>
+						<span className="text-xs text-neutral-500 font-normal ml-auto">
+							선택사항
+						</span>
+					</div>
+
+					<div>
+						<label className="block text-sm font-medium text-neutral-400 mb-2">
+							Task
+						</label>
+						<div className="relative">
+							<select
+								value={formData.taskId || ''}
+								onChange={(e) => {
+									const taskId = e.target.value || undefined
+									setFormData({ taskId })
+									
+									// Auto-fill objective and key result if task is linked
+									if (taskId) {
+										const task = allTasks.find(t => t.id === taskId)
+										if (task) {
+											setFormData({
+												taskId,
+												objectiveId: task.objectiveId,
+												keyResultId: task.keyResultId,
+											})
+										}
+									}
+								}}
+								className="w-full px-4 py-2.5 border border-neutral-700 rounded-xl bg-neutral-800 text-white focus:outline-none focus:border-orange-500 appearance-none"
+								disabled={disabled}
+							>
+								<option value="">작업과 관련 없음 (자유 작성)</option>
+								<optgroup label="추천 Tasks">
+									{availableTasks.map((task) => {
+										const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🔵'
+										const statusLabel = task.status === 'accepted' ? '진행중' : '대기중'
+										return (
+											<option key={task.id} value={task.id}>
+												{priorityEmoji} {task.title} ({statusLabel})
+											</option>
+										)
+									})}
+								</optgroup>
+								{formData.objectiveId && availableTasks.length === 0 && (
+									<optgroup label="다른 Tasks">
+										{allTasks
+											.filter(t => t.objectiveId !== formData.objectiveId)
+											.map((task) => {
+												const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🔵'
+												const statusLabel = task.status === 'accepted' ? '진행중' : '대기중'
+												return (
+													<option key={task.id} value={task.id}>
+														{priorityEmoji} {task.title} ({statusLabel})
+													</option>
+												)
+											})}
+									</optgroup>
+								)}
+							</select>
+							<ChevronDown className="absolute right-3 top-3 h-4 w-4 text-neutral-500 pointer-events-none" />
+						</div>
+						{selectedTask && (
+							<div className="mt-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
+								<p className="text-xs text-neutral-400 mb-2">Task 정보:</p>
+								<p className="text-sm text-neutral-300">{selectedTask.description}</p>
+								{selectedTask.deadline && (
+									<p className="text-xs text-neutral-500 mt-2">
+										마감일: {new Date(selectedTask.deadline).toLocaleDateString('ko-KR')}
+									</p>
+								)}
+								{selectedTask.estimatedDuration && (
+									<p className="text-xs text-neutral-500">
+										예상 소요: {selectedTask.estimatedDuration}분
+									</p>
+								)}
+							</div>
+						)}
+						{!formData.taskId && (
+							<p className="text-xs text-neutral-500 mt-2">
+								💡 Task를 선택하면 해당 Task의 진척도가 자동으로 업데이트됩니다
+							</p>
+						)}
+					</div>
+				</div>
 			</CardContent>
 		</Card>
 	)

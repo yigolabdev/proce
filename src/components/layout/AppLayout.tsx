@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X } from 'lucide-react'
+import { LayoutDashboard, FileText, Mail, Sparkles, Users, BarChart3, LogOut, Settings, History, FolderKanban, Building2, CheckCircle2, Menu, X, Target, ListTodo } from 'lucide-react'
 import Toaster from '../ui/Toaster'
 import type { UserRole } from '../../types/auth.types'
 import { useState, useEffect, useMemo } from 'react'
@@ -22,6 +22,7 @@ export default function AppLayout() {
 	const [unreadMessages, setUnreadMessages] = useState(0)
 	const [unreadReviews, setUnreadReviews] = useState(0)
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+	const [companyName, setCompanyName] = useState<string>('Proce')
 
 	// Load unread counts
 	useEffect(() => {
@@ -44,6 +45,37 @@ export default function AppLayout() {
 		return () => clearInterval(interval)
 	}, [])
 
+	// Load company name from settings
+	useEffect(() => {
+		const loadCompanyName = () => {
+			// Try new key first, then legacy key
+			let companySettings = storage.get<any>('company_settings')
+			if (!companySettings) {
+				companySettings = storage.get<any>('companyInfo')
+			}
+			
+			if (companySettings?.name) {
+				setCompanyName(companySettings.name)
+			}
+		}
+		
+		loadCompanyName()
+		
+		// Listen for custom company settings change event
+		const handleCompanySettingsChange = (event: CustomEvent) => {
+			if (event.detail?.name) {
+				setCompanyName(event.detail.name)
+			} else {
+				loadCompanyName()
+			}
+		}
+		
+		window.addEventListener('companySettingsChanged', handleCompanySettingsChange as EventListener)
+		return () => {
+			window.removeEventListener('companySettingsChanged', handleCompanySettingsChange as EventListener)
+		}
+	}, [])
+
 	// Close mobile sidebar when route changes
 	useEffect(() => {
 		setIsMobileSidebarOpen(false)
@@ -55,13 +87,23 @@ export default function AppLayout() {
 		title: t('menu.work'),
 		roles: ['user', 'admin', 'executive'] as UserRole[],
 		items: [
+			// 1. 개요 & 현황
 			{ to: '/app/dashboard', label: t('menu.dashboard'), icon: LayoutDashboard, roles: ['user', 'admin', 'executive'] },
-			{ to: '/app/input', label: t('menu.workInput'), icon: FileText, roles: ['user', 'admin', 'executive'] },
+			
+			// 2. 커뮤니케이션 (높은 우선순위)
 			{ to: '/app/messages', label: t('menu.messages'), icon: Mail, roles: ['user', 'admin', 'executive'], badge: unreadMessages },
-			{ to: '/app/ai-recommendations', label: t('menu.aiSuggestions'), icon: Sparkles, roles: ['user', 'admin', 'executive'] },
+			
+			// 3. 할 일 관리 (Tasks로 통합)
+			{ to: '/app/tasks', label: 'Tasks', icon: ListTodo, roles: ['user', 'admin', 'executive'] },
+			
+			// 4. 업무 작성 & 기록
+			{ to: '/app/input', label: t('menu.workInput'), icon: FileText, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-history', label: t('menu.workHistory'), icon: History, roles: ['user', 'admin', 'executive'] },
 			{ to: '/app/work-review', label: t('menu.workReview'), icon: CheckCircle2, roles: ['user', 'admin', 'executive'], badge: unreadReviews },
+			
+			// 5. 프로젝트 & 목표 관리
 			{ to: '/app/projects', label: t('menu.projects'), icon: FolderKanban, roles: ['user', 'admin', 'executive'] },
+			{ to: '/app/okr', label: 'OKR', icon: Target, roles: ['user', 'admin', 'executive'] },
 		] as MenuItem[],
 	},
 		{
@@ -76,6 +118,7 @@ export default function AppLayout() {
 		title: t('menu.executive'),
 		roles: ['executive', 'admin'] as UserRole[],
 		items: [
+			{ to: '/app/kpi', label: 'KPI', icon: BarChart3, roles: ['executive', 'admin'] },
 			{ to: '/app/executive', label: t('menu.analyticsInsights'), icon: BarChart3, roles: ['executive', 'admin'] },
 			{ to: '/app/admin/company-settings', label: t('menu.companySettings'), icon: Building2, roles: ['executive', 'admin'] },
 		] as MenuItem[],
@@ -98,16 +141,17 @@ const visibleMenuGroups = useMemo(() => menuGroups
 			<div className="px-6 py-8 flex items-center gap-4 shrink-0">
 				<div className="relative group cursor-pointer">
                     <div className="absolute -inset-2 bg-orange-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="relative size-10 rounded-2xl bg-linear-to-br from-white to-neutral-300 text-black flex items-center justify-center font-bold text-xl shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                    <div className="relative size-10 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-[0_0_15px_rgba(249,115,22,0.3)] overflow-hidden p-1.5">
+                        {/* Proce Logo */}
+                        <img 
+                            src="/proce-logo.png" 
+                            alt="Proce Logo" 
+                            className="w-full h-full object-contain filter brightness-0 invert"
+                        />
                     </div>
 				</div>
 				<div className="flex flex-col">
-					<div className="text-base font-bold text-white tracking-tight leading-none mb-1">Proce</div>
+					<div className="text-base font-bold text-white tracking-tight leading-none mb-1">{companyName}</div>
 					<div className="text-[10px] text-neutral-500 font-medium tracking-widest uppercase">{t('menu.workspace')}</div>
 				</div>
 

@@ -3,10 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import AppProviders from './providers/AppProviders'
 import { initializeMockRhythmData } from './utils/mockRhythmData'
+import { initializeAllMockData } from './_mocks'
 
 // 개발 환경에서만 목업 데이터 초기화
 if (import.meta.env.DEV) {
 	initializeMockRhythmData()
+	initializeAllMockData()
 }
 
 createRoot(document.getElementById('root')!).render(
