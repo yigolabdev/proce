@@ -7,6 +7,10 @@ import { Button } from '../../components/ui/Button'
 import { PageHeader } from '../../components/common/PageHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useRhythmUpdate } from '../../hooks/useRhythmUpdate'
+import { aiRecommendationManager } from '../../services/ai/aiRecommendationManager'
+import { backgroundAnalyzer } from '../../services/ai/backgroundAnalyzer'
+import { AIRecommendationButton } from '../../components/ai/AIRecommendationButton'
+import { useAINotifications } from '../../hooks/useAINotifications'
 import {
 	Sparkles,
 	CheckCircle2,
@@ -75,6 +79,7 @@ export default function AIRecommendationsPage() {
 	const { user } = useAuth()
 	const { updateAfterTaskChange } = useRhythmUpdate()
 	const { t, language } = useI18n()
+	const { notifications } = useAINotifications()
 	
 	// AI Recommendations state
 	const [recommendations, setRecommendations] = useState<TaskRecommendation[]>([])
@@ -176,19 +181,22 @@ export default function AIRecommendationsPage() {
 	}
 
 	// Load AI Recommendations
-	const loadRecommendations = () => {
+	const loadRecommendations = async () => {
 		setIsLoading(true)
 		
-		// Load manual tasks from localStorage
-		const manualTasksData = storage.get<TaskRecommendation[]>('manual_tasks')
-		const manualTasks = manualTasksData || []
-		
-		// Load AI-generated tasks from localStorage
-		const aiTasksData = storage.get<TaskRecommendation[]>('ai_recommendations')
-		const aiTasks = aiTasksData || []
-		
-		// QUICK FIX: Show mock data immediately
-		const mockRecommendations: TaskRecommendation[] = [
+		try {
+			// Load manual tasks from localStorage
+			const manualTasksData = storage.get<TaskRecommendation[]>('manual_tasks')
+			const manualTasks = manualTasksData || []
+			
+			// Load AI-generated tasks from AI manager
+			const aiState = aiRecommendationManager.getState('tasks')
+			const aiTasks = aiState.data || []
+			
+			// If no AI tasks available, show mock data or generate
+			if (aiTasks.length === 0) {
+				// Use mock data for demonstration
+				const mockRecommendations: TaskRecommendation[] = [
 			{
 				id: "mock-2",
 				title: "Update Project: Mobile App Redesign",
@@ -396,13 +404,38 @@ export default function AIRecommendationsPage() {
 			{type: "deadline", metric: "Upcoming", value: "3 deadlines in 2 weeks", status: "warning"},
 			{type: "inactive", metric: "Projects", value: "1 inactive project", status: "warning"},
 			{type: "info", metric: "Team Capacity", value: "3 members overworked", status: "warning"}
-		]
+			]
 		
-		// Merge all recommendations: AI-generated, manual tasks, and mock data
-		const allRecommendations = [...aiTasks, ...manualTasks, ...mockRecommendations]
-		setRecommendations(allRecommendations)
-		setInsights(mockInsights)
-		setIsLoading(false)
+			// Merge all recommendations: AI-generated, manual tasks, and mock data
+			const allRecommendations = [...aiTasks, ...manualTasks, ...mockRecommendations]
+			setRecommendations(allRecommendations as TaskRecommendation[])
+			setInsights(mockInsights)
+			} else {
+				// Use actual AI recommendations
+				const allRecommendations = [...aiTasks, ...manualTasks]
+				setRecommendations(allRecommendations as TaskRecommendation[])
+			}
+		} catch (error) {
+			console.error('Failed to load recommendations:', error)
+			toast.error('Failed to load recommendations')
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	// Generate AI Recommendations handler
+	const handleGenerateAIRecommendations = async () => {
+		setIsLoading(true)
+		try {
+			await backgroundAnalyzer.analyzeTaskRecommendations(true)
+			await loadRecommendations()
+			toast.success('AI recommendations generated successfully')
+		} catch (error) {
+			console.error('Failed to generate AI recommendations:', error)
+			toast.error('Failed to generate AI recommendations')
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	// Recommendation handlers
@@ -593,6 +626,14 @@ export default function AIRecommendationsPage() {
 				description={t('aiRec.description')}
 				actions={
 					<div className="flex gap-3">
+						<AIRecommendationButton
+							type="tasks"
+							onGenerate={handleGenerateAIRecommendations}
+							badge={notifications.tasks}
+							variant="outline"
+							size="sm"
+							label={t('aiRec.generate')}
+						/>
 						<Button
 							size="sm"
 							onClick={() => setShowManualTaskModal(true)}

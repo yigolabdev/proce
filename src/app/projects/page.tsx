@@ -27,14 +27,17 @@ import ProjectCard from './_components/ProjectCard'
 import TimelineView from './_components/TimelineView'
 import AIProjectRecommendationsPreview from './_components/AIProjectRecommendationsPreview'
 import { storage } from '../../utils/storage'
-import { createAITasksForProject } from '../ai-recommendations/_utils/aiTaskGenerator'
 import { parseProjectsFromStorage, parseWorkEntriesFromStorage } from '../../utils/mappers'
 import { useAuth } from '../../context/AuthContext'
+import { backgroundAnalyzer } from '../../services/ai/backgroundAnalyzer'
+import { AIRecommendationButton } from '../../components/ai/AIRecommendationButton'
+import { useAINotifications } from '../../hooks/useAINotifications'
 
 export default function ProjectsPage() {
 	const navigate = useNavigate()
 	const { t } = useI18n()
 	const { user } = useAuth()
+	const { notifications } = useAINotifications()
 	
 	// State
 	const [projects, setProjects] = useState<Project[]>([])
@@ -151,20 +154,15 @@ export default function ProjectsPage() {
 		setProjects(updated)
 		storage.set('projects', updated)
 		
-		// AI가 자동으로 프로젝트 관련 Task 생성
-		createAITasksForProject(newProject)
+		// Trigger background analysis for project tasks
+		backgroundAnalyzer.analyzeTaskRecommendations()
+		backgroundAnalyzer.analyzeProjectRecommendations()
 		
 		setShowCreateDialog(false)
 		setInitialProjectData(undefined)
-		toast.success(t('projects.projectCreated'))
-		
-		// AI Task 생성 알림
-		setTimeout(() => {
-			toast.info(`🤖 ${t('projects.aiTasksGenerated')}`, {
-				description: t('projects.checkAiRecommendations'),
-				duration: 5000,
-			})
-		}, 1000)
+		toast.success(t('projects.projectCreated'), {
+			description: 'AI recommendations will be available shortly',
+		})
 	} catch (error) {
 		console.error('Failed to create project:', error)
 		toast.error(t('projects.failedToCreateProject'))
@@ -172,6 +170,18 @@ export default function ProjectsPage() {
 }
 
 // Note: Delete functionality will be added to ProjectCard context menu later
+
+	// AI Recommendations handler
+	const handleGenerateAIRecommendations = async () => {
+		try {
+			await backgroundAnalyzer.analyzeTaskRecommendations(true)
+			await backgroundAnalyzer.analyzeProjectRecommendations(true)
+			toast.success('AI recommendations generated successfully')
+		} catch (error) {
+			console.error('Failed to generate AI recommendations:', error)
+			toast.error('Failed to generate AI recommendations')
+		}
+	}
 
 	// Filter projects by status
 	const filteredProjects = projects.filter((project) => {
@@ -253,6 +263,14 @@ export default function ProjectsPage() {
 				description={t('projects.description')}
 				actions={
 					<div className="flex items-center gap-3">
+						<AIRecommendationButton
+							type="projects"
+							onGenerate={handleGenerateAIRecommendations}
+							badge={notifications.projects + notifications.tasks}
+							variant="outline"
+							size="sm"
+							label="AI Recommendations"
+						/>
 						<Button onClick={() => setShowCreateDialog(true)} size="sm" className="rounded-full bg-white text-black hover:bg-neutral-200 border-none">
 							<Plus className="h-4 w-4 sm:mr-2" />
 							<span className="hidden sm:inline">{t('projects.newProject')}</span>

@@ -37,10 +37,13 @@ import {
 	type OKRInsight,
 	type OKRAnalysisResult
 } from '../../services/ai/okrRecommendation.service'
+import { AIRecommendationButton } from '../../components/ai/AIRecommendationButton'
+import { useAINotifications } from '../../hooks/useAINotifications'
 
 export default function OKRPage() {
 	// OKR Hook
 	const okr = useOKR()
+	const { notifications } = useAINotifications()
 
 	// UI State
 	const [activeTab, setActiveTab] = useState<'list' | 'analytics' | 'ai'>('list')
@@ -293,10 +296,20 @@ export default function OKRPage() {
 				title="OKR Management"
 				description="Set and track your objectives and key results"
 				actions={
+					<div className="flex items-center gap-3">
+						<AIRecommendationButton
+							type="okr"
+							onGenerate={handleGenerateAI}
+							badge={notifications.okr}
+							variant="outline"
+							size="sm"
+							label="AI Recommendations"
+						/>
 						<Button onClick={handleCreateObjective} variant="brand">
 							<Plus className="h-4 w-4 mr-2" />
 							New Objective
 						</Button>
+					</div>
 					}
 				/>
 

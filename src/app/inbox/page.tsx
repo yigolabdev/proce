@@ -1,4 +1,6 @@
 import { storage } from '../../utils/storage'
+import { aiRecommendationManager } from '../../services/ai/aiRecommendationManager'
+import { backgroundAnalyzer } from '../../services/ai/backgroundAnalyzer'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../components/ui/Card'
@@ -169,131 +171,33 @@ export default function InboxPage() {
 	}
 
 	// Load AI Recommendations
-	const loadRecommendations = () => {
+	const loadRecommendations = async () => {
 		setIsLoading(true)
 
-		setTimeout(() => {
-			// Load actual data from localStorage
-			const projectsData = storage.get<any>('projects')
-			const workEntriesData = storage.get<any>('workEntries')
-			const objectivesData = storage.get<any>('objectives')
+		try {
+			// Check if recommendations are already available
+			const state = aiRecommendationManager.getState('tasks')
 			
-			const projects = projectsData ? JSON.parse(projectsData) : []
-			const workEntries = workEntriesData ? JSON.parse(workEntriesData).map((e: any) => ({
-				...e,
-				date: new Date(e.date)
-			})) : []
-			const objectives = objectivesData ? JSON.parse(objectivesData) : []
-			
-			// Analyze and generate recommendations
-			const generatedRecommendations: TaskRecommendation[] = []
-			const generatedInsights: RecommendationInsight[] = []
-			
-			// 1. OKR Progress Gap Analysis
-			objectives.forEach((objective: any) => {
-				const avgProgress = objective.keyResults?.reduce((sum: number, kr: any) => 
-					sum + ((kr.current / kr.target) * 100), 0) / (objective.keyResults?.length || 1)
+			if (state.status === 'ready' && state.data.length > 0) {
+				// Use pre-analyzed recommendations
+				setRecommendations(state.data as TaskRecommendation[])
+				setLastUpdated(state.lastGenerated)
+				setIsLoading(false)
+			} else {
+				// Trigger background analysis and wait
+				await backgroundAnalyzer.analyzeTaskRecommendations(true)
 				
-				if (avgProgress < 50) {
-					generatedRecommendations.push({
-						id: `okr-${objective.id}`,
-						title: `Update OKR: ${objective.title}`,
-						description: `Current progress: ${Math.round(avgProgress)}%. Update key results to improve overall goal achievement.`,
-						priority: avgProgress < 30 ? 'high' : 'medium',
-						category: 'OKR Update',
-						deadline: objective.endDate,
-						dataSource: `OKR Data (${objective.keyResults?.length || 0} Key Results)`,
-						status: 'pending',
-					})
-					
-					generatedInsights.push({
-						type: 'gap',
-						metric: objective.title,
-						value: `${Math.round(avgProgress)}% complete`,
-						status: avgProgress < 30 ? 'urgent' : 'warning',
-					})
-				}
-			})
-			
-			// 2. Inactive Projects Detection
-			const sevenDaysAgo = new Date()
-			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-			
-			let inactiveProjectCount = 0
-			projects
-				.filter((p: any) => p.status === 'active')
-				.forEach((project: any) => {
-					const recentWork = workEntries.filter((e: any) => 
-						e.projectId === project.id && new Date(e.date) >= sevenDaysAgo
-					)
-					
-					if (recentWork.length === 0) {
-						inactiveProjectCount++
-						generatedRecommendations.push({
-							id: `project-${project.id}`,
-							title: `Update Project: ${project.name}`,
-							description: `No activity in 7 days. Consider logging progress or updating status.`,
-							priority: 'medium',
-							category: 'Project Update',
-							dataSource: `Project Status (Last activity: 7+ days ago)`,
-							status: 'pending',
-						})
-					}
-				})
-			
-			if (inactiveProjectCount > 0) {
-				generatedInsights.push({
-					type: 'inactive',
-					metric: 'Projects',
-					value: `${inactiveProjectCount} inactive ${inactiveProjectCount === 1 ? 'project' : 'projects'}`,
-					status: 'warning',
-				})
+				// Get the results
+				const updatedState = aiRecommendationManager.getState('tasks')
+				setRecommendations(updatedState.data as TaskRecommendation[])
+				setLastUpdated(updatedState.lastGenerated)
+				setIsLoading(false)
 			}
-			
-			// 3. Upcoming Deadlines Analysis
-			const now = new Date()
-			const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
-			
-			const upcomingDeadlines = objectives.filter((obj: any) => {
-				const endDate = new Date(obj.endDate)
-				return endDate >= now && endDate <= twoDaysFromNow
-			})
-			
-			if (upcomingDeadlines.length > 0) {
-				upcomingDeadlines.forEach((obj: any) => {
-					generatedRecommendations.push({
-						id: `deadline-${obj.id}`,
-						title: `Deadline Alert: ${obj.title}`,
-						description: `OKR deadline: ${new Date(obj.endDate).toLocaleDateString()}. Finalize key results.`,
-						priority: 'high',
-						category: 'Deadline',
-						deadline: obj.endDate,
-						dataSource: `OKR Deadline Tracking`,
-						status: 'pending',
-					})
-				})
-				
-				generatedInsights.push({
-					type: 'deadline',
-					metric: 'Deadlines',
-					value: `${upcomingDeadlines.length} in next 48 hours`,
-					status: 'urgent',
-				})
-			}
-			
-			// 4. Data Summary Insight
-			generatedInsights.unshift({
-				type: 'info',
-				metric: 'Data Sources',
-				value: `${projects.length} projects, ${objectives.length} OKRs, ${workEntries.length} work entries`,
-				status: 'info',
-			})
-
-			setRecommendations(generatedRecommendations)
-			setInsights(generatedInsights)
-			setLastUpdated(new Date())
+		} catch (error) {
+			console.error('Failed to load recommendations:', error)
 			setIsLoading(false)
-		}, 1000)
+			toast.error('Failed to load AI recommendations')
+		}
 	}
 
 	// Message handlers

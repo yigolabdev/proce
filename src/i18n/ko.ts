@@ -384,6 +384,7 @@ export const ko = {
   aiRec: {
     title: 'AI 제안',
     description: '업무 데이터를 기반으로 한 AI 기반 작업 추천',
+    generate: 'AI 추천 생성',
     createTask: '작업 생성',
     aiGenerated: 'AI 생성',
     totalPending: '총 대기 중',
@@ -553,6 +554,7 @@ export const ko = {
     tabs: {
       profile: 'Profile',
       account: '계정 및 보안',
+      
       notifications: '알림',
     },
     profile: {

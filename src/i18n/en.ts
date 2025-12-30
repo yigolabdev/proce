@@ -471,6 +471,7 @@ export const en = {
   aiRec: {
     title: 'AI Recommendations',
     description: 'AI-powered task recommendations based on your work data',
+    generate: 'Generate AI Recommendations',
     createTask: 'Create Task',
     aiGenerated: 'AI Generated',
     totalPending: 'Total Pending',
