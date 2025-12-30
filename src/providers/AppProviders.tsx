@@ -68,11 +68,15 @@ const TasksPage = lazy(() => import('../app/tasks/page'))
 const UsersManagementPage = lazy(() => import('../app/admin/users/page'))
 const SystemSettingsPage = lazy(() => import('../app/admin/system-settings/page'))
 const CompanySettingsPage = lazy(() => import('../app/admin/company-settings/page'))
+const CompanyStrategyPage = lazy(() => import('../app/admin/company-strategy/page'))
 
 // Executive Pages
 const ExecutiveDashboardPage = lazy(() => import('../app/executive/page'))
 const ExecutiveGoalsPage = lazy(() => import('../app/executive/goals/page'))
 const PerformancePage = lazy(() => import('../app/performance/page'))
+
+// Analytics & Insights
+const InsightsPage = lazy(() => import('../app/insights/page'))
 
 // Other Pages
 const IntegrationsPage = lazy(() => import('../app/integrations/page'))
@@ -135,11 +139,13 @@ const appRoutes = [
 	{ path: 'admin/users', element: withSuspense(UsersManagementPage) },
 	{ path: 'admin/system-settings', element: withSuspense(SystemSettingsPage) },
 	{ path: 'admin/company-settings', element: withSuspense(CompanySettingsPage), errorElement: <RouteError /> },
+	{ path: 'admin/company-strategy', element: withSuspense(CompanyStrategyPage) },
 	// 임원 메뉴
 	{ path: 'executive', element: withSuspense(ExecutiveDashboardPage) },
 	{ path: 'executive/goals', element: withSuspense(ExecutiveGoalsPage) },
 	{ path: 'analytics', element: <Navigate to="/app/executive" replace /> },
 	{ path: 'performance', element: withSuspense(PerformancePage) },
+	{ path: 'insights', element: withSuspense(InsightsPage) },
 	// 기타
 	{ path: 'org/setup', element: <Navigate to="/app/admin/company-settings?tab=workplace" replace /> },
 	{ path: 'integrations', element: withSuspense(IntegrationsPage) },
