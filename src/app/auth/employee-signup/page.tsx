@@ -6,6 +6,7 @@ import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { Users, ArrowLeft, Key, Building2, Mail, Lock, User, Phone, Briefcase, UserCog, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { signupService } from '../../../services/api/signup.service'
 
 interface Department {
 	id: string
@@ -51,25 +52,11 @@ export default function EmployeeSignUpPage() {
 	const [customDepartment, setCustomDepartment] = useState('')
 	const [customPosition, setCustomPosition] = useState('')
 	const [selectedJobId, setSelectedJobId] = useState('')
-	
-	// Email verification states
-	const [isCodeSent, setIsCodeSent] = useState(false)
-	const [sentCode, setSentCode] = useState('')
-	const [verificationCode, setVerificationCode] = useState('')
-	const [timeLeft, setTimeLeft] = useState(0)
-	const [isEmailVerified, setIsEmailVerified] = useState(false)
+	const [isVerifying, setIsVerifying] = useState(false)
 	
 	// TODO: Remove development features before production deployment
 	// Development mode check
 	const isDevelopment = true // import.meta.env.DEV
-	
-	// Timer effect for email verification
-	useEffect(() => {
-		if (timeLeft > 0) {
-			const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
-			return () => clearTimeout(timer)
-		}
-	}, [timeLeft])
 	
 	// Country codes for phone numbers
 	const countryCodes = [
@@ -210,76 +197,58 @@ export default function EmployeeSignUpPage() {
 		setData((prev) => ({ ...prev, [field]: value }))
 	}
 
-	// Send email verification code
-	const handleSendCode = async () => {
+	const handleVerifyCode = async () => {
 		if (!data.email) {
 			toast.error('Please enter your email address')
 			return
 		}
-		
+
 		// Simple email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 		if (!emailRegex.test(data.email)) {
 			toast.error('Please enter a valid email address')
 			return
 		}
-		
-		// Generate random 6-digit code
-		const code = Math.floor(100000 + Math.random() * 900000).toString()
-		setSentCode(code)
-		setIsCodeSent(true)
-		setTimeLeft(180) // 3 minutes
-		
-		// TODO: Replace with actual API call to send email
-		toast.success(`Verification code sent to ${data.email}`)
-		toast.info(`Demo code: ${code}`, { duration: 5000 })
-	}
-	
-	// Verify email code
-	const handleVerifyEmailCode = async () => {
-		if (!verificationCode) {
-			toast.error('Please enter the verification code')
-			return
-		}
-		
-		if (verificationCode !== sentCode) {
-			toast.error('Invalid verification code')
-			return
-		}
-		
-		setIsEmailVerified(true)
-		toast.success('Email verified successfully!')
-	}
-	
-	// Resend verification code
-	const handleResendCode = () => {
-		handleSendCode()
-	}
 
-	const handleVerifyCode = async () => {
 		if (!data.inviteCode) {
 			toast.error('Please enter the invite code')
 			return
 		}
-		
-		if (!isEmailVerified) {
-			toast.error('Please verify your email first')
-			return
-		}
 
-		// Mock API call - verify invite code
 		if (data.inviteCode.length < 6) {
-			toast.error('Please enter a valid invite code')
+			toast.error('Please enter a valid invite code (at least 6 characters)')
 			return
 		}
 
-		// Mock company info
-		setCompanyInfo({
-			name: 'Tech Company Inc.',
-			industry: 'IT/Software',
-		})
-		toast.success('Invite code verified successfully')
-		setStep(2)
+		setIsVerifying(true)
+		
+		try {
+			// 백엔드 API 호출: 이메일과 초대코드 검증
+			const response = await signupService.verifyInviteCode(data.email, data.inviteCode)
+			
+			if (response.success) {
+				// 회사 정보 설정
+				if (response.data) {
+					setCompanyInfo({
+						name: response.data.companyName,
+						industry: response.data.industry,
+					})
+				}
+				toast.success('Invite code verified successfully!')
+				setStep(2)
+			} else {
+				toast.error(response.message || 'Invalid invite code or email')
+			}
+		} catch (error) {
+			console.error('Invite code verification failed:', error)
+			toast.error(
+				error instanceof Error 
+					? error.message 
+					: 'Failed to verify invite code. Please try again.'
+			)
+		} finally {
+			setIsVerifying(false)
+		}
 	}
 
 	const handleSubmit = async () => {
@@ -305,18 +274,45 @@ export default function EmployeeSignUpPage() {
 			return
 		}
 
-		// Mock API call
-		console.log('Submitting with:', {
-			...data,
-			department: finalDepartment,
-			position: finalPosition,
-			jobs: data.jobs,
-		})
+		setIsVerifying(true)
 		
-		toast.success('Employee registration completed successfully! Please sign in.')
-		setTimeout(() => {
-			navigate('/')
-		}, 1500)
+		try {
+			// 백엔드 API 호출: 직원 회원가입 완료
+			const signupData = {
+				inviteCode: data.inviteCode,
+				username: data.username,
+				name: data.name,
+				email: data.email,
+				password: data.password,
+				phone: `${data.countryCode}${data.phone}`,
+				countryCode: data.countryCode,
+				department: finalDepartment,
+				position: finalPosition,
+				jobs: data.jobs,
+			}
+
+			const response = await signupService.completeEmployeeSignup(signupData)
+			
+			if (response.success) {
+				toast.success('Employee registration completed successfully! Please sign in.', {
+					description: 'Redirecting to login page...'
+				})
+				setTimeout(() => {
+					navigate('/')
+				}, 1500)
+			} else {
+				toast.error(response.message || 'Registration failed. Please try again.')
+			}
+		} catch (error) {
+			console.error('Employee signup failed:', error)
+			toast.error(
+				error instanceof Error 
+					? error.message 
+					: 'Registration failed. Please try again.'
+			)
+		} finally {
+			setIsVerifying(false)
+		}
 	}
 
 	const handleDepartmentChange = (value: string) => {
@@ -388,19 +384,19 @@ export default function EmployeeSignUpPage() {
 				Employee Sign Up
 			</h1>
 			<p className="mt-2 text-neutral-300">
-				Join your company using the invite code from your administrator
+				Join your company with your email and invite code
 			</p>
 		</div>
 
 		<Card>
 			<CardHeader>
 				<h2 className="text-xl font-bold">
-					{step === 1 && 'Enter Invite Code'}
+					{step === 1 && 'Enter Email & Invite Code'}
 					{step === 2 && 'Employee Information'}
 				</h2>
 			</CardHeader>
 			<CardContent>
-			{/* Step 1: Invite Code */}
+			{/* Step 1: Email & Invite Code */}
 			{step === 1 && (
 				<div className="space-y-6">
 					<div className="text-center py-8">
@@ -408,115 +404,54 @@ export default function EmployeeSignUpPage() {
 							<Key className="h-10 w-10 text-green-400" />
 						</div>
 						<p className="text-neutral-400 mb-6">
-							Verify your email and enter the invite code from your administrator
+							Enter your email and invite code from your administrator
 						</p>
 					</div>
 
-					{/* Email Input & Verification */}
+					{/* Email Input */}
 					<div>
 						<label className="block text-sm font-medium mb-2">
+							<Mail className="inline h-4 w-4 mr-1" />
 							Email Address <span className="text-red-500">*</span>
 						</label>
-						<div className="flex gap-2">
-							<Input
-								type="email"
-								placeholder="your.email@company.com"
-								value={data.email}
-								onChange={(e) => handleChange('email', e.target.value)}
-								disabled={isEmailVerified}
-								className={isEmailVerified ? 'bg-green-900/20 border-green-500' : ''}
-							/>
-							{!isEmailVerified && (
-								<Button
-									onClick={handleSendCode}
-									variant="outline"
-									disabled={isCodeSent && timeLeft > 0}
-									className="whitespace-nowrap"
-								>
-									{isCodeSent && timeLeft > 0 ? `Resend (${timeLeft}s)` : 'Send Code'}
-								</Button>
-							)}
-							{isEmailVerified && (
-								<Button variant="outline" disabled className="bg-green-900/20 border-green-500 text-green-400">
-									✓ Verified
-								</Button>
-							)}
-						</div>
-						{!isEmailVerified && (
-							<p className="text-xs text-neutral-400 mt-2">
-								💡 Use your company email address
-							</p>
-						)}
-						{isEmailVerified && (
-							<p className="text-xs text-green-400 mt-2">
-								✓ Email verified successfully
-							</p>
-						)}
+						<Input
+							type="email"
+							placeholder="your.email@company.com"
+							value={data.email}
+							onChange={(e) => handleChange('email', e.target.value)}
+							disabled={isVerifying}
+						/>
+						<p className="text-xs text-neutral-400 mt-2">
+							💡 Use your company email address
+						</p>
 					</div>
 
-					{/* Email Verification Code Input */}
-					{isCodeSent && !isEmailVerified && (
-						<div className="space-y-4 pt-4 border-t border-neutral-800">
-							<div>
-								<label className="block text-sm font-medium mb-2">
-									Verification Code <span className="text-red-500">*</span>
-								</label>
-								<Input
-									type="text"
-									placeholder="Enter 6-digit code"
-									value={verificationCode}
-									onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-									className="text-center text-lg font-mono tracking-wider"
-									maxLength={6}
-								/>
-								<div className="flex items-center justify-between mt-2">
-									<p className="text-xs text-neutral-400">
-										Code sent to {data.email}
-									</p>
-									{timeLeft > 0 ? (
-										<p className="text-xs text-orange-400 font-mono">
-											{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-										</p>
-									) : (
-										<button
-											onClick={handleResendCode}
-											className="text-xs text-green-400 hover:underline"
-										>
-											Resend code
-										</button>
-									)}
-								</div>
-							</div>
-							<Button onClick={handleVerifyEmailCode} className="w-full">
-								Verify Email
-							</Button>
-						</div>
-					)}
+					{/* Invite Code Input */}
+					<div>
+						<label className="block text-sm font-medium mb-2">
+							<Key className="inline h-4 w-4 mr-1" />
+							Invite Code <span className="text-red-500">*</span>
+						</label>
+						<Input
+							type="text"
+							placeholder="e.g., ABC12345"
+							value={data.inviteCode}
+							onChange={(e) => handleChange('inviteCode', e.target.value.toUpperCase())}
+							className="text-center text-lg font-mono tracking-wider"
+							disabled={isVerifying}
+						/>
+						<p className="text-xs text-neutral-400 mt-2">
+							Enter the invite code from your administrator
+						</p>
+					</div>
 
-					{/* Invite Code Input - Only show after email verification */}
-					{isEmailVerified && (
-						<div className="pt-4 border-t border-neutral-800">
-							<label className="block text-sm font-medium mb-2">
-								Invite Code <span className="text-red-500">*</span>
-							</label>
-							<Input
-								type="text"
-								placeholder="e.g., ABC12345"
-								value={data.inviteCode}
-								onChange={(e) => handleChange('inviteCode', e.target.value.toUpperCase())}
-								className="text-center text-lg font-mono tracking-wider"
-							/>
-							<p className="text-xs text-neutral-400 mt-2">
-								Enter the invite code from your administrator
-							</p>
-						</div>
-					)}
-
-					{isEmailVerified && (
-						<Button onClick={handleVerifyCode} className="w-full">
-							Verify & Continue
-						</Button>
-					)}
+					<Button 
+						onClick={handleVerifyCode} 
+						className="w-full"
+						disabled={isVerifying || !data.email || !data.inviteCode}
+					>
+						{isVerifying ? 'Verifying...' : 'Verify & Continue'}
+					</Button>
 
 					{/* Development: Skip to Step 2 */}
 					{isDevelopment && (
@@ -527,8 +462,7 @@ export default function EmployeeSignUpPage() {
 							<Button
 								variant="outline"
 								onClick={() => {
-									setData(prev => ({ ...prev, email: 'employee@company.com' }))
-									setIsEmailVerified(true)
+									setData(prev => ({ ...prev, email: 'employee@company.com', inviteCode: 'TEST123' }))
 									setCompanyInfo({
 										name: 'Tech Company Inc.',
 										industry: 'IT/Software',
@@ -598,17 +532,17 @@ export default function EmployeeSignUpPage() {
 						<div>
 							<label className="block text-sm font-medium mb-2">
 								<Mail className="inline h-4 w-4 mr-1" />
-								Email <span className="text-green-400 text-xs">(Verified)</span>
+								Email <span className="text-green-400 text-xs">(From Step 1)</span>
 							</label>
 							<Input
 								type="email"
 								placeholder="your.email@company.com"
 								value={data.email}
 								disabled
-								className="bg-green-900/20 border-green-500"
+								className="bg-neutral-900 border-neutral-700"
 							/>
-							<p className="text-xs text-green-400 mt-1">
-								✓ This email has been verified
+							<p className="text-xs text-neutral-400 mt-1">
+								This email was verified with the invite code
 							</p>
 						</div>
 
@@ -803,8 +737,8 @@ export default function EmployeeSignUpPage() {
 							</div>
 						</div>
 
-						<Button onClick={handleSubmit} className="w-full mt-6">
-							Complete Registration
+						<Button onClick={handleSubmit} className="w-full mt-6" disabled={isVerifying}>
+							{isVerifying ? 'Registering...' : 'Complete Registration'}
 						</Button>
 
 						{/* Development: Skip to Login */}

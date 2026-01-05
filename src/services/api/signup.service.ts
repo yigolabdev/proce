@@ -76,6 +76,24 @@ export interface CompanySignupRequest {
 	phone_number: string
 }
 
+export interface VerifyInviteCodeRequest {
+	email: string
+	inviteCode: string
+}
+
+export interface EmployeeSignupRequest {
+	inviteCode: string
+	username: string
+	name: string
+	email: string
+	password: string
+	phone: string
+	countryCode: string
+	department: string
+	position: string
+	jobs: string[]
+}
+
 // ==================== Response Types ====================
 
 export interface SendVerificationCodeResponse {
@@ -100,6 +118,26 @@ export interface CompanySignupResponse {
 		inviteCode?: string
 	}
 	message?: string
+}
+
+export interface VerifyInviteCodeResponse {
+	code: string
+	success: boolean
+	message: string
+	data?: {
+		companyName: string
+		industry: string
+	}
+}
+
+export interface EmployeeSignupResponse {
+	code: string
+	success: boolean
+	message: string
+	data?: {
+		userId: string
+		username: string
+	}
 }
 
 // ==================== API Functions ====================
@@ -148,10 +186,41 @@ export async function completeCompanySignup(
 }
 
 /**
+ * 직원 초대 코드 검증
+ * POST /employee/verify-invite
+ */
+export async function verifyInviteCode(
+	email: string,
+	inviteCode: string
+): Promise<VerifyInviteCodeResponse> {
+	return signupRequest<VerifyInviteCodeResponse>(
+		'employee/verify-invite',
+		'POST',
+		{ email, inviteCode }
+	)
+}
+
+/**
+ * 직원 회원가입 완료
+ * POST /employee/signup
+ */
+export async function completeEmployeeSignup(
+	data: EmployeeSignupRequest
+): Promise<EmployeeSignupResponse> {
+	return signupRequest<EmployeeSignupResponse>(
+		'employee/signup',
+		'POST',
+		data
+	)
+}
+
+/**
  * Export all signup services
  */
 export const signupService = {
 	sendVerificationCode,
 	verifyEmailCode,
 	completeCompanySignup,
+	verifyInviteCode,
+	completeEmployeeSignup,
 }
