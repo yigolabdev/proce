@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { signupService } from '../../../services/api/signup.service'
+import { validatePassword, isPasswordValid, type PasswordRequirements } from '../../../utils/passwordValidation'
 
 interface CompanyData {
 	// 이메일 인증
@@ -47,10 +48,21 @@ export default function CompanySignUpPage() {
 	const [isEmailVerified, setIsEmailVerified] = useState(false)
 	const [countdown, setCountdown] = useState(0)
 	const [isLoading, setIsLoading] = useState(false)
+	const [passwordRequirements, setPasswordRequirements] = useState<PasswordRequirements>({
+		minLength: false,
+		hasUppercase: false,
+		hasNumber: false,
+		hasSpecialChar: false,
+	})
 	const timerRef = useRef<number | null>(null)
 
 	const handleChange = (field: keyof CompanyData, value: string) => {
 		setData((prev) => ({ ...prev, [field]: value }))
+
+		// 비밀번호 입력 시 실시간 검증
+		if (field === 'adminPassword') {
+			setPasswordRequirements(validatePassword(value))
+		}
 	}
 
 	const handleEmployeeCountSelect = (value: string) => {
@@ -97,7 +109,7 @@ export default function CompanySignUpPage() {
 			toast.error('이메일 주소를 입력해주세요')
 			return
 		}
-		
+
 		// Email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 		if (!emailRegex.test(data.email)) {
@@ -105,11 +117,15 @@ export default function CompanySignUpPage() {
 			return
 		}
 
+		console.log('📧 이메일 인증 코드 발송 시작:', data.email)
+
 		setIsLoading(true)
 		try {
 			// STEP 1: 백엔드 API 호출 - 인증 코드 발송
 			const response = await signupService.sendVerificationCode(data.email)
-			
+
+			console.log('✅ 인증 코드 발송 응답:', response)
+
 			if (response.success) {
 				setIsCodeSent(true)
 				startCountdown()
@@ -118,7 +134,10 @@ export default function CompanySignUpPage() {
 				})
 			}
 		} catch (error) {
-			console.error('인증 코드 발송 실패:', error)
+			console.group('❌ 인증 코드 발송 실패')
+			console.error('Error:', error)
+			console.groupEnd()
+
 			toast.error('인증 코드 발송에 실패했습니다', {
 				description: error instanceof Error ? error.message : '다시 시도해주세요'
 			})
@@ -132,17 +151,24 @@ export default function CompanySignUpPage() {
 			toast.error('인증 코드를 입력해주세요')
 			return
 		}
-		
+
 		if (data.verificationCode.length !== 6) {
 			toast.error('6자리 인증 코드를 입력해주세요')
 			return
 		}
 
+		console.log('🔑 이메일 인증 코드 확인 시작:', {
+			email: data.email,
+			code: data.verificationCode
+		})
+
 		setIsLoading(true)
 		try {
 			// STEP 2: 백엔드 API 호출 - 인증 코드 확인
 			const response = await signupService.verifyEmailCode(data.email, data.verificationCode)
-			
+
+			console.log('✅ 인증 코드 확인 응답:', response)
+
 			if (response.success || response.verified) {
 				setIsEmailVerified(true)
 				toast.success('이메일 인증이 완료되었습니다!')
@@ -150,10 +176,14 @@ export default function CompanySignUpPage() {
 					setStep(2)
 				}, 500)
 			} else {
+				console.warn('⚠️ 인증 실패 (success/verified: false):', response)
 				toast.error('유효하지 않은 인증 코드입니다')
 			}
 		} catch (error) {
-			console.error('인증 코드 확인 실패:', error)
+			console.group('❌ 인증 코드 확인 실패')
+			console.error('Error:', error)
+			console.groupEnd()
+
 			toast.error('인증 코드 확인에 실패했습니다', {
 				description: error instanceof Error ? error.message : '인증 코드를 다시 확인해주세요'
 			})
@@ -193,10 +223,15 @@ export default function CompanySignUpPage() {
 				toast.error('필수 항목을 모두 입력해주세요')
 				return
 			}
-			if (data.adminPassword.length < 8) {
-				toast.error('비밀번호는 최소 8자 이상이어야 합니다')
+
+			// 비밀번호 검증: 최소 8자, 대문자, 숫자, 특수문자 필수
+			if (!isPasswordValid(data.adminPassword)) {
+				toast.error('비밀번호가 규칙을 충족하지 않습니다', {
+					description: '최소 8자, 대문자, 숫자, 특수문자를 포함해야 합니다'
+				})
 				return
 			}
+
 			if (data.adminPassword !== data.adminPasswordConfirm) {
 				toast.error('비밀번호가 일치하지 않습니다')
 				return
@@ -225,7 +260,34 @@ export default function CompanySignUpPage() {
 				phone_number: data.adminPhone,
 			}
 
+			// 🔍 DETAILED LOGGING FOR DEBUGGING
+			console.group('🚀 회사 등록 시작')
+			console.log('📋 Form Data (전체):', data)
+			console.log('📦 Signup Request (전송 데이터):', signupData)
+			console.log('📝 각 필드 상세:')
+			console.table({
+				'회사명': signupData.companyName,
+				'사업자번호': signupData.companyRegistrationNumber,
+				'업종': signupData.industry,
+				'직원 수': signupData.numberOfEmployees,
+				'관리자명': signupData.name,
+				'이메일': signupData.email,
+				'비밀번호': '***hidden***',
+				'사용자명': signupData.username,
+				'전화번호': signupData.phone_number,
+			})
+			console.groupEnd()
+
 			const response = await signupService.completeCompanySignup(signupData)
+
+			// 🔍 RESPONSE LOGGING
+			console.group('✅ 회사 등록 응답')
+			console.log('📥 Response:', response)
+			console.log('🎯 Success:', response.success)
+			if (response.data) {
+				console.log('💾 Data:', response.data)
+			}
+			console.groupEnd()
 
 			if (response.success) {
 				toast.success('기업 회원가입이 완료되었습니다!', {
@@ -234,8 +296,8 @@ export default function CompanySignUpPage() {
 
 				// 초대 코드가 있다면 표시
 				if (response.data?.inviteCode) {
-					toast.success(`직원 초대 코드: ${response.data.inviteCode}`, { 
-						duration: 10000 
+					toast.success(`직원 초대 코드: ${response.data.inviteCode}`, {
+						duration: 10000
 					})
 				}
 
@@ -244,12 +306,26 @@ export default function CompanySignUpPage() {
 					navigate('/dashboard')
 				}, 2000)
 			} else {
+				console.group('⚠️ 회사 등록 실패 (success: false)')
+				console.error('Response:', response)
+				console.error('Message:', response.message)
+				console.groupEnd()
+
 				toast.error('회사 등록에 실패했습니다', {
 					description: response.message || '다시 시도해주세요'
 				})
 			}
 		} catch (error) {
-			console.error('회사 등록 실패:', error)
+			// 🔍 CATCH ERROR LOGGING
+			console.group('💥 회사 등록 예외 발생')
+			console.error('Error Object:', error)
+			console.error('Error Type:', error instanceof Error ? 'Error' : typeof error)
+			if (error instanceof Error) {
+				console.error('Error Message:', error.message)
+				console.error('Error Stack:', error.stack)
+			}
+			console.groupEnd()
+
 			toast.error('회사 등록에 실패했습니다', {
 				description: error instanceof Error ? error.message : '다시 시도해주세요'
 			})
@@ -287,8 +363,8 @@ export default function CompanySignUpPage() {
 							employeeCountExact: '',
 							adminName: 'Admin User',
 							adminEmail: 'test@company.com',
-							adminPassword: 'password123',
-							adminPasswordConfirm: 'password123',
+							adminPassword: 'Password123!',
+							adminPasswordConfirm: 'Password123!',
 							adminPhone: '010-1234-5678',
 						})
 						setIsCodeSent(true)
@@ -694,11 +770,79 @@ export default function CompanySignUpPage() {
 							</label>
 							<Input
 								type="password"
-								placeholder="최소 8자"
+								placeholder="비밀번호 입력"
 								value={data.adminPassword}
 								onChange={(e) => handleChange('adminPassword', e.target.value)}
 								className="h-12"
 							/>
+
+							{/* 비밀번호 요구사항 실시간 표시 */}
+							{data.adminPassword && (
+								<div className="mt-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
+									<p className="text-xs font-medium text-neutral-400 mb-2">비밀번호 요구사항:</p>
+									<div className="space-y-1.5">
+										<div className="flex items-center gap-2">
+											{passwordRequirements.minLength ? (
+												<Check className="h-4 w-4 text-green-500" />
+											) : (
+												<X className="h-4 w-4 text-red-500" />
+											)}
+											<span className={`text-xs ${passwordRequirements.minLength ? 'text-green-500' : 'text-neutral-400'}`}>
+												최소 8자 이상
+											</span>
+										</div>
+										<div className="flex items-center gap-2">
+											{passwordRequirements.hasUppercase ? (
+												<Check className="h-4 w-4 text-green-500" />
+											) : (
+												<X className="h-4 w-4 text-red-500" />
+											)}
+											<span className={`text-xs ${passwordRequirements.hasUppercase ? 'text-green-500' : 'text-neutral-400'}`}>
+												대문자 1개 이상 (A-Z)
+											</span>
+										</div>
+										<div className="flex items-center gap-2">
+											{passwordRequirements.hasNumber ? (
+												<Check className="h-4 w-4 text-green-500" />
+											) : (
+												<X className="h-4 w-4 text-red-500" />
+											)}
+											<span className={`text-xs ${passwordRequirements.hasNumber ? 'text-green-500' : 'text-neutral-400'}`}>
+												숫자 1개 이상 (0-9)
+											</span>
+										</div>
+										<div className="flex items-center gap-2">
+											{passwordRequirements.hasSpecialChar ? (
+												<Check className="h-4 w-4 text-green-500" />
+											) : (
+												<X className="h-4 w-4 text-red-500" />
+											)}
+											<span className={`text-xs ${passwordRequirements.hasSpecialChar ? 'text-green-500' : 'text-neutral-400'}`}>
+												특수문자 1개 이상 (!@#$%^&* 등)
+											</span>
+										</div>
+									</div>
+
+									{/* 모든 조건 충족 시 메시지 */}
+									{isPasswordValid(data.adminPassword) && (
+										<div className="mt-2 pt-2 border-t border-neutral-700">
+											<div className="flex items-center gap-2">
+												<CheckCircle2 className="h-4 w-4 text-green-500" />
+												<span className="text-xs font-medium text-green-500">
+													안전한 비밀번호입니다!
+												</span>
+											</div>
+										</div>
+									)}
+								</div>
+							)}
+
+							{/* 안내 문구 (비밀번호 입력 전) */}
+							{!data.adminPassword && (
+								<p className="text-xs text-neutral-500 mt-2">
+									최소 8자, 대문자, 숫자, 특수문자를 포함해야 합니다
+								</p>
+							)}
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-2">
@@ -734,13 +878,13 @@ export default function CompanySignUpPage() {
 						
 						{/* Dev Mode: Auto-fill and Skip */}
 						
-							<Button 
+							<Button
 								onClick={() => {
 									setData(prev => ({
 										...prev,
 										adminName: 'Admin User',
-										adminPassword: 'password123',
-										adminPasswordConfirm: 'password123',
+										adminPassword: 'Password123!',
+										adminPasswordConfirm: 'Password123!',
 										adminPhone: '010-1234-5678',
 									}))
 									toast.success('⚡ Dev Mode: Admin info auto-filled')

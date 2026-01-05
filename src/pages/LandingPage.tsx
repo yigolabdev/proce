@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Eye, EyeOff, Quote, Loader2, Shield, Users, Briefcase, Languages } from 'lucide-react'
 import { Button } from '../components/ui/Button'
-import { signInWithPassword } from '../app/auth/_mocks/authApi'
+import { authService } from '../services/api/auth.service'
 import { track } from '../lib/analytics'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../i18n/I18nProvider'
@@ -70,7 +70,7 @@ export default function LandingPage() {
 
 	async function handleSignIn(e: React.FormEvent) {
 		e.preventDefault()
-		
+
 		const clean = email.trim().toLowerCase()
 		if (!validateEmail(clean)) {
 			toast.error(tt.errors.enterValidEmail)
@@ -84,20 +84,87 @@ export default function LandingPage() {
 		try {
 			setSubmitting(true)
 			track('sign_in_start', { method: 'password' })
-			const res = await signInWithPassword(clean, password)
-			
-			if (!res.ok) {
-				track('sign_in_error', { error: res.error })
-				toast.error(tt.errors.invalidCredentials)
-				return
+
+			// 🔍 DETAILED LOGGING FOR DEBUGGING
+			console.group('🔐 로그인 시작')
+			console.log('📧 Email:', clean)
+			console.log('📦 SignIn Request:', { email: clean, password: '***hidden***' })
+			console.groupEnd()
+
+			// Real API call: SignIn
+			const response = await authService.signIn({
+				email: clean,
+				password
+			})
+
+			// 🔍 RESPONSE LOGGING
+			console.group('✅ 로그인 응답')
+			console.log('📥 Response:', response)
+			console.log('💬 Message:', response.message)
+			console.log('🔑 AccessToken received:', response.tokens?.AccessToken ? 'Yes' : 'No')
+			console.log('🔄 RefreshToken received:', response.tokens?.RefreshToken ? 'Yes' : 'No')
+			console.log('⏰ Token expires in:', response.tokens?.ExpiresIn, 'seconds')
+			console.groupEnd()
+
+			// Store JWT tokens in localStorage
+			if (response.tokens?.AccessToken) {
+				try {
+					window.localStorage.setItem('proce:accessToken', response.tokens.AccessToken)
+					console.log('✅ Access Token 저장 완료:', response.tokens.AccessToken.substring(0, 20) + '...')
+				} catch (error) {
+					console.error('❌ Access Token 저장 실패:', error)
+				}
 			}
-			
+
+			if (response.tokens?.RefreshToken) {
+				try {
+					window.localStorage.setItem('proce:refreshToken', response.tokens.RefreshToken)
+					console.log('✅ Refresh Token 저장 완료')
+				} catch (error) {
+					console.error('❌ Refresh Token 저장 실패:', error)
+				}
+			}
+
+			// TODO: Backend API doesn't return user info in signin response
+			// Need to either:
+			// 1. Decode JWT token to extract user info (limited info)
+			// 2. Call separate API (e.g., GET /auth/me or GET /user/profile) to get full user info
+			// For now, creating minimal user object from email
+			const tempUser = {
+				id: '', // TODO: Get from JWT or separate API
+				email: clean,
+				name: clean.split('@')[0], // Temporary: use email prefix as name
+				role: 'user' as const, // TODO: Get from JWT or separate API
+				companyId: '', // TODO: Get from JWT or separate API
+				department: undefined,
+				position: undefined,
+			}
+
+			login(tempUser)
+			console.log('⚠️ 임시 사용자 정보 AuthContext에 저장 (TODO: 실제 user API 연동 필요)')
+
 			track('sign_in_success')
-			try { window.localStorage.setItem('proce:remember', JSON.stringify({ email: clean })) } catch {}
-			
+
+			// Save email for "Remember me"
+			try {
+				window.localStorage.setItem('proce:remember', JSON.stringify({ email: clean }))
+			} catch {}
+
+			console.log('🚀 대시보드로 이동...')
 			navigate('/app/dashboard')
 		} catch (error) {
-			toast.error(tt.errors.signInError)
+			// 🔍 CATCH ERROR LOGGING
+			console.group('💥 로그인 예외 발생')
+			console.error('Error Object:', error)
+			console.error('Error Type:', error instanceof Error ? 'Error' : typeof error)
+			if (error instanceof Error) {
+				console.error('Error Message:', error.message)
+				console.error('Error Stack:', error.stack)
+			}
+			console.groupEnd()
+
+			// 400 error means invalid credentials
+			toast.error(tt.errors.invalidCredentials)
 		} finally {
 			setSubmitting(false)
 		}
