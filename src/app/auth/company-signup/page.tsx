@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card'
 import Input from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
-import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2, X } from 'lucide-react'
+import { Building2, ArrowRight, ArrowLeft, Check, Home, Mail, RefreshCw, CheckCircle2, X, Languages } from 'lucide-react'
 import { toast } from 'sonner'
 import Toaster from '../../../components/ui/Toaster'
 import { signupService } from '../../../services/api/signup.service'
 import { validatePassword, isPasswordValid, type PasswordRequirements } from '../../../utils/passwordValidation'
+import { useI18n } from '../../../i18n/I18nProvider'
+import { companySignupI18n } from './_i18n/companySignup.i18n'
 
 interface CompanyData {
 	// 이메일 인증
@@ -29,6 +31,8 @@ interface CompanyData {
 
 export default function CompanySignUpPage() {
 	const navigate = useNavigate()
+	const { locale, setLocale } = useI18n()
+	const t = useMemo(() => companySignupI18n[locale as keyof typeof companySignupI18n], [locale])
 	const [step, setStep] = useState(1) // 1: Email Verification, 2: Company Info, 3: Admin Info, 4: Complete
 	const [data, setData] = useState<CompanyData>({
 		email: '',
@@ -106,14 +110,14 @@ export default function CompanySignUpPage() {
 
 	const handleSendCode = async () => {
 		if (!data.email) {
-			toast.error('이메일 주소를 입력해주세요')
+			toast.error(t.errors.enterEmail)
 			return
 		}
 
 		// Email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 		if (!emailRegex.test(data.email)) {
-			toast.error('유효한 이메일 주소를 입력해주세요')
+			toast.error(t.errors.invalidEmail)
 			return
 		}
 
@@ -129,8 +133,8 @@ export default function CompanySignUpPage() {
 			if (response.success) {
 				setIsCodeSent(true)
 				startCountdown()
-				toast.success('인증 코드가 발송되었습니다!', {
-					description: '이메일을 확인해주세요'
+				toast.success(t.codeSent, {
+					description: t.checkEmail
 				})
 			}
 		} catch (error) {
@@ -138,8 +142,8 @@ export default function CompanySignUpPage() {
 			console.error('Error:', error)
 			console.groupEnd()
 
-			toast.error('인증 코드 발송에 실패했습니다', {
-				description: error instanceof Error ? error.message : '다시 시도해주세요'
+			toast.error(t.errors.sendCodeFailed, {
+				description: error instanceof Error ? error.message : t.errors.tryAgain
 			})
 		} finally {
 			setIsLoading(false)
@@ -344,10 +348,20 @@ export default function CompanySignUpPage() {
 				className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-primary transition-colors"
 			>
 				<Home className="h-4 w-4" />
-				<span>홈으로 돌아가기</span>
+				<span>{t.backToHome}</span>
 			</button>
 			
 		<div className="flex items-center gap-4">
+			{/* Language Switcher */}
+			<button
+				onClick={() => setLocale(locale === 'en' ? 'ko' : 'en')}
+				className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full bg-neutral-900/90 backdrop-blur-sm border border-neutral-800 text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors"
+				aria-label="toggle language"
+			>
+				<Languages size={14} />
+				<span className="text-xs">{locale === 'ko' ? 'EN' : '한글'}</span>
+			</button>
+
 			{/* TODO: Remove development features before production deployment */}
 			{/* Dev Mode: Skip All Steps */}
 			{step < 4 && (
@@ -376,7 +390,7 @@ export default function CompanySignUpPage() {
 					variant="outline"
 					className="text-orange-400 border-orange-700 hover:hover:bg-orange-900/20"
 				>
-					⚡ 모든 단계 건너뛰기
+					⚡ {t.skipAll}
 				</Button>
 			)}
 				
@@ -386,7 +400,7 @@ export default function CompanySignUpPage() {
 						className="flex items-center gap-2 text-sm text-neutral-400 hover:hover:text-neutral-100 transition-colors"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span>이전</span>
+						<span>{t.previous}</span>
 					</button>
 				)}
 			</div>
@@ -397,9 +411,9 @@ export default function CompanySignUpPage() {
 			<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
 				<Building2 className="h-8 w-8 text-primary" />
 			</div>
-			<h1 className="text-3xl font-bold mb-2">기업 회원가입</h1>
+			<h1 className="text-3xl font-bold mb-2">{t.title}</h1>
 			<p className="text-neutral-400">
-				회사를 등록하고 관리자 계정을 만드세요
+				{t.subtitle}
 			</p>
 		</div>
 
@@ -407,10 +421,10 @@ export default function CompanySignUpPage() {
 		<div className="mb-10">
 			<div className="flex items-center max-w-3xl mx-auto">
 				{[
-					{ num: 1, label: '이메일 인증' },
-					{ num: 2, label: '회사 정보' },
-					{ num: 3, label: '관리자 정보' },
-					{ num: 4, label: '완료' },
+					{ num: 1, label: t.steps.emailVerification },
+					{ num: 2, label: t.steps.companyInfo },
+					{ num: 3, label: t.steps.adminInfo },
+					{ num: 4, label: t.steps.complete },
 				].map((s, index) => (
 						<div key={s.num} className="flex items-center flex-1">
 							{/* Step Circle */}
@@ -454,16 +468,16 @@ export default function CompanySignUpPage() {
 			<Card className="max-w-2xl mx-auto shadow-xl">
 			<CardHeader className="border-b border-neutral-800">
 				<h2 className="text-2xl font-bold">
-					{step === 1 && '이메일 인증'}
-					{step === 2 && '회사 정보'}
-					{step === 3 && '관리자 정보'}
-					{step === 4 && '등록 완료'}
+					{step === 1 && t.steps.emailVerification}
+					{step === 2 && t.steps.companyInfo}
+					{step === 3 && t.steps.adminInfo}
+					{step === 4 && t.steps.complete}
 				</h2>
 				<p className="text-sm text-neutral-400 mt-1">
-					{step === 1 && '이메일을 인증하여 무단 가입을 방지합니다'}
-					{step === 2 && '회사 세부 정보를 입력하세요'}
-					{step === 3 && '관리자 계정을 생성하세요'}
-					{step === 4 && '등록 정보를 검토하고 확인하세요'}
+					{step === 1 && t.stepDescriptions.emailVerification}
+					{step === 2 && t.stepDescriptions.companyInfo}
+					{step === 3 && t.stepDescriptions.adminInfo}
+					{step === 4 && t.stepDescriptions.complete}
 				</p>
 			</CardHeader>
 				<CardContent className="p-8">
